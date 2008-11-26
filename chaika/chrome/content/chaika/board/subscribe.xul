@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/subscribe.css" type="text/css"?>
+
+<page id="pageMain" title="購読 [chaika]"
+		onload="startup()" onunload="shutdown()"
+		onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/rdf.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/downloader.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/items.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/subscribe.js"/>
+
+<popupset>
+	<popup id="treeSubscribeContext"
+				onpopupshowing="return showTreeSubscribeContext(event)">
+		<menuitem label="開く" oncommand="openThread(false)"/>
+		<menuitem label="新しいタブで開く" oncommand="openThread(true)"/>
+		<menuseparator/>
+		<menuitem label="URL のコピー" oncommand="copyURL()" disabled="true"/>
+		<menuitem label="URL とタイトルのコピー" oncommand="copyTitleAndURL()" disabled="true"/>
+		<menuseparator/>
+		<menuitem label="ログの削除" oncommand="deleteLog()"/>
+	</popup>
+</popupset>
+
+<hbox align="center">
+	<label id="lblStatus" flex="1" crop="start"/>
+	<spacer class="small-margin"/>
+	<toolbarbutton label="ツール" type="menu">
+		<menupopup>
+				<menuitem label="Manage Subscribe Boards" oncommand="openSubscribeManager()"/>
+				<menuseparator/>
+				<menuitem label="オプション..." oncommand="openSettings()"/>
+		</menupopup>
+	</toolbarbutton>
+	<toolbarbutton id="btnUpdate" label="更新" oncommand="subjectUpdateAll()"/>
+	<spacer class="small-margin"/>
+</hbox>
+
+<tree id="treeSubscribe" flags="dont-build-content" class="plain" flex="1"
+		context="treeSubscribeContext" hidecolumnpicker="true"
+		onclick="treeSubscribeClick(event)" onkeypress="treeSubscribeKeyDown(event)"
+		datasources="rdf:null" ref="urn:b2rSubscribe:root">
+	<treecols>
+		<treecol id="title" hideheader="true" flex="1" primary="true"/>
+	</treecols>
+
+	<template>
+		<rule iscontainer="true">
+			<treechildren>
+				<treeitem uri="rdf:*">
+					<treerow>
+						<treecell label="rdf:http://bbs2ch.sourceforge.jp/#title"
+								properties="Name rdf:http://bbs2ch.sourceforge.jp/#state"/>
+					</treerow>
+				</treeitem>
+			</treechildren>
+		</rule>
+		<rule>
+			<treechildren>
+				<treeitem uri="rdf:*">
+					<treerow>
+						<treecell label="[ rdf:http://bbs2ch.sourceforge.jp/#unread ] rdf:http://bbs2ch.sourceforge.jp/#title"
+									properties="Name rdf:http://bbs2ch.sourceforge.jp/#state"/>
+					</treerow>
+				</treeitem>
+			</treechildren>
+		</rule>
+	</template>
+</tree>
+<splitter id="spltrSubscribeManager" collapsed="true"/>
+<vbox id="boxSubscribeManager" height="160" collapsed="true">
+	<textbox id="txtSubscribeManager" flex="1" multiline="true"/>
+	<hbox class="box-padded" align="center">
+		<label value="購読したい板のURLを一行ずつ書く" crop="start" flex="1"/>
+		<button label="Ok" oncommand="acceptSubscribeManager()" style="min-width:4em;"/>
+		<button label="Cancel" oncommand="closeSubscribeManager()" style="min-width:4em;"/>
+	</hbox>
+</vbox>
+</page>

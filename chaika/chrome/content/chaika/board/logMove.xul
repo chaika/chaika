@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<dialog id="winMain" class="plain" buttons="cancel" defaultButton="cancel"
+	title="ログファイルの移動 [chaika]" onload="startup()"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/logMove.js"/>
+
+<hbox class="wizard-header" id="hdrDialog" label="" description=""/>
+<vbox width="420" class="spaced">
+	<hbox class="spaced" flex="1">
+		<label id="lblStatus" flex="1" value="" crop="start"/>
+	</hbox>
+	<progressmeter id="progress" flex="1"/>
+</vbox>
+
+</dialog>

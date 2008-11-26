@@ -1,0 +1,29 @@
+#include "nsISupports.idl"
+
+interface nsIVariant;
+
+[scriptable, uuid(cfdf8cd6-c1b2-4d17-a82b-0616d457e647)]
+interface b2rIAboneManager : nsISupports
+{
+
+	const unsigned long ABONE_TYPE_NAME = 0;
+	const unsigned long ABONE_TYPE_MAIL = 1;
+	const unsigned long ABONE_TYPE_ID   = 2;
+	const unsigned long ABONE_TYPE_WORD = 3;
+
+
+	/**
+	 * レスが、NGワードに該当したら真を返す。引数の文字列は SJIS を渡すこと
+	 * @param aName 名前
+	 * @param aMail メールアドレス
+	 * @param aID ID
+	 * @param aMsg レス本文
+	 * @return boolean 該当したら真
+	 */
+	boolean shouldAbone(in AString aName, in AString aMail, in AString aID, in AString aMsg);
+
+	nsIVariant getAboneData(in unsigned long aType);
+
+	boolean addAbone(in AString aWord, in unsigned long aType);
+	boolean removeAbone(in AString aWord, in unsigned long aType);
+};

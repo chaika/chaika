@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="EUC-JP"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<dialog id="winMain" title="Be@2ch ログイン"
+	onload="startup()" onunload="shutdown()" ondialogaccept="return accept()"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<script type="application/x-javascript" src="chrome://chaika/content/belogin/belogin.js"/>
+
+	<script type="application/x-javascript"><![CDATA[
+		var gTxtBeCode;
+		var gTxtBeMail;
+		var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+								.getService(Components.interfaces.nsIBbs2chService);
+
+		function startup(){
+			gTxtBeCode = document.getElementById("txtBeCode");
+			gTxtBeMail = document.getElementById("txtBeMail");
+	
+			gTxtBeCode.value = gTxtBeCode.getAttribute("value2");
+			gTxtBeMail.value = gTxtBeMail.getAttribute("value2");
+		}
+
+
+		function shutdown(){
+			gTxtBeCode.setAttribute("value2", gTxtBeCode.value);
+			gTxtBeMail.setAttribute("value2", gTxtBeMail.value);
+		}
+
+
+		function accept(){
+			if(Bbs2chBeLogin.logined) Bbs2chBeLogin.logout();
+	
+			Bbs2chBeLogin.login(gTxtBeCode.value, gTxtBeMail.value);
+
+			gTxtBeCode.setAttribute("value2", gTxtBeCode.value);
+			gTxtBeMail.setAttribute("value2", gTxtBeMail.value);
+			return true;
+		}
+		
+		function openBe2ch(){
+			gBbs2chService.openURL("http://be.2ch.net/", null, true);
+		}
+	]]></script>
+
+
+
+<vbox style="padding:10px; width:360px;">
+	<hbox align="center">
+		<label value="認証コード" style="width:8em;"/>
+		<textbox id="txtBeCode" type="password" persist="value2" flex="1"/>
+	</hbox>
+	<hbox align="center">
+		<label value="メールアドレス" style="width:8em;"/>
+		<textbox id="txtBeMail" persist="value2" flex="1"/>
+	</hbox>
+	<hbox pack="end">
+		<label value="be.2ch.net" class="text-link" onclick="openBe2ch()"/>
+	</hbox>
+</vbox>
+
+</dialog>

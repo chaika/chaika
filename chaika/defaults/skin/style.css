@@ -1,0 +1,188 @@
+html * {
+  -moz-box-sizing:border-box;
+}
+
+html {
+  background-color: #F6F6F6;
+}
+
+body {
+  color: #111;
+  margin: 4em 0px 0px 0px;
+}
+
+h1 {
+  position: fixed;
+  border-bottom: 1px solid #222;
+  top: 0px;
+  left:0px;
+  right:0px;
+  line-height: 1;
+  margin: 0px;
+  padding:0.6em 5em 0.6em 0.6em;
+  background: #666;
+  color: #EEE;
+  font-size: 0.9em;
+}
+
+#navMenu {
+  position: fixed;
+  top: 0.4em;
+  right: 0.4em;
+  font-size: 0.9em;
+  cursor: default;
+  padding: 0px;
+  margin: 0px;
+  list-style-type: none;
+  line-height: 1;
+}
+
+#navMenu .menuItem {
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #FFF;
+  display: block;
+  padding: 3px 6px;
+  margin: 0px;
+}
+
+#navMenu ul{
+  padding: 0px;
+  margin: 0px;
+  background: transparent url('popup-back.png');
+}
+
+#navMenu li{
+  padding: 1px;
+  margin: 0px;
+  list-style-type: none;
+}
+
+#navMenu > li > ul{
+  border: 1px solid #555;
+  display: none;
+}
+#navMenu:hover > li > ul{
+  display: block;
+}
+
+#navMenu > li {
+  text-align: right;
+}
+
+#navMenu > li > ul > li > a:link,
+#navMenu > li > ul > li > a:visited{
+  font-size: 0.9em;
+  color: #F6F6F6;
+  display: block;
+  padding: 4px 8px;
+  text-decoration: none;
+}
+
+#navMenu > li > ul > li > a:hover{
+  background-color: #888;
+  color: #FFF;
+  opacity: 1;
+}
+
+#pStatus {
+  margin: 60px auto 20px auto;
+  max-width: 350px;
+  padding: 5px;
+  font-size: 0.8em;
+  border: 1px dashed #999;
+  color: #666;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* ***** ***** レス ***** ***** */
+dl.resContainer {
+  margin: 5px 10px 25px 10px;
+}
+dt.resHeader {
+  margin: 0px 0px 5px 0px;
+  padding: 2px 4px;
+  font-size: 0.8em;
+}
+
+span.resNumber {
+  font-weight: bold;
+}
+
+dl.resNew span.resNumber {
+  font-weight: bold;
+  color: #E63;
+}
+
+span.resName {
+  font-weight: bold;
+  color: #369;
+  font-size: 1.2em;
+}
+
+span.resID,
+span.resMesID {
+  text-decoration: underline;
+}
+
+
+/* ***** ***** ポップアップ ***** ***** */
+div.popup {
+  padding: 10px;
+  -moz-outline: 2px solid #555;
+  -moz-outline-radius: 8px;
+  background: transparent url('popup-back.png');
+  color: #F6F6F6;
+  position: absolute;
+  font-size: 0.8em;
+  overflow: auto;
+  left: -1000px;
+  top: -1000px;
+}
+
+div.imagePopup {
+  padding: 0px;
+  border: 1px solid #555;
+  background: transparent url('popup-back.png');
+  position: absolute;
+  left: -1000px;
+  top: -1000px;
+}
+
+div.popup a:link,
+div.popup a:visited {
+  color: #76D6F9;
+  text-decoration: none;
+}
+div.popup span.resName {
+  color: #F6F6F6;
+}
+
+
+/* ***** ***** 設定フォーム ***** ***** */
+#prefForm {
+  font-size: 0.9em;
+  margin: 10px 10%;
+  padding: 10px 15px;
+  border: 2px solid #999;
+  background-color: #E9E9E9;
+}
+
+#prefForm fieldset {
+  margin-bottom: 15px;
+}
+
+#prefForm ul {
+  list-style: none;
+  margin: 0px;
+  padding: 2px;
+}
+
+#prefForm li {
+  padding-bottom: 2px;
+}
+
+#prefForm ul ul{
+  padding-left: 2em;
+}

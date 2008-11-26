@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+
+<overlay id="ChaikaBrowserOverlay"
+			xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+	<script type="application/x-javascript" src="chrome://chaika/content/fx-overlay.js"/>
+
+	<!-- Toolbar Button -->
+	<toolbarpalette id="BrowserToolbarPalette">
+		<toolbarbutton id="bbs2chreader-button" tooltiptext="chaika"
+			observes="viewBbs2chSidebar" class="toolbarbutton-1"/>
+	</toolbarpalette>
+
+	<!-- SideBar Menu -->
+	<menupopup id="viewSidebarMenu">
+		<menuitem key="key_viewBbs2chSidebar" observes="viewBbs2chSidebar"/>
+	</menupopup>
+
+	<!-- Open SideBar Shortcut Key -->
+	<keyset id="mainKeyset">
+		<key id="key_viewBbs2chSidebar" command="viewBbs2chSidebar"
+			key="&quot;" modifiers="accel"/>
+	</keyset>
+
+	<!-- Open SideBar Command -->
+	<broadcasterset id="mainBroadcasterSet">
+		<broadcaster id="viewBbs2chSidebar"
+			autoCheck="false"
+			label="chaika"
+			type="checkbox" group="sidebar"
+			sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
+			sidebartitle="chaika"
+			oncommand="toggleSidebar('viewBbs2chSidebar');"/>
+	</broadcasterset>
+
+	<!-- Browser Context Menu -->
+	<popup id="contentAreaContextMenu">
+		<menu id="context-bbs2chreader" label="bbs2chreader" hidden="true"
+							insertbefore="context-bookmarklink">
+			<menupopup>
+				<menuitem label="Open"
+					oncommand="b2rBrowserOverlay.contextMenu.openThread(false)"/>
+				<menuitem label="Open In New Tab"
+					oncommand="b2rBrowserOverlay.contextMenu.openThread(true)"/>
+			</menupopup>
+		</menu>
+	</popup>
+
+	<!-- Statusbar -->
+	<statusbar id="status-bar">
+		<statusbarpanel id="statusbar-bbs2chreader"
+			insertafter="statusbar-progresspanel" hidden="true"
+			style="-moz-binding:url(chrome://chaika/content/statusbar.xml#b2rstatusbar)"/>
+	</statusbar>
+
+</overlay>

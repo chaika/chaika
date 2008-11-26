@@ -1,0 +1,145 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/board-page.css" type="text/css"?>
+
+<page id="pageMain" onload="startup()" onunload="shutdown()"
+	onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/clipboard.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/downloader.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/items.js"/>
+<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/page.js"/>
+
+<popupset>
+	<popup id="popAddBookmark" position="after_start">
+		<menuitem label="ブックマーク" oncommand="addBookmark(false)"/>
+		<menuitem label="ライブブックマーク" oncommand="addBookmark(true)"/>
+	</popup>
+
+	<popup id="popTools" position="after_end">
+		<menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
+			onclick="if(event.button==1)showBrowser(true)"/>
+		<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
+		<menuseparator/>
+		<menuitem label="オプション..." oncommand="openSettings()"/>
+	</popup>
+
+	<popup id="popTreeSubjectContext"
+				onpopupshowing="return showTreeSubjectContext(event)">
+		<menuitem label="開く" oncommand="openThread(false)"/>
+		<menuitem label="新しいタブで開く" oncommand="openThread(true)"/>
+		<menuseparator/>
+		<menuitem label="URL のコピー" oncommand="copyURL()"/>
+		<menuitem label="URL とタイトルのコピー" oncommand="copyTitleAndURL()"/>
+		<menuseparator/>
+		<menuitem label="ログの削除" oncommand="deleteLog()"/>
+	</popup>
+
+	<tooltip id="popBanner" position="after_end">
+		<image id="imgBanner" src=""/>
+	</tooltip>
+</popupset>
+
+<image id="imgHiddenBanner" src="" collapsed="true" onload="bannerLoaded()" onerror="bannerLoadError(event)"/>
+
+<vbox id="boxHeader">
+	<hbox flex="1" align="center">
+		<label id="lblTitle" crop="end" value="" flex="1"/>
+		<label id="lblSubTitle" value="[chaika]" flex="100"/>
+	</hbox>
+
+	<hbox id="boxMenu" flex="1" align="center">
+		<label id="lblStatus" crop="end" value="" flex="1"/>
+
+		<label id="lblShowBanner" class="text-link" value="バナー表示"
+			onclick="showBanner(event)"/>
+		<label class="menu-separator" value=" | "/>
+
+		<label id="lblTools" class="text-link" value="ツール"
+			popup="popTools"/>
+		<label class="menu-separator" value=" | "/>
+
+		<deck id="dckUpdate" selectedIndex="0">
+			<label id="lblUpdate" class="text-link" value="更新"
+					onclick="subjectUpdate(event)"/>
+			<label id="lblMoveCheck" class="text-link" value="確認"
+					onclick="boardMoveCheck(event)"/>
+			<label id="lblMoveNewURL" class="text-link" value="移動"
+					onclick="moveNewURL(event)"/>
+		</deck>
+
+
+	</hbox>
+</vbox>
+
+
+<toolbox>
+	<toolbar align="center">
+		<label value="検索: "/>
+		<textbox id="txtSearch" value="" flex="2" type="autocomplete"
+				autocompletesearch="form-history"
+				autocompletesearchparam="bbs2ch-board-history"
+				onkeypress="searchTitle(event, this.value)"/>
+		<spacer flex="1"/>
+
+		<label value="フィルタ: "/>
+		<menulist id="mlstFilterLimit" value="-1" persist2="value" oncommand="initTreeSubject()">
+			<menupopup>
+				<menuitem label="ALL" value="-1"/>
+				<menuitem label="TOP 200" value="200"/>
+				<menuitem label="TOP 400" value="400"/>
+				<menuitem label="Subscribing" value="0"/>
+			</menupopup>
+		</menulist>
+
+		<checkbox id="chkShowDownedLogs" label="過去ログ表示"
+				checked="true" persist2="checked" oncommand="initTreeSubject()"/>
+
+		<spacer class="small-margin"/>
+	</toolbar>
+</toolbox>
+
+
+<tree id="treeSubject" class="plain" flex="1" context="popTreeSubjectContext"
+	flags="dont-build-content"
+	onclick="treeSubjectClick(event)" onkeypress="treeSubjectKeyDown(event)">
+	<treecols>
+		<treecol id="colStatus" label="!" flex="1"
+				property="status" cellType="icon"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colNumber" label="No" flex="1"
+				property="number" cellType="int"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colTitle" label="タイトル" flex="15"
+				property="title" cellType="str"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colCount" label="レス数" flex="1"
+				property="count" cellType="int"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colRead" label="既読数" flex="1"
+				property="read" cellType="int"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colUnread" label="未読数" flex="1"
+				property="unread" cellType="int"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colForce" label="勢い" flex="1"
+				property="force" cellType="int"
+				persist2="hidden width sortActive sortDirection"/>
+		<splitter class="tree-splitter"/>
+		<treecol id="colMakeDate" label="作成日" flex="1"
+				property="makeDate" cellType="str"
+				persist2="hidden width sortActive sortDirection"/>
+	</treecols>
+	<treechildren/>
+</tree>
+
+
+</page>

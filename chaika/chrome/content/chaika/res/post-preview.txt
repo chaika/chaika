@@ -1,0 +1,5 @@
+
+<dl>
+	<dt>00 ñºëOÅF<font color="green"><b>%NAME%</b></font>[%MAIL%] ÅF%DATE%</dt>
+	<dd>%MESSAGE%</dd>
+</dl>

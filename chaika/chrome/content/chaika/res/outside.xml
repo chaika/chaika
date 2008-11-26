@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="SHIFT_JIS"?>
+<!--
+	type 値
+	0 = 2ch 型 BBS
+	1 = 旧 2ch 型 BBS (未対応)
+	2 = Be@2ch BBS
+	3 = livedoor したらば BBS
+	4 = まちBBS (未対応)
+	5 = 通常ページ
+-->
+<bbsmenu>
+<category title="外部板">
+	<board title="bbs2ch 公式サイト" url="http://bbs2ch.sourceforge.jp/" type="5"/>
+	<board title="bbs2ch テスト板" url="http://yy22.kakiko.com/bbs2ch/" type="0"/>
+	<category title="2ch Browser">
+		<board title="Monazilla@JBBS" url="http://jbbs.livedoor.jp/computer/351/" type="3"/>
+		<board title="スキン標準化板" url="http://dtao.cside.com/distrust/stdskin/" type="0"/>
+		<board title="Moz2ch開発板" url="http://baniisan.s12.xrea.com/x/moz2ch/" type="0"/>
+		<board title="Jane総合掲示板" url="http://jane.s28.xrea.com/bbs/" type="1"/>
+		<board title="非公式ギコナビ板" url="http://flounder.s27.xrea.com/bbs/giko/" type="1"/>
+		<board title="非公式ホットゾヌ板" url="http://zonutan.hacca.jp/bbs/zonu/" type="0"/>
+		<board title="マカー用。" url="http://tmhkym.net/maka/bbs/maka/" type="0"/>
+	</category>
+</category>
+
+</bbsmenu>

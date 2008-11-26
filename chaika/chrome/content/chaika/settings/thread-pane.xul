@@ -1,0 +1,116 @@
+<?xml version="1.0"?>
+<overlay id="threadPaneOverlay"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<prefpane id="paneThread" onpaneload="gThreadPane.startup()">
+
+	<script type="application/x-javascript; version=1.7"
+			src="chrome://chaika/content/settings/thread-pane.js"/>
+
+	<preferences>
+		<preference id="extensions.chaika.thread_skin"
+				name="extensions.chaika.thread_skin" type="unichar"/>
+		<preference id="extensions.chaika.thread_font_name"
+				name="extensions.chaika.thread_font_name" type="unichar"/>
+		<preference id="extensions.chaika.thread_font_size"
+				name="extensions.chaika.thread_font_size" type="int"/>
+		<preference id="extensions.chaika.thread_aa_font_name"
+				name="extensions.chaika.thread_aa_font_name" type="unichar"/>
+		<preference id="extensions.chaika.thread_aa_font_size"
+				name="extensions.chaika.thread_aa_font_size" type="int"/>
+		<preference id="extensions.chaika.thread_hide_abone"
+				name="extensions.chaika.thread_hide_abone" type="bool"/>
+		<preference id="extensions.chaika.thread_chain_abone"
+				name="extensions.chaika.thread_chain_abone" type="bool"/>
+	</preferences>
+
+	<settingbox label="スキン">
+		<menulist id="lstThreadSkinList" preference="extensions.chaika.thread_skin">
+			<menupopup id="popThreadSkinList" onpopupshowing="gThreadPane.initThreadSkinList()"/>
+		</menulist>
+		<button label="スキンディレクトリを開く"
+				oncommand="gThreadPane.openSkinDir()"/>
+	</settingbox>
+
+	<settingbox label="フォント" align="center">
+		<menulist id="lstThreadFontList"
+				preference="extensions.chaika.thread_font_name">
+			<menupopup>
+				<menuitem label="明朝体 (Serif)" value="serif"/>
+				<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
+				<menuitem label="等幅 (Monospace)" value="monospace"/>
+				<menuseparator/>
+			</menupopup>
+		</menulist>
+		<menulist preference="extensions.chaika.thread_font_size">
+			<menupopup>
+				<menuitem value="9" label="9"/>
+				<menuitem value="10" label="10"/>
+				<menuitem value="11" label="11"/>
+				<menuitem value="12" label="12"/>
+				<menuitem value="13" label="13"/>
+				<menuitem value="14" label="14"/>
+				<menuitem value="15" label="15"/>
+				<menuitem value="16" label="16"/>
+				<menuitem value="17" label="17"/>
+				<menuitem value="18" label="18"/>
+				<menuitem value="20" label="20"/>
+				<menuitem value="22" label="22"/>
+				<menuitem value="24" label="24"/>
+				<menuitem value="26" label="26"/>
+				<menuitem value="28" label="28"/>
+				<menuitem value="30" label="30"/>
+				<menuitem value="32" label="32"/>
+			</menupopup>
+		</menulist>
+		<label value="(対応スキンでのみ有効)"/>
+	</settingbox>
+
+	<settingbox label="AA用フォント" align="center">
+		<menulist id="lstThreadAAFontList"
+				preference="extensions.chaika.thread_aa_font_name">
+			<menupopup>
+				<menuitem label="明朝体 (Serif)" value="serif"/>
+				<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
+				<menuitem label="等幅 (Monospace)" value="monospace"/>
+				<menuseparator/>
+			</menupopup>
+		</menulist>
+		<menulist preference="extensions.chaika.thread_aa_font_size">
+			<menupopup>
+				<menuitem value="9" label="9"/>
+				<menuitem value="10" label="10"/>
+				<menuitem value="11" label="11"/>
+				<menuitem value="12" label="12"/>
+				<menuitem value="13" label="13"/>
+				<menuitem value="14" label="14"/>
+				<menuitem value="15" label="15"/>
+				<menuitem value="16" label="16"/>
+				<menuitem value="17" label="17"/>
+				<menuitem value="18" label="18"/>
+				<menuitem value="20" label="20"/>
+				<menuitem value="22" label="22"/>
+				<menuitem value="24" label="24"/>
+				<menuitem value="26" label="26"/>
+				<menuitem value="28" label="28"/>
+				<menuitem value="30" label="30"/>
+				<menuitem value="32" label="32"/>
+			</menupopup>
+		</menulist>
+		<label value="(対応スキンでのみ有効)"/>
+	</settingbox>
+
+	<settingbox label="あぼーん" orient="vertical" align="start">
+		<button label="あぼーんマネージャ..."
+				oncommand="gThreadPane.openAboneManager()"/>
+		<checkbox label="あぼーんしたレスを表示しない (透明あぼーん)"
+				preference="extensions.chaika.thread_hide_abone"/>
+		<checkbox label="連鎖あぼーん"
+				preference="extensions.chaika.thread_chain_abone"/>
+	</settingbox>
+
+</prefpane>
+
+
+</overlay>

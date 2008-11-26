@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<bindings xmlns="http://www.mozilla.org/xbl" xmlns:xbl="http://www.mozilla.org/xbl">
+	<binding id="postwizard-textbox" extends="chrome://global/content/bindings/textbox.xml#textarea">
+		<implementation>
+			<constructor><![CDATA[
+			]]></constructor>
+			<method name="buildContextMenu">
+			<body><![CDATA[
+				const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	      		var input = document.getAnonymousElementByAttribute(this, "anonid", "input");
+	      		var ctx = document.getAnonymousElementByAttribute(input.parentNode, "anonid", 
+	      						"input-box-contextmenu");
+	      		var firstChild = ctx.firstChild;
+	      		for (var i = 0; i < this.childNodes.length; i++){
+	      			var node = this.childNodes[i].cloneNode(true);
+	      			ctx.insertBefore(node, firstChild);
+      			}      			
+			]]></body>
+			</method>
+		</implementation>
+	</binding>
+</bindings>

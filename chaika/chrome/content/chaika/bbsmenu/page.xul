@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/bbsmenu-page.css" type="text/css"?>
+
+<page id="pageMain" title="BBSMENU [chaika]"
+	onload="startup()" onunload="shutdown()"
+	onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
+	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+<script type="application/x-javascript" src="chrome://chaika/content/lib/xpc.js"/>
+<script type="application/x-javascript" src="chrome://chaika/content/lib/downloader.js"/>
+<script type="application/x-javascript" src="chrome://chaika/content/lib/clipboard.js"/>
+<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
+<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
+
+<popupset>
+	<popup id="popBbsMenuContext"
+				onpopupshowing="return showBbsMenuContext(event)">
+		<menuitem label="開く" oncommand="openBoard(false)"/>
+		<menuitem label="新しいタブで開く" oncommand="openBoard(true)"/>
+		<menuseparator/>
+		<menuitem label="URL のコピー" oncommand="copyURL(false)"/>
+		<menuitem label="URL とタイトルのコピー" oncommand="copyURL(true)"/>
+	</popup>
+</popupset>
+
+<hbox align="center">
+	<textbox id="search-box" value="" flex="1" type="autocomplete"
+			autocompletesearch="form-history"
+			autocompletesearchparam="bbs2ch-bbsmenu-history"
+			ontextentered="searchTitle(this.value)"/>
+	<toolbarbutton id="btnHistory" label="履歴" type="menu">
+		<menupopup id="popHistory" onpopupshowing="updateHistoryMenu()"
+				onclick="popHistoryClick(event)"/>
+	</toolbarbutton>
+	<toolbarbutton label="ツール" type="menu">
+		<menupopup>
+			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
+			<menuseparator/>
+			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
+			<menuitem label="オプション..." oncommand="openSettings()"/>
+			<menuitem label="chaika について" oncommand="openAbout()"/>
+		</menupopup>
+	</toolbarbutton>
+	<spacer class="small-margin"/>
+</hbox>
+
+<hbox id="bbsmenuUpdater" collapsed="true"
+	onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
+	style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
+
+<tree id="treeBbsMenu"  hidecolumnpicker="true" context="popBbsMenuContext"
+		onclick="treeBbsMenuClick(event)" onkeypress="treeBbsMenuKeyDown(event)"
+		persist="openedCategories" flags="dont-build-content" class="plain" flex="1">
+	<treecols>
+		<treecol id="title" flex="1" hideheader="true" primary="true"/>
+	</treecols>
+	<treechildren/>
+</tree>
+
+</page>

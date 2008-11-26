@@ -1,0 +1,35 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+	"http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
+	<meta http-equiv="Content-Style-Type" content="text/css">
+	<title>Thread View Error [chaika]</title>
+
+	<style type="text/css" media="screen">
+		h1 {
+		  font-size: 1.4em;
+		}
+		dt {
+		  font-weight: bold;
+		  margin-top: 0.5em;
+		  margin-bottom: 0.1em;
+		}
+	</style>
+</head>
+
+<body>
+	<h1>Thread View Error</h1>
+	<dl>
+		<dt>URL:</dt>
+			<dd>
+				<a href="%URL%">%URL%</a><br>
+				[ <a href="bbs2ch:thread:%URL%">bbs2chreader</a> ]
+			</dd>
+		<dt>STATUS:</dt>
+			<dd>%STATUS%</dd>
+	</dl>
+</body>
+
+</html>

@@ -1,0 +1,222 @@
+<?xml version="1.0"?>
+
+<bindings id="b2rstatusbarBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<binding id="b2rstatusbar">
+	<content>
+		<xul:toolbarbutton anonid="btnGoToBoard" class="b2rstatusbar-button"
+				label="Go to board" tooltiptext="Go to board"/>
+		<xul:toolbarbutton anonid="btnWrite" class="b2rstatusbar-button"
+				label="Write" tooltiptext="Write this thread"/>
+		<xul:toolbarbutton anonid="btnDeleteLog" class="b2rstatusbar-button"
+				label="Delete Log" tooltiptext="Delete this thread Log Files"/>
+
+		<xul:toolbarbutton anonid="btnViewChange" type="menu" class="b2rstatusbar-button"
+				label="View">
+			<xul:menupopup anonid="popViewChange" position="before_end">
+				<xul:menuitem label="All" anonid="mnuViewAll"/>
+				<xul:menuitem label="Last 100" anonid="mnuViewL100"/>
+				<xul:menuitem label="Last 50" anonid="mnuViewL50"/>
+				<xul:menuseparator/>
+				<xul:menuitem label="View Browser" anonid="mnuViewBroser"/>
+			</xul:menupopup>
+		</xul:toolbarbutton>
+
+		<xul:toolbarbutton anonid="btnAboneManager" class="b2rstatusbar-button"
+				label="Abone Manager" tooltiptext="Open Abone Manager"/>
+	</content>
+
+	<resources>
+		<stylesheet src="chrome://chaika/skin/fx-statusbar.css"/>
+	</resources>
+
+	<implementation>
+		<method name ="showCheck">
+			<body><![CDATA[
+				this.hidden = (this._getCurrentThreadURLSpec() == null);
+			]]></body>
+		</method>
+
+		<method name ="_getCurrentThreadURLSpec">
+			<body><![CDATA[
+				var currentURI = null;
+				try{
+					currentURI = getBrowser().currentURI
+									.QueryInterface(Components.interfaces.nsIURL);
+				}catch(ex){
+					return null;
+				}
+				if(!(currentURI.host == "localhost" || currentURI.host == "127.0.0.1")) return null;
+				if(currentURI.path.substring(0, 8) != "/thread/") return null;
+
+				return currentURI.path.substring(8);
+			]]></body>
+		</method>
+
+		<method name ="_doCommand">
+			<parameter name="aEvent"/>
+			<body><![CDATA[
+				var targetElement = aEvent.originalTarget;
+				var anonymousID = targetElement.getAttribute("anonid");
+				switch(anonymousID){
+					case "btnGoToBoard":
+						this._goToBoard(false);
+						break;
+					case "btnWrite":
+						this._write();
+						break;
+					case "btnDeleteLog":
+						this._deleteLog();
+						break;
+					case "mnuViewAll":
+						this._viewChange("./", false);
+						break;
+					case "mnuViewL100":
+						this._viewChange("./l100", false);
+						break;
+					case "mnuViewL50":
+						this._viewChange("./l50", false);
+						break;
+					case "mnuViewBroser":
+						this._viewBrowser(false);
+						break;
+					case "btnAboneManager":
+						this._openAboneManager();
+						break;
+				}
+			]]></body>
+		</method>
+
+		<method name ="_doMiddleClick">
+			<parameter name="aEvent"/>
+			<body><![CDATA[
+				var targetElement = aEvent.originalTarget;
+				var anonymousID = targetElement.getAttribute("anonid");
+				switch(anonymousID){
+					case "btnGoToBoard":
+						this._goToBoard(true);
+						break;
+					case "mnuViewAll":
+						this._viewChange("./", true);
+						break;
+					case "mnuViewL100":
+						this._viewChange("./l100", true);
+						break;
+					case "mnuViewL50":
+						this._viewChange("./l50", true);
+						break;
+					case "mnuViewBroser":
+						this._viewBrowser(true);
+						break;
+				}
+			]]></body>
+		</method>
+
+
+		<method name ="_goToBoard">
+			<parameter name="aAddTab"/>
+			<body><![CDATA[
+				var currentURLSpec = this._getCurrentThreadURLSpec();
+				if(!currentURLSpec) return;
+
+				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+						.getService(Components.interfaces.nsIBbs2chService);
+				var boardURLSpec = bbs2chService.getBoardURL(currentURLSpec).spec;
+				bbs2chService.openURL("bbs2ch:board:" + boardURLSpec, null, aAddTab);
+			]]></body>
+		</method>
+
+		<method name ="_write">
+			<body><![CDATA[
+				var currentURLSpec = this._getCurrentThreadURLSpec();
+				if(!currentURLSpec) return;
+
+				window.openDialog("chrome://chaika/content/post-wizard.xul",
+					"_blank", "chrome, resizable", currentURLSpec);
+			]]></body>
+		</method>
+
+		<method name ="_deleteLog">
+			<body><![CDATA[
+				var currentURLSpec = this._getCurrentThreadURLSpec();
+				if(!currentURLSpec) return;
+
+				var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
+							.getService(Components.interfaces.nsIPromptService);
+				var result = promptService.confirm(null, "bbs2chreader",
+								"Are you sure you want to delete the log files?");
+				if(!result) return;
+
+				var datID = currentURLSpec.match(/\d{9,10}/);
+				if(!datID) return;
+
+				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+						.getService(Components.interfaces.nsIBbs2chService);
+				var boardURL = bbs2chService.getBoardURL(currentURLSpec);
+				var datFile = bbs2chService.getLogFileAtURL(boardURL.resolve(datID + ".dat"));
+				var idxFile = bbs2chService.getLogFileAtURL(boardURL.resolve(datID + ".idx"));
+				try{
+					if(datFile.exists()) datFile.remove(false);
+					if(idxFile.exists()) idxFile.remove(false);
+				}catch(ex){}
+			]]></body>
+		</method>
+
+		<method name ="_viewBrowser">
+			<parameter name="aAddTab"/>
+			<body><![CDATA[
+				var popViewChange = document
+						.getAnonymousElementByAttribute(this, "anonid", "popViewChange");
+				popViewChange.hidePopup();
+
+				var currentURLSpec = this._getCurrentThreadURLSpec();
+				if(!currentURLSpec) return;
+				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+						.getService(Components.interfaces.nsIBbs2chService);
+				bbs2chService.openURL(currentURLSpec, null, aAddTab);
+			]]></body>
+		</method>
+
+		<method name ="_viewChange">
+			<parameter name="aOption"/>
+			<parameter name="aAddTab"/>
+			<body><![CDATA[
+				var popViewChange = document
+						.getAnonymousElementByAttribute(this, "anonid", "popViewChange");
+				popViewChange.hidePopup();
+
+				var currentURLSpec = this._getCurrentThreadURLSpec();
+				if(!currentURLSpec) return;
+
+				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+						.getService(Components.interfaces.nsIIOService);
+				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+						.getService(Components.interfaces.nsIBbs2chService);
+				var currentURL = ioService.newURI(currentURLSpec, null, null)
+						.QueryInterface(Components.interfaces.nsIURL);
+				currentURLSpec = bbs2chService.serverURL.resolve("./thread/" + currentURL.resolve(aOption));
+				bbs2chService.openURL(currentURLSpec, null, aAddTab);
+			]]></body>
+		</method>
+
+		<method name ="_openAboneManager">
+			<body><![CDATA[
+				var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
+				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar");
+			]]></body>
+		</method>
+
+	</implementation>
+
+	<handlers>
+		<handler event="command" action="this._doCommand(event)"/>
+		<handler event="click" button="1" action="this._doMiddleClick(event)"/>
+	</handlers>
+</binding>
+
+
+</bindings>

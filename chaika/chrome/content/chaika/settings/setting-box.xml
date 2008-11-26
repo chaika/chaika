@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<bindings id="settingBoxBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<binding id="settingBox">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/settings.css"/>
+	</resources>
+
+	<content>
+		<xul:grid flex="1">
+			<xul:columns>
+				<xul:column/>
+				<xul:column flex="1"/>
+			</xul:columns>
+			<xul:rows>
+				<xul:row>
+					<xul:hbox align="center" class="settingbox-label-box">
+						<xul:label class="settingbox-label"
+								xbl:inherits="value=label" flex="1"/>
+					</xul:hbox>
+					<xul:hbox>
+						<xul:box class="settingbox-content-box"
+								xbl:inherits="orient align pack flex">
+							<children/>
+						</xul:box>
+					</xul:hbox>
+				</xul:row>
+			</xul:rows>
+		</xul:grid>
+	</content>
+</binding>
+
+
+</bindings>

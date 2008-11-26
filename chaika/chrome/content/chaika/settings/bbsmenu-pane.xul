@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<overlay id="bbsmenuPaneOverlay"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<prefpane id="paneBbsmenu" onpaneload="gBbsmenuPane.startup()">
+
+	<script type="application/x-javascript; version=1.7"
+			src="chrome://chaika/content/settings/bbsmenu-pane.js"/>
+
+	<preferences>
+		<preference id="extensions.chaika.bbsmenu_historymenu_show"
+				name="extensions.chaika.bbsmenu_historymenu_show" type="bool"
+				onchange="gBbsmenuPane.startup()"/>
+		<preference id="extensions.chaika.bbsmenu_historymenu_board_max"
+				name="extensions.chaika.bbsmenu_historymenu_board_max" type="int"/>
+		<preference id="extensions.chaika.bbsmenu_historymenu_thread_max"
+				name="extensions.chaika.bbsmenu_historymenu_thread_max" type="int"/>
+		<preference id="extensions.chaika.bbsmenu_toggle_open_container"
+				name="extensions.chaika.bbsmenu_toggle_open_container" type="bool"/>
+		<preference id="extensions.chaika.bbsmenu_load_url"
+				name="extensions.chaika.bbsmenu_load_url" type="string"/>
+		<preference id="extensions.chaika.bbsmenu_click_action"
+				name="extensions.chaika.bbsmenu_click_action" type="int"/>
+		<preference id="extensions.chaika.bbsmenu_double_click_action"
+				name="extensions.chaika.bbsmenu_double_click_action" type="int"/>
+		<preference id="extensions.chaika.bbsmenu_middle_click_action"
+				name="extensions.chaika.bbsmenu_middle_click_action" type="int"/>
+
+	</preferences>
+
+	<settingbox label="メニュー" orient="vertical">
+		<checkbox label="履歴メニューを表示する"
+				preference="extensions.chaika.bbsmenu_historymenu_show"/>
+		<grid class="indent">
+			<columns>
+				<column flex="1"/>
+				<column flex="1"/>
+			</columns>
+			<rows>
+				<row align="center" id="boxHistoryMenuBoardMax">
+					<label value="板の最大表示数 :" style="text-align:right;"/>
+					<menulist preference="extensions.chaika.bbsmenu_historymenu_board_max">
+						<menupopup>
+							<menuitem label=" 0" value="0"/>
+							<menuitem label=" 1" value="1"/>
+							<menuitem label=" 2" value="2"/>
+							<menuitem label=" 3" value="3"/>
+							<menuitem label=" 4" value="4"/>
+							<menuitem label=" 5" value="5"/>
+							<menuitem label=" 6" value="6"/>
+							<menuitem label=" 7" value="7"/>
+							<menuitem label=" 8" value="8"/>
+							<menuitem label=" 9" value="9"/>
+							<menuitem label="10" value="10"/>
+							<menuitem label="11" value="11"/>
+							<menuitem label="12" value="12"/>
+							<menuitem label="13" value="13"/>
+							<menuitem label="14" value="14"/>
+							<menuitem label="15" value="15"/>
+						</menupopup>
+					</menulist>
+				</row>
+				<row align="center" id="boxHistoryMenuThreadMax">
+					<label value="スレッドの最大表示数 :" style="text-align:right;"/>
+					<menulist preference="extensions.chaika.bbsmenu_historymenu_thread_max">
+						<menupopup>
+							<menuitem label=" 0" value="0"/>
+							<menuitem label=" 1" value="1"/>
+							<menuitem label=" 2" value="2"/>
+							<menuitem label=" 3" value="3"/>
+							<menuitem label=" 4" value="4"/>
+							<menuitem label=" 5" value="5"/>
+							<menuitem label=" 6" value="6"/>
+							<menuitem label=" 7" value="7"/>
+							<menuitem label=" 8" value="8"/>
+							<menuitem label=" 9" value="9"/>
+							<menuitem label="10" value="10"/>
+							<menuitem label="11" value="11"/>
+							<menuitem label="12" value="12"/>
+							<menuitem label="13" value="13"/>
+							<menuitem label="14" value="14"/>
+							<menuitem label="15" value="15"/>
+						</menupopup>
+					</menulist>
+				</row>
+			</rows>
+		</grid>
+	</settingbox>
+
+	<settingbox label="ツリー">
+		<checkbox label="一度に開けるカテゴリをひとつに制限する"
+				preference="extensions.chaika.bbsmenu_toggle_open_container"/>
+	</settingbox>
+
+	<settingbox label="板を開く動作" orient="vertical">
+		<grid>
+			<columns>
+				<column flex="1"/>
+				<column flex="1"/>
+			</columns>
+			<rows>
+				<row align="center">
+					<label value="クリック :" style="text-align:right;"/>
+					<menulist preference="extensions.chaika.bbsmenu_click_action">
+						<menupopup>
+							<menuitem label="なにもしない" value="0"/>
+							<menuitem label="現在のタブで開く" value="1"/>
+							<menuitem label="新しいタブで開く" value="2"/>
+						</menupopup>
+					</menulist>
+				</row>
+				<row align="center">
+					<label value="ダブルクリック :" style="text-align:right;"/>
+					<menulist preference="extensions.chaika.bbsmenu_double_click_action">
+						<menupopup>
+							<menuitem label="なにもしない" value="0"/>
+							<menuitem label="現在のタブで開く" value="1"/>
+							<menuitem label="新しいタブで開く" value="2"/>
+						</menupopup>
+					</menulist>
+				</row>
+				<row align="center">
+					<label value="ミドルクリック :" style="text-align:right;"/>
+					<menulist preference="extensions.chaika.bbsmenu_middle_click_action">
+						<menupopup>
+							<menuitem label="なにもしない" value="0"/>
+							<menuitem label="現在のタブで開く" value="1"/>
+							<menuitem label="新しいタブで開く" value="2"/>
+						</menupopup>
+					</menulist>
+				</row>
+			</rows>
+		</grid>
+	</settingbox>
+
+	<settingbox label="板一覧取得 URL" flex="1">
+		<textbox flex="2"
+				preference="extensions.chaika.bbsmenu_load_url"/>
+		<spacer flex="1"/>
+	</settingbox>
+
+</prefpane>
+
+
+</overlay>
