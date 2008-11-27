@@ -3,3 +3,4 @@ skin	chaika	classic/1.0	chrome/skin/classic/chaika/
 overlay	chrome://browser/content/browser.xul	chrome://chaika/content/fx-overlay.xul
 style	chrome://browser/content/browser.xul	chrome://chaika/skin/fx-toolbarbutton.css
 style	chrome://global/content/customizeToolbar.xul	chrome://chaika/skin/fx-toolbarbutton.css
+resource	chaika-modules	modules/

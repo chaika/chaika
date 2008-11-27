@@ -6,7 +6,7 @@ pref("extensions.chaika.tab_load_in_foreground", false);
 pref("extensions.chaika.appoint_data_dir", false);
 pref("extensions.chaika.data_dir", "");
 pref("extensions.chaika.enable_tree_stripe2", false);
-pref("extensions.chaika.server_port", 8823);
+pref("extensions.chaika.server_port.firefox", 8823);
 pref("extensions.chaika.server_port.seamonkey", 8824);
 pref("extensions.chaika.server_port.other", 8825);
 

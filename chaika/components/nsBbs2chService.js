@@ -188,47 +188,13 @@ nsBbs2chService.prototype = {
 	},
 
 	get userAgent(){
-		if(!this._userAgent){
-			try{
-				var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
-						.getService(Ci.nsIExtensionManager);
-				var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
-				var bbs2chID = "chaika@chaika.xrea.jp";
-				var item = extensionManager.getItemForID(bbs2chID);
-				this._userAgent = new Array(
-							"Monazilla/1.00 (", item.name, "/", item.version, "; ",
-							appInfo.name, "/", appInfo.version, ")").join("");
-			}catch(ex){
-				this._userAgent = "Monazilla/1.00 (chaika/0.4.0)"
-			}
-		}
-
-		return this._userAgent;
+		return ChaikaCore.getUserAgent();
 	},
 
 	get nameSpace(){ return "http://bbs2ch.sourceforge.jp/#"; },
 
 	get serverURL(){
-		if(!this._serverURL){
-			var port = 0;
-			try{
-				var appInfo = Cc["@mozilla.org/xre/app-info;1"].createInstance(Ci.nsIXULAppInfo);
-	    	    if(appInfo.name == "Firefox"){
-					port = this.pref.getIntPref("extensions.chaika.server_port");
-				}else if(appInfo.name == "SeaMonkey"){
-					port = this.pref.getIntPref("extensions.chaika.server_port.seamonkey");
-				}else{
-					port = this.pref.getIntPref("extensions.chaika.server_port.other");
-				}
-			}catch(ex){
-				port = this.pref.getIntPref("extensions.chaika.server_port.other");
-			}
-
-			var spec = "http://127.0.0.1:" + port;
-			this._serverURL = this._ioService.newURI(spec, null, null)
-						.QueryInterface(Ci.nsIURL);
-		}
-		return this._serverURL.clone();
+		return ChaikaCore.getServerURL();
 	},
 
 	get pref(){
@@ -260,6 +226,9 @@ nsBbs2chService.prototype = {
 	},
 
 	_delayInit: function(){
+		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+		ChaikaCore._init();
+
 		this._globalHistory = new b2rGlobalHistory(this);
 		this._maruAutoAuth();
 	},
@@ -416,28 +385,7 @@ nsBbs2chService.prototype = {
 
 
 	getDataDir: function(){
-		const DATA_DIR_NAME = "bbs2chreader";
-		var dataDir;
-
-			// ログファイルの位置を指定
-		if(this.pref.getBoolPref("extensions.chaika.appoint_data_dir")){
-			try{
-				var dataDirPath = this.pref.getComplexValue("extensions.chaika.data_dir",
-										Ci.nsISupportsString).data;
-				dataDir = this._createLocalFile(dataDirPath);
-				if(dataDir.leafName != DATA_DIR_NAME)
-					dataDir.appendRelativePath(DATA_DIR_NAME);
-				return dataDir;
-			}catch(ex){}
-
-		}
-
-			// 指定していないときはプロファイルディレクトリ
-		var dirService = Cc["@mozilla.org/file/directory_service;1"].getService(Ci.nsIProperties);
-		dataDir = dirService.get("ProfD", Ci.nsILocalFile);
-		dataDir.appendRelativePath(DATA_DIR_NAME);
-
-		return dataDir;
+		return ChaikaCore.getDataDir();
 	},
 
 	getLogFileAtURL: function(aURLSpec){
@@ -558,48 +506,7 @@ nsBbs2chService.prototype = {
 
 
 	getHttpChannel: function(aURL){
-		var httpChannel;
-		var proxyMode = this.pref.getIntPref("extensions.chaika.http_proxy_mode");
-		if(proxyMode != 0){
-			var httpProtocolHandler = this._ioService.getProtocolHandler("http")
-					.QueryInterface(Ci.nsIHttpProtocolHandler);
-			var pps = Cc["@mozilla.org/network/protocol-proxy-service;1"]
-                    .getService(Ci.nsIProtocolProxyService);
-			if(proxyMode == 1){
-				var proxyInfo = pps.newProxyInfo("direct", "", -1, 0, 0, null);
-				httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo)
-						.QueryInterface(Ci.nsIHttpChannel);
-			}else if(proxyMode == 2){
-					var httpProxyValue = this.pref.getComplexValue(
-							"extensions.chaika.http_proxy_value",
-								Ci.nsISupportsString).data;
-					httpProxyValue = httpProxyValue.replace(/\s/g, "");
-					if(httpProxyValue.match(/([^:]+):(\d+)/)){
-						var host = RegExp.$1;
-						var port = parseInt(RegExp.$2);
-						try{
-							var proxyInfo = pps.newProxyInfo("http", host, port, 0, 10,
-									pps.newProxyInfo("direct", "", -1, 0, 0, null));
-							httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo)
-								.QueryInterface(Ci.nsIHttpChannel);
-						}catch(ex){dump(ex)}
-					}
-			}
-		}
-
-		if(!httpChannel){
-			httpChannel = this._ioService.newChannelFromURI(aURL)
-					.QueryInterface(Ci.nsIHttpChannel);
-		}
-
-		httpChannel.setRequestHeader("User-Agent", this.userAgent, false);
-		httpChannel.notificationCallbacks = {
-		    getInterface: function(aIID, aInstance) {
-	    	    Components.returnCode = Components.results.NS_ERROR_NO_INTERFACE;
-	        	return null;
-		    }
-		};
-		return httpChannel;
+		return ChaikaCore.getHttpChannel(aURL);
 	},
 
 
@@ -744,12 +651,12 @@ nsBbs2chService.prototype = {
 					.getService(Ci.nsIObserverService);
 		switch(aTopic){
 			case "app-startup":
-				os.addObserver(this, "final-ui-startup", false);
+				os.addObserver(this, "profile-after-change", false);
 				os.addObserver(this, "xpcom-shutdown", false);
 				dump("nsBbs2chService\n");
 				break;
-			case "final-ui-startup":
-				os.removeObserver(this, "final-ui-startup");
+			case "profile-after-change":
+				os.removeObserver(this, "profile-after-change");
 				this._delayInit();
 				break;
 			case "xpcom-shutdown":
