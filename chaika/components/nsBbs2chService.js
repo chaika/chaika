@@ -228,6 +228,8 @@ nsBbs2chService.prototype = {
 	_delayInit: function(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		ChaikaCore._init();
+		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+
 
 		this._globalHistory = new b2rGlobalHistory(this);
 		this._maruAutoAuth();
@@ -389,20 +391,8 @@ nsBbs2chService.prototype = {
 	},
 
 	getLogFileAtURL: function(aURLSpec){
-		const LOGS_DIR_NAME = "logs";
-
 		var fromURL = this._ioService.newURI(aURLSpec, null, null).QueryInterface(Ci.nsIURL);
-
-		var logFile = this.getDataDir();
-		logFile.appendRelativePath(LOGS_DIR_NAME);
-		logFile.appendRelativePath(fromURL.host);
-
-		var pathArray = fromURL.path.split("/");
-		for(var i=0; i<pathArray.length; i++){
-			if(pathArray[i]) logFile.appendRelativePath(pathArray[i]);
-		}
-
-		return logFile;
+		return chaikaLogFile = ChaikaBoard.getLogFileAtURL(fromURL);
 	},
 
 
