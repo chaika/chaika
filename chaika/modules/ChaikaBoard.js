@@ -58,10 +58,10 @@ function ChaikaBoard(){
 }
 
 ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
-	if(!(aURL instanceof Ci.nsIURI)){
+	if(!(aBoardURL instanceof Ci.nsIURI)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 	}
-	if(aURL.scheme.indexOf("http") != 0){
+	if(aBoardURL.scheme.indexOf("http") != 0){
 		throw makeException(Cr.NS_ERROR_INVALID_ARG);
 	}
 
@@ -82,18 +82,19 @@ ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
 }
 
 
-ChaikaBoard.getLogFileAtURL = function(aURL){
+ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 	var logFile = null;
 	try{
 		var boardID = ChaikaBoard.getBoardID(aURL);
 		logFile = ChaikaBoard.getLogFileAtBoardID(boardID);
 	}catch(ex){
+		this.logger.error(ex);
 		throw makeException(ex.result);
 	}
 	return logFile;
 }
 
-ChaikaBoard.getLogFileAtBoardID = function(aBoardID){
+ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoardID){
 	var logFile = ChaikaCore.getDataDir();
 	logFile.appendRelativePath(LOGS_DIR_NAME);
 
