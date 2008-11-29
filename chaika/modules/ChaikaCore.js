@@ -69,9 +69,9 @@ var ChaikaCore = {
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
 
-		this.logger.info(this.getDataDir().path);
-		this.logger.info(this.getUserAgent());
-		this.logger.info(this.getServerURL().spec);
+		this.logger.info("DataDir: " + this.getDataDir().path);
+		this.logger.info("UserAgetn: " + this.getUserAgent());
+		this.logger.info("ServerURL: " + this.getServerURL().spec);
 	},
 
 
@@ -108,6 +108,9 @@ var ChaikaCore = {
 	getLogDir: function ChaikaCore_getLogDir(){
 		var logDir = this.getDataDir();
 		logDir.appendRelativePath(LOGS_DIR_NAME);
+		if(!logDir.exists()){
+			logDir.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+		}
 		return logDir;
 	},
 
