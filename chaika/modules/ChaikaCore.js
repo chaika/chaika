@@ -45,6 +45,7 @@ const Cr = Components.results;
 
 
 const DATA_DIR_NAME = "chaika";
+const LOGS_DIR_NAME = "chaika-logs";
 const EXTENSION_ID = "chaika@chaika.xrea.jp";
 
 const PR_PERMS_DIR = 0755;
@@ -103,6 +104,12 @@ var ChaikaCore = {
 		return dataDir;
 	},
 
+
+	getLogDir: function ChaikaCore_getLogDir(){
+		var logDir = this.getDataDir();
+		logDir.appendRelativePath(LOGS_DIR_NAME);
+		return logDir;
+	},
 
 	getUserAgent: function ChaikaCore_getUserAgent(){
 		if(!this._userAgent){

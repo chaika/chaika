@@ -45,9 +45,6 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
-const LOGS_DIR_NAME = "chaika-logs";
-
-
 function makeException(aResult){
 	var stack = Components.stack.caller.caller;
 	return new Components.Exception("exception", aResult, stack);
@@ -95,8 +92,7 @@ ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 }
 
 ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoardID){
-	var logFile = ChaikaCore.getDataDir();
-	logFile.appendRelativePath(LOGS_DIR_NAME);
+	var logFile = ChaikaCore.getLogDir();
 
 	var pathArray = aBoardID.split("/");
 	for(let i=0; i<pathArray.length; i++){
