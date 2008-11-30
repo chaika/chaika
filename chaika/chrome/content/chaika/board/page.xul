@@ -7,7 +7,6 @@
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
-<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/clipboard.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/downloader.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/board/items.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/board/page.js"/>

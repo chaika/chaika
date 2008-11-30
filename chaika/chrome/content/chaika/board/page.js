@@ -35,6 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
+
 
 var gBbs2chService = Cc["@mozilla.org/bbs2ch-service;1"].getService(Ci.nsIBbs2chService);
 var gTreeSubject;
@@ -348,7 +350,7 @@ function copyURL(){
 
 	var url = gBoardItems.items[index].url;
 
-	Bbs2chClipboard.setString(url);
+	ChaikaClipboard.setString(url);
 }
 
 
@@ -362,7 +364,7 @@ function copyTitleAndURL(){
 	var title = gBoardItems.items[index].title;
 	var url = gBoardItems.items[index].url;
 
-	Bbs2chClipboard.setString(title +"\n"+ url);
+	ChaikaClipboard.setString(title +"\n"+ url);
 }
 
 

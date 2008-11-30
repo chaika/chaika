@@ -1,3 +1,6 @@
+Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
+
+
 var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
 			.getService(Components.interfaces.nsIBbs2chService);
 
@@ -501,8 +504,8 @@ function copyURL(aAddTitle){
 	if(boardURL.indexOf("http://")!=0) return;
 	var boardTitle = item.title;
 	if(aAddTitle){
-		Bbs2chClipboard.setString(boardTitle +"\n"+ boardURL);
+		ChaikaClipboard.setString(boardTitle +"\n"+ boardURL);
 	}else{
-		Bbs2chClipboard.setString(boardURL);
+		ChaikaClipboard.setString(boardURL);
 	}
 }

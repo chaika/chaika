@@ -10,7 +10,6 @@
 
 <script type="application/x-javascript" src="chrome://chaika/content/lib/xpc.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/lib/downloader.js"/>
-<script type="application/x-javascript" src="chrome://chaika/content/lib/clipboard.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 
