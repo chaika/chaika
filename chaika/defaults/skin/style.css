@@ -49,7 +49,7 @@ h1 {
 #navMenu ul{
   padding: 0px;
   margin: 0px;
-  background: transparent url('popup-back.png');
+  background-color: rgba(60, 60, 60, 0.85);
 }
 
 #navMenu li{
@@ -130,9 +130,8 @@ span.resMesID {
 /* ***** ***** ポップアップ ***** ***** */
 div.popup {
   padding: 10px;
-  -moz-outline: 2px solid #555;
-  -moz-outline-radius: 8px;
-  background: transparent url('popup-back.png');
+  -moz-border-radius: 8px;
+  background-color: rgba(60, 60, 60, 0.85);
   color: #F6F6F6;
   position: absolute;
   font-size: 0.8em;
@@ -144,7 +143,7 @@ div.popup {
 div.imagePopup {
   padding: 0px;
   border: 1px solid #555;
-  background: transparent url('popup-back.png');
+  background-color: rgba(60, 60, 60, 0.85);
   position: absolute;
   left: -1000px;
   top: -1000px;
