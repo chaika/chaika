@@ -57,14 +57,36 @@ const PR_APPEND = 0x10;
 const PR_TRUNCATE = 0x20;
 
 
+/** @ignore */
 function makeException(aResult){
 	var stack = Components.stack.caller.caller;
 	return new Components.Exception("exception", aResult, stack);
 }
 
 
+/**
+ * @namespace
+ */
 var ChaikaCore = {
 
+	/**
+	 * ログをとるための {@link ChaikaLogger} オブジェクト
+	 * @type ChaikaLogger
+	 */
+	logger: null,
+
+
+	/**
+	 * ブランチが extensions.chaika に設定されている {@link ChaikaPref} オブジェクト
+	 * @type ChaikaPref
+	 */
+	pref: null,
+
+
+	/**
+	 * ブラウザ起動時に一度だけ実行され、初期化処理を行う。
+	 * @private
+	 */
 	_init: function ChaikaCore__init(){
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
@@ -75,6 +97,11 @@ var ChaikaCore = {
 	},
 
 
+	/**
+	 * Chaika の使用するデータを保存するプロファイル内のディレクトリを返す。
+	 * ディレクトリが存在しない場合はこのメソッドが呼ばれた時に作成される。
+	 * @return {nsILocalFile}
+	 */
 	getDataDir: function ChaikaCore_getDataDir(){
 		if(!this._dataDir){
 			if(this.pref.getBool("appoint_data_dir")){
@@ -105,6 +132,11 @@ var ChaikaCore = {
 	},
 
 
+	/**
+	 * DAT ファイル等を保存するディレクトリを返す。
+	 * ディレクトリが存在しない場合はこのメソッドが呼ばれた時に作成される。
+	 * @return {nsILocalFile}
+	 */
 	getLogDir: function ChaikaCore_getLogDir(){
 		var logDir = this.getDataDir();
 		logDir.appendRelativePath(LOGS_DIR_NAME);
@@ -114,6 +146,11 @@ var ChaikaCore = {
 		return logDir;
 	},
 
+
+	/**
+	 * Chaika が通信時に利用する UserAgent を返す。
+	 * @return {String}
+	 */
 	getUserAgent: function ChaikaCore_getUserAgent(){
 		if(!this._userAgent){
 			try{
@@ -132,6 +169,11 @@ var ChaikaCore = {
 		return this._userAgent;
 	},
 
+
+	/**
+	 * Chaika がスレッド表示に使用するローカルサーバの URL を返す。
+	 * @return {nsIURL}
+	 */
 	getServerURL: function ChaikaCore_getServerURL(){
 		if(!this._serverURL){
 			var port = 0;
@@ -157,6 +199,11 @@ var ChaikaCore = {
 	},
 
 
+	/**
+	 * プロクシや UserAgent などの設定を施した nsIHttpChannel を返す。
+	 * @param {nsIURI} aURL nsIHttpChannel を作成する URL
+	 * @return {nsIHttpChannel}
+	 */
 	getHttpChannel: function ChaikaCore_getHttpChannel(aURL){
 		if(!(aURL instanceof Ci.nsIURI)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
@@ -214,13 +261,17 @@ var ChaikaCore = {
 };
 
 
-
+/**
+ * メッセージログを取るオブジェクト。
+ * {@link ChaikaCore.logger} を経由して利用すること。
+ * @constructor
+ */
 function ChaikaLogger(){
 
 }
 ChaikaLogger.prototype = {
 
-
+	/** @private */
 	_insertLog: function ChaikaLogger__insertLog(atype, aMessage){
 		var stack = Components.stack.caller.caller;
 		dump(["[", stack.name, ":", stack.lineNumber,"] ", atype, " ", aMessage].join("") + "\n");
@@ -244,16 +295,23 @@ ChaikaLogger.prototype = {
 };
 
 
-function ChaikaPref(aRoot){
-	this._init(aRoot);
+/**
+ * Mozilla 設定システムにアクセスするためのオブジェクト。
+ * {@link ChaikaCore.pref} を経由して利用すること。
+ * @constructor
+ * @param {String} aBranch 設定名のブランチ。指定しない場合はルートとみなされる
+ */
+function ChaikaPref(aBranch){
+	this._init(aBranch);
 }
 
 ChaikaPref.prototype = {
 
-	_init: function ChaikaPref__init(aRoot){
-		var root = aRoot || "";
+	/** @private */
+	_init: function ChaikaPref__init(aBranch){
+		var branch = aBranch || "";
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
-		this._branch = prefService.getBranch(root);
+		this._branch = prefService.getBranch(aBranch);
 	},
 
 	getBool: function ChaikaPref_getBool(aPrefName){
