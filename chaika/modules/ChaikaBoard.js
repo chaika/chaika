@@ -52,6 +52,17 @@ function makeException(aResult){
 }
 
 
+// getBoardType で利用する例外的な URL のリスト (2ch だけど板じゃない URL)
+const EX_HOSTS = [
+		"find.2ch.net",
+		"info.2ch.net",
+		"epg.2ch.net",
+		"headline.2ch.net",
+		"newsnavi.2ch.net",
+		"headline.bbspink.com"
+	];
+
+
 function ChaikaBoard(){
 }
 
