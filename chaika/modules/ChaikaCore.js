@@ -288,7 +288,7 @@ ChaikaLogger.prototype = {
 		this._insertLog("WARNING", aMessage);
 	},
 	error: function ChaikaLogger_error(aError){
-		message =  (aError instanceof Ci.nsIException) ? aError.toString() : aError.toSource();
+		message =  aError.message || aError.toString();
 		this._insertLog("ERROR", message);
 	}
 
