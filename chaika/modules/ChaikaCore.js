@@ -84,12 +84,20 @@ var ChaikaCore = {
 
 
 	/**
+	 * ファイルを読み書きする {@link chaikaIO} オブジェクト
+	 * @type chaikaIO
+	 */
+	io: null,
+
+
+	/**
 	 * ブラウザ起動時に一度だけ実行され、初期化処理を行う。
 	 * @private
 	 */
 	_init: function ChaikaCore__init(){
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
+		this.io = new ChaikaIO();
 
 		this.logger.info("DataDir: " + this.getDataDir().path);
 		this.logger.info("UserAgetn: " + this.getUserAgent());
@@ -250,6 +258,7 @@ var ChaikaCore = {
 
 		httpChannel.setRequestHeader("User-Agent", this.userAgent, false);
 		httpChannel.notificationCallbacks = {
+			/** @ignore */
 		    getInterface: function(aIID, aInstance) {
 	    	    Components.returnCode = Cr.NS_ERROR_NO_INTERFACE;
 	        	return null;
@@ -350,4 +359,80 @@ ChaikaPref.prototype = {
 	setFile: function ChaikaPref_setFile(aPrefName, aPrefValue){
 		return this._branch.setComplexValue(aPrefName, Ci.nsILocalFile, aPrefValue);
 	}
+};
+
+
+/**
+ * ファイルを読み書きするオブジェクト。
+ * {@link ChaikaCore.io} を経由して利用すること。
+ * @constructor
+ */
+function chaikaIO(){
+
+}
+
+chaikaIO.prototype = {
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
+	 * @return {nsIConverterInputStream}
+	 */
+	getFileInputStream: function chaikaIO_getFileInputStream(aLocalFile, aCharset){
+		if(!(aLocalFile instanceof Ci.nsILocalFile)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		var charset = aCharset || "UTF-8";
+
+		var fileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
+				.createInstance(Ci.nsIFileInputStream);
+		var converterInputStream = CC["@mozilla.org/intl/converter-input-stream;1"]
+				.createInstance(Ci.nsIConverterInputStream);
+
+		try{
+			fileInputStream.init(aLocalFile, PR_RDONLY, PR_PERMS_FILE,
+					Ci.nsIFileInputStream.CLOSE_ON_EOF);
+			converterInputStream.init(fileInputStream, charset, 1024*8,
+					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
+		}catch(ex){
+			this.logger.error(ex);
+			throw makeException(ex.result);
+		}
+		return converterInputStream;
+	},
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
+	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
+	 * @return {nsIConverterOutputStream}
+	 */
+	getFileOutputStream: function chaikaIO_getFileOutputStream(aLocalFile, aCharset, aAppend){
+		if(!(aLocalFile instanceof Ci.nsILocalFile)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		var charset = aCharset || "UTF-8";
+		var ioFlags = PR_WRONLY|PR_CREATE_FILE;
+		ioFlags |= (aAppend) ? PR_APPEND : PR_TRUNCATE;
+
+		var fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"]
+				.createInstance(Ci.nsIFileOutputStream);
+		var converterOutputStream = Cc["@mozilla.org/intl/converter-output-stream;1"]
+				.createInstance(Ci.nsIConverterOutputStream);
+
+		try{
+			fileOutputStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
+			converterOutputStream.init(fileOutputStream, charset, 0,
+					Ci.nsIConverterOutputStream.DEFAULT_REPLACEMENT_CHARACTER);
+		}catch(ex){
+			this.logger.error(ex);
+			throw makeException(ex.result);
+		}
+
+
+		return converterOutputStream;
+	}
+
 };
