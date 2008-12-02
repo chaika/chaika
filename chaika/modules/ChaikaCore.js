@@ -84,8 +84,8 @@ var ChaikaCore = {
 
 
 	/**
-	 * ファイルを読み書きする {@link chaikaIO} オブジェクト
-	 * @type chaikaIO
+	 * ファイルを読み書きする {@link ChaikaIO} オブジェクト
+	 * @type ChaikaIO
 	 */
 	io: null,
 
@@ -367,18 +367,18 @@ ChaikaPref.prototype = {
  * {@link ChaikaCore.io} を経由して利用すること。
  * @constructor
  */
-function chaikaIO(){
+function ChaikaIO(){
 
 }
 
-chaikaIO.prototype = {
+ChaikaIO.prototype = {
 
 	/**
 	 * @param {nsILocalFile} aLocalFile 読み込むファイル
 	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
 	 * @return {nsIConverterInputStream}
 	 */
-	getFileInputStream: function chaikaIO_getFileInputStream(aLocalFile, aCharset){
+	getFileInputStream: function ChaikaIO_getFileInputStream(aLocalFile, aCharset){
 		if(!(aLocalFile instanceof Ci.nsILocalFile)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
@@ -408,7 +408,7 @@ chaikaIO.prototype = {
 	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
 	 * @return {nsIConverterOutputStream}
 	 */
-	getFileOutputStream: function chaikaIO_getFileOutputStream(aLocalFile, aCharset, aAppend){
+	getFileOutputStream: function ChaikaIO_getFileOutputStream(aLocalFile, aCharset, aAppend){
 		if(!(aLocalFile instanceof Ci.nsILocalFile)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
