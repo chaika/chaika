@@ -296,40 +296,8 @@ nsBbs2chService.prototype = {
 	},
 
 	getBoardType: function(aURLSpec){
-		if(aURLSpec.search(/^http:/) == -1) return this.BOARD_TYPE_PAGE;
-
-		if(this._exURLs.indexOf(aURLSpec) != -1) return this.BOARD_TYPE_PAGE;
-
-			// ヘッドライン
-		if(aURLSpec.search(/^http:\/\/headline\.2ch\.net\/.+/) != -1 ||
-					aURLSpec.search(/^http:\/\/headline\.bbspink\.com\/.+/) != -1)
-			return this.BOARD_TYPE_PAGE;
-
-			// Be@2ch.net
-		if(aURLSpec.search(/^http:\/\/be\.2ch\.net\/.+/) != -1)
-			return this.BOARD_TYPE_BE2CH;
-			// 2ch.net
-		if(aURLSpec.search(/^http:\/\/([^\.]+)\.2ch\.net\/.+/) != -1)
-			return this.BOARD_TYPE_2CH;
-			// bbspink.com
-		if(aURLSpec.search(/^http:\/\/([^\.]+)\.bbspink\.com\/.+/) != -1)
-			return this.BOARD_TYPE_2CH;
-			// JBBS
-		if(aURLSpec.search(/^http:\/\/jbbs\.livedoor\.jp\/.+/) != -1)
-			return this.BOARD_TYPE_JBBS;
-			// まちBBS
-		if(aURLSpec.search(/^http:\/\/([^\.]+)\.machi\.to\/.+/) != -1)
-			return this.BOARD_TYPE_MACHI;
-
-		var url = this._ioService.newURI(aURLSpec, null, null).QueryInterface(Ci.nsIURL);
-
-			// スレッド URL
-		if(url.directory.indexOf("/test/read.cgi/") != -1)
-			return this.BOARD_TYPE_2CH;
-		if(url.fileName == "read.cgi" && url.query.indexOf("key=") != -1)
-			return this.BOARD_TYPE_OLD2CH;
-
-		return this.BOARD_TYPE_PAGE;
+		var url = this._ioService.newURI(aURLSpec, null, null);
+		return ChaikaBoard.getBoardType(url);
 	},
 
 	getBoardURL: function(aURLSpec){

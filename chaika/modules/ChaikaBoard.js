@@ -45,6 +45,7 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
+/** @ignore */
 function makeException(aResult){
 	var stack = Components.stack.caller.caller;
 	return new Components.Exception("exception", aResult, stack);
@@ -54,8 +55,9 @@ function makeException(aResult){
 function ChaikaBoard(){
 }
 
+
 ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
-	if(!(aBoardURL instanceof Ci.nsIURI)){
+	if(!(aBoardURL instanceof Ci.nsIURL)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 	}
 	if(aBoardURL.scheme.indexOf("http") != 0){
@@ -85,7 +87,7 @@ ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 		var boardID = ChaikaBoard.getBoardID(aURL);
 		logFile = ChaikaBoard.getLogFileAtBoardID(boardID);
 	}catch(ex){
-		this.logger.error(ex);
+		ChaikaCore.logger.error(ex);
 		throw makeException(ex.result);
 	}
 	return logFile;
@@ -99,4 +101,37 @@ ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoar
 		if(pathArray[i]) logFile.appendRelativePath(pathArray[i]);
 	}
 	return logFile;
+}
+
+
+ChaikaBoard.getBoardType = function ChaikaBoard_getBoardType(aURL){
+	if(!(aURL instanceof Ci.nsIURI)){
+		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+	}
+
+	if(!(aURL instanceof Ci.nsIURL)) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+		// HTTP 以外
+	if(aURL.scheme != "http") return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+		// HOST だけの URL
+	if(aURL.directory.length == 1) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+
+	if(EX_HOSTS.indexOf(aURL.host) != -1) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+
+		// Be@2ch.net
+	if(aURL.host == "be.2ch.net") return Ci.nsIBbs2chService.BOARD_TYPE_BE2CH;
+		// 2ch.net
+	if(aURL.host.indexOf(".2ch.net") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+		// bbspink.com
+	if(aURL.host.indexOf(".bbspink.com") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+		// まちBBS
+	if(aURL.host.indexOf(".machi.to") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_MACHI;
+		// JBBS
+	if(aURL.host == "jbbs.livedoor.jp") return Ci.nsIBbs2chService.BOARD_TYPE_JBBS;
+
+		// スレッド URL
+	if(aURL.directory.indexOf("/test/read.cgi/") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+	if((aURL.fileName == "read.cgi") && (aURL.query.indexOf("key=") != -1))
+			return Ci.nsIBbs2chService.BOARD_TYPE_OLD2CH;
+
+	return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
 }
