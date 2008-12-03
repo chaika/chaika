@@ -297,7 +297,7 @@ ChaikaLogger.prototype = {
 		this._insertLog("WARNING", aMessage);
 	},
 	error: function ChaikaLogger_error(aError){
-		message =  aError.message || aError.toString();
+		var message =  aError.message || aError.toString();
 		this._insertLog("ERROR", message);
 	}
 
@@ -387,7 +387,7 @@ ChaikaIO.prototype = {
 
 		var fileInputStream = Cc["@mozilla.org/network/file-input-stream;1"]
 				.createInstance(Ci.nsIFileInputStream);
-		var converterInputStream = CC["@mozilla.org/intl/converter-input-stream;1"]
+		var converterInputStream = Cc["@mozilla.org/intl/converter-input-stream;1"]
 				.createInstance(Ci.nsIConverterInputStream);
 
 		try{
@@ -396,7 +396,7 @@ ChaikaIO.prototype = {
 			converterInputStream.init(fileInputStream, charset, 1024*8,
 					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
 		}catch(ex){
-			this.logger.error(ex);
+			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
 		return converterInputStream;
@@ -427,7 +427,7 @@ ChaikaIO.prototype = {
 			converterOutputStream.init(fileOutputStream, charset, 0,
 					Ci.nsIConverterOutputStream.DEFAULT_REPLACEMENT_CHARACTER);
 		}catch(ex){
-			this.logger.error(ex);
+			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
 
