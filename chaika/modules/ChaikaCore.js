@@ -91,6 +91,13 @@ var ChaikaCore = {
 
 
 	/**
+	 * ログデータ等を保存する mozIStorageConnection
+	 * @type mozIStorageConnection
+	 */
+	storage: null,
+
+
+	/**
 	 * ブラウザ起動時に一度だけ実行され、初期化処理を行う。
 	 * @private
 	 */
@@ -99,9 +106,59 @@ var ChaikaCore = {
 		this.pref = new ChaikaPref("extensions.chaika.");
 		this.io = new ChaikaIO();
 
-		this.logger.info("DataDir: " + this.getDataDir().path);
+		this.storage = this._openStorage();
+
+		this.logger.info("DataDir:   " + this.getDataDir().path);
 		this.logger.info("UserAgetn: " + this.getUserAgent());
 		this.logger.info("ServerURL: " + this.getServerURL().spec);
+		this.logger.info("Storage:   " + this.storage.databaseFile.path);
+	},
+
+
+	/**
+	 * ログ情報などを保存するストレージを開く。
+	 * @private
+	 */
+	_openStorage: function ChaikaCore__openStorage(){
+		var dbFile = this.getLogDir();
+		dbFile.appendRelativePath("storage.sqlite");
+
+		var storageService = Cc["@mozilla.org/storage/service;1"]
+				.getService(Ci.mozIStorageService);
+
+		var storage = null;
+
+		try{
+			storage = storageService.openDatabase(dbFile);
+		}catch(ex){
+				// SQLite ファイルの読み込みに失敗した場合は、
+				// バックアップを取って新規に作成する
+			ChaikaCore.logger.error(ex);
+			storageService.backupDatabaseFile(dbFile, dbFile.leafName + ".corrupt");
+			if(storage){
+				try{ storage.close(); }catch(ex2){};
+			}
+			try{
+				dbFile.remove(false);
+				storage = storageService.openDatabase(dbFile);
+			}catch(ex2){
+				ChaikaCore.logger.error(ex2);
+			}
+		}
+
+
+		// データベースにテーブルが存在しない場合に作成する。
+		storage.beginTransaction();
+		try{
+
+		}catch(ex){
+			ChaikaCore.logger.error(storage.lastErrorString);
+			ChaikaCore.logger.error(ex);
+		}finally{
+			storage.commitTransaction();
+		}
+
+		return storage;
 	},
 
 
