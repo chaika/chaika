@@ -56,12 +56,25 @@ const PR_CREATE_FILE = 0x08;
 const PR_APPEND = 0x10;
 const PR_TRUNCATE = 0x20;
 
+const STORAGE_SQL_HISTORY = [
+	"CREATE TABLE history(",
+	"    id TEXT NOT NULL UNIQUE,",
+	"    url TEXT NOT NULL,",
+	"    title NOT NULL,",
+	"    last_visited INTEGER NOT NULL DEFAULT 0,",
+	"    visit_count INTEGER NOT NULL DEFAULT 1,",
+	"    type INTEGER NOT NULL DEFAULT 0",
+	");"
+].join("\n");
+
 
 /** @ignore */
 function makeException(aResult){
 	var stack = Components.stack.caller.caller;
 	return new Components.Exception("exception", aResult, stack);
 }
+
+
 
 
 /**
@@ -91,6 +104,13 @@ var ChaikaCore = {
 
 
 	/**
+	 * 履歴を管理する {@link ChaikaHistory} オブジェクト
+	 * @type ChaikaHistory
+	 */
+	history: null,
+
+
+	/**
 	 * ログデータ等を保存する mozIStorageConnection
 	 * @type mozIStorageConnection
 	 */
@@ -105,6 +125,7 @@ var ChaikaCore = {
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
 		this.io = new ChaikaIO();
+		this.history = new ChaikaHistory();
 
 		this.storage = this._openStorage();
 
@@ -150,7 +171,10 @@ var ChaikaCore = {
 		// データベースにテーブルが存在しない場合に作成する。
 		storage.beginTransaction();
 		try{
-
+			if(!storage.tableExists("history")){
+				storage.executeSimpleSQL(STORAGE_SQL_HISTORY);
+				ChaikaCore.logger.info("Create Table: history");
+			}
 		}catch(ex){
 			ChaikaCore.logger.error(storage.lastErrorString);
 			ChaikaCore.logger.error(ex);
@@ -490,6 +514,94 @@ ChaikaIO.prototype = {
 
 
 		return converterOutputStream;
+	}
+
+};
+
+
+
+
+/**
+ * 履歴を管理するオブジェクト。
+ * {@link ChaikaCore.history} を経由して利用すること。
+ * @constructor
+ */
+function ChaikaHistory(){
+
+}
+
+ChaikaHistory.prototype = {
+
+	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
+		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
+
+		var storage = ChaikaCore.storage;
+
+		storage.beginTransaction();
+		try{
+			// ID で指定されたレコードがあるかチェック
+			var rowID = 0;
+			var sql = "SELECT ROWID FROM history WHERE id=?1";
+			var statement = storage.createStatement(sql);
+			statement.bindStringParameter(0, aID);
+			if(statement.executeStep()){
+				rowID = statement.getInt32(0);
+			}
+			statement.reset();
+
+			var now = Date.now()/1000;
+			if(rowID){ // レコードがあれば更新
+				sql = "UPDATE history SET url=?1, title=?2, visit_count=visit_count+1, last_visited=?3 WHERE ROWID=?4;";
+				statement = storage.createStatement(sql);
+				statement.bindStringParameter(0, aURL.spec);// url
+				statement.bindStringParameter(1, aTitle);	// title
+				statement.bindInt32Parameter(2, now);		// last_visited
+				statement.bindStringParameter(3, rowID);	// id
+				statement.execute();
+			}else{ // レコードがなければ新規作成
+				sql = "INSERT INTO history(id, url, title, last_visited, visit_count, type) VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
+				statement = storage.createStatement(sql);
+				statement.bindStringParameter(0, aID);		// id
+				statement.bindStringParameter(1, aURL.spec);// url
+				statement.bindStringParameter(2, aTitle);	// title
+				statement.bindInt32Parameter(3, now);		// last_visited
+				statement.bindInt32Parameter(4, 1);			// visit_count
+				statement.bindInt32Parameter(5, aType);		// type
+				statement.execute();
+			}
+
+		}catch(ex){
+			ChaikaCore.logger.error(storage.lastErrorString);
+			ChaikaCore.logger.error(ex);
+			return false;
+		}finally{
+			storage.commitTransaction();
+		}
+
+		return true;
+	},
+
+
+	clearHistory: function ChaikaHistory_clearHistory(){
+		var storage = ChaikaCore.storage;
+		storage.beginTransaction();
+		try{
+			storage.executeSimpleSQL("DELETE FROM history;");
+		}catch(ex){
+			ChaikaCore.logger.error(storage.lastErrorString);
+			ChaikaCore.logger.error(ex);
+		}finally{
+			storage.commitTransaction();
+		}
+
+		/*
+		try{
+			storage.executeSimpleSQL("VACUUM");
+		}catch(ex){
+			ChaikaCore.logger.error(storage.lastErrorString);
+			ChaikaCore.logger.error(ex);
+		}
+		*/
 	}
 
 };

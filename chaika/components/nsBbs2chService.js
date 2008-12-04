@@ -39,104 +39,6 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 
 
-function b2rGlobalHistory(aBbs2chService){
-	this._init(aBbs2chService);
-}
-
-b2rGlobalHistory.prototype = {
-
-	get historyDB(){
-		return this._historyDB;
-	},
-
-	_init: function(aBbs2chService){
-		var storageService = Cc["@mozilla.org/storage/service;1"]
-				.getService(Ci.mozIStorageService);
-		var dbFile = aBbs2chService.getDataDir();
-		dbFile.appendRelativePath("history.sqlite");
-			// 初回起動でデータディレクトリが存在しない場合にそなえて先に作成
-		if(!dbFile.exists()){
-			dbFile.create(dbFile.NORMAL_FILE_TYPE, 0666);
-		}
-
-		this._historyDB = storageService.openDatabase(dbFile);
-
-		this._historyDB.beginTransaction();
-		try{
-			if(!this._historyDB.tableExists("history")){
-				var sql = <><![CDATA[
-					CREATE TABLE history(
-						id INTEGER PRIMARY KEY,
-						url TEXT NOT NULL,
-						title NOT NULL,
-						last_visited INTEGER NOT NULL DEFAULT 0,
-						visit_count INTEGER NOT NULL DEFAULT 1,
-						type INTEGER NOT NULL DEFAULT 0
-					);
-				]]></>.toString();
-				this._historyDB.executeSimpleSQL(sql);
-			}
-
-			var historyExpireDays = aBbs2chService.pref.getIntPref("extensions.chaika.history_expire_days");
-			if(historyExpireDays > 365) historyExpireDays = 365;
-			var sql = "DELETE FROM history WHERE last_visited < strftime('%s', 'now', '-" + historyExpireDays +  " day')";
-			this._historyDB.executeSimpleSQL(sql);
-
-		}finally{
-			this.historyDB.commitTransaction();
-		}
-	},
-
-	visitPage: function(aURL, aTitle, aType){
-		var pageID = null;
-
-		this.historyDB.beginTransaction();
-		try{
-			var sql = "SELECT id FROM history WHERE url=?1";
-			var statement = this.historyDB.createStatement(sql);
-			statement.bindStringParameter(0, aURL.spec);
-			if(statement.executeStep()){
-				pageID = statement.getInt32(0);
-			}
-			statement.reset();
-
-			if(pageID){
-				sql = "UPDATE history SET title=?1, visit_count=visit_count+1, last_visited=?2 WHERE id=?3;";
-				statement = this.historyDB.createStatement(sql);
-				statement.bindStringParameter(0, aTitle);
-				statement.bindInt32Parameter(1, Date.now() / 1000);
-				statement.bindInt32Parameter(2, pageID);
-				statement.execute();
-			}else{
-				sql = "INSERT INTO history(url, title, type, last_visited) VALUES(?1, ?2, ?3, ?4);";
-				statement = this.historyDB.createStatement(sql);
-				statement.bindStringParameter(0, aURL.spec);
-				statement.bindStringParameter(1, aTitle);
-				statement.bindInt32Parameter(2, aType);
-				statement.bindInt32Parameter(3, Date.now() / 1000);
-				statement.execute();
-			}
-		}finally{
-			this.historyDB.commitTransaction();
-		}
-		return true;
-	},
-
-	clearHistory: function(){
-		this._historyDB.beginTransaction();
-		try{
-			this._historyDB.executeSimpleSQL("DELETE FROM history;");
-		}finally{
-			this.historyDB.commitTransaction();
-		}
-
-		try{
-			this._historyDB.executeSimpleSQL("VACUUM");
-		}catch(ex){}
-	}
-};
-
-
 
 
 function nsBbs2chService(){
@@ -152,7 +54,6 @@ function nsBbs2chService(){
 
 	this.__unicodeConverter = null;
 	this.__ioService = null;
-	this._globalHistory = null;
 	this._pref = null;
 	this._prefDefault = null;
 	this._userAgent = null;
@@ -221,24 +122,18 @@ nsBbs2chService.prototype = {
 		return this._maruSessionID;
 	},
 
-	get historyDB(){
-		return this._globalHistory.historyDB;
-	},
-
 	_delayInit: function(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		ChaikaCore._init();
 		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 
 
-		this._globalHistory = new b2rGlobalHistory(this);
 		this._maruAutoAuth();
 	},
 
 	_shutdown: function(){
 		this.__unicodeConverter = null;
 		this.__ioService = null;
-		this._globalHistory = null;
 		this._pref = null;
 		this._prefDefault = null;
 		this._userAgent = null;
@@ -589,16 +484,6 @@ nsBbs2chService.prototype = {
 		var os = Cc["@mozilla.org/observer-service;1"]
 					.getService(Ci.nsIObserverService);
 		os.notifyObservers(null, "b2r-2ch-viewer-auth", "NG");
-	},
-
-
-	visitPage: function(aURL, aTitle, aType){
-		return this._globalHistory.visitPage(aURL, aTitle, aType);
-	},
-
-
-	clearHistory :function(){
-		this._globalHistory.clearHistory();
 	},
 
 

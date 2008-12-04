@@ -1,3 +1,6 @@
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+
 this.script = {
 
 	start: function(aServerHandler){
@@ -258,8 +261,9 @@ b2rThread2ch.prototype = {
 
 	close: function(){
 		if(this._headerResponded && this.dat){
+			var threadID = ChaikaBoard.getBoardID(this.dat.boardURL) + this.dat.id;
 			var title = this._bbs2chService.fromSJIS(this.dat.title);
-			this._bbs2chService.visitPage(this.dat.threadPlainURL, title, 1);
+			ChaikaCore.history.visitPage(this.dat.threadPlainURL, threadID, title, 1);
 		}
 		this._opend = false;
 		this._httpChannel = null;

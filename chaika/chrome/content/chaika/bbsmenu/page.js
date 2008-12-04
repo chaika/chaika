@@ -1,3 +1,4 @@
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
@@ -141,10 +142,10 @@ function updateHistoryMenu(){
 	if(boardMax > 15) boardMax = 15;
 
 	var sql = "SELECT url, title FROM history WHERE type=0 ORDER BY last_visited DESC LIMIT ?1";
-	var statement = gBbs2chService.historyDB.createStatement(sql);
+	var statement = ChaikaCore.storage.createStatement(sql);
 	statement.bindInt32Parameter(0, boardMax);
 
-	gBbs2chService.historyDB.beginTransaction();
+	ChaikaCore.storage.beginTransaction();
 	try{
 		while(statement.executeStep()){
 			var url =  "bbs2ch:board:" + statement.getString(0);
@@ -157,7 +158,7 @@ function updateHistoryMenu(){
 		}
 		statement.reset();
 	}finally{
-		gBbs2chService.historyDB.commitTransaction();
+		ChaikaCore.storage.commitTransaction();
 	}
 
 	if(popHistory.hasChildNodes()){
@@ -168,10 +169,10 @@ function updateHistoryMenu(){
 	var threadMax = gBbs2chService.pref.getIntPref("extensions.chaika.bbsmenu_historymenu_thread_max");
 	if(threadMax > 15) threadMax = 15;
 	sql = sql = "SELECT url, title FROM history WHERE type=1 ORDER BY last_visited DESC LIMIT ?1";
-	statement = gBbs2chService.historyDB.createStatement(sql);
+	statement = ChaikaCore.storage.createStatement(sql);
 	statement.bindInt32Parameter(0, threadMax);
 
-	gBbs2chService.historyDB.beginTransaction();
+	ChaikaCore.storage.beginTransaction();
 	try{
 		while(statement.executeStep()){
 			var url = statement.getString(0);
@@ -195,7 +196,7 @@ function updateHistoryMenu(){
 		}
 		statement.reset();
 	}finally{
-		gBbs2chService.historyDB.commitTransaction();
+		ChaikaCore.storage.commitTransaction();
 	}
 
 	if(popHistory.hasChildNodes()){
@@ -225,7 +226,7 @@ function popHistoryClick(aEvent){
 }
 
 function clearHistory(){
-	gBbs2chService.clearHistory();
+	ChaikaCore.history.clearHistory();
 }
 
 /**

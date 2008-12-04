@@ -35,6 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
@@ -182,7 +184,8 @@ function initTreeSubject(){
 	document.getElementById("lblTitle").setAttribute("value", gBoardItems.title);
 
 	if(gFirstInitTreeSubject){
-		gBbs2chService.visitPage(gBoardItems.url, gBoardItems.title, 0);
+		ChaikaCore.history.visitPage(gBoardItems.url,
+				ChaikaBoard.getBoardID(gBoardItems.url), gBoardItems.title, 0);
 		gFirstInitTreeSubject = false;
 	}
 
