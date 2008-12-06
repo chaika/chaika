@@ -43,6 +43,7 @@ Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 var gBbs2chService = Cc["@mozilla.org/bbs2ch-service;1"].getService(Ci.nsIBbs2chService);
 var gTreeSubject;
 var gBoardItems;
+var gBoard;
 var gSubjectDownloader;
 var gSettingDownloader;
 var gBoardMoveChecker;
@@ -68,8 +69,12 @@ function startup(){
 
 	gBoardItems = new Bbs2chBoardItems(boardURLSpec);
 
+	try{
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var boardURL = ioService.newURI(boardURLSpec, null, null);
+		gBoard = new ChaikaBoard(boardURL);
+	}catch(ex){
 		// 認識できない URL
-	if(!gBoardItems.validURL){
 		alert("BAD URL");
 		return;
 	}
@@ -88,14 +93,17 @@ function startup(){
 	}
 
     	// ツリーの偶数行に色をつける
-	if(gBbs2chService.pref.getBoolPref("extensions.chaika.enable_tree_stripe2"))
+	if(gBbs2chService.pref.getBoolPref("extensions.chaika.enable_tree_stripe2")){
 		gTreeSubject.setAttribute("stripe", "true");
+	}
 
+	var subjectFile = gBoard.subjectFile.clone();
+	var settingFile = gBoard.settingFile.clone();
 	if(gBbs2chService.pref.getBoolPref("extensions.chaika.board_auto_update")){
 		subjectUpdate();
-	}else if(!gBoardItems.subjectFile.exists() || gBoardItems.subjectFile.fileSize==0){
+	}else if(!subjectFile.exists() || subjectFile.fileSize==0){
 		subjectUpdate();
-	}else if(!gBoardItems.settingFile.exists() || gBoardItems.settingFile.fileSize==0){
+	}else if(!settingFile.exists() || settingFile.fileSize==0){
 		settingUpdate();
 	}else{
 		initTreeSubject();
@@ -180,25 +188,20 @@ function savePersist(){
  * TreeSubject の初期化
  */
 function initTreeSubject(){
-	document.title = gBoardItems.title + " [chaika]";
-	document.getElementById("lblTitle").setAttribute("value", gBoardItems.title);
+	var boardTitle = gBoard.getTitle();
+	document.title = boardTitle + " [chaika]";
+	document.getElementById("lblTitle").setAttribute("value", boardTitle);
 
 	if(gFirstInitTreeSubject){
-		ChaikaCore.history.visitPage(gBoardItems.url,
-				ChaikaBoard.getBoardID(gBoardItems.url), gBoardItems.title, 0);
+		ChaikaCore.history.visitPage(gBoard.url,
+				ChaikaBoard.getBoardID(gBoard.url), boardTitle, 0);
 		gFirstInitTreeSubject = false;
 	}
 
 	var aFilterLimit = Number(document.getElementById("mlstFilterLimit").getAttribute("value"));
 	var showDownedLogs = document.getElementById("chkShowDownedLogs").getAttribute("checked") == "true";
 	gBoardItems.refresh(aFilterLimit, showDownedLogs);
-
-	var nativeJSON = Components.classes["@mozilla.org/dom/json;1"]
-                 .createInstance(Components.interfaces.nsIJSON);
-	var s = nativeJSON.encode(gBoardItems.items);
-	s = gBbs2chService.toSJIS(s);
-	gBbs2chService.writeFile("d:\\items.json", s, false);
-
+	gBoard.boardSubjectUpdate();
 
 		// ソート
 	var sortCol = null;
@@ -383,9 +386,9 @@ function deleteLog(){
 		var datID = gBoardItems.items[indices[i]].datID;
 
 					// ログディレクトリ内の .dat ファイル
-		var datFile = gBbs2chService.getLogFileAtURL(gBoardItems.url.resolve(datID + ".dat"));
+		var datFile = gBbs2chService.getLogFileAtURL(gBoard.url.resolve(datID + ".dat"));
 					// ログディレクトリ内の .idx ファイル
-		var idxFile = gBbs2chService.getLogFileAtURL(gBoardItems.url.resolve(datID + ".idx"));
+		var idxFile = gBbs2chService.getLogFileAtURL(gBoard.url.resolve(datID + ".idx"));
 
 		try{
 			if(datFile.exists()) datFile.remove(false);
@@ -477,8 +480,10 @@ function subjectUpdate(aEvent){
 	if(aEvent && aEvent.type=="click" && aEvent.button!=0) return;
 
 		// ダウンロード間隔の制限
-	if(gBoardItems.subjectFile.exists()){
-		var interval = new Date().getTime() - gBoardItems.subjectFile.lastModifiedTime;
+	var subjectFile = gBoard.subjectFile.clone();
+	var settingFile = gBoard.settingFile.clone();
+	if(subjectFile.exists()){
+		var interval = new Date().getTime() - subjectFile.lastModifiedTime;
 		var updateIntervalLimit =  gBbs2chService.pref.getIntPref(
 					"extensions.chaika.board_update_interval_limit");
 			// 不正な値や、15 秒以下なら 15 秒にする
@@ -486,7 +491,7 @@ function subjectUpdate(aEvent){
 			updateIntervalLimit = 15;
 
 		if(interval < updateIntervalLimit * 1000){
-			if(!gBoardItems.settingFile.exists() || gBoardItems.settingFile.fileSize==0){
+			if(!settingFile.exists() || settingFile.fileSize==0){
 				settingUpdate();
 			}else{
 				initTreeSubject();
@@ -495,21 +500,25 @@ function subjectUpdate(aEvent){
 		}
 	}
 
-	gSubjectDownloader = new b2rDownloader(gBoardItems.subjectURL.spec,
-									gBoardItems.subjectFile.path);
+	gSubjectDownloader = new b2rDownloader(gBoard.subjectURL.spec,
+									gBoard.subjectFile.path);
 
 	gSubjectDownloader.onStart = function(aDownloader){
 		setStatus("start: " + this.urlSpec);
 	};
 	gSubjectDownloader.onStop = function(aDownloader, aStatus){
 		setStatus("");
-		if(aStatus == 302 || gBoardItems.subjectFile.clone().fileSize==0){
+
+		var subjectFile = gBoard.subjectFile.clone();
+		var settingFile = gBoard.settingFile.clone();
+
+		if(aStatus == 302 || !subjectFile.exists() || subjectFile.fileSize==0){
 			setStatus("スレッド一覧を取得できませんでした。板が移転した可能性があります。");
 			document.getElementById("dckUpdate").selectedIndex = 1;
 			return;
 		}
 
-		if(!gBoardItems.settingFile.exists() || gBoardItems.settingFile.fileSize==0){
+		if(!settingFile.exists() || settingFile.fileSize==0){
 			settingUpdate();
 		}else{
 			initTreeSubject();
@@ -544,8 +553,8 @@ function subjectUpdate(aEvent){
  * SETTING.TXT をダウンロードする
  */
 function settingUpdate(){
-	gSettingDownloader = new b2rDownloader(gBoardItems.settingURL.spec,
-									gBoardItems.settingFile.path);
+	gSettingDownloader = new b2rDownloader(gBoard.settingURL.spec,
+									gBoard.settingFile.path);
 
 	gSettingDownloader.onStart = function(aDownloader){
 		setStatus("start: " + this.urlSpec);
@@ -577,7 +586,7 @@ function createSettingFile(){
 		// 板名記入ダイアログ表示
 	var promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 							.getService(Ci.nsIPromptService);
-	var promptTitle = gBoardItems.url.spec + " [chaika]";
+	var promptTitle = gBoard.url.spec + " [chaika]";
 	var promptMsg = "Entry This Board Title";
 	var promptValue = { value: "" };
 	promptService.prompt(window, promptTitle, promptMsg, promptValue, null, {});
@@ -585,21 +594,21 @@ function createSettingFile(){
 	var settingContent = "";
 	if(promptValue.value){
 		settingContent = "BBS_TITLE=" + promptValue.value + "\n";
-		settingContent = gBbs2chService.toType(settingContent, gBoardItems.type);
+		settingContent = gBbs2chService.toType(settingContent, gBoard.type);
 	}
 
-	gBbs2chService.writeFile(gBoardItems.settingFile.path, settingContent, false);
+	gBbs2chService.writeFile(gBoard.settingFile.path, settingContent, false);
 }
 
 function showBrowser(aTab){
 	if(aTab){
 		document.getElementById("popTools").hidePopup();
 	}
-	gBbs2chService.openURL(gBoardItems.url.spec, null, aTab);
+	gBbs2chService.openURL(gBoard.url.spec, null, aTab);
 }
 
 function openLogsDir(){
-	var logDir = gBoardItems.subjectFile.parent.QueryInterface(Ci.nsILocalFile);
+	var logDir = gBoard.subjectFile.parent.QueryInterface(Ci.nsILocalFile);
 	try{
 		logDir.reveal();
 	}catch(ex){
@@ -630,12 +639,12 @@ function showBanner(aEvent){
 
 	var imgBanner = document.getElementById("imgHiddenBanner");
 	imgBanner.removeAttribute("src");
-	imgBanner.setAttribute("src", gBoardItems.logoURL.spec);
+	imgBanner.setAttribute("src", gBoardI.getLogoURL().spec);
 }
 
 function bannerLoaded(){
 	var imgBanner = document.getElementById("imgBanner");
-	imgBanner.setAttribute("src", gBoardItems.logoURL.spec);
+	imgBanner.setAttribute("src", gBoardI.getLogoURL().spec);
 
 	var lblShowBanner = document.getElementById("lblShowBanner");
 	var popBanner = document.getElementById("popBanner");
@@ -644,7 +653,7 @@ function bannerLoaded(){
 }
 
 function bannerLoadError(aEvent){
-
+	alert(aEvent);
 }
 
 
@@ -656,9 +665,9 @@ function addBookmark(aLiveBookmark){
 	const ADD_BOOKMARK_URL = "chrome://browser/content/bookmarks/addBookmark2.xul";
 	const ADD_BOOKMARK_FLAG = "centerscreen,chrome,dialog,resizable,dependent";
 
-	var name = gBoardItems.title + " [chaika]";
-	var url = "bbs2ch:board:" + gBoardItems.url.spec;
-	var feedURL = aLiveBookmark ? "bbs2ch:board-rss:" + gBoardItems.url.spec : null;
+	var name = gBoard.getTitle() + " [chaika]";
+	var url = "bbs2ch:board:" + gBoard.url.spec;
+	var feedURL = aLiveBookmark ? "bbs2ch:board-rss:" + gBoard.url.spec : null;
 
 	var arg = { name:name, url:url, feedURL: feedURL};
 	openDialog(ADD_BOOKMARK_URL, "", ADD_BOOKMARK_FLAG, arg);
@@ -681,7 +690,7 @@ function boardMoveCheck(aEvent){
 		}
 		gBoardMoveChecker = null;
 	}
-	gBoardMoveChecker.check(gBoardItems.url.spec);
+	gBoardMoveChecker.check(gBoard.url.spec);
 	setStatus("板の移転を確認中...");
 }
 
@@ -689,22 +698,25 @@ function moveNewURL(aEvent){
 	if(aEvent.type=="click" && aEvent.button!=0) return;
 
 	if(gNewURL){
-		var oldLogDir = gBbs2chService.getLogFileAtURL(gBoardItems.url.spec);
+		var oldLogDir = gBbs2chService.getLogFileAtURL(gBoard.url.spec);
 		try{
-			if(gBoardItems.subjectFile.exists() && gBoardItems.subjectFile.fileSize==0){
-				gBoardItems.subjectFile.remove(true);
+			var subjectFile = gBoard.subjectFile.clone();
+			var settingFile = gBoard.settingFile.clone();
+			if(subjectFile.exists() && subjectFile.fileSize==0){
+				subjectFile.remove(true);
 			}
-			if(gBoardItems.settingFile.exists() && gBoardItems.settingFile.fileSize==0){
-				gBoardItems.settingFile.remove(true);
+			if(settingFile.exists() && settingFile.fileSize==0){
+				settingFile.remove(true);
 			}
 			oldLogDir.remove(false);
 		}catch(ex){}
-
+/*
 		if(oldLogDir.exists() && window.confirm("ログファイルも移動しますか?")) {
 			var logMoveDialogURL = "chrome://chaika/content/board/logMove.xul";
 			window.openDialog(logMoveDialogURL, "", "modal,chrome,centerscreen",
-						gBoardItems.title, gBoardItems.url.spec, gNewURL);
+						gBoard.getTitle(), gBoard.url.spec, gNewURL);
 		}
+*/
 		setTimeout(function(){
 			window.location.href = "bbs2ch:board:" + gNewURL;
 		}, 0);

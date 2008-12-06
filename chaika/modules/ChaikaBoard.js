@@ -51,6 +51,13 @@ function makeException(aResult){
 	return new Components.Exception("exception", aResult, stack);
 }
 
+/** @ignore */
+function convertEntities(aString){
+	if(aString.indexOf("&") == -1) return aString;
+	return aString.replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
+				.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+}
+
 
 // getBoardType で利用する例外的な URL のリスト (2ch だけど板じゃない URL)
 const EX_HOSTS = [
@@ -63,8 +70,232 @@ const EX_HOSTS = [
 	];
 
 
-function ChaikaBoard(){
+/**
+ * 板情報(スレッド一覧)を扱うオブジェクト
+ * @class
+ */
+function ChaikaBoard(aBoardURL){
+	if(!(aBoardURL instanceof Ci.nsIURL)){
+		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+	}
+	if(aBoardURL.scheme.indexOf("http") != 0){
+		throw makeException(Cr.NS_ERROR_INVALID_ARG);
+	}
+
+	this._init(aBoardURL);
 }
+
+ChaikaBoard.prototype = {
+
+	_init: function ChaikaBoard__init(aBoardURL){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+		this.url = aBoardURL;
+		if(this.url.fileName){ // URL の最後が "/" で終わっていないなら追加
+			ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + this.url.spec);
+			this.url = ioService.newURI(this.url.spec + "/", null, null)
+							.QueryInterface(Ci.nsIURL);
+		}
+
+		this.id = ChaikaBoard.getBoardID(this.url);
+		this.type = ChaikaBoard.getBoardType(this.url);
+
+		this.subjectURL = ioService.newURI("subject.txt", null, this.url)
+				.QueryInterface(Ci.nsIURL);
+		this.subjectFile = ChaikaBoard.getLogFileAtURL(this.subjectURL);
+
+		this.settingURL = ioService.newURI("SETTING.TXT", null, this.url)
+					.QueryInterface(Ci.nsIURL);
+		this.settingFile = ChaikaBoard.getLogFileAtURL(this.settingURL);
+
+		var logger = ChaikaCore.logger;
+		logger.debug("id:   " + this.id);
+		logger.debug("url:  " + this.url.spec);
+		logger.debug("type: " + this.type);
+		logger.debug("subjectURL:  " + this.subjectURL.spec);
+		logger.debug("subjectFile: " + this.subjectFile.path);
+		logger.debug("settingURL:  " + this.settingURL.spec);
+		logger.debug("settingFile: " + this.settingFile.path);
+	},
+
+
+	getTitle: function ChaikaBoard_getTitle(){
+		return this.getSetting("BBS_TITLE") || this.url.spec;
+	},
+
+
+	getLogoURL: function ChaikaBoard_getLogoURL(){
+		var logoURLSpec = this.getSetting("BBS_TITLE_PICTURE") ||
+				this.getSetting("BBS_FIGUREHEAD") || null;
+
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		if(logoURLSpec){
+			try{
+					// 相対リンクの解決
+				return ioService.newURI(logoURLSpec, null, this.url).QueryInterface(Ci.nsIURL);
+			}catch(ex){
+				try{
+					return ioService.newURI(logoURLSpec, null, null).QueryInterface(Ci.nsIURL);
+				}catch(ex2){
+					return null;
+				}
+			}
+		}
+		return null;
+	},
+
+
+	getSetting: function ChaikaBoard_getSetting(aSettingName){
+		if(!this._settings){
+			this._settings = [];
+
+			if(this.settingFile.exists()){
+				var charset;
+				switch(this.type){
+					case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
+					case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+					case Ci.nsIBbs2chService.BOARD_TYPE_OLD2CH:
+						charset =  "Shift_JIS";
+						break;
+					case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+					case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+						charset = "EUC-JP";
+						break;
+				}
+
+				var fileStream = ChaikaCore.io.getFileInputStream(this.settingFile, charset)
+							.QueryInterface(Ci.nsIUnicharLineInputStream);
+				var line = {};
+				while(fileStream.readLine(line)){
+					var splitPos = line.value.indexOf("=");
+					if(splitPos != -1){
+						var key = line.value.substring(0, splitPos);
+						var value = line.value.substring(splitPos + 1) || null;
+						this._settings[key] = value;
+					}
+				}
+				fileStream.close();
+			}
+
+		}
+		return this._settings[aSettingName] || null;
+	},
+
+
+	boardSubjectUpdate: function ChaikaBoard_boardSubjectUpdate(){
+		if(!this.subjectFile.exists()){
+			ChaikaCore.logger.warning("FILE NOT FOUND: " + this.subjectFile.path);
+			return;
+		}
+
+			// 行の解析に使う正規表現
+		var regLine;
+		switch(this.type){
+			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
+			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+				regLine = /^(\d{9,10})\.dat<>(.+) ?\((\d{1,4})\)/;
+				break;
+			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+				regLine = /^(\d{9,10})\.cgi,(.+) ?\((\d{1,4})\)/;
+				break;
+		}
+
+		var charset;
+		switch(this.type){
+			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
+			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+				charset = "Shift_JIS";
+				break;
+			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+				charset = "euc-jp";
+				break;
+		}
+
+		var fileStream = ChaikaCore.io.getFileInputStream(this.subjectFile, charset)
+								.QueryInterface(Ci.nsIUnicharLineInputStream);
+
+		var database = ChaikaCore.storage;
+		var statement = database.createStatement(
+				"INSERT INTO board_subject(thread_id, board_id, dat_id, title, title_n, line_count, ordinal) " +
+				"VALUES(?1,?2,?3,?4,?5,?6,?7);");
+
+		var boardID = this.id;
+		database.beginTransaction();
+		try{
+			database.executeSimpleSQL("DELETE FROM board_subject WHERE board_id='" + boardID + "';");
+			var line = {};
+			var ordinal = 1;
+			while(fileStream.readLine(line)) {
+				if(!regLine.test(line.value)) continue;
+				var datID = RegExp.$1;
+				var threadID = boardID + datID;
+				var count = Number(RegExp.$3);
+				var title = convertEntities(RegExp.$2);
+				// ChaikaCore.logger.debug([threadID, boardID, datID, count, ordinal]);
+				statement.bindStringParameter(0, threadID);
+				statement.bindStringParameter(1, boardID);
+				statement.bindStringParameter(2, datID);
+				statement.bindStringParameter(3, title);
+				statement.bindStringParameter(4, "");
+				statement.bindInt32Parameter(5, count);
+				statement.bindInt32Parameter(6, ordinal);
+				statement.execute();
+				ordinal++;
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}finally{
+			statement.reset();
+			database.commitTransaction();
+			fileStream.close();
+		}
+		this._setBoardData();
+	},
+
+
+	_setBoardData: function(){
+		var boardID = this.id;
+		var type = this.type;
+		var database = ChaikaCore.storage;
+		database.beginTransaction();
+		var statement = database.createStatement("SELECT _rowid_ FROM board_data WHERE board_id=?1;");
+		try{
+			statement.bindStringParameter(0, boardID);
+			var boardRowID = 0;
+			if(statement.executeStep()){
+				boardRowID = statement.getInt64(0);
+			}
+			statement.reset();
+
+			if(boardRowID){
+				statement = database.createStatement(
+					"UPDATE board_data SET url=?1, type=?2, last_modified=?3 WHERE _rowid_=?4;");
+				statement.bindStringParameter(0, this.url.spec);
+				statement.bindInt32Parameter(1, type);
+				statement.bindInt64Parameter(2, this.subjectFile.clone().lastModifiedTime);
+				statement.bindInt64Parameter(3, boardRowID);
+				statement.execute();
+			}else{
+				statement = database.createStatement(
+					"INSERT OR REPLACE INTO board_data(board_id, url, type, last_modified) VALUES(?1,?2,?3,?4);");
+ 				statement.bindStringParameter(0, boardID);
+				statement.bindStringParameter(1, this.url.spec);
+				statement.bindInt32Parameter(2, type);
+				statement.bindInt64Parameter(3, this.subjectFile.clone().lastModifiedTime);
+				statement.execute();
+			}
+		}catch(ex){
+			Components.utils.reportError(ex);
+		}finally{
+			statement.reset();
+			database.commitTransaction();
+		}
+	}
+
+};
 
 
 ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
