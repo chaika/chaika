@@ -56,16 +56,71 @@ const PR_CREATE_FILE = 0x08;
 const PR_APPEND = 0x10;
 const PR_TRUNCATE = 0x20;
 
+
 const STORAGE_SQL_HISTORY = [
-	"CREATE TABLE history(",
-	"    id TEXT NOT NULL UNIQUE,",
-	"    url TEXT NOT NULL,",
-	"    title NOT NULL,",
-	"    last_visited INTEGER NOT NULL DEFAULT 0,",
-	"    visit_count INTEGER NOT NULL DEFAULT 1,",
-	"    type INTEGER NOT NULL DEFAULT 0",
-	");"
-].join("\n");
+		"CREATE TABLE history(",
+		"    id TEXT NOT NULL UNIQUE,",
+		"    url TEXT NOT NULL,",
+		"    title NOT NULL,",
+		"    last_visited INTEGER NOT NULL DEFAULT 0,",
+		"    visit_count INTEGER NOT NULL DEFAULT 1,",
+		"    type INTEGER NOT NULL DEFAULT 0",
+		");"
+	].join("\n");
+const STORAGE_SQL_BBSMENU = [
+		"CREATE TABLE bbsmenu(",
+		"    title       TEXT NOT NULL,",
+		"    title_n     TEXT NOT NULL,",
+		"    url         TEXT,",
+		"    path        TEXT NOT NULL,",
+		"    board_type  INTEGER,",
+		"    board_id    TEXT,",
+		"    is_category INTEGER NOT NULL",
+		");",
+		"CREATE INDEX IF NOT EXISTS bbsmenu_board_id_index ON bbsmenu(board_id);"
+	].join("\n");
+const SQL_THREAD_DATA = [
+		"CREATE TABLE thread_data(",
+		"    thread_id          TEXT NOT NULL UNIQUE,",
+		"    board_id           TEXT NOT NULL,",
+		"    url                TEXT NOT NULL,",
+		"    dat_id             TEXT NOT NULL,",
+		"    title              TEXT,",
+		"    title_n            TEXT,",
+		"    line_count         INTEGER DEFAULT 0,",
+		"    read_position      INTEGER DEFAULT 0,",
+		"    http_last_modified TEXT,",
+		"    maru_getted        INTEGER DEFAULT 0,",
+		"    stored             INTEGER DEFAULT 0,",
+		"    post_name          TEXT,",
+		"    post_mail          TEXT,",
+		"    rate               INTEGER DEFAULT 0",
+		");",
+	].join("\n");
+const SQL_BOARD_SUBJECT = [
+		"CREATE TABLE board_subject(",
+		"    thread_id  TEXT NOT NULL UNIQUE,",
+		"    board_id   TEXT NOT NULL,",
+		"    dat_id     TEXT NOT NULL,",
+		"    title      TEXT,",
+		"    title_n    TEXT,",
+		"    line_count INTEGER DEFAULT 0,",
+		"    ordinal    INTEGER DEFAULT 0",
+		");"
+	].join("\n");
+const SQL_BOARD_DATA = [
+		"CREATE TABLE board_data(",
+		"    board_id       TEXT NOT NULL UNIQUE,",
+		"    url            TEXT NOT NULL,",
+		"    title          TEXT,",
+		"    title_n        TEXT,",
+		"    type           INTEGER DEFAULT 0,",
+		"    last_modified  INTEGER DEFAULT 0,",
+		"    subscribed     INTEGER DEFAULT 0,",
+		"    post_name      TEXT,",
+		"    post_mail      TEXT",
+		");"
+	].join("\n");
 
 
 /** @ignore */
@@ -174,6 +229,22 @@ var ChaikaCore = {
 			if(!storage.tableExists("history")){
 				storage.executeSimpleSQL(STORAGE_SQL_HISTORY);
 				ChaikaCore.logger.info("Create Table: history");
+			}
+			if(!storage.tableExists("bbsmenu")){
+				storage.executeSimpleSQL(STORAGE_SQL_BBSMENU);
+				ChaikaCore.logger.info("Create Table: bbsmenu");
+			}
+			if(!storage.tableExists("thread_data")){
+				storage.executeSimpleSQL(SQL_THREAD_DATA);
+				ChaikaCore.logger.info("Create Table: thread_data");
+			}
+			if(!storage.tableExists("board_subject")){
+				storage.executeSimpleSQL(SQL_BOARD_SUBJECT);
+				ChaikaCore.logger.info("Create Table: board_subject");
+			}
+			if(!storage.tableExists("board_data")){
+				storage.executeSimpleSQL(SQL_BOARD_DATA);
+				ChaikaCore.logger.info("Create Table: board_data");
 			}
 		}catch(ex){
 			ChaikaCore.logger.error(storage.lastErrorString);
