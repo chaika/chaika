@@ -36,7 +36,7 @@
 	</preferences>
 
 	<settingbox label="ブラウザ" orient="vertical">
-		<checkbox label="コンテキストメニューに bbs2chreader の項目を追加する"
+		<checkbox label="コンテキストメニューに chaika の項目を追加する"
 				preference="extensions.chaika.enable_browser_contextmenu"/>
 		<hbox id="boxDisregardURLOption" class="indent">
 		<checkbox label="URL の表示制限を無視して開く"
@@ -47,7 +47,7 @@
 	</settingbox>
 
 	<settingbox label="スレッドリダイレクタ" orient="vertical">
-		<checkbox label="2ch スレッド URL を自動的に bbs2chreader で開く"
+		<checkbox label="2ch スレッド URL を自動的に chaika で開く"
 				preference="extensions.chaika.thread_redirector.enabled"/>
 		<vbox id="boxRedirectorAsk" class="indent">
 			<checkbox label="毎回確認する"
