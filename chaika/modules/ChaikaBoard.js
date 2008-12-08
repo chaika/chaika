@@ -98,7 +98,11 @@ ChaikaBoard.prototype = {
 		}
 
 		this.id = ChaikaBoard.getBoardID(this.url);
+
 		this.type = ChaikaBoard.getBoardType(this.url);
+		if(this.type == Ci.nsIBbs2chService.BOARD_TYPE_PAGE){
+			this.type = Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+		}
 
 		this.subjectURL = ioService.newURI("subject.txt", null, this.url)
 				.QueryInterface(Ci.nsIURL);
@@ -168,14 +172,16 @@ ChaikaBoard.prototype = {
 				var fileStream = ChaikaCore.io.getFileInputStream(this.settingFile, charset)
 							.QueryInterface(Ci.nsIUnicharLineInputStream);
 				var line = {};
-				while(fileStream.readLine(line)){
+				var cont;
+				do{
+					cont = fileStream.readLine(line);
 					var splitPos = line.value.indexOf("=");
 					if(splitPos != -1){
 						var key = line.value.substring(0, splitPos);
 						var value = line.value.substring(splitPos + 1) || null;
 						this._settings[key] = value;
 					}
-				}
+				}while(cont);
 				fileStream.close();
 			}
 
@@ -392,7 +398,9 @@ ChaikaBoard.prototype = {
 			database.executeSimpleSQL("DELETE FROM board_subject WHERE board_id='" + boardID + "';");
 			var line = {};
 			var ordinal = 1;
-			while(fileStream.readLine(line)) {
+			var cont;
+			do{
+				cont = fileStream.readLine(line);
 				if(!regLine.test(line.value)) continue;
 				var datID = RegExp.$1;
 				var threadID = boardID + datID;
@@ -408,7 +416,7 @@ ChaikaBoard.prototype = {
 				statement.bindInt32Parameter(6, ordinal);
 				statement.execute();
 				ordinal++;
-			}
+			}while (cont);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
