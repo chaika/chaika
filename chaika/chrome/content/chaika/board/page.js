@@ -41,14 +41,13 @@ Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
 var gBbs2chService = Cc["@mozilla.org/bbs2ch-service;1"].getService(Ci.nsIBbs2chService);
-var gTreeSubject;
-var gBoardItems;
+var gBoardTree;
 var gBoard;
 var gSubjectDownloader;
 var gSettingDownloader;
 var gBoardMoveChecker;
 var gNewURL;
-var gFirstInitTreeSubject = true;
+var gFirstInitBoardTree = true;
 
 
 /**
@@ -67,8 +66,6 @@ function startup(){
 		// 板一覧URLの取得
 	var boardURLSpec = location.href.replace(/^bbs2ch:board:/, "");
 
-	gBoardItems = new Bbs2chBoardItems(boardURLSpec);
-
 	try{
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		var boardURL = ioService.newURI(boardURLSpec, null, null);
@@ -80,7 +77,7 @@ function startup(){
 	}
 
 
-	gTreeSubject = document.getElementById("treeSubject");
+	gBoardTree = document.getElementById("boardTree");
 	loadPersist();
 
 	var mlstFilterLimit = document.getElementById("mlstFilterLimit");
@@ -92,11 +89,6 @@ function startup(){
 		}
 	}
 
-    	// ツリーの偶数行に色をつける
-	if(gBbs2chService.pref.getBoolPref("extensions.chaika.enable_tree_stripe2")){
-		gTreeSubject.setAttribute("stripe", "true");
-	}
-
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
 	if(gBbs2chService.pref.getBoolPref("extensions.chaika.board_auto_update")){
@@ -106,7 +98,7 @@ function startup(){
 	}else if(!settingFile.exists() || settingFile.fileSize==0){
 		settingUpdate();
 	}else{
-		initTreeSubject();
+		initBoardTree();
 	}
 }
 
@@ -115,11 +107,6 @@ function startup(){
  * 終了時の処理
  */
 function shutdown(){
-	gTreeSubject.view = null;
-
-		// checked の値を完全に覚えさせる
-	var chkShowDownedLogs = document.getElementById("chkShowDownedLogs");
-	if(!chkShowDownedLogs.checked) chkShowDownedLogs.setAttribute("checked", "false");
 
 	savePersist();
 
@@ -176,8 +163,12 @@ function savePersist(){
 		for(var j=0; j<persists.length; j++){
 			var attrName = persists[j];
 			var attrValue = node.getAttribute(attrName);
-			if(attrValue != "")
-				persistPref.setCharPref(node.id +"."+ attrName, attrValue);
+			var prefName = node.id +"."+ attrName;
+			if(attrValue != ""){
+				persistPref.setCharPref(prefName, attrValue);
+			}else if(persistPref.prefHasUserValue(prefName)){
+				persistPref.clearUserPref(prefName);
+			}
 		}
 	}
 
@@ -185,81 +176,67 @@ function savePersist(){
 
 
 /**
- * TreeSubject の初期化
+ * boardTree の初期化
  */
-function initTreeSubject(){
+function initBoardTree(){
 	var boardTitle = gBoard.getTitle();
 	document.title = boardTitle + " [chaika]";
 	document.getElementById("lblTitle").setAttribute("value", boardTitle);
 
-	if(gFirstInitTreeSubject){
+	if(gFirstInitBoardTree){
 		ChaikaCore.history.visitPage(gBoard.url,
 				ChaikaBoard.getBoardID(gBoard.url), boardTitle, 0);
-		gFirstInitTreeSubject = false;
+		gFirstInitBoardTree = false;
 	}
 
 	var aFilterLimit = Number(document.getElementById("mlstFilterLimit").getAttribute("value"));
-	var showDownedLogs = document.getElementById("chkShowDownedLogs").getAttribute("checked") == "true";
-	gBoardItems.refresh(aFilterLimit, showDownedLogs);
-	gBoard.boardSubjectUpdate();
 
-		// ソート
-	var sortCol = null;
-	var sortProperty = "";
-	var sortDirection = "natural";
-	var colNodes = gTreeSubject.getElementsByTagName("treecol");
+	gBoard.refresh(aFilterLimit);
+	gBoardTree.builder.datasource = gBoard.itemsDoc.documentElement;
+	gBoardTree.builder.rebuild();
+
+		// 前回のソートを復元
+	var colNodes = document.getElementsByClassName("boardTreeCol");
 	for(var i=0; i<colNodes.length; i++){
 		if(colNodes[i].getAttribute("sortActive") == "true"){
-			sortCol = colNodes[i];
-			sortProperty = sortCol.getAttribute("property");
-			sortDirection = sortCol.getAttribute("sortDirection");
+			var sortDirection = colNodes[i].getAttribute("sortDirection");
+			if(sortDirection == "descending"){
+				colNodes[i].setAttribute("sortDirection", "ascending");
+			}else if(sortDirection == "natural"){
+				colNodes[i].setAttribute("sortDirection", "descending");
+			}else{
+				colNodes[i].setAttribute("sortDirection", "natural");
+			}
+			gBoardTree.builderView.sort(colNodes[i]);
 		}
 	}
-	function sortFunc(aItemA, aItemB){
-		var propA = aItemA[sortProperty];
-		var propB = aItemB[sortProperty];
-		return((propA > propB) - (propA < propB));
-	}
-	function reverseFunc(aItemA, aItemB){
-		var propA = aItemA[sortProperty];
-		var propB = aItemB[sortProperty];
-		return((propB > propA) - (propB < propA));
-	}
-	if(sortCol && sortDirection=="ascending") gBoardItems.items.sort(sortFunc);
-	if(sortCol && sortDirection=="descending") gBoardItems.items.sort(reverseFunc);
 
-	var searchString = document.getElementById("txtSearch").value;
-	if(searchString == ""){
-		gTreeSubject.view = new Bbs2chBoardTreeView(gBoardItems.items);
-	}else{
-			// 検索ツリーの表示
-		gBoardItems.search(searchString);
-		gTreeSubject.view = new Bbs2chBoardTreeView(gBoardItems.items);
-	}
 
 		// フォーカス
-	if(gTreeSubject.treeBoxObject.view.selection){
-		gTreeSubject.focus();
-		gTreeSubject.treeBoxObject.view.selection.select(0);
+	if(gBoardTree.treeBoxObject.view.selection){
+		gBoardTree.focus();
+		gBoardTree.treeBoxObject.view.selection.select(0);
 	}
 }
+
 
 /**
  * ツリーをクリックした時に呼ばれる
  * aEvent event クリック時のイベントオブジェクト
  */
-function treeSubjectClick(aEvent){
+function boardTreeClick(aEvent){
 		// ツリーのアイテム以外をクリック
 	if(getClickItemIndex(aEvent) == -1) return;
 
-	if(gTreeSubject._timer){
-		clearTimeout(gTreeSubject._timer);
+	if(gBoardTree._timer){
+		clearTimeout(gBoardTree._timer);
 	}
-	gTreeSubject._timer = setTimeout(treeSubjectClickDelay, 5, aEvent);
+	gBoardTree._timer = setTimeout(boardTreeClickDelay, 5, aEvent);
 }
 
-function treeSubjectClickDelay(aEvent){
-	gTreeSubject._timer = null;
+
+function boardTreeClickDelay(aEvent){
+	gBoardTree._timer = null;
 
 	var button = aEvent.button;
 	var detail = aEvent.detail;
@@ -291,8 +268,8 @@ function treeSubjectClickDelay(aEvent){
  * ツリーでキーボードダウン
  * aEvent event キーボードダウン時のイベントオブジェクト
  */
-function treeSubjectKeyDown(aEvent){
-	if(gTreeSubject.currentIndex == -1) return;
+function boardTreeKeyDown(aEvent){
+	if(gBoardTree.currentIndex == -1) return;
 
 		// エンターキー以外なら終了
 	if(!(aEvent.keyCode==aEvent.DOM_VK_ENTER || aEvent.keyCode==aEvent.DOM_VK_RETURN))
@@ -319,8 +296,11 @@ function openThread(aAddTab){
 
 
 function getSelectedThreadURL(){
-	var index = gTreeSubject.currentIndex;
+	var index = gBoardTree.currentIndex;
 	if(index == -1) return null;
+
+	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
+	var result = gBoardTree.builder.getResultForId(itemID);
 
 		// スレッド表示数の制限
 	var threadViewLimit = Number(gBbs2chService.pref.getIntPref(
@@ -331,7 +311,9 @@ function getSelectedThreadURL(){
 			threadViewLimit = "l" + threadViewLimit;
 	}
 
-	var url = "/thread/" + gBoardItems.items[index].url + threadViewLimit;
+	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+	var url = result.getBindingFor(atomService.getAtom("?url"));
+	url = "/thread/" + url + threadViewLimit;
 	return gBbs2chService.serverURL.resolve(url);
 }
 
@@ -339,7 +321,7 @@ function getSelectedThreadURL(){
 /**
  * ツリーのコンテキストメニューが表示されるときに呼ばれる
  */
-function showTreeSubjectContext(aEvent){
+function showBoardTreeContextMenu(aEvent){
 		// ツリーのアイテム以外をクリック
 	if(getClickItemIndex(aEvent) == -1) return false;
 
@@ -351,10 +333,14 @@ function showTreeSubjectContext(aEvent){
  * 選択スレッドの URL をクリップボードにコピー
  */
 function copyURL(){
-	var index = gTreeSubject.currentIndex;
+	var index = gBoardTree.currentIndex;
 	if(index == -1) return;
 
-	var url = gBoardItems.items[index].url;
+	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
+	var result = gBoardTree.builder.getResultForId(itemID);
+
+	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+	var url = result.getBindingFor(atomService.getAtom("?url"));
 
 	ChaikaClipboard.setString(url);
 }
@@ -364,11 +350,15 @@ function copyURL(){
  * 選択スレッドのタイトルと URL をクリップボードにコピー
  */
 function copyTitleAndURL(){
-	var index = gTreeSubject.currentIndex;
+	var index = gBoardTree.currentIndex;
 	if(index == -1) return;
 
-	var title = gBoardItems.items[index].title;
-	var url = gBoardItems.items[index].url;
+	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
+	var result = gBoardTree.builder.getResultForId(itemID);
+
+	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+	var title = result.getBindingFor(atomService.getAtom("?title"));
+	var url = result.getBindingFor(atomService.getAtom("?url"));
 
 	ChaikaClipboard.setString(title +"\n"+ url);
 }
@@ -378,24 +368,7 @@ function copyTitleAndURL(){
  * 選択スレッドのログを削除する (複数選択可)
  */
 function deleteLog(){
-	if(gTreeSubject.currentIndex == -1) return;
 
-	var indices = getSelectionIndices();
-
-	for(var i=0; i<indices.length; i++){
-		var datID = gBoardItems.items[indices[i]].datID;
-
-					// ログディレクトリ内の .dat ファイル
-		var datFile = gBbs2chService.getLogFileAtURL(gBoard.url.resolve(datID + ".dat"));
-					// ログディレクトリ内の .idx ファイル
-		var idxFile = gBbs2chService.getLogFileAtURL(gBoard.url.resolve(datID + ".idx"));
-
-		try{
-			if(datFile.exists()) datFile.remove(false);
-			if(idxFile.exists()) idxFile.remove(false);
-		}catch(e){}
-	}
-	initTreeSubject();
 }
 
 
@@ -408,12 +381,12 @@ function deleteLog(){
 function getSelectionIndices(){
 	var resultArray = new Array();
 
-	var rangeCount = gTreeSubject.treeBoxObject.view.selection.getRangeCount();
+	var rangeCount = gBoardTree.treeBoxObject.view.selection.getRangeCount();
 	for(var i=0; i<rangeCount; i++){
 		var rangeMin = {};
 		var rangeMax = {};
 
-		gTreeSubject.treeBoxObject.view.selection.getRangeAt(i, rangeMin, rangeMax);
+		gBoardTree.treeBoxObject.view.selection.getRangeAt(i, rangeMin, rangeMax);
 		for (var j=rangeMin.value; j<=rangeMax.value; j++){
 			resultArray.push(j);
 		}
@@ -423,7 +396,7 @@ function getSelectionIndices(){
 
 
 /**
- * gTreeSubject のクリックされたアイテムのインデックスを返す
+ * gBoardTree のクリックされたアイテムのインデックスを返す
  * アイテム以外をクリックしたときは、-1 を返す
  * @param aEvent event onClick のイベント
  * @return number アイテムのインデックス
@@ -431,7 +404,7 @@ function getSelectionIndices(){
 function getClickItemIndex(aEvent){
 	var row = {}
 	var obj = {}
-	gTreeSubject.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
+	gBoardTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
 	if(!obj.value) return -1;
 	return row.value;
 }
@@ -450,22 +423,7 @@ function searchTitle(aEvent, aSearchString){
 			(aEvent.keyCode != KeyEvent.DOM_VK_RETURN)))
 				return;
 
-		// ツリーを元に戻す
-	if (!aSearchString){
-		initTreeSubject();
-		return;
-	}
 
-	if(Ci.nsIFormHistory2){
-			// フォーム履歴に検索文字列を追加
-		var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
-				.getService(Ci.nsIFormHistory2);
-		formHistory.addEntry("bbs2ch-board-history", aSearchString);
-	}
-
-		// 検索ツリーの表示
-	gBoardItems.search(aSearchString);
-	gTreeSubject.view = new Bbs2chBoardTreeView(gBoardItems.items);
 }
 
 
@@ -494,7 +452,7 @@ function subjectUpdate(aEvent){
 			if(!settingFile.exists() || settingFile.fileSize==0){
 				settingUpdate();
 			}else{
-				initTreeSubject();
+				initBoardTree();
 			}
 			return;
 		}
@@ -518,10 +476,12 @@ function subjectUpdate(aEvent){
 			return;
 		}
 
+		gBoard.boardSubjectUpdate();
+
 		if(!settingFile.exists() || settingFile.fileSize==0){
 			settingUpdate();
 		}else{
-			initTreeSubject();
+			initBoardTree();
 		}
 	};
 	gSubjectDownloader.onProgressChange = function(aDownloader, aPercentage){
@@ -561,7 +521,7 @@ function settingUpdate(){
 	};
 	gSettingDownloader.onStop = function(aDownloader, aStatus){
 		setStatus("");
-		initTreeSubject();
+		initBoardTree();
 	};
 	gSettingDownloader.onProgressChange = function(aDownloader, aPercentage){
 		setStatus("downloading: " + aPercentage + "%");
@@ -571,7 +531,7 @@ function settingUpdate(){
 			setStatus("Download Error: NOT AVAILABLE: " + this.urlSpec);
 		}else{
 			createSettingFile();
-			initTreeSubject();
+			initBoardTree();
 		}
 	};
 
@@ -639,12 +599,12 @@ function showBanner(aEvent){
 
 	var imgBanner = document.getElementById("imgHiddenBanner");
 	imgBanner.removeAttribute("src");
-	imgBanner.setAttribute("src", gBoardI.getLogoURL().spec);
+	imgBanner.setAttribute("src", gBoard.getLogoURL().spec);
 }
 
 function bannerLoaded(){
 	var imgBanner = document.getElementById("imgBanner");
-	imgBanner.setAttribute("src", gBoardI.getLogoURL().spec);
+	imgBanner.setAttribute("src", gBoard.getLogoURL().spec);
 
 	var lblShowBanner = document.getElementById("lblShowBanner");
 	var popBanner = document.getElementById("popBanner");
@@ -653,24 +613,7 @@ function bannerLoaded(){
 }
 
 function bannerLoadError(aEvent){
-	alert(aEvent);
-}
-
-
-/**
- * ブックマークに追加
- * @param aLiveBookmark boolean 真ならライブブックマークとして追加
- */
-function addBookmark(aLiveBookmark){
-	const ADD_BOOKMARK_URL = "chrome://browser/content/bookmarks/addBookmark2.xul";
-	const ADD_BOOKMARK_FLAG = "centerscreen,chrome,dialog,resizable,dependent";
-
-	var name = gBoard.getTitle() + " [chaika]";
-	var url = "bbs2ch:board:" + gBoard.url.spec;
-	var feedURL = aLiveBookmark ? "bbs2ch:board-rss:" + gBoard.url.spec : null;
-
-	var arg = { name:name, url:url, feedURL: feedURL};
-	openDialog(ADD_BOOKMARK_URL, "", ADD_BOOKMARK_FLAG, arg);
+	alert("バナーの読み込みに失敗しました");
 }
 
 
@@ -782,155 +725,3 @@ b2rBoardMoveChecker.prototype = {
 	onChecked: function(aSuccess, aNewURL){}
 }
 
-
-
-
-/**
- * カスタムツリービューオブジェクト
- * @constructor
- *
- * @param aItems array ツリーの項目として表示するオブジェクトの配列
- */
-function Bbs2chBoardTreeView(aItems){
-	this._items = aItems;
-	this._rowCount = aItems.length;
-
-	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-	this._atom = new Array();
-	this._atom["s5"] = atomService.getAtom("s5");
-	this._atom["s4"] = atomService.getAtom("s4");
-	this._atom["s3"] = atomService.getAtom("s3");
-	this._atom["s2"] = atomService.getAtom("s2");
-	this._atom["s1"] = atomService.getAtom("s1");
-	this._atom["icon"] = atomService.getAtom("icon");
-}
-
-
-Bbs2chBoardTreeView.prototype = {
-
-
-// ********** ********* implements nsITreeView ********** **********
-
-
-	get rowCount(){
-		return this._rowCount;
-	},
-
-	selection: null,
-
-	getCellText : function(aRow, aCol){
-		var cellText = "";
-		var property = aCol.element._property;
-		var cellType = aCol.element._cellType;
-
-		switch(cellType){
-			case "icon":
-				cellText = "";
-				break;
-			case "str":
-				cellText = this._items[aRow][property];
-				break;
-			case "int":
-				cellText = String(this._items[aRow][property]);
-				break;
-		}
-		return cellText;
-	},
-
-	setTree: function(aTree){
-		if(aTree){
-			for(var i=0; i<aTree.columns.count; i++){
-				var columnElement = aTree.columns.getColumnAt(i).element;
-				columnElement._property = columnElement.getAttribute("property");
-				columnElement._cellType = columnElement.getAttribute("cellType");
-			}
-		}
-		this._treeBox = aTree;
-	},
-
-	cycleHeader: function(aCol){
-		var colElement = aCol.element;
-
-		var sortActive	  = colElement.getAttribute("sortActive");
-		var sortDirection = colElement.getAttribute("sortDirection");
-		var property  = colElement.getAttribute("property");
-		var treeNode = colElement.parentNode.parentNode;
-
-		switch(sortDirection){
-			case "ascending":
-				sortDirection = "descending";
-				sortActive = "true";
-				break;
-			case "descending":
-				sortDirection = "natural";
-				sortActive = "false";
-				break;
-			default:
-				sortDirection = "ascending";
-				sortActive = "true";
-				break;
-		}
-
-		colElement.setAttribute("sortDirection", sortDirection);
-		colElement.setAttribute("sortActive", sortActive);
-
-		var colNodes = colElement.parentNode.getElementsByTagName("treecol");
-		for(var i=0; i<colNodes.length; i++){
-			if(colNodes[i] == colElement) continue;
-			colNodes[i].setAttribute("sortDirection", "natural");
-			colNodes[i].setAttribute("sortActive", "false");
-		}
-
-		function sortFunc(aItemA, aItemB){
-			var propA = aItemA[property];
-			var propB = aItemB[property];
-			return((propA > propB) - (propA < propB));
-		}
-		function reverseFunc(aItemA, aItemB){
-			var propA = aItemA[property];
-			var propB = aItemB[property];
-			return((propB > propA) - (propB < propA));
-		}
-
-		if(sortDirection == "ascending") this._items.sort(sortFunc);
-		if(sortDirection == "descending") this._items.sort(reverseFunc);
-		this._treeBox.invalidate();
-	},
-
-	getRowProperties: function(aIndex, aProperties){
-		var status = "s" + this._items[aIndex].status;
-		aProperties.AppendElement(this._atom[status]);
-	},
-
-	getCellProperties: function(aRow, aCol, aProperties){
-		if(aCol.element._cellType == "icon"){
-			var status = "s" + this._items[aRow].status;
-			aProperties.AppendElement(this._atom[status]);
-			aProperties.AppendElement(this._atom["icon"]);
-		}
-	},
-	getColumnProperties: function(aCol, aProperties){},
-	isContainer: function(aRow){ return false; },
-	isContainerOpen: function(aRow){ return false; },
-	isContainerEmpty: function(aRow){ return false; },
-	isSeparator: function(aRow){ return false; },
-	isSorted: function(aRow){ return false; },
-	canDrop: function(aIndex){ return false; },
-	canDropOn: function(aIndex){},
-	canDropBeforeAfter: function(aIndex, aBefore){},
-	drop: function(aIndex, aOrientation){},
-	getParentIndex: function getParentIndex(aIndex){ return -1; },
-	hasNextSibling: function(aIndex, aAfterIndex){ return false; },
- 	getLevel: function(aIndex){ return 0; },
-	getImageSrc: function(aRow, aCol){},
-	getProgressMode: function(aRow, aCol){},
-	getCellValue: function(aRow, aCol){},
-	selectionChanged: function(){},
-	cycleCell: function(aRow, aCol){},
-	isEditable: function(aRow, aCol){ return false; },
-	setCellText: function(aRow, aCol, aValue){},
-	toggleOpenState: function(aIndex){},
-	performAction: function(aAction){},
-	performActionOnRow: function(aAction, aRow){},
-	performActionOnCell: function(aAction, aRow, aCol){}
-}

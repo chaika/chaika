@@ -933,6 +933,9 @@ b2rDat.prototype = {
 			this.remove();
 		}
 
+
+		this.getThreadData();
+/*
 			// idx ファイルからタイトル等を取得
 		if(this.idxFile.exists()){
 			var idxContent =  this._bbs2chService.readFile(this.idxFile.path);
@@ -947,10 +950,13 @@ b2rDat.prototype = {
 			this._lastModified = "";
 			this._maruGetted = false;
 		}
+*/
 	},
 
 
 	flushIdx: function(){
+		this.setThreadData();
+/*
 		var idxContent = new Array();
 		if(this.title) idxContent.push("title=" + this.title);
 		if(!isNaN(this.lineCount)) idxContent.push("lineCount=" + this.lineCount);
@@ -958,6 +964,89 @@ b2rDat.prototype = {
 		if(this.maruGetted) idxContent.push("maruGetted=true");
 		idxContent = idxContent.join("\n");
 		this._bbs2chService.writeFile(this.idxFile.path, idxContent, false);
+*/
+	},
+
+
+	getThreadData: function b2rDat_getThreadData(){
+		var boardID  = ChaikaBoard.getBoardID(this.boardURL);
+		var threadID = boardID + this.id;
+
+		var storage = ChaikaCore.storage;
+		storage.beginTransaction();
+		try{
+			var statement = storage.createStatement(
+					"SELECT title, line_count, http_last_modified, maru_getted FROM thread_data WHERE thread_id=?1;");
+			statement.bindStringParameter(0, threadID);
+			if(statement.executeStep()){
+				this._title        = statement.getString(0);
+				this._lineCount    = statement.getInt32(1);
+				this._lastModified = statement.getString(2);
+				this._maruGetted   = Boolean(statement.getInt32(3)==1);
+			}else{
+				this._title = "";
+				this._lineCount = 0;
+				this._lastModified = "";
+				this._maruGetted = false;
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			this._title = "";
+			this._lineCount = 0;
+			this._lastModified = "";
+			this._maruGetted = false;
+		}finally{
+			statement.reset();
+			storage.commitTransaction();
+		}
+
+	},
+
+
+	setThreadData: function b2rDat_setThreadData(){
+		var boardID  = ChaikaBoard.getBoardID(this.boardURL);
+		var threadID = boardID + this.id;
+		var title = this._bbs2chService.fromSJIS(this.title);
+
+		var storage = ChaikaCore.storage;
+		storage.beginTransaction();
+		try{
+			var statement = storage.createStatement(
+								"SELECT _rowid_ FROM thread_data WHERE thread_id=?1;");
+			statement.bindStringParameter(0, threadID);
+			var threadRowID = 0;
+			if(statement.executeStep()){
+				threadRowID = statement.getInt64(0);
+			}
+			statement.reset();
+			if(threadRowID){
+				statement = storage.createStatement(
+					"UPDATE thread_data SET url=?1, line_count=?2, http_last_modified=?3, maru_getted=?4 WHERE _rowid_=?5;");
+				statement.bindStringParameter(0, this.threadURL.spec);
+				statement.bindInt32Parameter(1, this.lineCount);
+				statement.bindStringParameter(2, this.lastModified);
+				statement.bindInt32Parameter(3, this.maruGetted ? 1 : 0);
+				statement.bindInt64Parameter(4, threadRowID);
+				statement.execute();
+			}else{
+				statement = storage.createStatement(
+				"INSERT INTO thread_data(thread_id, board_id, url, dat_id, title, title_n, line_count, http_last_modified, maru_getted) VALUES(?1,?2,?3,?4,?5,?6,?7,?8,?9);");
+				statement.bindStringParameter(0, threadID);
+				statement.bindStringParameter(1, boardID);
+				statement.bindStringParameter(2, this.threadURL.spec);
+				statement.bindStringParameter(3, this.id);
+				statement.bindStringParameter(4, title);
+				statement.bindStringParameter(5, "");
+				statement.bindInt32Parameter(6, this.lineCount);
+				statement.bindStringParameter(7, this.lastModified);
+				statement.bindInt32Parameter(8, this.maruGetted ? 1 : 0);
+				statement.execute();
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}finally{
+			storage.commitTransaction();
+		}
 	},
 
 

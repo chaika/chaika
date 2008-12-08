@@ -2,13 +2,12 @@
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/board-page.css" type="text/css"?>
 
-<page id="pageMain" onload="startup()" onunload="shutdown()"
+<page id="chaikaBoardPage" onload="startup()" onunload="shutdown()"
 	onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/downloader.js"/>
-<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/items.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/board/page.js"/>
 
 <popupset>
@@ -25,15 +24,15 @@
 		<menuitem label="オプション..." oncommand="openSettings()"/>
 	</popup>
 
-	<popup id="popTreeSubjectContext"
-				onpopupshowing="return showTreeSubjectContext(event)">
+	<popup id="boardTreeContextMenu"
+				onpopupshowing="return showBoardTreeContextMenu(event)">
 		<menuitem label="開く" oncommand="openThread(false)"/>
 		<menuitem label="新しいタブで開く" oncommand="openThread(true)"/>
 		<menuseparator/>
 		<menuitem label="URL のコピー" oncommand="copyURL()"/>
 		<menuitem label="URL とタイトルのコピー" oncommand="copyTitleAndURL()"/>
 		<menuseparator/>
-		<menuitem label="ログの削除" oncommand="deleteLog()"/>
+		<menuitem label="ログの削除" oncommand="deleteLog()" disabled="true"/>
 	</popup>
 
 	<tooltip id="popBanner" position="after_end">
@@ -77,68 +76,76 @@
 <toolbox>
 	<toolbar align="center">
 		<label value="検索: "/>
-		<textbox id="txtSearch" value="" flex="2" type="autocomplete"
+		<textbox id="txtSearch" value="" flex="2" type="autocomplete" disabled="true"
 				autocompletesearch="form-history"
 				autocompletesearchparam="bbs2ch-board-history"
 				onkeypress="searchTitle(event, this.value)"/>
 		<spacer flex="1"/>
 
 		<label value="フィルタ: "/>
-		<menulist id="mlstFilterLimit" value="-1" persist2="value" oncommand="initTreeSubject()">
+		<menulist id="mlstFilterLimit" value="0" persist2="value" oncommand="initBoardTree()">
 			<menupopup>
-				<menuitem label="ALL" value="-1"/>
+				<menuitem label="すべて" value="0"/>
 				<menuitem label="TOP 200" value="200"/>
 				<menuitem label="TOP 400" value="400"/>
-				<menuitem label="Subscribing" value="0"/>
+				<menuitem label="購読中" value="-2"/>
+				<menuitem label="DAT落ち" value="-1"/>
 			</menupopup>
 		</menulist>
-
-		<checkbox id="chkShowDownedLogs" label="過去ログ表示"
-				checked="true" persist2="checked" oncommand="initTreeSubject()"/>
 
 		<spacer class="small-margin"/>
 	</toolbar>
 </toolbox>
 
-
-<tree id="treeSubject" class="plain" flex="1" context="popTreeSubjectContext"
-	flags="dont-build-content"
-	onclick="treeSubjectClick(event)" onkeypress="treeSubjectKeyDown(event)">
+<dummyItems id="dummyItems" xmlns=""/>
+<tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
+		onclick="boardTreeClick(event)" onkeypress="boardTreeKeyDown(event)"
+		datasources="#dummyItems" ref="*" querytype="xml" flags="dont-build-content">
 	<treecols>
-		<treecol id="colStatus" label="!" flex="1"
-				property="status" cellType="icon"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-status" label="!"        sort="?status"     style="width:3em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colNumber" label="No" flex="1"
-				property="number" cellType="int"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-number" label="No"       sort="?numberSort" style="width:3em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colTitle" label="タイトル" flex="15"
-				property="title" cellType="str"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-title"  label="タイトル" sort="?title"      flex="1" primary="true"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colCount" label="レス数" flex="1"
-				property="count" cellType="int"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-count"  label="レス"     sort="?countSort"  style="width:4em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colRead" label="既読数" flex="1"
-				property="read" cellType="int"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-read"   label="既読"     sort="?readSort"   style="width:4em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colUnread" label="未読数" flex="1"
-				property="unread" cellType="int"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-unread" label="未読"     sort="?unreadSort" style="width:4em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colForce" label="勢い" flex="1"
-				property="force" cellType="int"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-force"   label="勢い"    sort="?forceSort"  style="width:4em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="colMakeDate" label="作成日" flex="1"
-				property="makeDate" cellType="str"
-				persist2="hidden width sortActive sortDirection"/>
+		<treecol id="boardTreeCol-created" label="作成日"  sort="?datID"      style="width:9em;"
+				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 	</treecols>
-	<treechildren/>
-</tree>
 
+	<template>
+		<query expr="boarditem"/>
+		<action>
+			<treechildren flex="1">
+				<treeitem uri="?">
+					<treerow>
+						<treecell label="" properties="icon s?status"/>
+						<treecell label="?number"/>
+						<treecell label="?title"/>
+						<treecell label="?count"/>
+						<treecell label="?read"/>
+						<treecell label="?unread"/>
+						<treecell label="?force"/>
+						<treecell label="?created"/>
+					</treerow>
+				</treeitem> 
+			</treechildren>
+		</action>
+	</template>
+</tree>
 
 </page>

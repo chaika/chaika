@@ -37,36 +37,36 @@
   color: #BBB;
 }
 
-#treeSubject[stripe="true"] treechildren:-moz-tree-row(odd){
+#boardTree[stripe="true"] treechildren:-moz-tree-row(odd){
   background-image: url("chrome://chaika/skin/tree-row-odd.png");
 }
 
-#treeSubject treechildren::-moz-tree-image(icon){
+#boardTree treechildren::-moz-tree-image(icon){
   margin-left: 2px;
   list-style-image: url("chrome://chaika/skin/board-status.gif") !important;
 }
 
 /*  STATUS_NEW  */
-#treeSubject treechildren::-moz-tree-image(icon, s5){
+#boardTree treechildren::-moz-tree-image(icon, s3){
   -moz-image-region: rect(0px, 12px, 12px, 0px);
 }
 
 /*  STATUS_UNREAD  */
-#treeSubject treechildren::-moz-tree-image(icon, s4){
+#boardTree treechildren::-moz-tree-image(icon, s2){
   -moz-image-region: rect(0px, 24px, 12px, 12px);
 }
 
 /*  STATUS_SUBSCRIBE  */
-#treeSubject treechildren::-moz-tree-image(icon, s3){
+#boardTree treechildren::-moz-tree-image(icon, s1){
   -moz-image-region: rect(0px, 36px, 12px, 24px);
 }
 
 /*  STATUS_NONE  */
-#treeSubject treechildren::-moz-tree-image(icon, s2){
+#boardTree treechildren::-moz-tree-image(icon, s0){
   -moz-image-region: rect(0px, 48px, 12px, 36px);
 }
 
 /*  STATUS_DOWN  */
-#treeSubject treechildren::-moz-tree-image(icon, s1){
+#boardTree treechildren::-moz-tree-image(icon, s4){
   -moz-image-region: rect(0px, 60px, 12px, 48px);
 }

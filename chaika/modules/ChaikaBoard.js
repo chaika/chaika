@@ -108,6 +108,8 @@ ChaikaBoard.prototype = {
 					.QueryInterface(Ci.nsIURL);
 		this.settingFile = ChaikaBoard.getLogFileAtURL(this.settingURL);
 
+		this.itemsDoc = null;
+
 		var logger = ChaikaCore.logger;
 		logger.debug("id:   " + this.id);
 		logger.debug("url:  " + this.url.spec);
@@ -179,6 +181,169 @@ ChaikaBoard.prototype = {
 
 		}
 		return this._settings[aSettingName] || null;
+	},
+
+
+	FILTER_LIMIT_ALL: 0,
+	FILTER_LIMIT_LOG: -1,
+	FILTER_LIMIT_SUBSCRIBE: -2,
+	FILTER_LIMIT_NEW: -3,
+
+
+	refresh: function(aFilterLimit){
+		this.itemsDoc = Cc["@mozilla.org/xmlextras/domparser;1"]
+				.createInstance(Ci.nsIDOMParser).parseFromString("<boarditems/>", "text/xml");
+
+			// スレッドの URL
+		var baseUrlSpec;
+		var categoryPath;
+		var threadUrlSpec;
+		switch(this.type){
+			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
+			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+				baseUrlSpec = this.url.resolve("../");
+				categoryPath = this.url.spec.substring(baseUrlSpec.length);
+				threadUrlSpec = baseUrlSpec + "test/read.cgi/" + categoryPath;
+				break;
+			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+				baseUrlSpec = this.url.resolve("../../");
+				categoryPath = this.url.spec.substring(baseUrlSpec.length);
+				threadUrlSpec = baseUrlSpec + "bbs/read.cgi/" + categoryPath;
+				break;
+			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+				baseUrlSpec = this.url.resolve("../");
+				categoryPath = this.url.spec.substring(baseUrlSpec.length);
+				threadUrlSpec = baseUrlSpec + "bbs/read.cgi/" + categoryPath;
+
+				break;
+		}
+
+		var boardID = this.id;
+		var database = ChaikaCore.storage;
+
+		var sql;
+		var statement;
+		switch(aFilterLimit){
+			case this.FILTER_LIMIT_LOG:
+				sql = [
+					"SELECT",
+					"    4 AS status,",
+					"    0 AS number,",
+					"    td.dat_id AS dat_id,",
+					"    td.title AS title,",
+					"    0 AS line_count,",
+					"    td.line_count AS read,",
+					"    0 AS unread,",
+					"    0 AS force,",
+					"    STRFTIME(?1, td.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM thread_data AS td",
+					"WHERE board_id=?2 AND dat_id IN (",
+					"    SELECT dat_id FROM thread_data WHERE board_id=?2",
+					"    EXCEPT",
+					"    SELECT dat_id FROM board_subject WHERE board_id=?2",
+					");"
+				].join("\n");
+				statement = database.createStatement(sql);
+				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(1, boardID);
+				break;
+			case this.FILTER_LIMIT_SUBSCRIBE:
+				sql = [
+					"SELECT",
+					"    1 + (bs.line_count > td.line_count) AS status,",
+					"    bs.ordinal AS number,",
+					"    bs.dat_id AS dat_id,",
+					"    bs.title AS title,",
+					"    bs.line_count AS line_count,",
+					"    IFNULL(td.line_count, 0) AS read,",
+					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
+					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM board_subject AS bs INNER JOIN thread_data AS td",
+					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"WHERE bs.board_id=?2;"
+				].join("\n");
+				statement = database.createStatement(sql);
+				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(1, boardID);
+				statement.bindInt32Parameter(2, Date.now() / 1000);
+				break;
+			case this.FILTER_LIMIT_NEW:
+				sql = [
+					"SELECT",
+					"    2 AS status,",
+					"    bs.ordinal AS number,",
+					"    bs.dat_id AS dat_id,",
+					"    bs.title AS title,",
+					"    bs.line_count AS line_count,",
+					"    IFNULL(td.line_count, 0) AS read,",
+					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
+					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM board_subject AS bs INNER JOIN thread_data AS td",
+					"ON td.board_id=?2 AND bs.dat_id=td.dat_id AND bs.line_count > td.line_count",
+					"WHERE bs.board_id=?2;"
+				].join("\n");
+				statement = database.createStatement(sql);
+				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(1, boardID);
+				statement.bindInt32Parameter(2, Date.now() / 1000);
+				break;
+			default:
+				sql = [
+					"SELECT",
+					"    IFNULL((td.line_count != 0) + (bs.line_count > td.line_count), 0) AS status,",
+					"    bs.ordinal AS number,",
+					"    bs.dat_id AS dat_id,",
+					"    bs.title AS title,",
+					"    bs.line_count AS line_count,",
+					"    IFNULL(td.line_count, 0) AS read,",
+					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
+					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
+					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"WHERE bs.board_id=?2",
+					"LIMIT ?4;"
+				].join("\n");
+				statement = database.createStatement(sql);
+				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(1, boardID);
+				statement.bindInt32Parameter(2, Date.now() / 1000);
+				statement.bindInt32Parameter(3, (aFilterLimit > 0) ? aFilterLimit : 10000);
+				break;
+		}
+
+		database.beginTransaction();
+		try{
+			while(statement.executeStep()){
+				var itemNode = this.itemsDoc.createElement("boarditem");
+				itemNode.setAttribute("status",     statement.getInt32(0));
+				itemNode.setAttribute("number",     statement.getInt32(1));
+				itemNode.setAttribute("numberSort", statement.getInt32(1) + 100000);
+				itemNode.setAttribute("datID",      statement.getString(2));
+				itemNode.setAttribute("id",         "item-" + statement.getString(2));
+				itemNode.setAttribute("title",      statement.getString(3));
+				itemNode.setAttribute("count",      statement.getInt32(4));
+				itemNode.setAttribute("countSort",  statement.getInt32(4) + 100000);
+				itemNode.setAttribute("read",       statement.getInt32(5));
+				itemNode.setAttribute("readSort",   statement.getInt32(5) + 100000);
+				itemNode.setAttribute("unread",     statement.getInt32(6));
+				itemNode.setAttribute("unreadSort", statement.getInt32(6) + 100000);
+				itemNode.setAttribute("force",      Math.round(statement.getInt32(7) / 10));
+				itemNode.setAttribute("forceSort",  statement.getInt32(7)  + 100000);
+				itemNode.setAttribute("created",  statement.getString(8));
+				itemNode.setAttribute("url",      threadUrlSpec + statement.getString(2) + "/");
+
+				this.itemsDoc.documentElement.appendChild(itemNode);
+			}
+		}catch(ex){
+			Components.utils.reportError(ex);
+		}finally{
+			statement.reset();
+			database.commitTransaction();
+		}
+
 	},
 
 
@@ -339,7 +504,7 @@ ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoar
 	var logFile = ChaikaCore.getLogDir();
 
 	var pathArray = aBoardID.split("/");
-	for(let i=0; i<pathArray.length; i++){
+	for(var i=0; i<pathArray.length; i++){
 		if(pathArray[i]) logFile.appendRelativePath(pathArray[i]);
 	}
 	return logFile;
