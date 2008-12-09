@@ -194,9 +194,9 @@ ChaikaBoard.prototype = {
 	FILTER_LIMIT_LOG: -1,
 	FILTER_LIMIT_SUBSCRIBE: -2,
 	FILTER_LIMIT_NEW: -3,
+	FILTER_LIMIT_SEARCH: -4,
 
-
-	refresh: function(aFilterLimit){
+	refresh: function ChaikaBoard_refresh(aFilterLimit, aSearchStr){
 		this.itemsDoc = Cc["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Ci.nsIDOMParser).parseFromString("<boarditems/>", "text/xml");
 
@@ -294,6 +294,28 @@ ChaikaBoard.prototype = {
 				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
 				statement.bindStringParameter(1, boardID);
 				statement.bindInt32Parameter(2, Date.now() / 1000);
+				break;
+			case this.FILTER_LIMIT_SEARCH:
+				sql = [
+					"SELECT",
+					"    IFNULL((td.line_count != 0) + (bs.line_count > td.line_count), 0) AS status,",
+					"    bs.ordinal AS number,",
+					"    bs.dat_id AS dat_id,",
+					"    bs.title AS title,",
+					"    bs.line_count AS line_count,",
+					"    IFNULL(td.line_count, 0) AS read,",
+					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
+					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
+					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?4)"
+				].join("\n");
+				statement = database.createStatement(sql);
+				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(1, boardID);
+				statement.bindInt32Parameter(2, Date.now() / 1000);
+				statement.bindStringParameter(3, aSearchStr);
 				break;
 			default:
 				sql = [

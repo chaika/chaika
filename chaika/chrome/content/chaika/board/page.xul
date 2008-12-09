@@ -75,12 +75,12 @@
 
 <toolbox>
 	<toolbar align="center">
+		<spacer flex="5"/>
 		<label value="検索: "/>
-		<textbox id="txtSearch" value="" flex="2" type="autocomplete" disabled="true"
+		<textbox id="searchTextBox" value="" flex="1" type="autocomplete"
 				autocompletesearch="form-history"
 				autocompletesearchparam="bbs2ch-board-history"
 				onkeypress="searchTitle(event, this.value)"/>
-		<spacer flex="1"/>
 
 		<label value="フィルタ: "/>
 		<menulist id="mlstFilterLimit" value="0" persist2="value" oncommand="initBoardTree()">

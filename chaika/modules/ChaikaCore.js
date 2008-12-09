@@ -222,6 +222,20 @@ var ChaikaCore = {
 			}
 		}
 
+			// SQLite ユーザ定義関数
+			// x_normalize(文字列)
+			// 文字列の NFKC 正規化を行う
+		storage.createFunction("x_normalize", 1, {
+			onFunctionCall: function sqlite_x_normalize(aFunctionArguments) {
+				var arg = aFunctionArguments.getString(0);
+				var normalizedStr = {};
+				this._unicodeNormalizer.NormalizeUnicodeNFKC(arg, normalizedStr);
+				return normalizedStr.value;
+			},
+			_unicodeNormalizer: Cc["@mozilla.org/intl/unicodenormalizer;1"]
+				.createInstance(Ci.nsIUnicodeNormalizer)
+		});
+
 
 		// データベースにテーブルが存在しない場合に作成する。
 		storage.beginTransaction();

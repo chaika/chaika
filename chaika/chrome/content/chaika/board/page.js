@@ -191,7 +191,13 @@ function initBoardTree(){
 
 	var aFilterLimit = Number(document.getElementById("mlstFilterLimit").getAttribute("value"));
 
-	gBoard.refresh(aFilterLimit);
+	var searchStr = document.getElementById("searchTextBox").value;
+	if(searchStr){
+		searchStr = "%" + searchStr + "%";
+		gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
+	}else{
+		gBoard.refresh(aFilterLimit);
+	}
 	gBoardTree.builder.datasource = gBoard.itemsDoc.documentElement;
 	gBoardTree.builder.rebuild();
 
@@ -211,9 +217,8 @@ function initBoardTree(){
 		}
 	}
 
-
 		// フォーカス
-	if(gBoardTree.treeBoxObject.view.selection){
+	if(!searchStr && gBoardTree.treeBoxObject.view.selection){
 		gBoardTree.focus();
 		gBoardTree.treeBoxObject.view.selection.select(0);
 	}
@@ -410,19 +415,20 @@ function getClickItemIndex(aEvent){
 }
 
 
-/**
- * スレッドタイトルを検索して、結果をツリーに表示
- * aSearchString が空ならツリーを元に戻す
- * @param aEvent event イベントオブジェクト
- * @param aSearchString string 検索文字列
- */
-function searchTitle(aEvent, aSearchString){
+function searchTitle(aEvent, aSearchStr){
 		// keypress イベント時にエンター以外が押された
 	if((aEvent.type == "keypress") &&
 		((aEvent.keyCode != KeyEvent.DOM_VK_ENTER) &&
 			(aEvent.keyCode != KeyEvent.DOM_VK_RETURN)))
 				return;
 
+	if (aSearchStr){
+			// フォーム履歴に検索文字列を追加
+		var formHistory	= XPC.getService("@mozilla.org/satchel/form-history;1", "nsIFormHistory2");
+		formHistory.addEntry("bbs2ch-board-history", aSearchStr);
+	}
+
+	initBoardTree();
 
 }
 
