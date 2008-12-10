@@ -177,15 +177,10 @@ function updateHistoryMenu(){
 		while(statement.executeStep()){
 			var url = statement.getString(0);
 			var title = statement.getString(1);
-			var type = gBbs2chService.getBoardType(url);
 			var threadURL = gBbs2chService.serverURL.resolve("./thread/" + url);
 
 			if(threadViewLimit > 0){
-				if(type == gBbs2chService.BOARD_TYPE_MACHI){
-					threadURL += "&LAST=" + threadViewLimit;
-				}else{
-					threadURL += "l" + threadViewLimit;
-				}
+				threadURL += "l" + threadViewLimit;
 			}
 
 			var menuNode = document.createElement("menuitem");
