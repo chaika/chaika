@@ -979,7 +979,7 @@ b2rDat.prototype = {
 					"SELECT title, line_count, http_last_modified, maru_getted FROM thread_data WHERE thread_id=?1;");
 			statement.bindStringParameter(0, threadID);
 			if(statement.executeStep()){
-				this._title        = statement.getString(0);
+				this._title        = this._bbs2chService.toSJIS(statement.getString(0));
 				this._lineCount    = statement.getInt32(1);
 				this._lastModified = statement.getString(2);
 				this._maruGetted   = Boolean(statement.getInt32(3)==1);
