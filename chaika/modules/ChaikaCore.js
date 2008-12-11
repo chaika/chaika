@@ -37,6 +37,7 @@
 
 
 EXPORTED_SYMBOLS = ["ChaikaCore"];
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 
 const Ci = Components.interfaces;
@@ -442,30 +443,81 @@ var ChaikaCore = {
  * @constructor
  */
 function ChaikaLogger(){
-
+	this._init();
 }
+
 ChaikaLogger.prototype = {
+
+	LEVEL_NONE      : 0,
+	LEVEL_ERROR     : 1,
+	LEVEL_WARNING   : 2,
+	LEVEL_INFO      : 3,
+	LEVEL_DEBUG     : 4,
+
+
+	/** @private */
+	_init: function ChaikaLogger__init(){
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		this._level = pref.getIntPref("extensions.chaika.logger_level");
+
+		if(this._level >= this.LEVEL_ERROR){
+			var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+		    consoleService.registerListener(this);
+		}
+	},
 
 	/** @private */
 	_insertLog: function ChaikaLogger__insertLog(atype, aMessage){
 		var stack = Components.stack.caller.caller;
-		dump(["[", stack.name, ":", stack.lineNumber,"] ", atype, " ", aMessage].join("") + "\n");
+		dump(["[", stack.name, ":", stack.lineNumber, "] ", atype, " ", aMessage].join("") + "\n");
 	},
 
 
 	debug: function ChaikaLogger_debug(aMessage){
+		if(this._level < this.LEVEL_DEBUG) return;
+
 		this._insertLog("DEBUG", aMessage);
 	},
 	info: function ChaikaLogger_info(aMessage){
+		if(this._level < this.LEVEL_INFO) return;
+
 		this._insertLog("INFO", aMessage);
 	},
 	warning: function ChaikaLogger_warning(aMessage){
+		if(this._level < this.LEVEL_WARNING) return;
+
+		var message =  aMessage.message || aMessage.toString();
 		this._insertLog("WARNING", aMessage);
 	},
-	error: function ChaikaLogger_error(aError){
-		var message =  aError.message || aError.toString();
+
+	error: function ChaikaLogger_error(aMessage){
+		if(this._level < this.LEVEL_ERROR) return;
+
+		var message =  aMessage.message || aMessage.toString();
 		this._insertLog("ERROR", message);
-	}
+	},
+
+	/** @private */
+	observe: function ChaikaLogger_observe(aMessage){
+		if(this._level < this.LEVEL_ERROR) return;
+
+		if(!(aMessage instanceof Ci.nsIScriptError)) return;
+		if(!(aMessage.flags & Ci.nsIScriptError.exceptionFlag))
+		if(aMessage.category != "chrome javascript") return;
+
+		var message = aMessage.message;
+		if(message.indexOf("/chaika")!=-1 ||
+				message.indexOf("/nsBbs2ch")!=-1 || message.indexOf("/b2r")!=-1){
+			dump(["[] LEVEL_ERROR ", aMessage.message].join("") + "\n");
+		}
+	},
+
+	/** @private */
+	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsIConsoleListener,
+		Ci.nsISupportsWeakReference,
+		Ci.nsISupports
+	])
 
 };
 
