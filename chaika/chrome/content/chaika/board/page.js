@@ -37,6 +37,7 @@
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
@@ -375,7 +376,26 @@ function copyTitleAndURL(){
  * 選択スレッドのログを削除する (複数選択可)
  */
 function deleteLog(){
+	var itemIndices = getSelectionIndices();
 
+	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+	var urlAtom = atomService.getAtom("?url");
+
+	for(var i=0; i<itemIndices.length; i++){
+		var itemIndex = itemIndices[i];
+		var itemID = gBoardTree.builderView.getResourceAtIndex(itemIndex).Value;
+		var result = gBoardTree.builder.getResultForId(itemID);
+		var url = result.getBindingFor(urlAtom);
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var threadURL = ioService.newURI(url, null, null);
+		try{
+			(new ChaikaThread(threadURL)).deteleThreadData();
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+	}
+
+	initBoardTree();
 }
 
 

@@ -32,7 +32,7 @@
 		<menuitem label="URL のコピー" oncommand="copyURL()"/>
 		<menuitem label="URL とタイトルのコピー" oncommand="copyTitleAndURL()"/>
 		<menuseparator/>
-		<menuitem label="ログの削除" oncommand="deleteLog()" disabled="true"/>
+		<menuitem label="ログの削除" oncommand="deleteLog()"/>
 	</popup>
 
 	<tooltip id="popBanner" position="after_end">
