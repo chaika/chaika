@@ -95,6 +95,8 @@ function startup(){
 		subjectUpdate();
 	}else if(!subjectFile.exists() || subjectFile.fileSize==0){
 		subjectUpdate();
+	}else if(gBoard.getItemLength()==0){
+		subjectUpdate();
 	}else if(!settingFile.exists() || settingFile.fileSize==0){
 		settingUpdate();
 	}else{

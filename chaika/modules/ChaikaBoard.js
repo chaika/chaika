@@ -115,13 +115,14 @@ ChaikaBoard.prototype = {
 		this.itemsDoc = null;
 
 		var logger = ChaikaCore.logger;
-		logger.debug("id:   " + this.id);
-		logger.debug("url:  " + this.url.spec);
-		logger.debug("type: " + this.type);
-		logger.debug("subjectURL:  " + this.subjectURL.spec);
-		logger.debug("subjectFile: " + this.subjectFile.path);
-		logger.debug("settingURL:  " + this.settingURL.spec);
-		logger.debug("settingFile: " + this.settingFile.path);
+		logger.debug("id          : " + this.id);
+		logger.debug("url         : " + this.url.spec);
+		logger.debug("type        : " + this.type);
+		logger.debug("subjectURL  : " + this.subjectURL.spec);
+		logger.debug("subjectFile : " + this.subjectFile.path);
+		logger.debug("settingURL  : " + this.settingURL.spec);
+		logger.debug("settingFile : " + this.settingFile.path);
+		logger.debug("ItemLength  : " + this.getItemLength());
 	},
 
 
@@ -483,11 +484,33 @@ ChaikaBoard.prototype = {
 				statement.execute();
 			}
 		}catch(ex){
-			Components.utils.reportError(ex);
+			ChaikaCore.logger.error(ex);
 		}finally{
 			statement.reset();
 			database.commitTransaction();
 		}
+	},
+
+
+	getItemLength: function ChaikaBoard_getItemLength(){
+		var result = 0;
+		var storage  = ChaikaCore.storage;
+		var statement = storage.createStatement(
+				"SELECT count(_rowid_) FROM board_subject WHERE board_id=?1;");
+		statement.bindStringParameter(0, this.id);
+
+		storage.beginTransaction();
+		try{
+			if(statement.executeStep()){
+				result = statement.getInt32(0);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}finally{
+			statement.reset();
+			storage.commitTransaction();
+		}
+		return result;
 	}
 
 };
