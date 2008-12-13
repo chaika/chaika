@@ -1,5 +1,5 @@
 pref("extensions.chaika.enable_browser_contextmenu", true);
-pref("extensions.chaika.browser_contextmenu_disregard_url_option", false);
+pref("extensions.chaika.browser_contextmenu_disregard_url_option", true);
 pref("extensions.chaika.http_proxy_mode", 0);
 pref("extensions.chaika.http_proxy_value", "localhost:8080");
 pref("extensions.chaika.tab_load_in_foreground", false);
@@ -25,6 +25,7 @@ pref("extensions.chaika.maru_session_id", "");
 pref("extensions.chaika.thread_redirector.enabled", false);
 pref("extensions.chaika.thread_redirector.ask", true);
 pref("extensions.chaika.thread_redirector.throw_bookmarks", false);
+pref("extensions.chaika.thread_redirector.disregard_url_option", true);
 
 pref("extensions.chaika.bbsmenu_load_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu_toggle_open_container", false);

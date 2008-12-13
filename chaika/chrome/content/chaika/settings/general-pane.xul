@@ -21,6 +21,8 @@
 				name="extensions.chaika.thread_redirector.ask" type="bool"/>
 		<preference id="extensions.chaika.thread_redirector.throw_bookmarks"
 				name="extensions.chaika.thread_redirector.throw_bookmarks" type="bool"/>
+		<preference id="extensions.chaika.thread_redirector.disregard_url_option"
+				name="extensions.chaika.thread_redirector.disregard_url_option" type="bool"/>
 		<preference id="extensions.chaika.tab_load_in_foreground"
 				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
 		<preference id="extensions.chaika.http_proxy_mode"
@@ -54,6 +56,8 @@
 				preference="extensions.chaika.thread_redirector.ask"/>
 			<checkbox label="ブックマークやスレッド表示からはそのまま開く"
 				preference="extensions.chaika.thread_redirector.throw_bookmarks"/>
+			<checkbox label="URL の表示制限を無視して開く"
+				preference="extensions.chaika.thread_redirector.disregard_url_option"/>
 		</vbox>
 	</settingbox>
 
