@@ -147,22 +147,21 @@
 
 				var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 							.getService(Components.interfaces.nsIPromptService);
-				var result = promptService.confirm(null, "bbs2chreader",
-								"Are you sure you want to delete the log files?");
+				var result = promptService.confirm(null, "ログの削除 [chaika]",
+								"このスレッドのログを削除しますか?");
 				if(!result) return;
 
-				var datID = currentURLSpec.match(/\d{9,10}/);
-				if(!datID) return;
+				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-				var boardURL = bbs2chService.getBoardURL(currentURLSpec);
-				var datFile = bbs2chService.getLogFileAtURL(boardURL.resolve(datID + ".dat"));
-				var idxFile = bbs2chService.getLogFileAtURL(boardURL.resolve(datID + ".idx"));
+				Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+				Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 				try{
-					if(datFile.exists()) datFile.remove(false);
-					if(idxFile.exists()) idxFile.remove(false);
-				}catch(ex){}
+					var threadURL = ioService.newURI(currentURLSpec, null, null);
+					var thread = new ChaikaThread(threadURL);
+					thread.deteleThreadData();
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
+				}
 			]]></body>
 		</method>
 
