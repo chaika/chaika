@@ -256,7 +256,7 @@ b2rThread2ch.prototype = {
 	},
 
 	close: function(){
-		if(this._headerResponded && this.dat){
+		if(this._headerResponded && this.thread){
 			ChaikaCore.history.visitPage(this.thread.plainURL,
 					this.thread.threadID, this.thread.title, 1);
 		}
