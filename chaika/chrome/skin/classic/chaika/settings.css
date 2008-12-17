@@ -26,17 +26,18 @@ radio[pane="paneThread"]{
 
 settingbox {
   -moz-binding: url('chrome://chaika/content/settings/setting-box.xml#settingBox');
-  margin: 2px 2px 8px 2px;
+  margin: 0.2em 2px 0.6em 2px;
 }
 
 .settingbox-label-box {
   width: 11em;
   border-right: 2px solid GrayText;
-  margin: 4px 0.5em 4px 2px;
+  margin: 0px 0.5em 0px 0px;
   padding-right: 0.5em;
 }
 
 .settingbox-label {
+  font-size:0.9em;
   text-align: right;
 }
 
