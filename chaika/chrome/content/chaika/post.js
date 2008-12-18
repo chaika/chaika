@@ -35,7 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
 
 function Bbs2chPost(aThreadURI){
@@ -52,26 +53,10 @@ function Bbs2chPost(aThreadURI){
 Bbs2chPost.prototype = {
 
 	_init:function(){
-		this.boardURI = this._bbs2chService.getBoardURL(this.threadURI.spec);
+		this.boardURI = ChaikaThread.getBoardURL(this.threadURI);
+		this.thread = new ChaikaThread(this.threadURI);
 		this.board = new Bbs2chBoardItems(this.boardURI.spec);
-		this.type = this._bbs2chService.getBoardType(this.threadURI.spec);
-		var datID = (this.threadURI.spec.match(/\/(\d{9,10})/)) ? RegExp.$1 : "";
-		var idxFile = this._bbs2chService.getLogFileAtURL(this.boardURI.resolve(datID + ".idx"));
-
-		if(!idxFile.exists()){
-			this._isIdx=false;
-		}else{
-			this._isIdx=true;
-			this._idx = this._bbs2chService.fromSJIS(this._bbs2chService.readFile(idxFile.path));
-		}
-	},
-
-
-	_getSetting: function(aName){
-			//実際はthread側にあるべきなんだけど…
-		var reg = new RegExp("^"+aName+"=(.+)","m");
-		var title = this._idx.match(reg) ? RegExp.$1 : null;
-		return title;
+		this.type = this.thread.type;
 	},
 
 
@@ -93,7 +78,7 @@ Bbs2chPost.prototype = {
 
 	isValidThread:function(){
 			//読み込まれていないスレッドには書き込まないようにする。
-		if(!this._isIdx){
+		if(this.thread.lineCount>0){
 			return false;
 		}
 		return true;
@@ -101,7 +86,7 @@ Bbs2chPost.prototype = {
 
 
 	get title(){
-		return (this._getSetting("title")!=null)?this._getSetting("title"):this.threadURI.spec;
+		return (this.thread.title !="") ? this.thread.title : this.threadURI.spec;
 	},
 
 
@@ -233,7 +218,7 @@ Bbs2chPost.prototype = {
 		return preview;
 	},
 	getLastModified: function(){
-		var lastModified = this._getSetting("lastModified");
+		var lastModified = this.thread.lastModified;
 		if(lastModified==null)lastModified = "";
 		return Math.ceil(new Date(lastModified).getTime() / 1000);
 	},
