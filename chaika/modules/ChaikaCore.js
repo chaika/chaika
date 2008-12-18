@@ -423,7 +423,7 @@ var ChaikaCore = {
 			httpChannel = ioService.newChannelFromURI(aURL).QueryInterface(Ci.nsIHttpChannel);
 		}
 
-		httpChannel.setRequestHeader("User-Agent", this.userAgent, false);
+		httpChannel.setRequestHeader("User-Agent", this.getUserAgent(), false);
 		httpChannel.notificationCallbacks = {
 			/** @ignore */
 		    getInterface: function(aIID, aInstance) {
