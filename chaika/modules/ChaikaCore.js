@@ -672,6 +672,14 @@ ChaikaHistory.prototype = {
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
+		var title = aTitle;
+		if(title.indexOf("&") != -1){
+			title = title.replace("&quot;", "\"", "g")
+						.replace("&amp;", "&", "g")
+						.replace("&lt;", "<", "g")
+						.replace("&gt;", ">", "g");
+		}
+
 		var storage = ChaikaCore.storage;
 
 		storage.beginTransaction();
@@ -691,7 +699,7 @@ ChaikaHistory.prototype = {
 				sql = "UPDATE history SET url=?1, title=?2, visit_count=visit_count+1, last_visited=?3 WHERE ROWID=?4;";
 				statement = storage.createStatement(sql);
 				statement.bindStringParameter(0, aURL.spec);// url
-				statement.bindStringParameter(1, aTitle);	// title
+				statement.bindStringParameter(1, title);	// title
 				statement.bindInt32Parameter(2, now);		// last_visited
 				statement.bindStringParameter(3, rowID);	// id
 				statement.execute();
@@ -700,7 +708,7 @@ ChaikaHistory.prototype = {
 				statement = storage.createStatement(sql);
 				statement.bindStringParameter(0, aID);		// id
 				statement.bindStringParameter(1, aURL.spec);// url
-				statement.bindStringParameter(2, aTitle);	// title
+				statement.bindStringParameter(2, title);	// title
 				statement.bindInt32Parameter(3, now);		// last_visited
 				statement.bindInt32Parameter(4, 1);			// visit_count
 				statement.bindInt32Parameter(5, aType);		// type
