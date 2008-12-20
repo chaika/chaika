@@ -643,7 +643,7 @@ ChaikaIO.prototype = {
 		try{
 			fileOutputStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
 			converterOutputStream.init(fileOutputStream, charset, 0,
-					Ci.nsIConverterOutputStream.DEFAULT_REPLACEMENT_CHARACTER);
+					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
