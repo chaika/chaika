@@ -298,7 +298,7 @@ function boardTreeKeyDown(aEvent){
 function openThread(aAddTab){
 	var threadURL = getSelectedThreadURL();
 	if(threadURL){
-		gBbs2chService.openURL(threadURL, null, aAddTab);
+		ChaikaCore.browser.openThread(threadURL, aAddTab, true);
 	}
 }
 
@@ -310,19 +310,11 @@ function getSelectedThreadURL(){
 	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
 	var result = gBoardTree.builder.getResultForId(itemID);
 
-		// スレッド表示数の制限
-	var threadViewLimit = Number(gBbs2chService.pref.getIntPref(
-									"extensions.chaika.board_thread_view_limit"));
-	if(isNaN(threadViewLimit) || threadViewLimit == 0){
-		threadViewLimit = "";
-	}else{
-			threadViewLimit = "l" + threadViewLimit;
-	}
-
 	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
 	var url = result.getBindingFor(atomService.getAtom("?url"));
-	url = "/thread/" + url + threadViewLimit;
-	return gBbs2chService.serverURL.resolve(url);
+	return ioService.newURI(url, null, null);
 }
 
 
@@ -592,7 +584,7 @@ function showBrowser(aTab){
 	if(aTab){
 		document.getElementById("popTools").hidePopup();
 	}
-	gBbs2chService.openURL(gBoard.url.spec, null, aTab);
+	ChaikaCore.browser.openURL(gBoard.url, aTab);
 }
 
 function openLogsDir(){
