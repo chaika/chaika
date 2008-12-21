@@ -153,6 +153,13 @@ var ChaikaCore = {
 
 
 	/**
+	 * ホストブラウザとの連携を行う {@link ChaikaBrowser} オブジェクト
+	 * @type ChaikaBrowser
+	 */
+	browser: null,
+
+
+	/**
 	 * ファイルを読み書きする {@link ChaikaIO} オブジェクト
 	 * @type ChaikaIO
 	 */
@@ -180,6 +187,7 @@ var ChaikaCore = {
 	_init: function ChaikaCore__init(){
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
+		this.browser = new ChaikaBrowser();
 		this.io = new ChaikaIO();
 		this.history = new ChaikaHistory();
 
@@ -437,6 +445,8 @@ var ChaikaCore = {
 };
 
 
+
+
 /**
  * メッセージログを取るオブジェクト。
  * {@link ChaikaCore.logger} を経由して利用すること。
@@ -522,6 +532,8 @@ ChaikaLogger.prototype = {
 };
 
 
+
+
 /**
  * Mozilla 設定システムにアクセスするためのオブジェクト。
  * {@link ChaikaCore.pref} を経由して利用すること。
@@ -578,6 +590,165 @@ ChaikaPref.prototype = {
 		return this._branch.setComplexValue(aPrefName, Ci.nsILocalFile, aPrefValue);
 	}
 };
+
+
+
+
+/**
+ * ホストブラウザとの連携を行うオブジェクト
+ * {@link ChaikaCore.browser} を経由して利用すること。
+ * @constructor
+ */
+function ChaikaBrowser(){
+}
+
+ChaikaBrowser.prototype = {
+
+	/**
+	 * 指定した URL をスレッド表示で開く。
+	 * @param {nsIURL} aThreadURL 開くスレッドの URL
+	 * @param {Boolean} aAddTab タブで開くかどうか
+	 * @param {Boolean} aThreadViewLimit 表示制限オプションを付加するかどうか
+	 */
+	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab, aThreadViewLimit){
+		if(!(aThreadURL instanceof Ci.nsIURL)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+			// スレッド表示数の制限
+		var threadViewLimit = "";
+		if(aThreadViewLimit){
+			var threadViewLimitInt = ChaikaCore.pref.getInt("board_thread_view_limit");
+			if(threadViewLimitInt != 0){
+				threadViewLimit = "l" + threadViewLimitInt;
+			}
+		}
+
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+		try{
+			var plainThreadURI = aThreadURL;
+			if((/^\d{9,10}$/).test(plainThreadURI.fileName)){
+				plainThreadURI = ioService.newURI(plainThreadURI.spec + "/", null, null);
+				ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + this.url.spec);
+			}else{
+				plainThreadURI = ioService.newURI(plainThreadURI.resolve("./"), null, null);
+			}
+
+			var threadURI = ioService.newURI("/thread/" + plainThreadURI.spec + threadViewLimit,
+					null, ChaikaCore.getServerURL());
+
+			this.openURL(threadURI, aAddTab);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+	},
+
+
+	/**
+	 * 指定した URL をスレ一覧で開く。
+	 * @param {nsIURL} aBoardURL 開く板の URL
+	 * @param {Boolean} aAddTab タブで開くかどうか
+	 */
+	openBoard: function ChaikaBrowser_openBoard(aBoardURL, aAddTab){
+		if(!(aBoardURL instanceof Ci.nsIURL)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		var boardURI = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
+		boardURI.spec = "bbs2ch:board:" + aBoardURL.spec;
+
+		try{
+			this.openURL(boardURI, aAddTab);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+	},
+
+
+	/**
+	 * ブラウザで指定した URI を開く。
+	 * ブラウザウィンドウが無いときは新規ウィンドウで開く。
+	 * @param {nsIURI} aURI 開くページの URI
+	 * @param {Boolean} aAddTab タブで開くかどうか
+	 */
+	openURL: function ChaikaBrowser_openURL(aURI, aAddTab){
+		if(!(aURI instanceof Ci.nsIURI)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		var browserWindow = this._getBrowserWindow();
+		if(browserWindow && browserWindow.getBrowser){
+			try{
+				var contentBrowser = browserWindow.getBrowser();
+				if(aAddTab){
+					ChaikaCore.logger.debug("addTab: " + aURI.spec);
+					var newTab = contentBrowser.addTab(aURI.spec);
+					if(ChaikaCore.pref.getBool("tab_load_in_foreground")){
+						contentBrowser.selectedTab = newTab;
+					}
+				}else{
+					ChaikaCore.logger.debug("loadURI: " + aURI.spec);
+					contentBrowser.loadURI(aURI.spec);
+				}
+			}catch(ex){
+				ChaikaCore.logger.error(ex);
+				throw makeException(ex.result);
+			}
+			return;
+		}
+
+		// Firefox/Seamonkey 以外のブラウザでの処理はここに書く
+
+		ChaikaCore.logger.warning("ブラウザウィンドウの取得失敗");
+		this.openNewWindow(aURI);
+	},
+
+
+	/**
+	 * 新しいブラウザウィンドウで指定した URI を開く。
+	 * @param {nsIURI} aURI 新しいウィンドウで開くページの URI
+	 */
+	openNewWindow: function ChaikaBrowser_openNewWindow(aURI){
+		if(!(aURI instanceof Ci.nsIURI)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+		try{
+			var browserURL = pref.getCharPref("browser.chromeURL");
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+
+		var argString = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+		argString.data = aURI.spec;
+
+		var winWatcher = Cc["@mozilla.org/embedcomp/window-watcher;1"]
+				.getService(Ci.nsIWindowWatcher);
+		try{
+			winWatcher.openWindow(null, browserURL, "_blank",
+					"chrome,all,dialog=no", argString);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+	},
+
+
+	/** @private */
+	_getBrowserWindow: function ChaikaBrowser__getBrowserWindow(){
+		var windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
+				.getService(Ci.nsIWindowMediator);
+		return windowMediator.getMostRecentWindow("navigator:browser");
+	}
+
+};
+
+
 
 
 /**
