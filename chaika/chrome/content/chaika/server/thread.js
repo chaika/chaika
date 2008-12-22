@@ -377,6 +377,13 @@ b2rThread2ch.prototype = {
 			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
 		}
 
+			// ’ÊíƒŠƒ“ƒNˆ—
+		if(resMes.indexOf("sssp://")!=-1){
+			var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.gif)/g;
+			resMes = resMes.replace(regUrlLink,
+						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
+		}
+
 			// ƒŒƒXID
 		var regResID = / (ID:)([0-9a-z\+\/]+)/ig;
 		resMes = resMes.replace(regResID, ' <span class="resMesID"><span class="mesID_$2">$1$2</span></span>');

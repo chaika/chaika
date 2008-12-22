@@ -127,6 +127,11 @@ span.resMesID {
 }
 
 
+img.beIcon {
+  width: 32px;
+  height: 32px;
+}
+
 /* ***** ***** ポップアップ ***** ***** */
 div.popup {
   padding: 10px;
