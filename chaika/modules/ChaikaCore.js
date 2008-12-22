@@ -606,38 +606,37 @@ ChaikaBrowser.prototype = {
 
 	/**
 	 * 指定した URL をスレッド表示で開く。
+	 * aReplaceViewLimit が真なら、渡された URL のオプションを Chaika の設定で上書きする。
 	 * @param {nsIURL} aThreadURL 開くスレッドの URL
-	 * @param {Boolean} aAddTab タブで開くかどうか
-	 * @param {Boolean} aThreadViewLimit 表示制限オプションを付加するかどうか
+	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
+	 * @param {Boolean} aReplaceViewLimit 表示制限オプションの上書き
 	 */
-	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab, aThreadViewLimit){
+	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab, aReplaceViewLimit){
 		if(!(aThreadURL instanceof Ci.nsIURL)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
-			// スレッド表示数の制限
-		var threadViewLimit = "";
-		if(aThreadViewLimit){
-			var threadViewLimitInt = ChaikaCore.pref.getInt("board_thread_view_limit");
-			if(threadViewLimitInt != 0){
-				threadViewLimit = "l" + threadViewLimitInt;
-			}
-		}
-
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
+		var threadURI = aThreadURL;
+
 		try{
-			var plainThreadURI = aThreadURL;
-			if((/^\d{9,10}$/).test(plainThreadURI.fileName)){
-				plainThreadURI = ioService.newURI(plainThreadURI.spec + "/", null, null);
-				ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + this.url.spec);
-			}else{
-				plainThreadURI = ioService.newURI(plainThreadURI.resolve("./"), null, null);
+			if((/^\d{9,10}$/).test(threadURI.fileName)){
+				threadURI = ioService.newURI(threadURI.spec + "/", null, null);
+				ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + threadURI.spec);
+			}
+				// スレッド表示数の制限
+			if(aReplaceViewLimit){
+				var threadViewLimit = ChaikaCore.pref.getInt("board_thread_view_limit");
+				if(threadViewLimit == 0){
+					threadURI = ioService.newURI("./", null, threadURI);
+				}else{
+					threadURI = ioService.newURI("./l" + threadViewLimit, null, threadURI);
+				}
 			}
 
-			var threadURI = ioService.newURI("/thread/" + plainThreadURI.spec + threadViewLimit,
-					null, ChaikaCore.getServerURL());
-
+			threadURI = ioService.newURI("/thread/" + threadURI.spec,
+							null, ChaikaCore.getServerURL());
 			this.openURL(threadURI, aAddTab);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
@@ -649,7 +648,7 @@ ChaikaBrowser.prototype = {
 	/**
 	 * 指定した URL をスレ一覧で開く。
 	 * @param {nsIURL} aBoardURL 開く板の URL
-	 * @param {Boolean} aAddTab タブで開くかどうか
+	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
 	 */
 	openBoard: function ChaikaBrowser_openBoard(aBoardURL, aAddTab){
 		if(!(aBoardURL instanceof Ci.nsIURL)){
