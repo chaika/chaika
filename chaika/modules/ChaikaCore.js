@@ -610,8 +610,10 @@ ChaikaBrowser.prototype = {
 	 * @param {nsIURL} aThreadURL 開くスレッドの URL
 	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
 	 * @param {Boolean} aReplaceViewLimit 表示制限オプションの上書き
+	 * @param {Boolean} aOpenBrowser 真ならブラウザで開く
 	 */
-	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab, aReplaceViewLimit){
+	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab,
+														aReplaceViewLimit, aOpenBrowser){
 		if(!(aThreadURL instanceof Ci.nsIURL)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
@@ -635,8 +637,10 @@ ChaikaBrowser.prototype = {
 				}
 			}
 
-			threadURI = ioService.newURI("/thread/" + threadURI.spec,
+			if(!aOpenBrowser){
+				threadURI = ioService.newURI("/thread/" + threadURI.spec,
 							null, ChaikaCore.getServerURL());
+			}
 			this.openURL(threadURI, aAddTab);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
