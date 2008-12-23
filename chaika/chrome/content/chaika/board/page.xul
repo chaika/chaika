@@ -108,7 +108,7 @@
 		<treecol id="boardTreeCol-number" label="No"       sort="?numberSort" style="width:3em;"
 				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-title"  label="タイトル" sort="?title"      flex="1" primary="true"
+		<treecol id="boardTreeCol-title"  label="タイトル" sort="?title"      flex="1" ignoreincolumnpicker="true"
 				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
 		<treecol id="boardTreeCol-count"  label="レス"     sort="?countSort"  style="width:4em;"

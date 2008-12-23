@@ -70,3 +70,20 @@
 #boardTree treechildren::-moz-tree-image(icon, s4){
   -moz-image-region: rect(0px, 60px, 12px, 48px);
 }
+
+
+#boardTreeCol-number,
+#boardTreeCol-count,
+#boardTreeCol-read,
+#boardTreeCol-unread,
+#boardTreeCol-force {
+  text-align: right;
+}
+
+#boardTree .treecol-text {
+  text-align: left;
+}
+
+#boardTree treechildren::-moz-tree-cell {
+  margin-right: 4px;
+}
