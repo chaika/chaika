@@ -1,5 +1,21 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+#search-box {
+  height: 1.6em;
+  background-image: none;
+}
+
+#mainMenubar {
+  -moz-appearance:none;
+  padding:1px 1px 1px 0px;
+  border-style: none;
+  margin: 0px;
+}
+
+#mainMenubar > menu{
+  font-size: 0.95em;
+}
+
 #treeBbsMenu[stripe="true"] treechildren:-moz-tree-row(odd){
   background-image: url("chrome://chaika/skin/tree-row-odd.png");
 }

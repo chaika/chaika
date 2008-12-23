@@ -24,17 +24,17 @@
 		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
 
-<hbox align="center">
-	<textbox id="search-box" value="" flex="1" type="autocomplete"
+<menubar id="mainMenubar">
+	<textbox id="search-box" value="" emptytext="板の検索" flex="1" type="autocomplete"
 			autocompletesearch="form-history"
 			autocompletesearchparam="bbs2ch-bbsmenu-history"
 			ontextentered="searchTitle(this.value)"/>
-	<toolbarbutton id="btnHistory" label="履歴" type="menu">
+	<menu id="btnHistory" label="履歴">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
 				boardItemContext="boardItemHistoryContext"
 				threadItemContext="threadItemHistoryContext"/>
-	</toolbarbutton>
-	<toolbarbutton label="ツール" type="menu">
+	</menu>
+	<menu label="ツール">
 		<menupopup>
 			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
 			<menuseparator/>
@@ -42,9 +42,8 @@
 			<menuitem label="オプション..." oncommand="openSettings()"/>
 			<menuitem label="chaika について" oncommand="openAbout()"/>
 		</menupopup>
-	</toolbarbutton>
-	<spacer class="small-margin"/>
-</hbox>
+	</menu>
+</menubar>
 
 <hbox id="bbsmenuUpdater" collapsed="true"
 	onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
