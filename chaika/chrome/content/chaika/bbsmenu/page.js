@@ -130,101 +130,6 @@ function createBbsmenuXML(){
 
 
 /**
- * 履歴を読んで History メニューを更新する
- */
-function updateHistoryMenu(){
-	var popHistory = document.getElementById("popHistory");
-	while(popHistory.hasChildNodes()){
-		popHistory.removeChild(popHistory.firstChild);
-	}
-
-	var boardMax = gBbs2chService.pref.getIntPref("extensions.chaika.bbsmenu_historymenu_board_max");
-	if(boardMax > 15) boardMax = 15;
-
-	var sql = "SELECT url, title FROM history WHERE type=0 ORDER BY last_visited DESC LIMIT ?1";
-	var statement = ChaikaCore.storage.createStatement(sql);
-	statement.bindInt32Parameter(0, boardMax);
-
-	ChaikaCore.storage.beginTransaction();
-	try{
-		while(statement.executeStep()){
-			var url =  "bbs2ch:board:" + statement.getString(0);
-			var title = statement.getString(1);
-			var menuNode = document.createElement("menuitem");
-			menuNode.setAttribute("label", title);
-			menuNode.setAttribute("value", url);
-			menuNode.setAttribute("tooltiptext", url);
-			popHistory.appendChild(menuNode);
-		}
-		statement.reset();
-	}finally{
-		ChaikaCore.storage.commitTransaction();
-	}
-
-	if(popHistory.hasChildNodes()){
-		popHistory.appendChild(document.createElement("menuseparator"));
-	}
-
-	var threadViewLimit = gBbs2chService.pref.getIntPref("extensions.chaika.board_thread_view_limit");
-	var threadMax = gBbs2chService.pref.getIntPref("extensions.chaika.bbsmenu_historymenu_thread_max");
-	if(threadMax > 15) threadMax = 15;
-	sql = sql = "SELECT url, title FROM history WHERE type=1 ORDER BY last_visited DESC LIMIT ?1";
-	statement = ChaikaCore.storage.createStatement(sql);
-	statement.bindInt32Parameter(0, threadMax);
-
-	ChaikaCore.storage.beginTransaction();
-	try{
-		while(statement.executeStep()){
-			var url = statement.getString(0);
-			var title = statement.getString(1);
-			var threadURL = gBbs2chService.serverURL.resolve("./thread/" + url);
-
-			if(threadViewLimit > 0){
-				threadURL += "l" + threadViewLimit;
-			}
-
-			var menuNode = document.createElement("menuitem");
-			menuNode.setAttribute("label", title);
-			menuNode.setAttribute("value", threadURL);
-			menuNode.setAttribute("tooltiptext", threadURL);
-			popHistory.appendChild(menuNode);
-		}
-		statement.reset();
-	}finally{
-		ChaikaCore.storage.commitTransaction();
-	}
-
-	if(popHistory.hasChildNodes()){
-		popHistory.appendChild(document.createElement("menuseparator"));
-		var menuNode = document.createElement("menuitem");
-		menuNode.setAttribute("label", "Clear History");
-		menuNode.setAttribute("oncommand", "clearHistory()");
-		popHistory.appendChild(menuNode);
-	}
-
-}
-
-
-/**
- * History メニューアイテムをクリックしたときの処理
- * @param aEvent event イベントオブジェクト
- */
-function popHistoryClick(aEvent){
-	var target = aEvent.originalTarget;
-	if(target.localName != "menuitem" || !(target.value)) return;
-	if(aEvent.button == 0){
-		gBbs2chService.openURL(target.value, null, false);
-	}else if(aEvent.button == 1){
-		target.parentNode.hidePopup();
-		gBbs2chService.openURL(target.value, null, true);
-	}
-}
-
-function clearHistory(){
-	ChaikaCore.history.clearHistory();
-}
-
-/**
  * bbsmenu.html をダウンロードして板一覧を更新する
  */
 function bbsmenuUpdate(){
@@ -454,9 +359,9 @@ function closeAllOpendContainers(aEvent, aExceptIndex){
 
 /**
  * ツリーのコンテキストメニューが表示されるときに呼ばれる
- * @param {event} aEvent
+ * @param {Event} aEvent
  */
-function showBbsMenuContext(aEvent){
+function showBoardItemBbsMenuContext(aEvent){
 	var row = {}
 	var obj = {};
 	gTreeBbsMenu.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
@@ -467,6 +372,25 @@ function showBbsMenuContext(aEvent){
 	if(gTreeBbsMenu.view.isSeparator(row.value)) return false;
 		// コンテナの場合はコンテキストメニューを出さない
 	if(gTreeBbsMenu.view.isContainer(row.value)) return false;
+
+
+	var item = gTreeBbsMenuView.viewItems[gTreeBbsMenu.currentIndex];
+	var boardItemBbsMenuContext = document.getElementById("boardItemBbsMenuContext");
+	boardItemBbsMenuContext.itemTitle = item.title;
+	boardItemBbsMenuContext.itemURL = item.url;
+
+	switch(parseInt(item.type)){
+		case gBbs2chService.BOARD_TYPE_2CH:
+		case gBbs2chService.BOARD_TYPE_BE2CH:
+		case gBbs2chService.BOARD_TYPE_JBBS:
+		case gBbs2chService.BOARD_TYPE_MACHI:
+			boardItemBbsMenuContext.itemType = "board";
+			break;
+		default:
+			boardItemBbsMenuContext.itemType = "page";
+			break;
+	}
+
 	return true;
 }
 

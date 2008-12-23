@@ -14,14 +14,14 @@
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 
 <popupset>
-	<popup id="popBbsMenuContext"
-				onpopupshowing="return showBbsMenuContext(event)">
-		<menuitem label="開く" oncommand="openBoard(false)"/>
-		<menuitem label="新しいタブで開く" oncommand="openBoard(true)"/>
-		<menuseparator/>
-		<menuitem label="URL のコピー" oncommand="copyURL(false)"/>
-		<menuitem label="URL とタイトルのコピー" oncommand="copyURL(true)"/>
-	</popup>
+	<popup id="boardItemHistoryContext" itemType="board"
+		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+	<popup id="threadItemHistoryContext" itemType="thread"
+		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+
+	<popup id="boardItemBbsMenuContext" itemType="board"
+		onpopupshowing="return showBoardItemBbsMenuContext(event)"
+		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
 
 <hbox align="center">
@@ -30,8 +30,9 @@
 			autocompletesearchparam="bbs2ch-bbsmenu-history"
 			ontextentered="searchTitle(this.value)"/>
 	<toolbarbutton id="btnHistory" label="履歴" type="menu">
-		<menupopup id="popHistory" onpopupshowing="updateHistoryMenu()"
-				onclick="popHistoryClick(event)"/>
+		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
+				boardItemContext="boardItemHistoryContext"
+				threadItemContext="threadItemHistoryContext"/>
 	</toolbarbutton>
 	<toolbarbutton label="ツール" type="menu">
 		<menupopup>
@@ -49,7 +50,8 @@
 	onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
 	style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
 
-<tree id="treeBbsMenu"  hidecolumnpicker="true" context="popBbsMenuContext"
+<tree id="treeBbsMenu"  hidecolumnpicker="true" context="boardItemBbsMenuContext"
+		seltype="single"
 		onclick="treeBbsMenuClick(event)" onkeypress="treeBbsMenuKeyDown(event)"
 		persist="openedCategories" flags="dont-build-content" class="plain" flex="1">
 	<treecols>

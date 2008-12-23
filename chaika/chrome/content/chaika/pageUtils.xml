@@ -1,0 +1,357 @@
+<?xml version="1.0"?>
+
+<bindings id="pageUtilsBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<binding id="itemContext" extends="chrome://global/content/bindings/popup.xml#popup">
+	<content>
+		<xul:menuitem label="開く" anonid="open"/>
+		<xul:menuitem label="新しいタブで開く" anonid="openTab"/>
+		<xul:menuitem label="タブですべてを開く" anonid="openTabAll"/>
+		<xul:menuitem label="ブラウザで開く" anonid="openBrowser"/>
+		<xul:menuitem label="新しいブラウザタブで開く" anonid="openBrowserTab"/>
+		<xul:menuseparator/>
+		<xul:menuitem label="URL のコピー" anonid="copyURL"/>
+		<xul:menuitem label="URL とタイトルのコピー" anonid="openTitleAndURL"/>
+		<xul:menuseparator anonid="deleteLogSeparator"/>
+		<xul:menuitem label="ログの削除" anonid="deleteLog"/>
+	</content>
+
+
+	<implementation>
+		<constructor><![CDATA[
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+			Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
+			Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+
+			if(!this.itemType) this.itemType = "page";
+		]]></constructor>
+
+
+		<property name="itemType"
+				onget="return this.getAttribute('itemType');"
+				onset="this.setAttribute('itemType', val); return val;"/>
+		<property name="itemTitle"
+				onget="return this.getAttribute('itemTitle');"
+				onset="this.setAttribute('itemTitle', val); return val;"/>
+		<property name="itemURL"
+				onget="return this.getAttribute('itemURL');"
+				onset="this.setAttribute('itemURL', val); return val;"/>
+	</implementation>
+
+
+	<handlers>
+		<handler event="popupshowing" phase="target"><![CDATA[
+			var urlSpec = this.itemURL;
+			if(!urlSpec) return false;
+
+				// itemURL が "," 区切りのリストでなければ
+				// 「タブですべてを開く」を隠す
+			document.getAnonymousElementByAttribute(this, "anonid", "openTabAll")
+						.hidden = (urlSpec.indexOf(",") == -1);
+
+			var itemType = this.itemType;
+
+				// itemType  が "thread" 以外なら 「ログの削除」を隠す
+			document.getAnonymousElementByAttribute(this, "anonid", "deleteLogSeparator")
+						.hidden = (itemType != "thread");
+			document.getAnonymousElementByAttribute(this, "anonid", "deleteLog")
+						.hidden = (itemType != "thread");
+
+				// itemType  が "page" なら「開く」「新しいタブで開く」を隠す
+			document.getAnonymousElementByAttribute(this, "anonid", "open")
+						.hidden = (itemType == "page");
+			document.getAnonymousElementByAttribute(this, "anonid", "openTab")
+						.hidden = (itemType == "page");
+			return true;
+		]]></handler>
+
+
+		<!-- メニューアイテムの実行 -->
+		<handler event="command" phase="bubbling"><![CDATA[
+			var target = event.originalTarget;
+			if(target.localName != "menuitem") return;
+
+			var isBoard = (this.itemType == "board");
+			var isPage = (this.itemType == "page");
+
+			var title = this.itemTitle;
+			var urls = this.itemURL.replace(/\s/g, "").split(",");
+
+			function getURI(aSpec){
+				var result = null;
+				try{
+					var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+							.getService(Components.interfaces.nsIIOService);
+					result = ioService.newURI(aSpec, null, null);
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
+				}
+				return result;
+			}
+			
+			switch(target.getAttribute("anonid")){
+				case "open":
+					if(isBoard){
+						ChaikaCore.browser.openBoard(getURI(urls[0]), false);
+					}else{
+						ChaikaCore.browser.openThread(getURI(urls[0]), false, true);
+					}
+					break;
+				case "openTab":
+					if(isBoard){
+						ChaikaCore.browser.openBoard(getURI(urls[0]), true);
+					}else{
+						ChaikaCore.browser.openThread(getURI(urls[0]), true, true);
+					}
+					break;
+				case "openTabAll":
+					for(var i=0; i<urls.length; i++){
+						if(isBoard){
+							ChaikaCore.browser.openBoard(getURI(urls[i]), true);
+						}else{
+							ChaikaCore.browser.openThread(getURI(urls[i]), true, true);
+						}
+					}
+					break;
+				case "openBrowser":
+					if(isBoard || isPage){
+						ChaikaCore.browser.openURL(getURI(urls[0]), false);
+					}else{
+						ChaikaCore.browser.openThread(getURI(urls[0]), false, true, true);
+					}
+					break;
+				case "openBrowserTab":
+					if(isBoard || isPage){
+						ChaikaCore.browser.openURL(getURI(urls[0]), true);
+					}else{
+						ChaikaCore.browser.openThread(getURI(urls[0]), true, true, true);
+					}
+					break;
+				case "copyURL":
+					ChaikaClipboard.setString(getURI(urls[0]).spec);
+					break;
+				case "openTitleAndURL":
+					ChaikaClipboard.setString(title +"\n"+ getURI(urls[0]).spec);
+					break;
+				case "deleteLog":
+					for(var i=0; i<urls.length; i++){
+						try{
+							(new ChaikaThread(getURI(urls[i]))).deteleThreadData();
+						}catch(ex){
+							ChaikaCore.logger.error(ex);
+						}
+					}
+					break;
+			}
+
+		]]></handler>
+	</handlers>	
+</binding>
+
+
+
+
+<binding id="historyMenuPopup" extends="chrome://global/content/bindings/popup.xml#popup">
+
+	<implementation>
+		<constructor><![CDATA[
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+		]]></constructor>
+
+
+		<method name="_setOverLink">
+			<parameter name="aLink"/>
+			<body><![CDATA[
+				var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+						.getService(Components.interfaces.nsIWindowMediator);
+				var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+				if(browserWindow && browserWindow.XULBrowserWindow){
+					browserWindow.XULBrowserWindow.setOverLink(aLink, null);
+				}
+			]]></body>
+		</method>
+
+
+		<property name="boardItemContext"
+				onget="return this.getAttribute('boardItemContext');"
+				onset="this.setAttribute('boardItemContext', val); return val;"/>
+		<property name="threadItemContext"
+				onget="return this.getAttribute('threadItemContext');"
+				onset="this.setAttribute('threadItemContext', val); return val;"/>
+	</implementation>
+
+
+	<handlers>
+		<handler event="popupshowing" phase="target"><![CDATA[
+			var historyMenuPopup = this;
+
+			var storage = ChaikaCore.storage;
+			var lastVisitedStatement = storage.createStatement(
+					"SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
+			var visitCountStatement = storage.createStatement(
+					"SELECT title, url FROM history WHERE type=?1 ORDER BY visit_count DESC LIMIT ?2");
+
+
+			function createCategory(aCategoryTitle, aStatement, aItemType, aLimit){
+				var menu = document.createElement("menu");
+				var menupopup = document.createElement("menupopup");
+				menu.appendChild(menupopup);
+
+				menu.setAttribute("label", aCategoryTitle);
+
+				storage.beginTransaction();
+				try{
+					var historyType = (aItemType=="board") ? 0 : 1;
+					aStatement.bindInt32Parameter(0, historyType);
+					aStatement.bindInt32Parameter(1, aLimit);
+					while(aStatement.executeStep()){
+						var menuitem = document.createElement("menuitem");
+						menuitem.setAttribute("label", aStatement.getString(0));
+						menuitem.setAttribute("value",  aStatement.getString(1));
+						menuitem.setAttribute("itemType",  aItemType);
+						menupopup.appendChild(menuitem);
+					}
+				}finally{
+					aStatement.reset();
+					storage.commitTransaction();
+				}
+
+				if(!menupopup.hasChildNodes()){
+					var emptyMenuitem = document.createElement("menuitem");
+					emptyMenuitem.setAttribute("label", "(なし)");
+					emptyMenuitem.setAttribute("disabled", "true");
+					menupopup.appendChild(emptyMenuitem);
+				}
+
+				return menu;
+			}
+
+
+			var boardMax = ChaikaCore.pref.getInt("bbsmenu_historymenu_board_max");
+			if(boardMax > 30) boardMax = 30;
+			var threadMax = ChaikaCore.pref.getInt("bbsmenu_historymenu_thread_max");
+			if(threadMax > 30) threadMax = 30;
+
+			if(boardMax){
+				historyMenuPopup.appendChild(createCategory("最近アクセスした板",
+						lastVisitedStatement, "board", boardMax));
+				historyMenuPopup.appendChild(createCategory("アクセス回数の多い板",
+						visitCountStatement, "board", boardMax));
+			}
+			if(threadMax){
+				historyMenuPopup.appendChild(createCategory("最近アクセスしたスレッド",
+						lastVisitedStatement, "thread", threadMax));
+				historyMenuPopup.appendChild(createCategory("アクセス回数の多いスレッド",
+						visitCountStatement, "thread", threadMax));
+			}
+
+			lastVisitedStatement.reset();
+			visitCountStatement.reset();
+
+			historyMenuPopup.appendChild(document.createElement("menuseparator"));
+			var historyMenuitem = document.createElement("menuitem");
+			historyMenuitem.setAttribute("label", "履歴の消去");
+			historyMenuitem.setAttribute("value", "clearHistory");
+			historyMenuPopup.appendChild(historyMenuitem);
+		]]></handler>
+	
+
+		<handler event="popuphidden" phase="target"><![CDATA[
+			while(this.hasChildNodes()){
+				this.removeChild(this.firstChild);
+			}
+		]]></handler>
+
+
+		<!-- メニューアイテムの実行 -->
+		<handler event="command"><![CDATA[
+			var target = event.target;
+			if(target.localName != "menuitem" || !(target.value)) return;
+
+				// 「履歴の消去」メニューアイテム
+			if(target.value == "clearHistory"){
+				ChaikaCore.history.clearHistory();;
+				return;
+			}
+
+			var itemType = target.getAttribute("itemType");
+			if(itemType){
+				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+							.getService(Components.interfaces.nsIIOService);
+				var url = ioService.newURI(target.value, null, null);
+
+					// Ctrl を押している場合はタブで開く
+				var addTab = event.ctrlKey;
+				if(itemType == "board"){
+					ChaikaCore.browser.openBoard(url, addTab);
+				}else if(itemType == "thread"){
+					ChaikaCore.browser.openThread(url, addTab, true);
+				}
+			}
+		]]></handler>
+
+
+		<!-- メニューアイテムのミドルクリック -->
+		<handler event="click" button="1"><![CDATA[
+			var target = event.target;
+			if(target.localName != "menuitem" || !(target.value)) return;
+			var itemType = target.getAttribute("itemType");
+			if(itemType){
+				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+							.getService(Components.interfaces.nsIIOService);
+				var url = ioService.newURI(target.value, null, null);
+
+				if(itemType == "board"){
+					ChaikaCore.browser.openBoard(url, true);
+				}else if(itemType == "thread"){
+					ChaikaCore.browser.openThread(url, true, true);
+				}
+
+				this.hidePopup();
+			}
+		]]></handler>
+
+
+		<!-- メニューアイテムの選択 -->
+		<handler event="DOMMenuItemActive"><![CDATA[
+			var target = event.target;
+			if(!target.hasAttribute("itemType")) return;
+			this._setOverLink(target.value);
+		]]></handler>
+
+
+		<!-- メニューアイテムの選択解除 -->
+		<handler event="DOMMenuItemInactive"><![CDATA[
+			this._setOverLink("");
+		]]></handler>
+
+
+		<!-- メニューアイテムの選択解除 -->
+		<handler event="contextmenu"><![CDATA[
+			var target = event.target;
+			var itemType = target.getAttribute("itemType");
+			if(!itemType) return;
+
+			var itemContext;
+			if(itemType == "board"){
+				itemContext = document.getElementById(this.boardItemContext);
+				if(!itemContext) return;
+			}else if(itemType == "thread"){
+				itemContext = document.getElementById(this.threadItemContext);
+				if(!itemContext) return;
+			}
+
+			itemContext.itemTitle = target.label;
+			itemContext.itemURL = target.value;
+			itemContext.openPopup(target, "after_start", 0, 0, true, false);
+
+		]]></handler>
+	</handlers>
+
+</binding>
+
+</bindings>
