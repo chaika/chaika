@@ -37,8 +37,6 @@
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
-Components.utils.import("resource://chaika-modules/ChaikaThread.js");
-Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
 var gBbs2chService = Cc["@mozilla.org/bbs2ch-service;1"].getService(Ci.nsIBbs2chService);
@@ -296,25 +294,28 @@ function boardTreeKeyDown(aEvent){
  * @param aAddTab boolean true なら新しいタブで開く
  */
 function openThread(aAddTab){
-	var threadURL = getSelectedThreadURL();
-	if(threadURL){
-		ChaikaCore.browser.openThread(threadURL, aAddTab, true);
-	}
-}
-
-
-function getSelectedThreadURL(){
 	var index = gBoardTree.currentIndex;
 	if(index == -1) return null;
 
-	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
-	var result = gBoardTree.builder.getResultForId(itemID);
+	ChaikaCore.browser.openThread(getItemURL(index), aAddTab, true);
+}
 
-	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+
+function getItemURL(aIndex){
 	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-	var url = result.getBindingFor(atomService.getAtom("?url"));
-	return ioService.newURI(url, null, null);
+	var titleColumn = gBoardTree.columns.getNamedColumn("boardTreeCol-title");
+	var spec = gBoardTree.builder.getCellValue(aIndex, titleColumn);
+
+	return ioService.newURI(spec, null, null);
+}
+
+
+function getItemTitle(aIndex){
+	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+	var titleColumn = gBoardTree.columns.getNamedColumn("boardTreeCol-title");
+	return gBoardTree.builder.getCellText(aIndex, titleColumn);
 }
 
 
@@ -325,72 +326,24 @@ function showBoardTreeContextMenu(aEvent){
 		// ツリーのアイテム以外をクリック
 	if(getClickItemIndex(aEvent) == -1) return false;
 
+	var currentIndex = gBoardTree.currentIndex;
+	var selectionIndices = getSelectionIndices();
+
+	selectionIndices = selectionIndices.filter(function(aElement, aIndex, aArray){
+		return (aElement != currentIndex);
+	});
+	selectionIndices.unshift(currentIndex);
+
+	var urls = selectionIndices.map(function(aElement, aIndex, aArray){
+		return getItemURL(aElement).spec;
+	});
+
+	var boardTreeContextMenu = document.getElementById("boardTreeContextMenu");
+	boardTreeContextMenu.itemTitle = getItemTitle(currentIndex);
+	boardTreeContextMenu.itemURL = urls.join(",");
+
 	return true;
 }
-
-
-/**
- * 選択スレッドの URL をクリップボードにコピー
- */
-function copyURL(){
-	var index = gBoardTree.currentIndex;
-	if(index == -1) return;
-
-	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
-	var result = gBoardTree.builder.getResultForId(itemID);
-
-	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-	var url = result.getBindingFor(atomService.getAtom("?url"));
-
-	ChaikaClipboard.setString(url);
-}
-
-
-/**
- * 選択スレッドのタイトルと URL をクリップボードにコピー
- */
-function copyTitleAndURL(){
-	var index = gBoardTree.currentIndex;
-	if(index == -1) return;
-
-	var itemID = gBoardTree.builderView.getResourceAtIndex(index).Value;
-	var result = gBoardTree.builder.getResultForId(itemID);
-
-	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-	var title = result.getBindingFor(atomService.getAtom("?title"));
-	var url = result.getBindingFor(atomService.getAtom("?url"));
-
-	ChaikaClipboard.setString(title +"\n"+ url);
-}
-
-
-/**
- * 選択スレッドのログを削除する (複数選択可)
- */
-function deleteLog(){
-	var itemIndices = getSelectionIndices();
-
-	var atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-	var urlAtom = atomService.getAtom("?url");
-
-	for(var i=0; i<itemIndices.length; i++){
-		var itemIndex = itemIndices[i];
-		var itemID = gBoardTree.builderView.getResourceAtIndex(itemIndex).Value;
-		var result = gBoardTree.builder.getResultForId(itemID);
-		var url = result.getBindingFor(urlAtom);
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var threadURL = ioService.newURI(url, null, null);
-		try{
-			(new ChaikaThread(threadURL)).deteleThreadData();
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}
-	}
-
-	initBoardTree();
-}
-
-
 
 
 /**
