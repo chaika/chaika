@@ -124,11 +124,15 @@ nsBbs2chService.prototype = {
 
 	_delayInit: function(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-		ChaikaCore._init();
+		ChaikaCore._startup();
 		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 
 
 		this._maruAutoAuth();
+	},
+
+	_quit: function(){
+		ChaikaCore._quit();
 	},
 
 	_shutdown: function(){
@@ -495,12 +499,17 @@ nsBbs2chService.prototype = {
 		switch(aTopic){
 			case "app-startup":
 				os.addObserver(this, "profile-after-change", false);
+				os.addObserver(this, "quit-application", false);
 				os.addObserver(this, "xpcom-shutdown", false);
 				dump("nsBbs2chService\n");
 				break;
 			case "profile-after-change":
 				os.removeObserver(this, "profile-after-change");
 				this._delayInit();
+				break;
+			case "quit-application":
+				this._quit();
+				os.removeObserver(this, "quit-application");
 				break;
 			case "xpcom-shutdown":
 				this._shutdown();

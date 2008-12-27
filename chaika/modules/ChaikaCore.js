@@ -181,10 +181,10 @@ var ChaikaCore = {
 
 
 	/**
-	 * ブラウザ起動時に一度だけ実行され、初期化処理を行う。
+	 * ブラウザ起動時のプロファイル読み込み後に一度だけ実行され、初期化処理を行う。
 	 * @private
 	 */
-	_init: function ChaikaCore__init(){
+	_startup: function ChaikaCore__startup(){
 		this.logger = new ChaikaLogger();
 		this.pref = new ChaikaPref("extensions.chaika.");
 		this.browser = new ChaikaBrowser();
@@ -197,6 +197,15 @@ var ChaikaCore = {
 		this.logger.info("UserAgetn: " + this.getUserAgent());
 		this.logger.info("ServerURL: " + this.getServerURL().spec);
 		this.logger.info("Storage:   " + this.storage.databaseFile.path);
+	},
+
+
+	/**
+	 * ブラウザ終了時に一度だけ実行され、終了処理を行う。
+	 * @private
+	 */
+	_quit: function ChaikaCore__quit(){
+
 	},
 
 
