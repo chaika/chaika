@@ -23,6 +23,8 @@
 				name="extensions.chaika.thread_hide_abone" type="bool"/>
 		<preference id="extensions.chaika.thread_chain_abone"
 				name="extensions.chaika.thread_chain_abone" type="bool"/>
+		<preference id="extensions.chaika.refController.enabled"
+				name="extensions.chaika.refController.enabled" type="bool"/>
 	</preferences>
 
 	<settingbox label="スキン">
@@ -108,6 +110,11 @@
 				preference="extensions.chaika.thread_hide_abone"/>
 		<checkbox label="連鎖あぼーん"
 				preference="extensions.chaika.thread_chain_abone"/>
+	</settingbox>
+
+	<settingbox label="リファラ制御" orient="vertical" align="start">
+		<checkbox label="スレッド表示のリンクからはリファラを送らない"
+				preference="extensions.chaika.refController.enabled"/>
 	</settingbox>
 
 </prefpane>

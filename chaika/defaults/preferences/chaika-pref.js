@@ -10,6 +10,8 @@ pref("extensions.chaika.server_port.firefox", 8823);
 pref("extensions.chaika.server_port.seamonkey", 8824);
 pref("extensions.chaika.server_port.other", 8825);
 
+pref("extensions.chaika.refController.enabled", true);
+
 pref("extensions.chaika.logger_level", 0);
 
 pref("extensions.chaika.history_expire_days", 60);
