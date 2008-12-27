@@ -172,8 +172,7 @@ b2rServer.prototype = {
 		aTransport.setTimeout(Ci.nsITransport.TIMEOUT_READ_WRITE, 30);
 
 		var input = aTransport.openInputStream(0, 1024*8, 1024).QueryInterface(Ci.nsIAsyncInputStream);
-		var output = XPC.createInstance("@mozilla.org/network/buffered-output-stream;1", "nsIBufferedOutputStream");
-		output.init(aTransport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING, 1024*32, 1024), 1024*128);
+		var output = aTransport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING, 1024*512, 1024);
 
 		new b2rServerHandler(aServerSocket.port, input, output);
 		// dump("b2rServer.onSocketAccepted\n");
