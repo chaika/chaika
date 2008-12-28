@@ -264,7 +264,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count AS line_count,",
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
-					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
 					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
@@ -273,7 +273,6 @@ ChaikaBoard.prototype = {
 				statement = database.createStatement(sql);
 				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
 				statement.bindStringParameter(1, boardID);
-				statement.bindInt32Parameter(2, Date.now() / 1000);
 				break;
 			case this.FILTER_LIMIT_NEW:
 				sql = [
@@ -285,7 +284,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count AS line_count,",
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
-					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
 					"ON td.board_id=?2 AND bs.dat_id=td.dat_id AND bs.line_count > td.line_count",
@@ -294,7 +293,6 @@ ChaikaBoard.prototype = {
 				statement = database.createStatement(sql);
 				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
 				statement.bindStringParameter(1, boardID);
-				statement.bindInt32Parameter(2, Date.now() / 1000);
 				break;
 			case this.FILTER_LIMIT_SEARCH:
 				sql = [
@@ -306,17 +304,16 @@ ChaikaBoard.prototype = {
 					"    bs.line_count AS line_count,",
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
-					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
-					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?4)"
+					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?3)"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(0, "%Y/%m/%d %H:%M");
 				statement.bindStringParameter(1, boardID);
-				statement.bindInt32Parameter(2, Date.now() / 1000);
-				statement.bindStringParameter(3, aSearchStr);
+				statement.bindStringParameter(2, aSearchStr);
 				break;
 			default:
 				sql = [
@@ -328,41 +325,57 @@ ChaikaBoard.prototype = {
 					"    bs.line_count AS line_count,",
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
-					"    bs.line_count * 864000 / (?3 - bs.dat_id) AS force,",
+					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
 					"WHERE bs.board_id=?2",
-					"LIMIT ?4;"
+					"LIMIT ?3;"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
+				statement.bindStringParameter(0, "%Y/%m/%d %H:%M");
 				statement.bindStringParameter(1, boardID);
-				statement.bindInt32Parameter(2, Date.now() / 1000);
-				statement.bindInt32Parameter(3, (aFilterLimit > 0) ? aFilterLimit : 10000);
+				statement.bindInt32Parameter(2, (aFilterLimit > 0) ? aFilterLimit : 10000);
 				break;
 		}
 
 		database.beginTransaction();
 		try{
 			while(statement.executeStep()){
+				var status  = statement.getInt32(0);
+				var number  = statement.getInt32(1);
+				var datID   = statement.getString(2);
+				var title   = statement.getString(3);
+				var count   = statement.getInt32(4);
+				var read    = statement.getInt32(5);
+				var unread  = statement.getInt32(6);
+				var force   = statement.getInt32(7);
+				var created = statement.getString(8);
+				var url     = threadUrlSpec + datID + "/";
+
+
 				var itemNode = this.itemsDoc.createElement("boarditem");
-				itemNode.setAttribute("status",     statement.getInt32(0));
-				itemNode.setAttribute("number",     statement.getInt32(1));
-				itemNode.setAttribute("numberSort", statement.getInt32(1) + 100000);
-				itemNode.setAttribute("datID",      statement.getString(2));
-				itemNode.setAttribute("id",         "item-" + statement.getString(2));
-				itemNode.setAttribute("title",      statement.getString(3));
-				itemNode.setAttribute("count",      statement.getInt32(4));
-				itemNode.setAttribute("countSort",  statement.getInt32(4) + 100000);
-				itemNode.setAttribute("read",       statement.getInt32(5));
-				itemNode.setAttribute("readSort",   statement.getInt32(5) + 100000);
-				itemNode.setAttribute("unread",     statement.getInt32(6));
-				itemNode.setAttribute("unreadSort", statement.getInt32(6) + 100000);
-				itemNode.setAttribute("force",      Math.round(statement.getInt32(7) / 10));
-				itemNode.setAttribute("forceSort",  statement.getInt32(7)  + 100000);
-				itemNode.setAttribute("created",  statement.getString(8));
-				itemNode.setAttribute("url",      threadUrlSpec + statement.getString(2) + "/");
+				itemNode.setAttribute("status",     status);
+				itemNode.setAttribute("number",     number);
+				itemNode.setAttribute("numberSort", number + 10000);
+				itemNode.setAttribute("datID",      datID);
+				itemNode.setAttribute("id",         "item-" + datID);
+				itemNode.setAttribute("title",      title);
+				itemNode.setAttribute("count",      count);
+				itemNode.setAttribute("countSort",  count + 10000);
+				itemNode.setAttribute("read",       read);
+				itemNode.setAttribute("readSort",   read + 10000);
+				itemNode.setAttribute("unread",     unread);
+				itemNode.setAttribute("unreadSort", (unread + 10000) +" "+ (read + 10000));
+
+				if(force > 60){
+					itemNode.setAttribute("force",  Math.round(force/24) +"/h");
+				}else{
+					itemNode.setAttribute("force",  force + "/d");
+				}
+				itemNode.setAttribute("forceSort",  force + 100000);
+				itemNode.setAttribute("created",    created);
+				itemNode.setAttribute("url",        url);
 
 				this.itemsDoc.documentElement.appendChild(itemNode);
 			}
