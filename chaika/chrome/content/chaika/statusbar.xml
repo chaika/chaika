@@ -9,25 +9,25 @@
 <binding id="b2rstatusbar">
 	<content>
 		<xul:toolbarbutton anonid="btnGoToBoard" class="b2rstatusbar-button"
-				label="Go to board" tooltiptext="Go to board"/>
+				label="スレ一覧" tooltiptext="スレッド一覧を開く"/>
 		<xul:toolbarbutton anonid="btnWrite" class="b2rstatusbar-button"
-				label="Write" tooltiptext="Write this thread"/>
+				label="書き込み" tooltiptext="このスレッドに書き込む"/>
 		<xul:toolbarbutton anonid="btnDeleteLog" class="b2rstatusbar-button"
-				label="Delete Log" tooltiptext="Delete this thread Log Files"/>
+				label="ログ削除" tooltiptext="このスレッドのログを削除"/>
 
 		<xul:toolbarbutton anonid="btnViewChange" type="menu" class="b2rstatusbar-button"
 				label="View">
 			<xul:menupopup anonid="popViewChange" position="before_end">
-				<xul:menuitem label="All" anonid="mnuViewAll"/>
-				<xul:menuitem label="Last 100" anonid="mnuViewL100"/>
-				<xul:menuitem label="Last 50" anonid="mnuViewL50"/>
+				<xul:menuitem label="すべて" anonid="mnuViewAll"/>
+				<xul:menuitem label="最新 100件" anonid="mnuViewL100"/>
+				<xul:menuitem label="最新 50件" anonid="mnuViewL50"/>
 				<xul:menuseparator/>
-				<xul:menuitem label="View Browser" anonid="mnuViewBroser"/>
+				<xul:menuitem label="ブラウザで開く" anonid="mnuViewBroser"/>
 			</xul:menupopup>
 		</xul:toolbarbutton>
 
 		<xul:toolbarbutton anonid="btnAboneManager" class="b2rstatusbar-button"
-				label="Abone Manager" tooltiptext="Open Abone Manager"/>
+				label="あぼーんマネージャ" tooltiptext="あぼーんマネージャを開く"/>
 	</content>
 
 	<resources>
@@ -35,25 +35,38 @@
 	</resources>
 
 	<implementation>
+		<constructor><![CDATA[
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+			Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+		]]></constructor>
+
 		<method name ="showCheck">
 			<body><![CDATA[
-				this.hidden = (this._getCurrentThreadURLSpec() == null);
+				this.hidden = (this._getCurrentThreadURL() == null);
 			]]></body>
 		</method>
 
-		<method name ="_getCurrentThreadURLSpec">
+		<method name ="_getCurrentThreadURL">
 			<body><![CDATA[
 				var currentURI = null;
 				try{
-					currentURI = getBrowser().currentURI
-									.QueryInterface(Components.interfaces.nsIURL);
+					currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
 				}catch(ex){
 					return null;
 				}
 				if(!(currentURI.host == "localhost" || currentURI.host == "127.0.0.1")) return null;
 				if(currentURI.path.substring(0, 8) != "/thread/") return null;
 
-				return currentURI.path.substring(8);
+				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+				var threadURL = null;
+				try{
+					 threadURL = ioService.newURI(currentURI.path.substring(8), null, null)
+							 .QueryInterface(Ci.nsIURL);					
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
+				}
+				
+				return threadURL;
 			]]></body>
 		</method>
 
@@ -120,30 +133,28 @@
 		<method name ="_goToBoard">
 			<parameter name="aAddTab"/>
 			<body><![CDATA[
-				var currentURLSpec = this._getCurrentThreadURLSpec();
-				if(!currentURLSpec) return;
+				var threadURL = this._getCurrentThreadURL();
+				if(!threadURL) return;
 
-				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-				var boardURLSpec = bbs2chService.getBoardURL(currentURLSpec).spec;
-				bbs2chService.openURL("bbs2ch:board:" + boardURLSpec, null, aAddTab);
+				var boardURL = ChaikaThread.getBoardURL(threadURL);
+				ChaikaCore.browser.openBoard(boardURL, aAddTab);
 			]]></body>
 		</method>
 
 		<method name ="_write">
 			<body><![CDATA[
-				var currentURLSpec = this._getCurrentThreadURLSpec();
-				if(!currentURLSpec) return;
+				var threadURL = this._getCurrentThreadURL();
+				if(!threadURL) return;
 
 				window.openDialog("chrome://chaika/content/post-wizard.xul",
-					"_blank", "chrome, resizable", currentURLSpec);
+					"_blank", "chrome, resizable", threadURL.spec);
 			]]></body>
 		</method>
 
 		<method name ="_deleteLog">
 			<body><![CDATA[
-				var currentURLSpec = this._getCurrentThreadURLSpec();
-				if(!currentURLSpec) return;
+				var threadURL = this._getCurrentThreadURL();
+				if(!threadURL) return;
 
 				var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
 							.getService(Components.interfaces.nsIPromptService);
@@ -151,12 +162,7 @@
 								"このスレッドのログを削除しますか?");
 				if(!result) return;
 
-				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
-				Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-				Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 				try{
-					var threadURL = ioService.newURI(currentURLSpec, null, null);
 					var thread = new ChaikaThread(threadURL);
 					thread.deteleThreadData();
 				}catch(ex){
@@ -172,11 +178,9 @@
 						.getAnonymousElementByAttribute(this, "anonid", "popViewChange");
 				popViewChange.hidePopup();
 
-				var currentURLSpec = this._getCurrentThreadURLSpec();
-				if(!currentURLSpec) return;
-				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-				bbs2chService.openURL(currentURLSpec, null, aAddTab);
+				var threadURL = this._getCurrentThreadURL();
+				if(!threadURL) return;
+				ChaikaCore.browser.openThread(threadURL, aAddTab, false, true);
 			]]></body>
 		</method>
 
@@ -188,17 +192,17 @@
 						.getAnonymousElementByAttribute(this, "anonid", "popViewChange");
 				popViewChange.hidePopup();
 
-				var currentURLSpec = this._getCurrentThreadURLSpec();
-				if(!currentURLSpec) return;
+				var threadURL = this._getCurrentThreadURL();
+				if(!threadURL) return;
 
-				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-						.getService(Components.interfaces.nsIIOService);
-				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-				var currentURL = ioService.newURI(currentURLSpec, null, null)
-						.QueryInterface(Components.interfaces.nsIURL);
-				currentURLSpec = bbs2chService.serverURL.resolve("./thread/" + currentURL.resolve(aOption));
-				bbs2chService.openURL(currentURLSpec, null, aAddTab);
+				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+				try{
+					var threadPlainURL = (new ChaikaThread(threadURL)).plainURL;
+					threadURL = ioService.newURI(aOption, null, threadPlainURL);
+					ChaikaCore.browser.openThread(threadURL, aAddTab, false, false);
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
+				}
 			]]></body>
 		</method>
 
