@@ -205,18 +205,13 @@ function openURL(aURLSpec){
  * @param {boolean} aAddTab true なら新しいタブで開く
  */
 function openBoard(aAddTab){
-	var boardURL = getSelectedBoardURL();
-	if(boardURL){
-		gBbs2chService.openURL(boardURL, null, aAddTab);
-	}
-}
+	if(gTreeBbsMenu.currentIndex == -1) return;
 
-
-function getSelectedBoardURL(){
-	if(gTreeBbsMenu.currentIndex == -1) return null;
 	var item = gTreeBbsMenuView.viewItems[gTreeBbsMenu.currentIndex];
-	var boardURL = item.url;
-	if(boardURL.indexOf("http://") != 0) return null;
+	if(item.url.indexOf("http://") != 0) return;
+
+	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+	var boardURL = ioService.newURI(item.url, null, null);
 
 	var boardType = item.type;
 	switch(parseInt(boardType)){
@@ -224,11 +219,14 @@ function getSelectedBoardURL(){
 		case gBbs2chService.BOARD_TYPE_BE2CH:
 		case gBbs2chService.BOARD_TYPE_JBBS:
 		case gBbs2chService.BOARD_TYPE_MACHI:
-			boardURL = "bbs2ch:board:" + boardURL;
+			ChaikaCore.browser.openBoard(boardURL, aAddTab);
+			break;
+		default:
+			ChaikaCore.browser.openURL(boardURL, aAddTab);
 			break;
 	}
-	return boardURL;
 }
+
 
 /**
  * ツリーをクリックしたときに呼ばれる
