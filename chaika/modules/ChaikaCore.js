@@ -195,10 +195,12 @@ var ChaikaCore = {
 
 		this.storage = this._openStorage();
 
-		this.logger.info("DataDir:   " + this.getDataDir().path);
-		this.logger.info("UserAgetn: " + this.getUserAgent());
-		this.logger.info("ServerURL: " + this.getServerURL().spec);
-		this.logger.info("Storage:   " + this.storage.databaseFile.path);
+		this.logger.info("DataDir:     " + this.getDataDir().path);
+		this.logger.info("LogDir:      " + this.getLogDir().path);
+		this.logger.info("DefaultsDir: " + this.getDefaultsDir().path);
+		this.logger.info("UserAgetn:   " + this.getUserAgent());
+		this.logger.info("ServerURL:   " + this.getServerURL().spec);
+		this.logger.info("Storage:     " + this.storage.databaseFile.path);
 	},
 
 
@@ -338,6 +340,23 @@ var ChaikaCore = {
 			logDir.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
 		}
 		return logDir;
+	},
+
+
+	/**
+	 * 拡張機能のインストールディレクトリ内にある defaults ディレクトリを返す。
+	 * @return {nsILocalFile}
+	 */
+	getDefaultsDir: function ChaikaCore_getDefaultsDir(){
+		var extensionID = "chaika@chaika.xrea.jp";
+		var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
+				.getService(Ci.nsIExtensionManager);
+
+		var installLocation = extensionManager.getInstallLocation(extensionID);
+
+		var defaultsDir = installLocation.getItemFile(extensionID, "defaults")
+				.clone().QueryInterface(Ci.nsILocalFile);
+		return defaultsDir;
 	},
 
 
