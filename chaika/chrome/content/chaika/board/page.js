@@ -626,13 +626,7 @@ function moveNewURL(aEvent){
 			}
 			oldLogDir.remove(false);
 		}catch(ex){}
-/*
-		if(oldLogDir.exists() && window.confirm("ログファイルも移動しますか?")) {
-			var logMoveDialogURL = "chrome://chaika/content/board/logMove.xul";
-			window.openDialog(logMoveDialogURL, "", "modal,chrome,centerscreen",
-						gBoard.getTitle(), gBoard.url.spec, gNewURL);
-		}
-*/
+
 		setTimeout(function(){
 			window.location.href = "bbs2ch:board:" + gNewURL;
 		}, 0);
