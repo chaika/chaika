@@ -126,9 +126,6 @@ b2rProtocolHandler.prototype = {
 			case "bbsmenu":
 				tmpChannel = this._redirectChannel("chrome://chaika/content/bbsmenu/page.xul");
 				break;
-			case "subscribe":
-				tmpChannel = this._redirectChannel("chrome://chaika/content/board/subscribe.xul");
-				break;
 			case "board:":
 				tmpChannel = this._redirectChannel("chrome://chaika/content/board/page.xul");
 				break;

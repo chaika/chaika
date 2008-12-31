@@ -55,7 +55,3 @@ pref("extensions.chaika.thread_chain_abone", false);
 
 pref("extensions.chaika.livebookmarks_append_board_link", true);
 pref("extensions.chaika.livebookmarks_min_unread", 1);
-
-pref("extensions.chaika.subscribe_compact_mode", false);
-pref("extensions.chaika.subscribe_hide_unread", true);
-pref("extensions.chaika.subscribe_min_unread", 0);
