@@ -87,6 +87,18 @@ function ChaikaBoard(aBoardURL){
 
 ChaikaBoard.prototype = {
 
+	/**
+	 * 板内のスレッドの情報を持った XML ドキュメント。
+	 * refresh メソッドで初期化されるまでは、null を返す。
+	 * @type Document
+	 */
+	itemsDoc: null,
+
+
+	/**
+	 * 初期化処理
+	 * @private
+	 */
 	_init: function ChaikaBoard__init(aBoardURL){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
@@ -100,8 +112,8 @@ ChaikaBoard.prototype = {
 		this.id = ChaikaBoard.getBoardID(this.url);
 
 		this.type = ChaikaBoard.getBoardType(this.url);
-		if(this.type == Ci.nsIBbs2chService.BOARD_TYPE_PAGE){
-			this.type = Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+		if(this.type == ChaikaBoard.BOARD_TYPE_PAGE){
+			this.type = ChaikaBoard.BOARD_TYPE_2CH;
 		}
 
 		this.subjectURL = ioService.newURI("subject.txt", null, this.url)
@@ -126,11 +138,21 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * 板のタイトルを SETTING.TXT から取得して返す。
+	 * 取得できない場合は、板の URL を返す。
+	 * @return {String}
+	 */
 	getTitle: function ChaikaBoard_getTitle(){
 		return this.getSetting("BBS_TITLE") || this.url.spec;
 	},
 
 
+	/**
+	 * 板バナーの URL を SETTING.TXT から取得して返す。
+	 * 取得できない場合は、null を返す。
+	 * @return {nsIURL} 板バナーの URL
+	 */
 	getLogoURL: function ChaikaBoard_getLogoURL(){
 		var logoURLSpec = this.getSetting("BBS_TITLE_PICTURE") ||
 				this.getSetting("BBS_FIGUREHEAD") || null;
@@ -152,6 +174,12 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * SETTING.TXT から設定値を取得する。
+	 * 取得できない場合や指定した設定がなければ、null を返す。
+	 * @param {String} aSettingName 取得する設定の名前
+	 * @return {String} 設定の値
+	 */
 	getSetting: function ChaikaBoard_getSetting(aSettingName){
 		if(!this._settings){
 			this._settings = [];
@@ -159,13 +187,13 @@ ChaikaBoard.prototype = {
 			if(this.settingFile.exists()){
 				var charset;
 				switch(this.type){
-					case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
-					case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
-					case Ci.nsIBbs2chService.BOARD_TYPE_OLD2CH:
+					case ChaikaBoard.BOARD_TYPE_2CH:
+					case ChaikaBoard.BOARD_TYPE_MACHI:
+					case ChaikaBoard.BOARD_TYPE_OLD2CH:
 						charset =  "Shift_JIS";
 						break;
-					case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
-					case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+					case ChaikaBoard.BOARD_TYPE_BE2CH:
+					case ChaikaBoard.BOARD_TYPE_JBBS:
 						charset = "EUC-JP";
 						break;
 				}
@@ -191,12 +219,41 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * 板内のすべてのスレッド。
+	 * @constant
+	 */
 	FILTER_LIMIT_ALL: 0,
+	/**
+	 * DAT 落ちしたスレッド。
+	 * @constant
+	 */
 	FILTER_LIMIT_LOG: -1,
+	/**
+	 * 購読中のスレッド。
+	 * @constant
+	 */
 	FILTER_LIMIT_SUBSCRIBE: -2,
+	/**
+	 * 作成されたばかりのスレッド
+	 * @private
+	 * @constant
+	 */
 	FILTER_LIMIT_NEW: -3,
+	/**
+	 * 検索でヒットしたスレッド。
+	 * @constant
+	 */
 	FILTER_LIMIT_SEARCH: -4,
 
+
+	/**
+	 * 板内のスレッド情報を取得して itemsDoc プロパティを更新する。
+	 * aFilterLimit が FILTER_LIMIT_SEARCH のときは、aSearchStr に検索文字列を渡すことで、
+	 * スレッド名で検索を行う。
+	 * @param {Number} aFilterLimit 取得するスレッドのフィルタ(FILTER_LIMIT_XXX)。
+	 * @param {String} aSearchStr aFilterLimit が FILTER_LIMIT_SEARCH の時の検索文字列
+	 */
 	refresh: function ChaikaBoard_refresh(aFilterLimit, aSearchStr){
 		this.itemsDoc = Cc["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Ci.nsIDOMParser).parseFromString("<boarditems/>", "text/xml");
@@ -206,18 +263,18 @@ ChaikaBoard.prototype = {
 		var categoryPath;
 		var threadUrlSpec;
 		switch(this.type){
-			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
-			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
 				baseUrlSpec = this.url.resolve("../");
 				categoryPath = this.url.spec.substring(baseUrlSpec.length);
 				threadUrlSpec = baseUrlSpec + "test/read.cgi/" + categoryPath;
 				break;
-			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				baseUrlSpec = this.url.resolve("../../");
 				categoryPath = this.url.spec.substring(baseUrlSpec.length);
 				threadUrlSpec = baseUrlSpec + "bbs/read.cgi/" + categoryPath;
 				break;
-			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				baseUrlSpec = this.url.resolve("../");
 				categoryPath = this.url.spec.substring(baseUrlSpec.length);
 				threadUrlSpec = baseUrlSpec + "bbs/read.cgi/" + categoryPath;
@@ -389,6 +446,9 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * subject.txt を解析してスレッド情報を更新する。
+	 */
 	boardSubjectUpdate: function ChaikaBoard_boardSubjectUpdate(){
 		if(!this.subjectFile.exists()){
 			ChaikaCore.logger.warning("FILE NOT FOUND: " + this.subjectFile.path);
@@ -398,24 +458,24 @@ ChaikaBoard.prototype = {
 			// 行の解析に使う正規表現
 		var regLine;
 		switch(this.type){
-			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
-			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
 				regLine = /^(\d{9,10})\.dat<>(.+) ?\((\d{1,4})\)/;
 				break;
-			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
-			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				regLine = /^(\d{9,10})\.cgi,(.+) ?\((\d{1,4})\)/;
 				break;
 		}
 
 		var charset;
 		switch(this.type){
-			case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
-			case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				charset = "Shift_JIS";
 				break;
-			case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
-			case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				charset = "euc-jp";
 				break;
 		}
@@ -465,6 +525,10 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * 板の情報をデータベースに書き込む
+	 * @private
+	 */
 	_setBoardData: function(){
 		var boardID = this.id;
 		var type = this.type;
@@ -505,6 +569,11 @@ ChaikaBoard.prototype = {
 	},
 
 
+	/**
+	 * 板内のスレッド数を返す。
+	 * boardSubjectUpdate メソッドが一度も実行されていない板では 0 を返す。
+	 * @return {Number}
+	 */
 	getItemLength: function ChaikaBoard_getItemLength(){
 		var result = 0;
 		var storage  = ChaikaCore.storage;
@@ -529,6 +598,43 @@ ChaikaBoard.prototype = {
 };
 
 
+/**
+ * 2ch 型 BBS
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_2CH    = 0;
+/**
+ * 旧 2ch 型 BBS
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_OLD2CH = 1;
+/**
+ * Be@2ch BBS
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_BE2CH  = 2;
+/**
+ * したらば JBBS
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_JBBS   =  3;
+/**
+ * まちBBS
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_MACHI  = 4;
+/**
+ * 通常ページ
+ * @constant
+ */
+ChaikaBoard.BOARD_TYPE_PAGE   = 5;
+
+
+/**
+ * 板を一意で表す ID を返す。
+ * @param {nsIURL} aBoardURL
+ * @return {String}
+ */
 ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
 	if(!(aBoardURL instanceof Ci.nsIURL)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
@@ -554,6 +660,12 @@ ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
 }
 
 
+/**
+ * 指定した URL に対応する ログディレクトリ内のファイル、ディレクトリを、
+ * nsILocalFile で返す。
+ * @param {nsIURL} aURL
+ * @return {nsILocalFile}
+ */
 ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 	var logFile = null;
 	try{
@@ -566,6 +678,13 @@ ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 	return logFile;
 }
 
+
+/**
+ * 指定した 板ID に対応する ログディレクトリ内のファイル、ディレクトリを、
+ * nsILocalFile で返す。
+ * @param {nsIURL} aBoardID
+ * @return {nsILocalFile}
+ */
 ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoardID){
 	var logFile = ChaikaCore.getLogDir();
 
@@ -577,34 +696,39 @@ ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoar
 }
 
 
+/**
+ * 指定した URL のタイプを返す。
+ * @param {nsIURL} aURL
+ * @return {Number} BOARD_TYPE_XXX
+ */
 ChaikaBoard.getBoardType = function ChaikaBoard_getBoardType(aURL){
 	if(!(aURL instanceof Ci.nsIURI)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 	}
 
-	if(!(aURL instanceof Ci.nsIURL)) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+	if(!(aURL instanceof Ci.nsIURL)) return ChaikaBoard.BOARD_TYPE_PAGE;
 		// HTTP 以外
-	if(aURL.scheme != "http") return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+	if(aURL.scheme != "http") return ChaikaBoard.BOARD_TYPE_PAGE;
 		// HOST だけの URL
-	if(aURL.directory.length == 1) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+	if(aURL.directory.length == 1) return ChaikaBoard.BOARD_TYPE_PAGE;
 
-	if(EX_HOSTS.indexOf(aURL.host) != -1) return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+	if(EX_HOSTS.indexOf(aURL.host) != -1) return ChaikaBoard.BOARD_TYPE_PAGE;
 
 		// Be@2ch.net
-	if(aURL.host == "be.2ch.net") return Ci.nsIBbs2chService.BOARD_TYPE_BE2CH;
+	if(aURL.host == "be.2ch.net") return ChaikaBoard.BOARD_TYPE_BE2CH;
 		// 2ch.net
-	if(aURL.host.indexOf(".2ch.net") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+	if(aURL.host.indexOf(".2ch.net") != -1) return ChaikaBoard.BOARD_TYPE_2CH;
 		// bbspink.com
-	if(aURL.host.indexOf(".bbspink.com") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+	if(aURL.host.indexOf(".bbspink.com") != -1) return ChaikaBoard.BOARD_TYPE_2CH;
 		// まちBBS
-	if(aURL.host.indexOf(".machi.to") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_MACHI;
+	if(aURL.host.indexOf(".machi.to") != -1) return ChaikaBoard.BOARD_TYPE_MACHI;
 		// JBBS
-	if(aURL.host == "jbbs.livedoor.jp") return Ci.nsIBbs2chService.BOARD_TYPE_JBBS;
+	if(aURL.host == "jbbs.livedoor.jp") return ChaikaBoard.BOARD_TYPE_JBBS;
 
 		// スレッド URL
-	if(aURL.directory.indexOf("/test/read.cgi/") != -1) return Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+	if(aURL.directory.indexOf("/test/read.cgi/") != -1) return ChaikaBoard.BOARD_TYPE_2CH;
 	if((aURL.fileName == "read.cgi") && (aURL.query.indexOf("key=") != -1))
-			return Ci.nsIBbs2chService.BOARD_TYPE_OLD2CH;
+			return ChaikaBoard.BOARD_TYPE_OLD2CH;
 
-	return Ci.nsIBbs2chService.BOARD_TYPE_PAGE;
+	return ChaikaBoard.BOARD_TYPE_PAGE;
 }

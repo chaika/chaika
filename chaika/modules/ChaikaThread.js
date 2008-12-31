@@ -46,6 +46,14 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
+const PR_PERMS_FILE = 0644;
+const PR_RDONLY = 0x01;
+const PR_WRONLY = 0x02;
+const PR_CREATE_FILE = 0x08;
+const PR_APPEND = 0x10;
+const PR_TRUNCATE = 0x20;
+
+
 /** @ignore */
 function makeException(aResult, aMessage){
 	var stack = Components.stack.caller.caller;
@@ -55,6 +63,10 @@ function makeException(aResult, aMessage){
 
 
 
+/**
+ * スレッドを扱うオブジェクト
+ * @class
+ */
 function ChaikaThread(aThreadURL){
 	if(!(aThreadURL instanceof Ci.nsIURL)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
@@ -72,21 +84,72 @@ function ChaikaThread(aThreadURL){
 
 ChaikaThread.prototype = {
 
+	/**
+	 *
+	 * @type nsIURL
+	 */
 	url: null,
+	/**
+	 *
+	 *@type nsIURL
+	 */
 	plainURL: null,
+	/**
+	 *
+	 * @type nsIURL
+	 */
 	boardURL: null,
+	/**
+	 *
+	 * @type nsIURL
+	 */
 	datURL: null,
+	/**
+	 *
+	 * @type nsIURL
+	 */
 	datKakoURL: null,
+	/**
+	 *
+	 * @type String
+	 */
 	threadID: null,
+	/**
+	 *
+	 * @type String
+	 */
 	datID: null,
+	/**
+	 *
+	 * @type nsILocalFIle
+	 */
 	datFile: null,
-
+	/**
+	 *
+	 * @type String
+	 */
 	title: null,
+	/**
+	 *
+	 * @type Number
+	 */
 	lineCount: null,
+	/**
+	 *
+	 * @type String
+	 */
 	lastModified: null,
+	/**
+	 *
+	 * @type Boolean
+	 */
 	maruGetted: null,
 
 
+	/**
+	 * 初期化処理
+	 * @private
+	 */
 	_init: function ChaikaThread__init(aThreadURL){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
@@ -101,11 +164,11 @@ ChaikaThread.prototype = {
 		this.type = ChaikaBoard.getBoardType(this.url);
 			// 板のタイプが、BOARD_TYPE_PAGE でも、
 			// URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
-		if(this.type == Ci.nsIBbs2chService.BOARD_TYPE_PAGE &&
+		if(this.type == ChaikaBoard.BOARD_TYPE_PAGE &&
 					this.url.spec.indexOf("/test/read.cgi/") != -1){
-			this.type = Ci.nsIBbs2chService.BOARD_TYPE_2CH;
+			this.type = ChaikaBoard.BOARD_TYPE_2CH;
 		}
-		if(this.type == Ci.nsIBbs2chService.BOARD_TYPE_PAGE){
+		if(this.type == ChaikaBoard.BOARD_TYPE_PAGE){
 			throw makeException(Cr.NS_ERROR_INVALID_ARG, "No Supported Boad");
 		}
 
@@ -120,7 +183,7 @@ ChaikaThread.prototype = {
 		this.boardURL = ChaikaThread.getBoardURL(this.plainURL);
 
 		var datURLSpec;
-		if(this.type == Ci.nsIBbs2chService.BOARD_TYPE_MACHI){
+		if(this.type == ChaikaBoard.BOARD_TYPE_MACHI){
 			datURLSpec = this.url.spec.replace("/read.cgi/", "/offlaw.cgi/") + this.datID + "/";
 			this.datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
 		}else{
@@ -129,7 +192,7 @@ ChaikaThread.prototype = {
 		}
 
 
-		if(this.type != Ci.nsIBbs2chService.BOARD_TYPE_2CH){
+		if(this.type != ChaikaBoard.BOARD_TYPE_2CH){
 			this.datKakoURL = this.datURL.clone().QueryInterface(Ci.nsIURL);
 		}else{
 			datURLSpec = this.boardURL.resolve(["kako/", this.datID.substring(0,4), "/",
@@ -150,26 +213,12 @@ ChaikaThread.prototype = {
 		if(!this.datFile.exists() && this.lineCount>0){
 			this.deteleThreadData();
 		}
-
-
-		var logger = ChaikaCore.logger;
-		logger.debug("url:        " + this.url.spec);
-		logger.debug("plainURL:   " + this.plainURL.spec);
-		logger.debug("boardURL:   " + this.boardURL.spec);
-		logger.debug("datURL:     " + this.datURL.spec);
-		logger.debug("datKakoURL: " + this.datKakoURL.spec);
-		logger.debug("threadID:   " + this.threadID);
-		logger.debug("datID:      " + this.datID);
-		logger.debug("datFile:    " + this.datFile.path);
-
-		logger.debug("title:        " + this.title);
-		logger.debug("lineCount:    " + this.lineCount);
-		logger.debug("lastModified: " + this.lastModified);
-		logger.debug("maruGetted:   " + this.maruGetted);
-
 	},
 
 
+	/**
+	 * データベースからスレッド情報を取得する。
+	 */
 	getThreadData: function ChaikaThread_getThreadData(){
 		var storage = ChaikaCore.storage;
 		storage.beginTransaction();
@@ -203,6 +252,9 @@ ChaikaThread.prototype = {
 	},
 
 
+	/**
+	 * スレッド情報をデータベースに保存する。
+	 */
 	setThreadData: function ChaikaThread_setThreadData(){
 		var storage = ChaikaCore.storage;
 		storage.beginTransaction();
@@ -249,6 +301,9 @@ ChaikaThread.prototype = {
 	},
 
 
+	/**
+	 * スレッド情報をデータベースから消去し、DAT ファイルを削除する。
+	 */
 	deteleThreadData: function ChaikaThread_deteleThreadData(){
 		var storage = ChaikaCore.storage;
 		var statement = storage.createStatement("DELETE FROM thread_data WHERE thread_id=?1");
@@ -277,21 +332,27 @@ ChaikaThread.prototype = {
 	},
 
 
+	/**
+	 * DAT ファイルに aContent の内容を追加保存する。
+	 * DAT ファイルが存在しない場合は新規作成する。
+	 * @param {String} aContent
+	 */
 	appendContent: function ChaikaThread_appendContent(aContent){
 		var fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"]
 						.createInstance(Ci.nsIFileOutputStream);
 		try{
 				// nsILocalFIle.create は親フォルダをふくめて作成する
-			if(!this.datFile.exists()) this.datFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, 0666);
-				// 0x02=PR_WRONLY; 0x08=PR_CREATE_FILE;
-				// 0x10=PR_APPEND; 0x20=PR_TRUNCATE;
-			var flag = 0x02|0x08|0x10;
-			fileOutputStream.init(this.datFile, flag, 0666, 0);
+			if(!this.datFile.exists()){
+				this.datFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
+			}
+
+			var flag = PR_WRONLY | PR_CREATE_FILE | PR_APPEND;
+			fileOutputStream.init(this.datFile, flag, PR_PERMS_FILE, 0);
 			fileOutputStream.write(aContent, aContent.length);
 			fileOutputStream.flush();
 			fileOutputStream.close();
 		}catch(ex){
-			dump(ex +"\n")
+			ChaikaCore.logger.error(ex);
 			return false;
 		}
 	}
@@ -299,7 +360,11 @@ ChaikaThread.prototype = {
 };
 
 
-
+/**
+ * スレッドの所属する板の URL を返す。
+ * @param {nsIURL} aThreadURL
+ * @return {nsIURL} 板 URL
+ */
 ChaikaThread.getBoardURL = function ChaikaThread_getBoardURL(aThreadURL){
 	if(!(aThreadURL instanceof Ci.nsIURL)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
@@ -313,15 +378,15 @@ ChaikaThread.getBoardURL = function ChaikaThread_getBoardURL(aThreadURL){
 	var boardURLSpec = aThreadURL.resolve("../");
 
 	switch(type){
-		case Ci.nsIBbs2chService.BOARD_TYPE_2CH:
-		case Ci.nsIBbs2chService.BOARD_TYPE_BE2CH:
+		case ChaikaBoard.BOARD_TYPE_2CH:
+		case ChaikaBoard.BOARD_TYPE_BE2CH:
 			boardURLSpec = boardURLSpec.replace("/test/read.cgi/", "/");
 			break;
-		case Ci.nsIBbs2chService.BOARD_TYPE_JBBS:
-		case Ci.nsIBbs2chService.BOARD_TYPE_MACHI:
+		case ChaikaBoard.BOARD_TYPE_JBBS:
+		case ChaikaBoard.BOARD_TYPE_MACHI:
 			boardURLSpec = boardURLSpec.replace("/bbs/read.cgi/", "/");
 			break;
-		case Ci.nsIBbs2chService.BOARD_TYPE_OLD2CH:
+		case ChaikaBoard.BOARD_TYPE_OLD2CH:
 			throw makeException(Cr.NS_ERROR_INVALID_ARG);
 			break;
 	}
