@@ -778,7 +778,7 @@ ChaikaIO.prototype = {
 
 	/**
 	 * @param {nsILocalFile} aLocalFile 読み込むファイル
-	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
+	 * @param {String} aCharset 読み込むファイルの文字コード。指定しない場合は UTF-8
 	 * @return {nsIConverterInputStream}
 	 */
 	getFileInputStream: function ChaikaIO_getFileInputStream(aLocalFile, aCharset){
@@ -805,6 +805,7 @@ ChaikaIO.prototype = {
 		return converterInputStream;
 	},
 
+
 	/**
 	 * @param {nsILocalFile} aLocalFile 書き込むファイル
 	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
@@ -826,6 +827,11 @@ ChaikaIO.prototype = {
 				.createInstance(Ci.nsIConverterOutputStream);
 
 		try{
+				// nsILocalFile.create は親フォルダもふくめて作成する
+			if(!aLocalFile.exists()){
+				aLocalFile.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
+			}
+
 			fileOutputStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
 			converterOutputStream.init(fileOutputStream, charset, 0,
 					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
@@ -836,6 +842,125 @@ ChaikaIO.prototype = {
 
 
 		return converterOutputStream;
+	},
+
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @param {String} aCharset 読み込むファイルの文字コード。指定しない場合は UTF-8
+	 * @return {String}
+	 */
+	readString: function ChaikaIO_readString(aLocalFile, aCharset){
+		var result = [];
+		var stream;
+		try{
+			stream = this.getFileInputStream(aLocalFile, aCharset);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+
+		try{
+			var str = {};
+			while (stream.readString(1024*16, str) != 0){
+				result.push(str.value);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}finally{
+			stream.close();
+		}
+
+		return result.join("");
+	},
+
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
+	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
+	 * @param {String} aContent 書き込む内容
+	 */
+	writeString: function ChaikaIO_writeString(aLocalFile, aCharset, aAppend, aContent){
+		var stream;
+		try{
+			stream = ChaikaCore.io.getFileOutputStream(aLocalFile, aCharset, aAppend);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+
+		try{
+			stream.writeString(aContent);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}finally{
+			stream.close();
+		}
+	},
+
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @return {String}
+	 */
+	readData: function ChaikaIO_readData(aLocalFile){
+		var result = [];
+		var fileStream = Cc["@mozilla.org/network/file-input-stream;1"]
+					.createInstance(Ci.nsIFileInputStream);
+		var binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
+					.createInstance(Ci.nsIBinaryInputStream);
+
+		try{
+			fileStream.init(aLocalFile, PR_RDONLY, PR_PERMS_FILE, 0);
+			binaryStream.setInputStream(fileStream);
+
+			var str;
+			while(binaryStream.available() > 1024*16){
+				result.push(binaryStream.readBytes(1024*16));
+			}
+			result.push(binaryStream.readBytes(binaryStream.available()));
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}finally{
+			binaryStream.close();
+			fileStream.close();
+		}
+
+		return result.join("");
+	},
+
+
+	/**
+	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
+	 * @param {String} aContent 書き込む内容
+	 */
+	writeData: function ChaikaIO_writeData(aLocalFile, aContent, aAppend){
+		var fileStream = Cc["@mozilla.org/network/file-output-stream;1"]
+						.createInstance(Ci.nsIFileOutputStream);
+		try{
+				// nsILocalFile.create は親フォルダもふくめて作成する
+			if(!aLocalFile.exists()){
+				aLocalFile.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
+			}
+
+			var ioFlags = PR_WRONLY|PR_CREATE_FILE;
+			ioFlags |= (aAppend) ? PR_APPEND : PR_TRUNCATE;
+			fileStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
+			var content = String(aContent);
+			fileStream.write(content, content.length);
+			fileStream.flush();
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}finally{
+			fileStream.close();
+		}
+		return true;
 	}
 
 };
