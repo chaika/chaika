@@ -35,13 +35,13 @@
 
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">
-		<menu id="context-bbs2chreader" label="bbs2chreader" hidden="true"
+		<menu id="context-bbs2chreader" label="chaika" hidden="true"
 							insertbefore="context-bookmarklink">
 			<menupopup>
 				<menuitem label="Open"
-					oncommand="b2rBrowserOverlay.contextMenu.openThread(false)"/>
+					oncommand="ChaikaBrowserOverlay.contextMenu.openThread(false)"/>
 				<menuitem label="Open In New Tab"
-					oncommand="b2rBrowserOverlay.contextMenu.openThread(true)"/>
+					oncommand="ChaikaBrowserOverlay.contextMenu.openThread(true)"/>
 			</menupopup>
 		</menu>
 	</popup>

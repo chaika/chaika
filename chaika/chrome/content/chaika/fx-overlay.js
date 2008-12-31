@@ -35,44 +35,33 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
-var b2rBrowserOverlay = {};
+var ChaikaBrowserOverlay = {};
 
+ChaikaBrowserOverlay.contextMenu = {
 
-b2rBrowserOverlay.contextMenu = {
-
-	get prefBranch(){
-		if(!this._prefBranch){
-			this._prefBranch = Components.classes["@mozilla.org/preferences-service;1"]
-								.getService(Components.interfaces.nsIPrefBranch);
-		}
-		return this._prefBranch;
-	},
-	_prefBranch: null,
-
-
-	start: function(){
-		var enableContextMenu = true;
-		try{
-			enableContextMenu = b2rBrowserOverlay.contextMenu.prefBranch.getBoolPref(
-									"extensions.chaika.enable_browser_contextmenu");
-		}catch(ex){}
+	start: function contextMenu_start(){
+		var enableContextMenu = ChaikaCore.pref.getBool("enable_browser_contextmenu");
 
 		if(enableContextMenu){
 			document.getElementById("contentAreaContextMenu")
 						.addEventListener("popupshowing",
-								b2rBrowserOverlay.contextMenu.showMenu, false);
+							ChaikaBrowserOverlay.contextMenu.showMenu, false);
 		}
 	},
 
-	stop: function(){
-		document.getElementById("contentAreaContextMenu")
-					.removeEventListener("popupshowing",
-							b2rBrowserOverlay.contextMenu.showMenu, false);
+
+	stop: function contextMenu_stop(){
+		try{
+			document.getElementById("contentAreaContextMenu")
+						.removeEventListener("popupshowing",
+							ChaikaBrowserOverlay.contextMenu.showMenu, false);
+		}catch(ex){}
 	},
 
 
-	showMenu: function(aEvent){
+	showMenu: function contextMenu_showMenu(aEvent){
 		if(aEvent.originalTarget.id != "contentAreaContextMenu") return;
 		document.getElementById("context-bbs2chreader").hidden = true;
 
@@ -86,64 +75,40 @@ b2rBrowserOverlay.contextMenu = {
 	},
 
 
-	openThread: function(aNewTab){
-
+	openThread: function contextMenu_openThread(aAddTab){
 		if(!gContextMenu || !gContextMenu.onLink) return;
 
-		var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-		var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-					.getService(Components.interfaces.nsIIOService);
-
-		var threadURLSpec = gContextMenu.link.href;
-
 				// スレッド表示数の制限
-		var disregardURLOption = bbs2chService.pref.getBoolPref(
-						"extensions.chaika.browser_contextmenu_disregard_url_option");
-		var type = bbs2chService.getBoardType(threadURLSpec);
-		if(disregardURLOption && (type != bbs2chService.BOARD_TYPE_MACHI)){
-			var threadURL = ioService.newURI(threadURLSpec, null, null)
-					.QueryInterface(Components.interfaces.nsIURL);
-			var threadViewLimit = Number(bbs2chService.pref.getIntPref(
-						"extensions.chaika.board_thread_view_limit"));
-			if(isNaN(threadViewLimit) || threadViewLimit == 0){
-				threadViewLimit = "./";
-			}else{
-				threadViewLimit = "./l" + threadViewLimit;
-			}
-			threadURLSpec = threadURL.resolve(threadViewLimit);
-		}
+		var disregardURLOption = ChaikaCore.pref.getBool(
+				"browser_contextmenu_disregard_url_option");
 
-		threadURLSpec = bbs2chService.serverURL.resolve("./thread/" + threadURLSpec);
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-		if(aNewTab){
-			var newTab = gBrowser.addTab(threadURLSpec, null);
-				// 新しいタブをアクティブにするか
-			var tabLoadInForeground = false;
-			try{
-				tabLoadInForeground = this.prefBranch.getBoolPref(
-							"extensions.chaika.tab_load_in_foreground");
-			}catch(ex){}
-			if(tabLoadInForeground) gBrowser.selectedTab = newTab; 
-		}else{
-			gBrowser.loadURI(threadURLSpec, null);
+		try{
+			var threadURL = ioService.newURI(gContextMenu.link, null, null);
+			ChaikaCore.browser.openThread(threadURL, aAddTab, disregardURLOption, false);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			return;
 		}
 	}
 
 };
 
 
-b2rBrowserOverlay.statusbar = {
 
-	start: function(){
-		getBrowser().addProgressListener(b2rBrowserOverlay.statusbar.webProgress, 
-						Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+
+ChaikaBrowserOverlay.statusbar = {
+
+	start: function statusbar_start(){
+		getBrowser().addProgressListener(ChaikaBrowserOverlay.statusbar.webProgress,
+						Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
-	stop: function(){
-		getBrowser().removeProgressListener(b2rBrowserOverlay.statusbar.webProgress, 
-						Components.interfaces.nsIWebProgress.NOTIFY_LOCATION);
+	stop: function statusbar_stop(){
+		getBrowser().removeProgressListener(ChaikaBrowserOverlay.statusbar.webProgress,
+						Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
@@ -162,24 +127,27 @@ b2rBrowserOverlay.statusbar = {
 };
 
 
-b2rBrowserOverlay.aboneEvent = {
-	start: function(){
-		var os = Components.classes["@mozilla.org/observer-service;1"]
-					.getService(Components.interfaces.nsIObserverService);
-		os.addObserver(b2rBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
+
+
+ChaikaBrowserOverlay.aboneEvent = {
+
+	start: function aboneEvent_start(){
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.addObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
 	},
 
-	stop: function(){
-		var os = Components.classes["@mozilla.org/observer-service;1"]
-					.getService(Components.interfaces.nsIObserverService);
-		os.removeObserver(b2rBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
+
+	stop: function aboneEvent_stop(){
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.removeObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
 	},
 
-	observe: function(aSubject, aTopic, aData){
+
+	observe: function aboneEvent_observe(aSubject, aTopic, aData){
 		var aboneType;
 		switch(aTopic){
 			case "b2r-abone-data-add":
-				aboneType = aSubject.QueryInterface(Components.interfaces.nsISupportsPRInt32).data;
+				aboneType = aSubject.QueryInterface(Ci.nsISupportsPRInt32).data;
 				break;
 			default:
 				return;
@@ -198,12 +166,13 @@ b2rBrowserOverlay.aboneEvent = {
 			}
 		}
 	}
+
 }
 
 
-window.addEventListener("load",   b2rBrowserOverlay.contextMenu.start, false);
-window.addEventListener("unload", b2rBrowserOverlay.contextMenu.stop, false);
-window.addEventListener("load",   b2rBrowserOverlay.statusbar.start, false);
-window.addEventListener("unload", b2rBrowserOverlay.statusbar.stop, false);
-window.addEventListener("load",   b2rBrowserOverlay.aboneEvent.start, false);
-window.addEventListener("unload", b2rBrowserOverlay.aboneEvent.stop, false);
+window.addEventListener("load",   ChaikaBrowserOverlay.contextMenu.start, false);
+window.addEventListener("unload", ChaikaBrowserOverlay.contextMenu.stop, false);
+window.addEventListener("load",   ChaikaBrowserOverlay.statusbar.start, false);
+window.addEventListener("unload", ChaikaBrowserOverlay.statusbar.stop, false);
+window.addEventListener("load",   ChaikaBrowserOverlay.aboneEvent.start, false);
+window.addEventListener("unload", ChaikaBrowserOverlay.aboneEvent.stop, false);
