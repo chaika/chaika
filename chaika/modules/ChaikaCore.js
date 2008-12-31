@@ -584,40 +584,90 @@ ChaikaPref.prototype = {
 	},
 
 	getBool: function ChaikaPref_getBool(aPrefName){
-		return this._branch.getBoolPref(aPrefName);
+		try{
+			return this._branch.getBoolPref(aPrefName);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 	setBool: function ChaikaPref_setBool(aPrefName, aPrefValue){
-		return this._branch.setBoolPref(aPrefName, aPrefValue);
+		try{
+			return this._branch.setBoolPref(aPrefName, aPrefValue);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 
 	getInt: function ChaikaPref_getInt(aPrefName){
-		return this._branch.getIntPref(aPrefName);
+		try{
+			return this._branch.getIntPref(aPrefName);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 	setInt: function ChaikaPref_setInt(aPrefName, aPrefValue){
-		return this._branch.setIntPref(aPrefName, parseInt(aPrefValue));
+		try{
+			return this._branch.setIntPref(aPrefName, parseInt(aPrefValue));
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 
 	getChar: function ChaikaPref_getChar(aPrefName){
-		return this._branch.getCharPref(aPrefName);
+		try{
+			return this._branch.getCharPref(aPrefName);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 	setChar: function ChaikaPref_setChar(aPrefName, aPrefValue){
-		return this._branch.setCharPref(aPrefName, aPrefValue);
+		try{
+			return this._branch.setCharPref(aPrefName, aPrefValue);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 
 	getUniChar: function ChaikaPref_getUniChar(aPrefName){
-		return this._branch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
+		try{
+			return this._branch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 	setUniChar: function ChaikaPref_setUniChar(aPrefName, aPrefValue){
-		var sStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-		sStr.data = aPrefValue;
-		return this._branch.setComplexValue(aPrefName, Ci.nsISupportsString, sStr);
+		try{
+			var sStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+			sStr.data = aPrefValue;
+			return this._branch.setComplexValue(aPrefName, Ci.nsISupportsString, sStr);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 
 	getFile: function ChaikaPref_getFile(aPrefName){
-		return this._branch.getComplexValue(aPrefName, Ci.nsILocalFile);
+		try{
+			return this._branch.getComplexValue(aPrefName, Ci.nsILocalFile);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	},
 	setFile: function ChaikaPref_setFile(aPrefName, aPrefValue){
-		return this._branch.setComplexValue(aPrefName, Ci.nsILocalFile, aPrefValue);
+		try{
+			return this._branch.setComplexValue(aPrefName, Ci.nsILocalFile, aPrefValue);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
 	}
 };
 
