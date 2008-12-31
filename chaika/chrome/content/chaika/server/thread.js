@@ -5,12 +5,6 @@ Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 this.script = {
 
 	start: function(aServerHandler){
-		this._bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-
-		this._ioService = Components.classes["@mozilla.org/network/io-service;1"]
-					.getService(Components.interfaces.nsIIOService);
-
 		aServerHandler.setResponseHeader("Content-Type", "text/html; charset=Shift_JIS");
 		aServerHandler.writeResponseHeader(200);
 
@@ -20,24 +14,24 @@ this.script = {
 			aServerHandler.close();
 			return;
 		}
-		var boardURL = this._bbs2chService.getBoardURL(threadURL.spec);
-		var type = this._bbs2chService.getBoardType(threadURL.spec);
+		var boardURL = ChaikaThread.getBoardURL(threadURL);
+		var type = ChaikaBoard.getBoardType(threadURL);
 			// 板のタイプが、BOARD_TYPE_PAGE でも、
 			// URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
-		if(type == this._bbs2chService.BOARD_TYPE_PAGE &&
+		if(type == ChaikaBoard.BOARD_TYPE_PAGE &&
 					threadURL.spec.indexOf("/test/read.cgi/") != -1){
-			type = this._bbs2chService.BOARD_TYPE_2CH;
+			type = ChaikaBoard.BOARD_TYPE_2CH;
 		}
 
 
 		switch(type){
-			case this._bbs2chService.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_2CH:
 				this.thread = new b2rThread2ch();
 				break;
-			case this._bbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				this.thread = new b2rThreadJbbs();
 				break;
-			case this._bbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				this.thread = new b2rThreadMachi();
 				break;
 			default:
@@ -65,19 +59,46 @@ this.script = {
 		if(threadURLSpec == "") return null;
 
 		// threadURLSpec = decodeURIComponent(threadURLSpec);
-
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		try{
-			var threadURL = this._ioService.newURI(threadURLSpec, null, null)
-					.QueryInterface(Components.interfaces.nsIURL);
+			var threadURL = ioService.newURI(threadURLSpec, null, null).QueryInterface(Ci.nsIURL);
 				// URL が、DAT ID で終わるときは "/" を追加する
 			if(threadURL.fileName.match(/^\d{9,10}$/)){
-				threadURL = this._ioService.newURI(threadURLSpec + "/", null, null)
-						.QueryInterface(Components.interfaces.nsIURL);
+				threadURL = ioService.newURI(threadURLSpec + "/", null, null)
+						.QueryInterface(Ci.nsIURL);
 			}
 			return threadURL;
 		}catch(ex){}
 
 		return null;
+	}
+
+};
+
+
+var UniConverter = {
+
+	_unicodeConverter: Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+			.createInstance(Ci.nsIScriptableUnicodeConverter),
+
+	toSJIS: function uniConverter_toSJIS(aString){
+		this._unicodeConverter.charset = "Shift_JIS";
+		return this._unicodeConverter.ConvertFromUnicode(aString);
+	},
+
+	fromSJIS: function uniConverter_fromSJIS(aString){
+		this._unicodeConverter.charset = "Shift_JIS";
+		return this._unicodeConverter.ConvertToUnicode(aString);
+	},
+
+	toEUC: function uniConverter_toEUC(aString){
+		this._unicodeConverter.charset = "EUC-JP";
+		return this._unicodeConverter.ConvertFromUnicode(aString);
+	},
+
+	fromEUC: function uniConverter_fromEUC(aString){
+		this._unicodeConverter.charset = "EUC-JP";
+		return this._unicodeConverter.ConvertToUnicode(aString);
 	}
 
 };
@@ -108,16 +129,11 @@ b2rThread2ch.prototype = {
 	init: function(aHandler, aThreadURL, aBoardURL, aType){
 		this._handler = aHandler;
 
-		this._bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-		this._aboneManager = Components.classes["@mozilla.org/b2r-abone-manager;1"]
-					.getService(Components.interfaces.b2rIAboneManager);
-
-		this._ioService = Components.classes["@mozilla.org/network/io-service;1"]
-					.getService(Components.interfaces.nsIIOService);
+		this._aboneManager = Cc["@mozilla.org/b2r-abone-manager;1"]
+					.getService(Ci.b2rIAboneManager);
 
 		this._chainAboneNumbers = new Array();
-		this._enableChainAbone = this._bbs2chService.pref.getBoolPref("extensions.chaika.thread_chain_abone")
+		this._enableChainAbone = ChaikaCore.pref.getBool("thread_chain_abone");
 
 			// HTML ヘッダを送信したら true になる
 		this._headerResponded = false;
@@ -138,14 +154,12 @@ b2rThread2ch.prototype = {
 			this.converter.init(this, this.thread.url, this.thread.boardURL, this.thread.type);
 		}catch(ex){
 			if(ex == Components.results.NS_ERROR_FILE_NOT_FOUND){
-				var skinName = this._bbs2chService.pref.getComplexValue(
-						"extensions.chaika.thread_skin",
-						Components.interfaces.nsISupportsString).data;
-				skinName = this._bbs2chService.toSJIS(skinName);
+				var skinName = ChaikaCore.pref.getUniChar("thread_skin");
+				skinName = UniConverter.toSJIS(skinName);
 				this.write("スキン ("+ skinName +") の読み込みに失敗したため、");
 				this.write("設定をデフォルトスキンに戻しました。<br>ページを更新してください。");
 				this.close();
-				this._bbs2chService.pref.setCharPref("extensions.chaika.thread_skin", "");
+				ChaikaCore.pref.setChar("thread_skin", "");
 				return;
 			}else {
 				this.write(ex);
@@ -168,13 +182,13 @@ b2rThread2ch.prototype = {
 		this._logLineCount = 0;
 			// 取得済みログの送信
 		if(this.thread.datFile.exists()){
-			var datLines = this._bbs2chService.readFileLine(this.thread.datFile.path, {});
+			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
 
 			this._logLineCount = datLines.length;
 
 			if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
 				this._headerResponded = true;
-				var title = this._bbs2chService.toSJIS(this.thread.title);
+				var title = UniConverter.toSJIS(this.thread.title);
 				var header = this.converter.getHeader(title);
 				this.write(header);
 				this.write(this.datLineParse(datLines[this.optionsOnes-1],
@@ -185,7 +199,7 @@ b2rThread2ch.prototype = {
 
 			}else if(this.optionsEnd){
 				this._headerResponded = true;
-				var title = this._bbs2chService.toSJIS(this.thread.title);
+				var title = UniConverter.toSJIS(this.thread.title);
 				var header = this.converter.getHeader(title);
 				this.write(header);
 
@@ -211,7 +225,7 @@ b2rThread2ch.prototype = {
 					this.write(this.datLineParse(datLines[0], 1, false) +"\n");
 				}else if(this.thread.title){
 					this._headerResponded = true;
-					var title = this._bbs2chService.toSJIS(this.thread.title);
+					var title = UniConverter.toSJIS(this.thread.title);
 					var header = this.converter.getHeader(title);
 					this.write(header);
 				}else{
@@ -268,20 +282,19 @@ b2rThread2ch.prototype = {
 
 
 	htmlToText: function(aStr){
-		var fromStr = Components.classes["@mozilla.org/supports-string;1"]
-									.createInstance(Components.interfaces.nsISupportsString);
+		var fromStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
 		fromStr.data = aStr;
 		try{
 			var toStr = { value: null };
-			var	formatConverter = Components.classes["@mozilla.org/widget/htmlformatconverter;1"]
-									.createInstance(Components.interfaces.nsIFormatConverter);
+			var	formatConverter = Cc["@mozilla.org/widget/htmlformatconverter;1"]
+									.createInstance(Ci.nsIFormatConverter);
 			formatConverter.convert("text/html", fromStr, fromStr.toString().length,
 										"text/unicode", toStr, {});
 		}catch(e){
 			return aStr;
 		}
 		if(toStr.value){
-			toStr = toStr.value.QueryInterface(Components.interfaces.nsISupportsString);
+			toStr = toStr.value.QueryInterface(Ci.nsISupportsString);
 			return toStr.toString();
 		}
 		return aStr;
@@ -342,7 +355,7 @@ b2rThread2ch.prototype = {
 		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			resName = resMail = resDate = resMes = "ABONE";
-			if(aNumber>1 && this._bbs2chService.pref.getBoolPref("extensions.chaika.thread_hide_abone")){
+			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -366,7 +379,7 @@ b2rThread2ch.prototype = {
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
 			resName = resMail = resDate = resMes = "ABONE";
-			if(aNumber>1 && this._bbs2chService.pref.getBoolPref("extensions.chaika.thread_hide_abone")){
+			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -392,7 +405,7 @@ b2rThread2ch.prototype = {
 		if(!this._headerResponded && resArray[4]){
 			this._headerResponded = true;
 			var title = resArray[4];
-			this.thread.title = this._bbs2chService.fromSJIS(title);
+			this.thread.title = UniConverter.fromSJIS(title);
 
 			var header = this.converter.getHeader(title);
 			this.write(header);
@@ -406,21 +419,23 @@ b2rThread2ch.prototype = {
 
 	datDownload: function(aKako){
 		if(aKako){
-			if(this._bbs2chService.maruLogined){
-				var sid = encodeURIComponent(this._bbs2chService.maruSessionID);
+			var bbs2chService = Cc["@mozilla.org/bbs2ch-service;1"]
+					.getService(Ci.nsIBbs2chService);
+			if(bbs2chService.maruLogined){
+				var sid = encodeURIComponent(bbs2chService.maruSessionID);
 				var datURLSpec = this.thread.plainURL.spec.replace(/\/read\.cgi\//, "/offlaw.cgi/");
 				datURLSpec += "?raw=.0&sid=" + sid;
-				var datKakoURL = this._ioService.newURI(datURLSpec, null, null)
-						.QueryInterface(Components.interfaces.nsIURL);
-				this.httpChannel = this._bbs2chService.getHttpChannel(datKakoURL);
+				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+				var datKakoURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
+				this.httpChannel = ChaikaCore.getHttpChannel(datKakoURL);
 				this._maruMode = true;
 			}else{
-				this.httpChannel = this._bbs2chService.getHttpChannel(this.thread.datKakoURL);
+				this.httpChannel = ChaikaCore.getHttpChannel(this.thread.datKakoURL);
 			}
 			this._kakoDatDownload = true;
 
 		}else{
-			this.httpChannel = this._bbs2chService.getHttpChannel(this.thread.datURL);
+			this.httpChannel = ChaikaCore.getHttpChannel(this.thread.datURL);
 			this._kakoDatDownload = false;
 		}
 		this.httpChannel.requestMethod = "GET";
@@ -445,8 +460,8 @@ b2rThread2ch.prototype = {
 	},
 
 	onStartRequest: function(aRequest, aContext){
-		this._bInputStream = Components.classes["@mozilla.org/binaryinputstream;1"]
-					.createInstance(Components.interfaces.nsIBinaryInputStream);
+		this._bInputStream = Cc["@mozilla.org/binaryinputstream;1"]
+					.createInstance(Ci.nsIBinaryInputStream);
 		this._data = new Array();
 		this._datBuffer = "";
 	},
@@ -454,7 +469,7 @@ b2rThread2ch.prototype = {
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
 		if(!this._opend) return;
 
-		aRequest.QueryInterface(Components.interfaces.nsIHttpChannel);
+		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		var httpStatus = aRequest.responseStatus;
 			// 必要な情報がないなら終了
 		if(!(httpStatus==200 || httpStatus==206)) return;
@@ -512,7 +527,7 @@ b2rThread2ch.prototype = {
 		if(!this._opend) return;
 
 		this._bInputStream = null;
-		aRequest.QueryInterface(Components.interfaces.nsIHttpChannel);
+		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		try{
 			var httpStatus = aRequest.responseStatus;
 		}catch(ex){
@@ -616,10 +631,10 @@ b2rThreadJbbs.prototype = {
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
 
-		var datURL = this._ioService.newURI(datURLSpec, null, null)
-				.QueryInterface(Components.interfaces.nsIURL);
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
 
-		this.httpChannel = this._bbs2chService.getHttpChannel(datURL);
+		this.httpChannel = ChaikaCore.getHttpChannel(datURL);
 		this.httpChannel.requestMethod = "GET";
 		this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
 		this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
@@ -631,8 +646,8 @@ b2rThreadJbbs.prototype = {
 		if(!aLine) return "";
 
 			// EUC-JP から SJIS へ変換
-		var line = this._bbs2chService.fromEUC(aLine);
-		line = this._bbs2chService.toSJIS(line);
+		var line = UniConverter.fromEUC(aLine);
+		line = UniConverter.toSJIS(line);
 		var resArray = line.split("<>");
 		var resNumber = aNumber;
 		var resName = "BROKEN";
@@ -652,7 +667,7 @@ b2rThreadJbbs.prototype = {
 
 		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			resName = resMail = resDate = resMes = "ABONE";
-			if(aNumber>1 && this._bbs2chService.pref.getBoolPref("extensions.chaika.thread_hide_abone")){
+			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -677,7 +692,7 @@ b2rThreadJbbs.prototype = {
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
 			resName = resMail = resDate = resMes = "ABONE";
-			if(aNumber>1 && this._bbs2chService.pref.getBoolPref("extensions.chaika.thread_hide_abone")){
+			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -692,7 +707,7 @@ b2rThreadJbbs.prototype = {
 		if(!this._headerResponded && resArray[5]!= ""){
 			this._headerResponded = true;
 			var title = resArray[5];
-			this.thread.title = this._bbs2chService.fromSJIS(title);
+			this.thread.title = UniConverter.fromSJIS(title);
 			var header = this.converter.getHeader(title);
 			this.write(header);
 			this._handler.flush();
@@ -705,7 +720,7 @@ b2rThreadJbbs.prototype = {
 	onStopRequest: function(aRequest, aContext, aStatus){
 		if(!this._opend) return;
 
-		aRequest.QueryInterface(Components.interfaces.nsIHttpChannel);
+		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		var httpStatus = aRequest.responseStatus;
 		var jbbsError = "";
 		try{
@@ -759,10 +774,10 @@ b2rThreadMachi.prototype = {
 		if(this.thread.datFile.exists() && this.thread.lineCount){
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
-		var datURL = this._ioService.newURI(datURLSpec, null, null)
-				.QueryInterface(Components.interfaces.nsIURL);
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
 
-		this.httpChannel = this._bbs2chService.getHttpChannel(datURL);
+		this.httpChannel = ChaikaCore.getHttpChannel(datURL);
 		this.httpChannel.requestMethod = "GET";
 		this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
 		this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
@@ -868,22 +883,18 @@ b2rThreadConverter.prototype = {
 		this._boardURL = aBoardURL;
 		this._type = aType;
 
-		this._bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-		this._ioService = Components.classes["@mozilla.org/network/io-service;1"]
-					.getService(Components.interfaces.nsIIOService);
-
 		this._dd2Color = new b2rId2Color();
 		this._dd2Color.init();
 
-		this._tmpHeader   = this._bbs2chService.readFile(this._resolveSkinFile("Header.html").path);
-		this._tmpFooter   = this._bbs2chService.readFile(this._resolveSkinFile("Footer.html").path);
-		this._tmpRes	  = this._bbs2chService.readFile(this._resolveSkinFile("Res.html").path);
-		this._tmpNewRes	  = this._bbs2chService.readFile(this._resolveSkinFile("NewRes.html").path);
-		this._tmpNewMark  = this._bbs2chService.readFile(this._resolveSkinFile("NewMark.html").path);
-
-		if(this._tmpHeader===null || this._tmpFooter===null || this._tmpRes===null || this._tmpNewRes===null || this._tmpNewMark===null){
-			throw Components.results.NS_ERROR_FILE_NOT_FOUND
+		try{
+			this._tmpHeader   = ChaikaCore.io.readData(this._resolveSkinFile("Header.html"));
+			this._tmpFooter   = ChaikaCore.io.readData(this._resolveSkinFile("Footer.html"));
+			this._tmpRes	  = ChaikaCore.io.readData(this._resolveSkinFile("Res.html"));
+			this._tmpNewRes	  = ChaikaCore.io.readData(this._resolveSkinFile("NewRes.html"));
+			this._tmpNewMark  = ChaikaCore.io.readData(this._resolveSkinFile("NewMark.html"));
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw Components.results.NS_ERROR_FILE_NOT_FOUND;
 		}
 
 			// 基本スキンタグの置換
@@ -903,21 +914,16 @@ b2rThreadConverter.prototype = {
 	},
 
 	_resolveSkinFile: function(aFilePath){
-		var skinName = this._bbs2chService.pref.getComplexValue("extensions.chaika.thread_skin",
-							Components.interfaces.nsISupportsString).data;
+		var skinName = ChaikaCore.pref.getUniChar("thread_skin");
 
 		var skinFile = null;
 		if(skinName){
-			skinFile = this._bbs2chService.getDataDir();
+			skinFile = ChaikaCore.getDataDir();
 			skinFile.appendRelativePath("skin");
 			skinFile.appendRelativePath(skinName);
 		}else{
-			var bbs2chreaderID = "chaika@chaika.xrea.jp";
-			var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
-					.getService(Components.interfaces.nsIExtensionManager);
-			var installLocation = extensionManager.getInstallLocation(bbs2chreaderID);
-			skinFile = installLocation.getItemFile(bbs2chreaderID, "defaults/skin").clone()
-							.QueryInterface(Components.interfaces.nsILocalFile);
+			skinFile = ChaikaCore.getDefaultsDir();
+			skinFile.appendRelativePath("skin");
 		}
 		skinFile.appendRelativePath(aFilePath);
 		return skinFile;
@@ -930,20 +936,14 @@ b2rThreadConverter.prototype = {
 	_replaceBaseTag: function(aString){
 		var requestURL = this._context._handler.requestURL;
 		var threadURLSpec = requestURL.path.substring(8);
-		var skinURISpec = this._bbs2chService.serverURL.resolve("./skin/");
-		var serverURLSpec = this._bbs2chService.serverURL.resolve("./thread/");
-		var fontName = this._bbs2chService.pref.getComplexValue(
-							"extensions.chaika.thread_font_name",
-							Components.interfaces.nsISupportsString).data;
-		fontName = this._bbs2chService.toSJIS(fontName);
-		var fontSize = this._bbs2chService.pref.getIntPref(
-							"extensions.chaika.thread_font_size");
-		var aaFontName = this._bbs2chService.pref.getComplexValue(
-							"extensions.chaika.thread_aa_font_name",
-							Components.interfaces.nsISupportsString).data;
-		aaFontName = this._bbs2chService.toSJIS(aaFontName);
-		var aaFontSize = this._bbs2chService.pref.getIntPref(
-							"extensions.chaika.thread_aa_font_size");
+		var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
+		var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
+		var fontName = ChaikaCore.pref.getUniChar("thread_font_name");
+		fontName = UniConverter.toSJIS(fontName);
+		var fontSize = ChaikaCore.pref.getInt("thread_font_size");
+		var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+		aaFontName = UniConverter.toSJIS(aaFontName);
+		var aaFontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
 
 		return aString.replace(/<SKINPATH\/>/g, skinURISpec)
 				.replace(/<THREADURL\/>/g, this._threadURL.resolve("./"))
@@ -979,8 +979,8 @@ b2rThreadConverter.prototype = {
 	},
 
 	getStatusText: function(aStatus){
-	    var strBundleService = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                                      .getService(Components.interfaces.nsIStringBundleService);
+	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+                                      .getService(Ci.nsIStringBundleService);
 		var statusBundle = strBundleService.createBundle(
 								"chrome://chaika/content/server/thread-status.properties");
 		var statusText = "";
@@ -993,7 +993,7 @@ b2rThreadConverter.prototype = {
 				statusText = statusBundle.formatStringFromName("error", [String(aStatus)], 1);
 			}catch(ex){}
 		}
-		return this._bbs2chService.toSJIS(statusText);
+		return UniConverter.toSJIS(statusText);
 	},
 
 	getNewMark: function(){

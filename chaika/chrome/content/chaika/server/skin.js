@@ -1,3 +1,5 @@
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
 this.script = {
 
 	start: function(aServerHandler){
@@ -17,7 +19,8 @@ this.script = {
 			// If-Modified-Since が存在しファイルが更新されていなければ 304
 		if(aServerHandler.requestHeaders["If-Modified-Since"]){
 			var lastModified = parseInt(new Date(skinFile.lastModifiedTime).getTime() / 1000);
-			var ifLastModified = parseInt(new Date(aServerHandler.requestHeaders["If-Modified-Since"]).getTime() / 1000);
+			var ifLastModified = parseInt(new Date(
+					aServerHandler.requestHeaders["If-Modified-Since"]).getTime() / 1000);
 			if(lastModified == ifLastModified){
 				aServerHandler.writeResponseHeader(304);
 				aServerHandler.close();
@@ -25,13 +28,13 @@ this.script = {
 			}
 		}
 
-		var mimeService = Components.classes["@mozilla.org/uriloader/external-helper-app-service;1"]
-								.getService(Components.interfaces.nsIMIMEService);
+		var mimeService = Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
+								.getService(Ci.nsIMIMEService);
 		var contentType = mimeService.getTypeFromFile(skinFile);
 		aServerHandler.setResponseHeader("Content-Type", contentType);
 		aServerHandler.writeResponseHeader(200);
-		var fileStream = Components.classes["@mozilla.org/network/file-input-stream;1"]
-							.createInstance(Components.interfaces.nsIFileInputStream);
+		var fileStream = Cc["@mozilla.org/network/file-input-stream;1"]
+							.createInstance(Ci.nsIFileInputStream);
 		fileStream.init(skinFile, 0x01, 0444, fileStream.CLOSE_ON_EOF);
 		aServerHandler._output.writeFrom(fileStream, skinFile.fileSize);
 		fileStream.close();
@@ -42,24 +45,16 @@ this.script = {
 	},
 
 	resolveSkinFile: function(aFilePath){
-		var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-				.getService(Components.interfaces.nsIBbs2chService);
-		var skinName = bbs2chService.pref.getComplexValue(
-							"extensions.chaika.thread_skin",
-							Components.interfaces.nsISupportsString).data;
+		var skinName = ChaikaCore.pref.getUniChar("thread_skin");
 
 		var skinFile = null;
 		if(skinName){
-			skinFile = bbs2chService.getDataDir();
+			skinFile = ChaikaCore.getDataDir();
 			skinFile.appendRelativePath("skin");
 			skinFile.appendRelativePath(skinName);
 		}else{
-			var bbs2chreaderID = "chaika@chaika.xrea.jp";
-			var extensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
-				.getService(Components.interfaces.nsIExtensionManager);
-			var installLocation = extensionManager.getInstallLocation(bbs2chreaderID);
-			skinFile = installLocation.getItemFile(bbs2chreaderID, "defaults/skin").clone()
-							.QueryInterface(Components.interfaces.nsILocalFile);
+			skinFile = ChaikaCore.getDefaultsDir();
+			skinFile.appendRelativePath("skin");
 		}
 
 		for(let [i, value] in Iterator(aFilePath.split("/"))){
