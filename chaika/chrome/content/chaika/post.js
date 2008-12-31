@@ -55,7 +55,7 @@ Bbs2chPost.prototype = {
 	_init:function(){
 		this.boardURI = ChaikaThread.getBoardURL(this.threadURI);
 		this.thread = new ChaikaThread(this.threadURI);
-		this.board = new Bbs2chBoardItems(this.boardURI.spec);
+		this.board = new ChaikaBoard(this.boardURI);
 		this.type = this.thread.type;
 	},
 
