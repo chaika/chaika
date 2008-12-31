@@ -20,16 +20,15 @@
 	</resources>
 
 	<implementation>
-		<field name="_bbs2chService"/>
 		<field name="_bbsMenuFile"/>
 		<field name="_downloader"/>
 		<field name="_prgrsMeter"/>
 		<property name="bbsMenuFile" onget="return this._bbsMenuFile" readonly="true"/>
 
 		<constructor><![CDATA[
-			this._bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-			this._bbsMenuFile = this._bbs2chService.getDataDir();
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
+			this._bbsMenuFile = ChaikaCore.getDataDir();
 			this._bbsMenuFile.appendRelativePath("bbsmenu.html");
 
 			this._downloader = null;
@@ -60,8 +59,7 @@
 
 		<method name ="update">
 			<body><![CDATA[
-				var urlSpec = this._bbs2chService.pref.getCharPref(
-								"extensions.chaika.bbsmenu_load_url");
+				var urlSpec = ChaikaCore.pref.getChar("bbsmenu_load_url");
 				var filePath = this._bbsMenuFile.path;
 				this._downloader = new b2rDownloader(urlSpec, filePath);
 				this._downloader._context = this;

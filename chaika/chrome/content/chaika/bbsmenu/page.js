@@ -1,9 +1,7 @@
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
-
-var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-			.getService(Components.interfaces.nsIBbs2chService);
 
 var gBbsmenuUpdater
 var gTreeBbsMenu;
@@ -14,18 +12,17 @@ var gBbsMenuXMLFile;
 function startup(){
 	gBbsmenuUpdater = document.getElementById("bbsmenuUpdater");
 	gTreeBbsMenu = document.getElementById("treeBbsMenu");
-	gBbsMenuFile = gBbs2chService.getDataDir();
+	gBbsMenuFile = ChaikaCore.getDataDir();
 	gBbsMenuFile.appendRelativePath("bbsmenu.html");
-	gBbsMenuXMLFile = gBbs2chService.getDataDir();
+	gBbsMenuXMLFile = ChaikaCore.getDataDir();
 	gBbsMenuXMLFile.appendRelativePath("bbsmenu.xml");
 
 
 	var btnHistory = document.getElementById("btnHistory");
-	btnHistory.hidden = !gBbs2chService.pref.getBoolPref(
-				"extensions.chaika.bbsmenu_historymenu_show");
+	btnHistory.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
 
     	// ツリーの偶数行に色をつける
-	if(gBbs2chService.pref.getBoolPref("extensions.chaika.enable_tree_stripe2"))
+	if(ChaikaCore.pref.getBool("enable_tree_stripe2"))
 		gTreeBbsMenu.setAttribute("stripe", "true");
 
 
@@ -63,12 +60,14 @@ function initTreeBbsMenu(){
 	delete httpReq;
 
 		// 外部板
-	var	outsidexmlFile = gBbs2chService.getDataDir();
+	var	outsidexmlFile = ChaikaCore.getDataDir();
 	outsidexmlFile.appendRelativePath("outside.xml");
 	if(!outsidexmlFile.exists()){
-		var outsideContent = gBbs2chService.readLocalURI(
-				"chrome://chaika/content/res/outside.xml");
-		gBbs2chService.writeFile(outsidexmlFile.path, outsideContent, false);
+		var defaultOutsideFile = ChaikaCore.getDefaultsDir();
+		defaultOutsideFile.appendRelativePath("outside.xml");
+		defaultOutsideFile.copyTo(outsidexmlFile.parent, null);
+
+		outsidexmlFile = outsidexmlFile.clone().QueryInterface(Ci.nsILocalFile);
 	}
 	var outsideXMLURL = ioService.newFileURI(outsidexmlFile);
 	var httpReq = new XMLHttpRequest();
@@ -88,8 +87,7 @@ function initTreeBbsMenu(){
 
 function createBbsmenuXML(){
 		// bbsmenu.html を読み込んで、行を配列に格納
-	var contentLines = gBbs2chService.readFile(gBbsMenuFile.path);
-	contentLines = gBbs2chService.fromSJIS(contentLines);
+	var contentLines = ChaikaCore.io.readString(gBbsMenuFile, "Shift_JIS");
 		// 改行位置がおかしい部分の修正
 	contentLines = contentLines.replace(/<\/B><BR><A HREF/igm, "</B><BR>\n<A HREF");
 	contentLines = contentLines.split("\n");
@@ -100,6 +98,10 @@ function createBbsmenuXML(){
 
 	var currentCategory = null;
 	var doc = new DOMParser().parseFromString("<bbsmenu/>", "text/xml");
+
+	var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+			.getService(Components.interfaces.nsIIOService);
+
 	for(var i=0; i<contentLines.length; i++){
 		var line = contentLines[i];
 		if(categoryReg.test(line)){
@@ -109,23 +111,24 @@ function createBbsmenuXML(){
 		}else if((threadReg.test(line) || threadReg2.test(line)) && currentCategory){
 			var board = doc.createElement("board");
 			board.setAttribute("title", RegExp.$2);
-			var url = RegExp.$1;
-			url = url.replace(/"/g, "");
-			board.setAttribute("url", url);
+			var urlSpec = RegExp.$1;
+			urlSpec = urlSpec.replace(/"/g, "");
+			board.setAttribute("url", urlSpec);
 			try{
-				board.setAttribute("type", gBbs2chService.getBoardType(url));
+				var url = ioService.newURI(urlSpec, null, null);
+				board.setAttribute("type", ChaikaBoard.getBoardType(url));
 				currentCategory.appendChild(board);
 			}catch(ex){
-				dump(RegExp.$1 +"\n");
+				ChaikaCore.logger.error(RegExp.$1);
 			}
 		}
 	}
 	var xmlSource = new XMLSerializer().serializeToString(doc);
-	xmlSource = gBbs2chService.toSJIS(xmlSource);
 	xmlSource = xmlSource.replace(/></gm, ">\n<");
 	xmlSource = xmlSource.replace(/<board/gm, "\t<board");
-	xmlSource = '<?xml version="1.0" encoding="SHIFT_JIS"?>\n' + xmlSource;
-	gBbs2chService.writeFile(gBbsMenuXMLFile.path, xmlSource, false);
+	xmlSource = '<?xml version="1.0" encoding="Shift_JIS"?>\n' + xmlSource;
+
+	var output = ChaikaCore.io.writeString(gBbsMenuXMLFile, "Shift_JIS", false, xmlSource);
 }
 
 
@@ -148,7 +151,7 @@ function onBbsmenuUpdated(){
  * ログフォルダを開く
  */
 function openLogsDir(){
-	var logDir = gBbs2chService.getDataDir();
+	var logDir = ChaikaCore.getDataDir();
 
 	try{
 		logDir.reveal();
@@ -173,7 +176,8 @@ function openSettings(){
 
 	var features = "";
 	try{
-    	var instantApply = gBbs2chService.pref.getBoolPref("browser.preferences.instantApply");
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    	var instantApply = pref.getBoolPref("browser.preferences.instantApply");
 		features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 	}catch(ex){
 		features = "chrome,titlebar,toolbar,centerscreen,modal";
@@ -197,7 +201,8 @@ function openAbout(){
  * About ダイアログがホームページを開く時に利用するメソッド
  */
 function openURL(aURLSpec){
-	gBbs2chService.openURL(aURLSpec, null, true);
+	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+	ChaikaCore.browser.openURL(ioService.newURI(aURLSpec, null, null), true);
 }
 
 /**
@@ -215,10 +220,10 @@ function openBoard(aAddTab){
 
 	var boardType = item.type;
 	switch(parseInt(boardType)){
-		case gBbs2chService.BOARD_TYPE_2CH:
-		case gBbs2chService.BOARD_TYPE_BE2CH:
-		case gBbs2chService.BOARD_TYPE_JBBS:
-		case gBbs2chService.BOARD_TYPE_MACHI:
+		case ChaikaBoard.BOARD_TYPE_2CH:
+		case ChaikaBoard.BOARD_TYPE_BE2CH:
+		case ChaikaBoard.BOARD_TYPE_JBBS:
+		case ChaikaBoard.BOARD_TYPE_MACHI:
 			ChaikaCore.browser.openBoard(boardURL, aAddTab);
 			break;
 		default:
@@ -271,18 +276,18 @@ function treeBbsMenuClickDelay(aEvent){
 	var openActionPref;
 	if(button==0 && detail==1){
 			// クリック
-		openActionPref = "extensions.chaika.bbsmenu_click_action";
+		openActionPref = "bbsmenu_click_action";
 	}else if(button==0 && detail==2){
 			// ダブルクリック
-		openActionPref = "extensions.chaika.bbsmenu_double_click_action";
+		openActionPref = "bbsmenu_double_click_action";
 	}else if(button==1 && detail==1){
 			// ミドルクリック
-		openActionPref = "extensions.chaika.bbsmenu_middle_click_action";
+		openActionPref = "bbsmenu_middle_click_action";
 	}else{
 		return;
 	}
 
-	var openAction = gBbs2chService.pref.getIntPref(openActionPref);
+	var openAction = ChaikaCore.pref.getInt(openActionPref);
 	if(openAction==1){
 		openBoard(false);
 	}else if(openAction==2){
@@ -319,8 +324,7 @@ function closeAllOpendContainers(aEvent, aExceptIndex){
 	// XXX TODO b2rBbsmenuTreeView に移動させる
 	if(!gTreeBbsMenu.view.isContainerOpen(aExceptIndex)) return;
 
-	if(!gBbs2chService.pref.getBoolPref(
-					"extensions.chaika.bbsmenu_toggle_open_container")) return;
+	if(!ChaikaCore.pref.getBool("bbsmenu_toggle_open_container")) return;
 
 	var exceptItemTitle = gTreeBbsMenuView.viewItems[aExceptIndex].title;
 	var exceptItem;
@@ -378,10 +382,10 @@ function showBoardItemBbsMenuContext(aEvent){
 	boardItemBbsMenuContext.itemURL = item.url;
 
 	switch(parseInt(item.type)){
-		case gBbs2chService.BOARD_TYPE_2CH:
-		case gBbs2chService.BOARD_TYPE_BE2CH:
-		case gBbs2chService.BOARD_TYPE_JBBS:
-		case gBbs2chService.BOARD_TYPE_MACHI:
+		case ChaikaBoard.BOARD_TYPE_2CH:
+		case ChaikaBoard.BOARD_TYPE_BE2CH:
+		case ChaikaBoard.BOARD_TYPE_JBBS:
+		case ChaikaBoard.BOARD_TYPE_MACHI:
 			boardItemBbsMenuContext.itemType = "board";
 			break;
 		default:
