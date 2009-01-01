@@ -35,6 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
 
 /**
  * シンプルなダウンローダオブジェクト
@@ -139,7 +141,6 @@ b2rDownloader.prototype = {
 		}
 
 		var ioService = XPC.getService("@mozilla.org/network/io-service;1", "nsIIOService");
-		var bbs2chService = XPC.getService("@mozilla.org/bbs2ch-service;1", "nsIBbs2chService");
 
 		try{
 			this._file = XPC.createInstance("@mozilla.org/file/local;1", "nsILocalFile");
@@ -164,7 +165,7 @@ b2rDownloader.prototype = {
 		this._browserPersist.persistFlags |= Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE
 					| Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
 
-		var httpChannel = bbs2chService.getHttpChannel(fromURI);
+		var httpChannel = ChaikaCore.getHttpChannel(fromURI);
 		httpChannel.requestMethod = "GET";
 		httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
 		httpChannel.loadFlags |= Ci.nsIHttpChannel.LOAD_BYPASS_CACHE;

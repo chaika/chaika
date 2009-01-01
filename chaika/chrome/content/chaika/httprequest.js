@@ -35,7 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
 /**
@@ -136,10 +136,7 @@ Bbs2chHttpRequest.prototype = {
 		try{
 			this._URI.spec = this.uriSpec;
 
-			var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-
-			this._channel = bbs2chService.getHttpChannel(this._URI);
+			this._channel = ChaikaCore.getHttpChannel(this._URI);
 			this._channel.loadFlags = this._channel.LOAD_BYPASS_CACHE;
 
 				// リファラの設定
@@ -184,9 +181,7 @@ Bbs2chHttpRequest.prototype = {
 		try{
 			this._URI.spec = this.uriSpec;
 
-			var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-					.getService(Components.interfaces.nsIBbs2chService);
-			this._channel = bbs2chService.getHttpChannel(this._URI);
+			this._channel = ChaikaCore.getHttpChannel(this._URI);
 			this._channel.setRequestHeader("Content-Type",
 								"application/x-www-form-urlencoded", false);
 
