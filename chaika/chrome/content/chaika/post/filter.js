@@ -1,3 +1,4 @@
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
 function b2rPostFilterManager(){
@@ -32,7 +33,7 @@ b2rPostFilterManager.prototype = {
 		entries.close();
 
 
-		var postFiltersProfileFolder = gBbs2chService.getDataDir();
+		var postFiltersProfileFolder = ChaikaCore.getDataDir();
 		postFiltersProfileFolder.appendRelativePath("postFilters");
 		if(!postFiltersProfileFolder.exists()){
 			postFiltersProfileFolder.create(Ci.nsIFile.DIRECTORY_TYPE, 0777);

@@ -35,12 +35,13 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+
 
 var gThreadURL;
 var gPost;
 var gFilterManager;
-var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
 var gIoService = Components.classes["@mozilla.org/network/io-service;1"]
 						.getService(Components.interfaces.nsIIOService);
 
@@ -72,7 +73,7 @@ function startup(){
 
 	if(!gPost.isSupport()){
 		switch(gPost.type){
-			case gBbs2chService.BOARD_TYPE_PAGE:
+			case ChaikaBoard.BOARD_TYPE_PAGE:
 				alert("BAD URL");
 				break;
 			default:
@@ -139,13 +140,7 @@ function execPostFilter(aScriptIndex){
  * @return string 内部文字列
  */
 function hardCoatingStr(aString){
-	var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-							.getService(Components.interfaces.nsIBbs2chService);
-	if(bbs2chService.geckoVersionCompare("1.8") <= 0){
-		return aString;
-	}
-	
-	return bbs2chService.fromEUC(aString);
+	return aString;
 }
 
 /**
@@ -172,7 +167,7 @@ var postListener = {
 
 	onHttpStop: function(aResponseText, aStatus){
 		try{
-			var response = gBbs2chService.fromType(aResponseText, gPost.type);
+			var response = this.getCharsetFromType(aResponseText, gPost.type);
 			gTxtResponse.value += htmlToText(response) + "\n";
 
 			postCheck(response, aStatus);
@@ -198,7 +193,28 @@ var postListener = {
 		gTxtResponse.value += "\n\nERROR: " + errorMessage + "\n\n";
 		document.getElementById("wizPostWizard").getButton("back").disabled = false;
 		document.getElementById("btnRePost").disabled = false;
+	},
+
+	getCharsetFromType: function(aString, aBoardType){
+		var unicodeConverter = Components.classes["@mozilla.org/intl/scriptableunicodeconverter"]
+					.createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+
+		switch(aBoardType){
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_OLD2CH:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
+				unicodeConverter.charset = "Shift_JIS";
+				return unicodeConverter.ConvertToUnicode(aString);
+				break;
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
+				unicodeConverter.charset = "EUC-JP";
+				return unicodeConverter.ConvertToUnicode(aString);
+				break;
+		}
+		return aString;
 	}
+
 }
 
 var rewrite = false;
@@ -298,13 +314,14 @@ function preview(){
 	var previewItem = gPost.getPreview();
 	var bwrPreview = document.getElementById("bwrPreview");
 	var prevDoc = bwrPreview.contentDocument;
-	var template = gBbs2chService.readLocalURI("chrome://chaika/content/res/post-preview.txt");
-	template = gBbs2chService.fromSJIS(template);
+	var templateFile = ChaikaCore.getDefaultsDir();
+	templateFile.appendRelativePath("post-preview.txt");
+	template = ChaikaCore.io.readString(templateFile, "Shift_JIS");
 
 	template = template.replace(/%NAME%/m, previewItem.name);
 	template = template.replace(/%MAIL%/m, previewItem.mail);
 	template = template.replace(/%DATE%/m, previewItem.date);
-	
+
 	var message = previewItem.message.replace(/</gm, "&lt;").replace(/>/gm, "&gt;");
 	message = message.replace(/\n/gm, "<br>");
 	template = template.replace(/%MESSAGE%/m, message);
