@@ -18,7 +18,7 @@
 	<wizardpage pageid="wpgForm" id="wpgForm" onpageadvanced="return formCheck()"
 			label="書き込みウィザード" description="マターリ">
 
-		<label id="lblThreadTitle" class="header" value=""/>
+		<label id="lblThreadTitle" class="header" value="" crop="end"/>
 		<spacer class="small-margin"/>
 		<hbox align="center">
 			<label value="名前 :" style="text-align:right"/>
