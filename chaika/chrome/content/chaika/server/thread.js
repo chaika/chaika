@@ -1,6 +1,7 @@
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 
 this.script = {
 
@@ -426,10 +427,8 @@ b2rThread2ch.prototype = {
 
 	datDownload: function(aKako){
 		if(aKako){
-			var bbs2chService = Cc["@mozilla.org/bbs2ch-service;1"]
-					.getService(Ci.nsIBbs2chService);
-			if(bbs2chService.maruLogined){
-				var sid = encodeURIComponent(bbs2chService.maruSessionID);
+			if(Chaika2chViewer.logined){
+				var sid = encodeURIComponent(Chaika2chViewer.sessionID);
 				var datURLSpec = this.thread.plainURL.spec.replace(/\/read\.cgi\//, "/offlaw.cgi/");
 				datURLSpec += "?raw=.0&sid=" + sid;
 				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);

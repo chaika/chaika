@@ -38,6 +38,7 @@
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 
 
 function Bbs2chPost(aThreadURI){
@@ -311,10 +312,8 @@ Bbs2chPost.prototype = {
 					postData = postData.concat(additionalData);
 				}
 
-				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-						.getService(Components.interfaces.nsIBbs2chService);
-				if(bbs2chService.maruLogined){
-					var sid = "sid=" + encodeURIComponent(bbs2chService.maruSessionID);
+				if(Chaika2chViewer.logined){
+					var sid = "sid=" + encodeURIComponent(Chaika2chViewer.sessionID);
 					postData.push(sid);
 				}
 				break;
