@@ -121,6 +121,10 @@ span.resName {
   font-size: 1.2em;
 }
 
+span.resSystem {
+  color: #C43;
+} 
+
 span.resID,
 span.resMesID {
   text-decoration: underline;

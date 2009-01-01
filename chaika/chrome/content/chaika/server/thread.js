@@ -183,6 +183,7 @@ b2rThread2ch.prototype = {
 			// Žæ“¾Ï‚ÝƒƒO‚Ì‘—M
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
+			datLines.pop();
 
 			this._logLineCount = datLines.length;
 
@@ -314,11 +315,17 @@ b2rThread2ch.prototype = {
 		var resMes	= "";
 
 		if(resArray.length > 3){
-			resName = resArray[0].replace(/<\/?b>|/g, "");
+			resName = resArray[0]; //.replace(/<\/?b>|/g, "");
 			resMail = resArray[1];
 			resDate = resArray[2];
 			resMes = resArray[3];
 		}
+
+		if(resName.indexOf("<") != -1){
+			resName =  resName.replace("</b>", "<span class=\"resSystem\">", "g")
+							.replace("<b>", "</span>", "g");;
+		}
+
 
 		if(resDate.indexOf("<") != -1){
 			resDate	= this.htmlToText(resDate);
