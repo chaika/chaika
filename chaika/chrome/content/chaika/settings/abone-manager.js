@@ -37,9 +37,6 @@
 
 const b2rIAboneManager = Components.interfaces.b2rIAboneManager;
 
-var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-			.getService(Components.interfaces.nsIBbs2chService);
-
 var gAboneManager = Components.classes["@mozilla.org/b2r-abone-manager;1"]
 					.getService(b2rIAboneManager);
 

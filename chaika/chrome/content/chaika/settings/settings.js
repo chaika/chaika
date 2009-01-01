@@ -35,11 +35,9 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
-
-var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-		.getService(Components.interfaces.nsIBbs2chService);
 var gIoService = Components.classes["@mozilla.org/network/io-service;1"]
 		.getService(Components.interfaces.nsIIOService);
 

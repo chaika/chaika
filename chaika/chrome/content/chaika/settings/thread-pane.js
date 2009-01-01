@@ -54,7 +54,7 @@ var gThreadPane = {
 			// 規定のスキン
 		lstThreadSkinList.appendItem("(Default)", "");
 
-		var skinDir = gBbs2chService.getDataDir();
+		var skinDir = ChaikaCore.getDataDir();
 		skinDir.appendRelativePath("skin");
 		try{
 			if(!skinDir.exists()) skinDir.create(skinDir.DIRECTORY_TYPE, 0777);
@@ -137,7 +137,7 @@ var gThreadPane = {
 	},
 
 	openSkinDir: function(){
-		var skinDir = gBbs2chService.getDataDir();
+		var skinDir = ChaikaCore.getDataDir();
 		skinDir.appendRelativePath("skin");
 		try{
 			skinDir.launch();
