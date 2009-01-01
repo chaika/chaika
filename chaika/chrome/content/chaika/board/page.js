@@ -62,7 +62,7 @@ function startup(){
 	}
 
 		// 板一覧URLの取得
-	var boardURLSpec = location.href.replace(/^bbs2ch:board:/, "");
+	var boardURLSpec = location.pathname.substring(1);
 
 	try{
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
@@ -108,7 +108,9 @@ function startup(){
  */
 function shutdown(){
 
-	savePersist();
+	if(!gFirstInitBoardTree){
+		savePersist();
+	}
 
 		// ダウンロードのキャンセル
 	if(gSubjectDownloader && gSubjectDownloader.loading)
@@ -604,7 +606,7 @@ function moveNewURL(aEvent){
 		}catch(ex){}
 
 		setTimeout(function(){
-			window.location.href = "bbs2ch:board:" + gNewURL;
+			window.location.href = "chaika://board/" + gNewURL;
 		}, 0);
 	}else{
 		document.getElementById("dckUpdate").selectedIndex = 0;

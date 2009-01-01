@@ -57,8 +57,6 @@ function startup(){
 	}
 
 	var threadURLSpec = window.arguments[0];
-	threadURLSpec = threadURLSpec.replace(/^bbs2ch:post:/, "");
-
 	try{
 		gThreadURL = gIoService.newURI(threadURLSpec, null, null)
 							.QueryInterface(Components.interfaces.nsIURL);

@@ -740,7 +740,7 @@ ChaikaBrowser.prototype = {
 		}
 
 		var boardURI = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
-		boardURI.spec = "bbs2ch:board:" + aBoardURL.spec;
+		boardURI.spec = "chaika://board/" + aBoardURL.spec;
 
 		try{
 			this.openURL(boardURI, aAddTab);
