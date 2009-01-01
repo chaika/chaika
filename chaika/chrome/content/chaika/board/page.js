@@ -39,7 +39,6 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 
 
-var gBbs2chService = Cc["@mozilla.org/bbs2ch-service;1"].getService(Ci.nsIBbs2chService);
 var gBoardTree;
 var gBoard;
 var gSubjectDownloader;
@@ -90,7 +89,7 @@ function startup(){
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
-	if(gBbs2chService.pref.getBoolPref("extensions.chaika.board_auto_update")){
+	if(ChaikaCore.pref.getBool("board_auto_update")){
 		subjectUpdate();
 	}else if(!subjectFile.exists() || subjectFile.fileSize==0){
 		subjectUpdate();
@@ -250,18 +249,18 @@ function boardTreeClickDelay(aEvent){
 	var openActionPref;
 	if(button==0 && detail==1){
 			// クリック
-		openActionPref = "extensions.chaika.board_click_action";
+		openActionPref = "board_click_action";
 	}else if(button==0 && detail==2){
 			// ダブルクリック
-		openActionPref = "extensions.chaika.board_double_click_action";
+		openActionPref = "board_double_click_action";
 	}else if(button==1 && detail==1){
 			// ミドルクリック
-		openActionPref = "extensions.chaika.board_middle_click_action";
+		openActionPref = "board_middle_click_action";
 	}else{
 		return;
 	}
 
-	var openAction = gBbs2chService.pref.getIntPref(openActionPref);
+	var openAction = ChaikaCore.pref.getInt(openActionPref);
 	if(openAction==1){
 		openThread(false);
 	}else if(openAction==2){
@@ -415,8 +414,7 @@ function subjectUpdate(aEvent){
 	var settingFile = gBoard.settingFile.clone();
 	if(subjectFile.exists()){
 		var interval = new Date().getTime() - subjectFile.lastModifiedTime;
-		var updateIntervalLimit =  gBbs2chService.pref.getIntPref(
-					"extensions.chaika.board_update_interval_limit");
+		var updateIntervalLimit =  ChaikaCore.pref.getInt("board_update_interval_limit");
 			// 不正な値や、15 秒以下なら 15 秒にする
 		if(isNaN(parseInt(updateIntervalLimit)) || updateIntervalLimit < 15)
 			updateIntervalLimit = 15;
@@ -502,35 +500,12 @@ function settingUpdate(){
 	gSettingDownloader.onError = function(aDownloader, aErrorCode){
 		if(aErrorCode == this.ERROR_NOT_AVAILABLE){
 			setStatus("Download Error: NOT AVAILABLE: " + this.urlSpec);
-		}else{
-			createSettingFile();
-			initBoardTree();
 		}
 	};
 
 
 	gSettingDownloader.download();
 	setStatus("request: " + gSettingDownloader.urlSpec);
-}
-
-
-
-function createSettingFile(){
-		// 板名記入ダイアログ表示
-	var promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
-							.getService(Ci.nsIPromptService);
-	var promptTitle = gBoard.url.spec + " [chaika]";
-	var promptMsg = "Entry This Board Title";
-	var promptValue = { value: "" };
-	promptService.prompt(window, promptTitle, promptMsg, promptValue, null, {});
-
-	var settingContent = "";
-	if(promptValue.value){
-		settingContent = "BBS_TITLE=" + promptValue.value + "\n";
-		settingContent = gBbs2chService.toType(settingContent, gBoard.type);
-	}
-
-	gBbs2chService.writeFile(gBoard.settingFile.path, settingContent, false);
 }
 
 function showBrowser(aTab){
@@ -559,7 +534,8 @@ function openSettings(){
 
 	var features = "";
 	try{
-    	var instantApply = gBbs2chService.pref.getBoolPref("browser.preferences.instantApply");
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    	var instantApply = pref.getBoolPref("browser.preferences.instantApply");
 		features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 	}catch(ex){
 		features = "chrome,titlebar,toolbar,centerscreen,modal";
@@ -614,7 +590,7 @@ function moveNewURL(aEvent){
 	if(aEvent.type=="click" && aEvent.button!=0) return;
 
 	if(gNewURL){
-		var oldLogDir = gBbs2chService.getLogFileAtURL(gBoard.url.spec);
+		var oldLogDir = ChaikaBoard.getLogFileAtURL(gBoard.url);
 		try{
 			var subjectFile = gBoard.subjectFile.clone();
 			var settingFile = gBoard.settingFile.clone();
