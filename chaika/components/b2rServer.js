@@ -148,7 +148,8 @@ b2rServer.prototype = {
 			return;
 		}
 
-		var port = XPC.getService("@mozilla.org/bbs2ch-service;1", "nsIBbs2chService").serverURL.port;
+		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+		var port = ChaikaCore.getServerURL().port;
 		var serverSocket = XPC.createInstance("@mozilla.org/network/server-socket;1", "nsIServerSocket");
 		serverSocket.init(port, true, 10);
 		serverSocket.asyncListen(this);

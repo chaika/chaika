@@ -51,6 +51,7 @@ b2rAboneManager.prototype = {
 	get ABONE_TYPE_WORD(){ return Ci.b2rIAboneManager.ABONE_TYPE_WORD },
 
 	_startup: function(){
+		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		this._loadAboneData();
 		dump("b2rAboneManager.startup\n");
 	},
@@ -68,14 +69,11 @@ b2rAboneManager.prototype = {
 		this._aboneData["word"] = this._loadNgFile("NGwords.txt");
 	},
 	_loadNgFile: function(aNgFileName){
-		var bbs2chService = Cc["@mozilla.org/bbs2ch-service;1"]
-						.getService(Ci.nsIBbs2chService);
-
-		var ngFile = bbs2chService.getDataDir();
+		var ngFile = ChaikaCore.getDataDir();
 		ngFile.appendRelativePath(aNgFileName);
 		if(!ngFile.exists()) return new Array();
 
-		var contentLine = bbs2chService.readFileLine(ngFile.path, {});
+		var contentLine = ChaikaCore.io.readData(ngFile).split("\n");
 		var resultArray = new Array();
 			// 空白行は読み込まない
 		for(let [i, line] in Iterator(contentLine)){
@@ -92,12 +90,9 @@ b2rAboneManager.prototype = {
 		this._saveNgFile("NGwords.txt", this._aboneData["word"]);
 	},
 	_saveNgFile: function(aNgFileName, aboneDataArray){
-		var bbs2chService = Cc["@mozilla.org/bbs2ch-service;1"]
-						.getService(Ci.nsIBbs2chService);
-
-		var ngFile = bbs2chService.getDataDir();
+		var ngFile = ChaikaCore.getDataDir();
 		ngFile.appendRelativePath(aNgFileName);
-		bbs2chService.writeFile(ngFile.path, aboneDataArray.join("\n"), false);
+		ChaikaCore.io.writeData(ngFile, aboneDataArray.join("\n"), false);
 	},
 
 

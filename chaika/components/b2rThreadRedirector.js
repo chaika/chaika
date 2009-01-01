@@ -81,6 +81,7 @@ b2rThreadRedirector.prototype = {
 				break;
 
 			case "profile-after-change":
+				Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 				if(this._enabled){
 					var categoryManager = Cc["@mozilla.org/categorymanager;1"]
 								.getService(Ci.nsICategoryManager);
@@ -163,22 +164,20 @@ b2rThreadRedirector.prototype = {
 			}
 
 			if(viewB2r){
-				var bbs2chService = Cc["@mozilla.org/bbs2ch-service;1"]
-						.getService(Ci.nsIBbs2chService);
 				var ioService = Cc["@mozilla.org/network/io-service;1"]
 						.getService(Ci.nsIIOService);
 
 				var serverURLSpec = "./thread/" + aContentLocation.spec;
-				serverURLSpec = bbs2chService.serverURL.resolve(serverURLSpec);
+				serverURLSpec = ChaikaCore.getServerURL().resolve(serverURLSpec);
 
-				var disregardURLOption = bbs2chService.pref.getBoolPref(
-						"extensions.chaika.thread_redirector.disregard_url_option");
+				var disregardURLOption = ChaikaCore.pref.getBool(
+							"thread_redirector.disregard_url_option");
 				if(disregardURLOption){
 					var serverURL = ioService.newURI(serverURLSpec, null, null)
 							.QueryInterface(Ci.nsIURL);
 
-					var threadViewLimit = Number(bbs2chService.pref.getIntPref(
-								"extensions.chaika.board_thread_view_limit"));
+					var threadViewLimit = Number(ChaikaCore.pref.getInt(
+								"board_thread_view_limit"));
 					if(isNaN(threadViewLimit) || threadViewLimit == 0){
 						threadViewLimit = "./";
 					}else{
