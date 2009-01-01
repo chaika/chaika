@@ -8,10 +8,10 @@
 	<script type="application/x-javascript" src="chrome://chaika/content/belogin/belogin.js"/>
 
 	<script type="application/x-javascript"><![CDATA[
+		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
 		var gTxtBeCode;
 		var gTxtBeMail;
-		var gBbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-								.getService(Components.interfaces.nsIBbs2chService);
 
 		function startup(){
 			gTxtBeCode = document.getElementById("txtBeCode");
@@ -39,7 +39,10 @@
 		}
 		
 		function openBe2ch(){
-			gBbs2chService.openURL("http://be.2ch.net/", null, true);
+			var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+					.getService(Components.interfaces.nsIIOService);
+			var be2chURL = ioService.newURI("http://be.2ch.net/", null, null);
+			ChaikaCore.browser.openURL(be2chURL, true);
 		}
 	]]></script>
 

@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
@@ -42,8 +43,6 @@ Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 function Bbs2chPost(aThreadURI){
 	this.threadURI = aThreadURI;
 
-	this._bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
-			.getService(Components.interfaces.nsIBbs2chService),
 	this._ioService = Components.classes["@mozilla.org/network/io-service;1"]
 			.getService(Components.interfaces.nsIIOService),
 
@@ -62,13 +61,13 @@ Bbs2chPost.prototype = {
 
 	isSupport:function(){
 		switch(this.type){
-			case this._bbs2chService.BOARD_TYPE_PAGE:
-			case this._bbs2chService.BOARD_TYPE_OLD2CH:
+			case ChaikaBoard.BOARD_TYPE_PAGE:
+			case ChaikaBoard.BOARD_TYPE_OLD2CH:
 				return false;
-			case this._bbs2chService.BOARD_TYPE_2CH:
-			case this._bbs2chService.BOARD_TYPE_BE2CH:
-			case this._bbs2chService.BOARD_TYPE_JBBS:
-			case this._bbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				return true;
 			default:
 				return false;
@@ -147,7 +146,7 @@ Bbs2chPost.prototype = {
 	isValid: function(){
 		var flag = this.OK;
 			//be¥Á¥§¥Ã¥¯
-		if((this.board.getSetting("BBS_BE_ID")=="1" || this.type==this._bbs2chService.BOARD_TYPE_BE2CH)
+		if((this.board.getSetting("BBS_BE_ID")=="1" || this.type==ChaikaBoard.BOARD_TYPE_BE2CH)
 				&& !Bbs2chBeLogin.logined){
 			flag |= this.ERROR_NOT_BE_LOGIN;
 		}
@@ -225,14 +224,14 @@ Bbs2chPost.prototype = {
 	get _postURI(){
 		var postURISpec;
 		switch(this.type){
-			case this._bbs2chService.BOARD_TYPE_2CH:
-			case this._bbs2chService.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
 				postURISpec = this.boardURI.resolve("../test/bbs.cgi");
 				break;
-			case this._bbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				postURISpec = this.threadURI.spec.replace("read.cgi", "write.cgi");
 				break;
-			case this._bbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				postURISpec = this.boardURI.resolve("../bbs/write.cgi");
 				break;
 		}
@@ -254,12 +253,12 @@ Bbs2chPost.prototype = {
 
 		var charset = "";
 		switch(this.type){
-			case this._bbs2chService.BOARD_TYPE_2CH:
-			case this._bbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 				charset = "Shift_JIS";
 				break;
-			case this._bbs2chService.BOARD_TYPE_BE2CH:
-			case this._bbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				charset = "EUC-JP";
 				break;
 		}
@@ -285,8 +284,8 @@ Bbs2chPost.prototype = {
 		this.listener = aListener;
 
 		switch(this.type){
-			case this._bbs2chService.BOARD_TYPE_2CH:
-			case this._bbs2chService.BOARD_TYPE_BE2CH:
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_BE2CH:
 					// DAT ID
 				this.threadURI.spec.match(/\/(\d{9,10})/);
 				var datID = RegExp.$1;
@@ -312,12 +311,14 @@ Bbs2chPost.prototype = {
 					postData = postData.concat(additionalData);
 				}
 
-				if(this._bbs2chService.maruLogined){
-					var sid = "sid=" + encodeURIComponent(this._bbs2chService.maruSessionID);
+				var bbs2chService = Components.classes["@mozilla.org/bbs2ch-service;1"]
+						.getService(Components.interfaces.nsIBbs2chService);
+				if(bbs2chService.maruLogined){
+					var sid = "sid=" + encodeURIComponent(bbs2chService.maruSessionID);
 					postData.push(sid);
 				}
 				break;
-			case this._bbs2chService.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 					// DAT ID
 				this.threadURI.spec.match(/\/(\d{9,10})/);
 				var datID = RegExp.$1;
@@ -341,7 +342,7 @@ Bbs2chPost.prototype = {
 				var postData = new Array(postSubmit, postDir, postBbs, postKey,
 											postTime,postMsg, postName, postMail);
 				break;
-			case this._bbs2chService.BOARD_TYPE_MACHI:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
 					// DAT ID
 				this.threadURI.spec.match(/\/(\d{9,10})/);
 				var datID = RegExp.$1;
@@ -383,7 +384,7 @@ Bbs2chPost.prototype = {
 			//ERROR,£Å£Ò£Ò£Ï£Ò
 		const CHECK_ERROR = new Array("ERROR","\uFF25\uFF32\uFF32\uFF2F\uFF32");
 
-		if(this.type == this._bbs2chService.BOARD_TYPE_MACHI && aStatus == 302)
+		if(this.type == ChaikaBoard.BOARD_TYPE_MACHI && aStatus == 302)
 			return this.SUCCESS;
 
 		for(var i in SUCCESS){
