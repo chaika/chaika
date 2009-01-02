@@ -15,7 +15,7 @@
 		<em:targetApplication>
 			<!-- Firefox -->
 			<Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-					em:minVersion="3.0" em:maxVersion="3.0.*"
+					em:minVersion="3.0" em:maxVersion="3.1.*"
 					em:updateURL="https://ss2.xrea.com/chaika.xrea.jp/update/chaika-release.rdf"/>
 		</em:targetApplication>
 	</Description>

@@ -135,7 +135,7 @@ b2rBbsmenuTreeView.prototype = {
 	getCellProperties: function(aRow, aCol, aProperties){
 		if(this.viewItems[aRow].isSeparator) return;
 		if(aCol.primary){
-			aProperties.AppendElement(this._atomService.getAtom("Name"));
+			aProperties.AppendElement(this._atomService.getAtom("title"));
 			var type = this.viewItems[aRow].type;
 			if(type)
 				aProperties.AppendElement(this._atomService.getAtom("type-" + type));
