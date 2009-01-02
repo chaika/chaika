@@ -122,7 +122,8 @@ span.resName {
 }
 
 span.resSystem {
-  color: #C43;
+  font-weight: normal;
+  color: #477;
 } 
 
 span.resID,
@@ -167,6 +168,9 @@ div.popup span.resName {
   color: #F6F6F6;
 }
 
+div.popup span.resSystem {
+  color: #F6F6F6;
+} 
 
 /* ***** ***** İ’èƒtƒH[ƒ€ ***** ***** */
 #prefForm {
