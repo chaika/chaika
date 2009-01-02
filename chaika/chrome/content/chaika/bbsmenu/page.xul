@@ -9,7 +9,6 @@
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 
 <script type="application/x-javascript" src="chrome://chaika/content/lib/xpc.js"/>
-<script type="application/x-javascript" src="chrome://chaika/content/lib/downloader.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 

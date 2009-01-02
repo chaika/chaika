@@ -27,6 +27,7 @@
 
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+			Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 			this._bbsMenuFile = ChaikaCore.getDataDir();
 			this._bbsMenuFile.appendRelativePath("bbsmenu.html");
@@ -59,9 +60,11 @@
 
 		<method name ="update">
 			<body><![CDATA[
-				var urlSpec = ChaikaCore.pref.getChar("bbsmenu_load_url");
-				var filePath = this._bbsMenuFile.path;
-				this._downloader = new b2rDownloader(urlSpec, filePath);
+				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+						.getService(Components.interfaces.nsIIOService);
+				var url = ioService.newURI(ChaikaCore.pref.getChar("bbsmenu_load_url"), null, null);
+
+				this._downloader = new ChaikaDownloader(url, this._bbsMenuFile);
 				this._downloader._context = this;
 				this._downloader.onStart = function(aDownloader){
 					var context = this._context;

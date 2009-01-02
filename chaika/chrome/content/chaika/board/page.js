@@ -37,7 +37,7 @@
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
-
+Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 var gBoardTree;
 var gBoard;
@@ -431,11 +431,10 @@ function subjectUpdate(aEvent){
 		}
 	}
 
-	gSubjectDownloader = new b2rDownloader(gBoard.subjectURL.spec,
-									gBoard.subjectFile.path);
+	gSubjectDownloader = new ChaikaDownloader(gBoard.subjectURL, gBoard.subjectFile);
 
 	gSubjectDownloader.onStart = function(aDownloader){
-		setStatus("start: " + this.urlSpec);
+		setStatus("start: " + this.url.spec);
 	};
 	gSubjectDownloader.onStop = function(aDownloader, aStatus){
 		setStatus("");
@@ -463,13 +462,13 @@ function subjectUpdate(aEvent){
 	gSubjectDownloader.onError = function(aDownloader, aErrorCode){
 		var errorText = "";
 		switch(aErrorCode){
-			case this.ERROR_BAD_URL:
+			case ChaikaDownloader.ERROR_BAD_URL:
 				errorText = "BAD URL";
 				break;
-			case this.ERROR_NOT_AVAILABLE:
+			case ChaikaDownloader.ERROR_NOT_AVAILABLE:
 				errorText = "NOT AVAILABLE";
 				break;
-			case this.ERROR_FAILURE:
+			case ChaikaDownloader.ERROR_FAILURE:
 				errorText = "ERROR FAILURE";
 				break;
 		}
@@ -478,7 +477,7 @@ function subjectUpdate(aEvent){
 
 
 	gSubjectDownloader.download();
-	setStatus("request: " + gSubjectDownloader.urlSpec);
+	setStatus("request: " + gSubjectDownloader.url.spec);
 }
 
 
@@ -486,11 +485,10 @@ function subjectUpdate(aEvent){
  * SETTING.TXT をダウンロードする
  */
 function settingUpdate(){
-	gSettingDownloader = new b2rDownloader(gBoard.settingURL.spec,
-									gBoard.settingFile.path);
+	gSettingDownloader = new ChaikaDownloader(gBoard.settingURL, gBoard.settingFile);
 
 	gSettingDownloader.onStart = function(aDownloader){
-		setStatus("start: " + this.urlSpec);
+		setStatus("start: " + this.url.spec);
 	};
 	gSettingDownloader.onStop = function(aDownloader, aStatus){
 		setStatus("");
@@ -500,14 +498,14 @@ function settingUpdate(){
 		setStatus("downloading: " + aPercentage + "%");
 	};
 	gSettingDownloader.onError = function(aDownloader, aErrorCode){
-		if(aErrorCode == this.ERROR_NOT_AVAILABLE){
-			setStatus("Download Error: NOT AVAILABLE: " + this.urlSpec);
+		if(aErrorCode == ChaikaDownloader.ERROR_NOT_AVAILABLE){
+			setStatus("Download Error: NOT AVAILABLE: " + this.url.spec);
 		}
 	};
 
 
 	gSettingDownloader.download();
-	setStatus("request: " + gSettingDownloader.urlSpec);
+	setStatus("request: " + gSettingDownloader.url.spec);
 }
 
 function showBrowser(aTab){
