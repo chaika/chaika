@@ -324,7 +324,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
-					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"ON bs.thread_id=td.thread_id",
 					"WHERE bs.board_id=?2;"
 				].join("\n");
 				statement = database.createStatement(sql);
@@ -344,7 +344,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
-					"ON td.board_id=?2 AND bs.dat_id=td.dat_id AND bs.line_count > td.line_count",
+					"ON bs.thread_id=td.thread_id AND bs.line_count > td.line_count",
 					"WHERE bs.board_id=?2;"
 				].join("\n");
 				statement = database.createStatement(sql);
@@ -364,7 +364,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
-					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"ON bs.thread_id=td.thread_id",
 					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?3)"
 				].join("\n");
 				statement = database.createStatement(sql);
@@ -385,7 +385,7 @@ ChaikaBoard.prototype = {
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
-					"ON td.board_id=?2 AND bs.dat_id=td.dat_id",
+					"ON bs.thread_id=td.thread_id",
 					"WHERE bs.board_id=?2",
 					"LIMIT ?3;"
 				].join("\n");
