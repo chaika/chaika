@@ -1,0 +1,41 @@
+#include "nsISupports.idl"
+
+interface nsIURL;
+interface nsIURI;
+
+[scriptable, uuid(a94a3fb9-7fea-47f4-a51a-e349550d4845)]
+interface chIChaikaService : nsISupports
+{
+	
+	/**
+	 * chaika で開くことができるスレッド URL か調べる。
+	 *
+	 * @param aThreadURL スレッドの URL。
+	 * @return 開くことができるなら真。
+	 */
+	boolean isSupportedThread(in nsIURL aThreadURL);
+
+	/**
+	 * スレッドの既読数を返す。
+	 * @param aThreadURL スレッドの URL。
+	 * @return スレッドの既読数。一度も開いたことがなければ 0。
+	 */
+	unsigned long getThreadLineCount(in nsIURL aThreadURL);
+
+	/**
+	 * chaika の板一覧で板を開く。
+	 * @param aThreadURL 板の URL。
+	 * @param aAddTab 真なら新しいタブで開く。
+	 * @return 開かれた板一覧の URI。 開けない URI なら null。
+	 */
+	nsIURI openBoard(in nsIURL aBoardURL, in boolean aAddTab);
+
+	/**
+	 * chaika のスレッド表示でスレッドを開く。
+	 * @param aThreadURL スレッドの URL
+	 * @param aAddTab 真なら新しいタブで開く。
+	 * @param aReplaceViewLimit 真なら aThreadURL の表示制限を無視して chaika の設定を使う。
+	 * @return 開かれたスレッド表示の URL。 開けない URI なら null。
+	 */
+	nsIURL openThread(in nsIURL aThreadURL, in boolean aAddTab, in boolean aReplaceViewLimit);
+};

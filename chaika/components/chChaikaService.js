@@ -42,6 +42,8 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
 
+var gService = null;
+
 
 function ChaikaService(){
 
@@ -51,11 +53,13 @@ ChaikaService.prototype = {
 
 	_startup: function ChaikaService__startup(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-		Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
-
 		ChaikaCore._startup();
+
+		Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 		Chaika2chViewer._startup();
 
+		Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 	},
 
 
@@ -68,6 +72,52 @@ ChaikaService.prototype = {
 	_shutdown: function ChaikaService__shutdown(){
 	},
 
+
+	// ********** ********* implements chIChaikaService ********** **********
+
+
+	isSupportedThread: function ChaikaService_isSupportedThread(aThreadURL){
+		try{
+			return ChaikaBoard.getBoardType(aThreadURL) != ChaikaBoard.BOARD_TYPE_PAGE;
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return false;
+	},
+
+
+	getThreadLineCount: function ChaikaService_getThreadLineCount(aThreadURL){
+		try{
+			return (new ChaikaThread(aThreadURL)).lineCount;
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return 0;
+	},
+
+
+	openBoard: function ChaikaService_openBoard(aBoardURL, aAddTab){
+		try{
+			return ChaikaCore.browser.openBoard(aBoardURL, aAddTab);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
+	},
+
+
+	openThread: function ChaikaService_openThread(aThreadURL, aAddTab, aReplaceViewLimit){
+		try{
+			return ChaikaCore.browser.openThread(aThreadURL, aAddTab, aReplaceViewLimit, false);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
+	},
 
 	// ********** ********* implements nsIObserver ********** **********
 
@@ -103,8 +153,17 @@ ChaikaService.prototype = {
 	classDescription: "ChaikaService js component",
 	contractID: "@chaika.xrea.jp/chaika-service;1",
 	classID: Components.ID("{1a48801d-18c1-4d5f-9fed-03b2aeded9f9}"),
-	_xpcom_categories: [{ category: "app-startup", service: false }],
+	_xpcom_categories: [{ category: "app-startup", service: true }],
+	_xpcom_factory: {
+		createInstance: function(aOuter, aIID) {
+			if(aOuter != null) throw Cr.NS_ERROR_NO_AGGREGATION;
+			if(!gService) gService = new ChaikaService();
+
+			return gService.QueryInterface(aIID);
+		}
+	},
 	QueryInterface: XPCOMUtils.generateQI([
+		Ci.chIChaikaService,
 		Ci.nsISupportsWeakReference,
 		Ci.nsIObserver,
 		Ci.nsISupports

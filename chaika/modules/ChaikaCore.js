@@ -96,7 +96,7 @@ const SQL_THREAD_DATA = [
 		"    post_name          TEXT,",
 		"    post_mail          TEXT,",
 		"    rate               INTEGER DEFAULT 0",
-		");",
+		");"
 	].join("\n");
 const SQL_BOARD_SUBJECT = [
 		"CREATE TABLE board_subject(",
@@ -726,6 +726,7 @@ ChaikaBrowser.prototype = {
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
+		return threadURI;
 	},
 
 
@@ -748,6 +749,7 @@ ChaikaBrowser.prototype = {
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
+		return boardURI;
 	},
 
 
