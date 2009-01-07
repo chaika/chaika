@@ -29,13 +29,14 @@
 			autocompletesearch="form-history"
 			autocompletesearchparam="bbs2ch-bbsmenu-history"
 			ontextentered="searchTitle(this.value)"/>
-	<menu id="btnHistory" label="履歴">
+	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
+				position="after_end"
 				boardItemContext="boardItemHistoryContext"
 				threadItemContext="threadItemHistoryContext"/>
 	</menu>
-	<menu label="ツール">
-		<menupopup>
+	<menu id="toolMenu" label="ツール" tooltiptext="ツール" class="menu-iconic">
+		<menupopup position="after_end">
 			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
 			<menuseparator/>
 			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>

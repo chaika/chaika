@@ -5,16 +5,34 @@
   background-image: none;
 }
 
+
 #mainMenubar {
   -moz-appearance:none;
-  padding:1px 1px 1px 0px;
+  padding: 1px 2px 1px 1px;
   border-style: none;
   margin: 0px;
 }
 
-#mainMenubar > menu{
-  font-size: 0.95em;
+#mainMenubar > menu {
+  list-style-image: url("chrome://chaika/skin/bbsmenu-toolbar.png") !important;
 }
+
+#mainMenubar > menu .menubar-left {
+  margin: 1px 4px !important;
+}
+
+#mainMenubar > menu .menubar-text {
+  display: none;
+}
+
+#toolMenu {
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+
+#historyMenu {
+  -moz-image-region: rect(0px, 32px, 16px, 16px);
+}
+
 
 #treeBbsMenu[stripe="true"] treechildren:-moz-tree-row(odd){
   background-image: url("chrome://chaika/skin/tree-row-odd.png");

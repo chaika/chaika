@@ -18,8 +18,8 @@ function startup(){
 	gBbsMenuXMLFile.appendRelativePath("bbsmenu.xml");
 
 
-	var btnHistory = document.getElementById("btnHistory");
-	btnHistory.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
+	var historyMenu = document.getElementById("historyMenu");
+	historyMenu.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
 
     	// ツリーの偶数行に色をつける
 	if(ChaikaCore.pref.getBool("enable_tree_stripe2"))
