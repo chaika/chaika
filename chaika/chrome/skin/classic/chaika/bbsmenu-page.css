@@ -14,6 +14,7 @@
 }
 
 #mainMenubar > menu {
+  padding: 0px !important;
   list-style-image: url("chrome://chaika/skin/bbsmenu-toolbar.png") !important;
 }
 
