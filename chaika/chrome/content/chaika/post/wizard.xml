@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE bindings [
+	<!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
+	%globalDTD;
+	<!ENTITY % wizardDTD SYSTEM "chrome://global/locale/wizard.dtd">
+	%wizardDTD;
+]>
+<bindings id="aboneManagerBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="wizard" extends="chrome://global/content/bindings/wizard.xml#wizard">
+	<content>
+		<xul:hbox class="wizard-header" chromedir="&locale.dir;" anonid="Header"/>
+		<children includes="stack"/>
+		<xul:deck class="wizard-page-box" flex="1" anonid="Deck">
+			<children includes="wizardpage"/>
+		</xul:deck>
+		<children/>
+		<xul:hbox class="wizard-buttons" anonid="Buttons" xbl:inherits="pagestep,firstpage,lastpage"/>
+	</content>
+</binding>
+
+</bindings>

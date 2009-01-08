@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/post-wizard.css" type="text/css"?>
+
+<wizard id="postWizard" title="書き込みウィザード [chaika]" windowtype="chaika:postWizard"
+		onload="startup()" onunload="shutdown()"
+		onwizardcancel="return cancelCheck(event)" onwizardfinish="return finish();"
+		style="-moz-binding:url(chrome://chaika/content/post/wizard.xml#wizard)"
+		persist="screenX screenY width height"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/javascript" src="chrome://chaika/content/post/wizard.js"/>
+<script type="application/javascript" src="chrome://chaika/content/post/post.js"/>
+
+
+<stack id="titleHeaderContainer">
+	<label id="titleHeader" crop="center" value=""/>
+	<notificationbox id="notification"/>
+</stack>
+
+
+<wizardpage pageid="startPage" id="startPage" label=" " description="">
+</wizardpage>
+
+
+<wizardpage pageid="boardSettingPage" id="boardSettingPage"
+		label="板設定のダウンロード" description=""
+		onpageshow="BoardSettingPage.pageShow(event)">
+
+	<progressmeter id="settingDownloaderProgress" mode="undetermined"/>
+</wizardpage>
+
+
+<wizardpage pageid="formPage" id="formPage"
+		label="書き込みウィザード" description="マターリ"
+		onpageshow="FormPage.pageShow(event)"
+		onpageadvanced="return FormPage.pageAdvanced(event)">
+
+	<hbox id="titleFormContainer" align="center" hidden="true">
+		<label control="titleForm" value="タイトル :"/>
+		<textbox id="titleForm" value="" flex="1"/>
+	</hbox>
+
+	<hbox align="center">
+		<label control="nameForm" value="名前 :"/>
+		<textbox id="nameForm" value="" flex="3"/>
+		<label control="mailForm" value="メール :"/>
+		<textbox id="mailForm" value="" flex="1"/>
+		<checkbox id="sageCheck" label="sage" persist="checked"
+				oncommand="FormPage.sageCheck()"/>
+	</hbox>
+	<textbox id="messeageForm" value="" multiline="true" flex="1"/>
+</wizardpage>
+
+
+<wizardpage  pageid="previewPage" id="previewPage"
+		label="プレビュー" description="次へ進むと実際に書き込みます"
+		onpageshow="PreviewPage.pageShow(event)">
+
+	<iframe id="previewFrame" src="chrome://chaika/content/post/preview.html" flex="1"
+			onload="event.stopPropagation()"/>
+
+</wizardpage>
+
+
+<wizardpage  pageid="submitPage" id="submitPage"
+		label="書き込み" description="マターリ"
+		onpageshow="SubmitPage.pageShow(event)"
+		onpagerewound="return SubmitPage.pageRewound(event)">
+
+		<vbox flex="1">
+			<textbox id="response" multiline="true" readonly="true" flex="1"/>
+			<hbox align="center">
+				<hbox flex="1">
+					<progressmeter id="submitProgress" mode="undetermined" flex="1"/>
+				</hbox>
+				<button id="reSubmitButton" disabled="true" label="再書き込み"
+						oncommand="SubmitPage.reSubmit()"/>
+			</hbox>
+		</vbox>
+</wizardpage>
+
+</wizard>

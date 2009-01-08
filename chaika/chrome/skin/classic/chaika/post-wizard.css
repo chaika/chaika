@@ -1,0 +1,37 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+.wizard-page-box {
+  padding: 0px;
+  margin: 0px 12px 8px 12px;
+}
+
+#titleHeaderContainer {
+  height: 2.75em;
+}
+
+#titleHeader {
+  margin: 8px 24px 0px 24px;
+  font-weight: bold;
+}
+
+
+/* ***** formPage ***** */
+
+#mailForm {
+  max-width: 11em;
+}
+
+
+/* ***** previewPage ***** */
+
+#previewFrame {
+  -moz-appearance: listbox;
+  margin: 2px 4px;
+  border: 2px solid;
+  -moz-border-top-colors: ThreeDShadow ThreeDDarkShadow;
+  -moz-border-right-colors: ThreeDHighlight ThreeDLightShadow;
+  -moz-border-bottom-colors: ThreeDHighlight ThreeDLightShadow;
+  -moz-border-left-colors: ThreeDShadow ThreeDDarkShadow;
+  background-color: -moz-Field;
+  color: -moz-FieldText;
+}

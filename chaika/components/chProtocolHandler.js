@@ -183,9 +183,11 @@ chContentHandler.prototype = {
 				.createInstance(Ci.nsISupportsString);
 		argString.data = aThreadURLSpec;
 
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
 		var winWatcher = Cc["@mozilla.org/embedcomp/window-watcher;1"]
 				.getService(Ci.nsIWindowWatcher);
-		winWatcher.openWindow(null, "chrome://chaika/content/post-wizard.xul",
+		var postWizardURLSpec = pref.getCharPref("extensions.chaika.post.wizard_uri");
+		winWatcher.openWindow(null, postWizardURLSpec,
 				"_blank", "chrome, resizable, dialog", argString);
 	},
 
