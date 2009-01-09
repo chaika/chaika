@@ -43,15 +43,12 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
-
-
 function chProtocolHandler(){
-
 }
 
 chProtocolHandler.prototype = {
 
-	_redirectChannel: function chProtocolHandler__redirectChannel(aURISpec){
+	_getRedirectChannel: function chProtocolHandler__getRedirectChannel(aURISpec){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		var channelURI = ioService.newURI(aURISpec, null, null);
 		return ioService.newChannelFromURI(channelURI);
@@ -100,10 +97,10 @@ chProtocolHandler.prototype = {
 
 		switch(aURI.host){
 			case "bbsmenu":
-				channel = this._redirectChannel("chrome://chaika/content/bbsmenu/page.xul");
+				channel = this._getRedirectChannel("chrome://chaika/content/bbsmenu/page.xul");
 				break;
 			case "board":
-				channel = this._redirectChannel("chrome://chaika/content/board/page.xul");
+				channel = this._getRedirectChannel("chrome://chaika/content/board/page.xul");
 				break;
 			default:
 				channel = this._getCommandChannel(aURI);
@@ -125,6 +122,45 @@ chProtocolHandler.prototype = {
 		Ci.nsISupports
 	])
 };
+
+
+
+
+function b2rProtocolHandler(){
+}
+
+b2rProtocolHandler.prototype = {
+
+	// ********** ********* implements nsIProtocolHandler ********* **********
+
+	scheme: "bbs2ch",
+
+
+	newURI: function chProtocolHandler_newURI(aSpec, aCharset, aBaseURI){
+		aSpec = aSpec.replace("bbs2ch:board:", "bbs2ch:board/")
+					.replace("bbs2ch:post:", "bbs2ch:post/")
+					.replace("bbs2ch:", "chaika://");
+
+		var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
+		uri.init(Ci.nsIStandardURL.URLTYPE_NO_AUTHORITY, -1, aSpec, aCharset, null);
+		uri.QueryInterface(Ci.nsIURL);
+		return uri;
+	},
+
+
+	// ********** ********* XPCOMUtils Component Registration ********** **********
+
+	classDescription: "b2rProtocolHandler js component",
+	contractID: "@mozilla.org/network/protocol;1?name=bbs2ch",
+	classID: Components.ID("{9c30cf1f-eb30-4870-a12a-15c1414bd299}"),
+	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsIProtocolHandler,
+		Ci.nsISupports
+	])
+
+};
+
+b2rProtocolHandler.prototype.__proto__ = chProtocolHandler.prototype;
 
 
 
@@ -207,5 +243,5 @@ chContentHandler.prototype = {
 
 
 function NSGetModule(aCompMgr, aFileSpec){
-	return XPCOMUtils.generateModule([chProtocolHandler, chContentHandler]);
+	return XPCOMUtils.generateModule([chProtocolHandler, b2rProtocolHandler, chContentHandler]);
 }
