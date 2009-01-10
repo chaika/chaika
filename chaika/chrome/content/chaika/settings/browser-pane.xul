@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<overlay id="bbsmenuPaneOverlay"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<prefpane id="paneBrowser" onpaneload="gBrowserPane.startup()">
+
+	<script type="application/x-javascript; version=1.7"
+			src="chrome://chaika/content/settings/browser-pane.js"/>
+
+	<preferences>
+		<preference id="extensions.chaika.enable_browser_contextmenu"
+				name="extensions.chaika.enable_browser_contextmenu" type="bool"
+				onchange="setCcontainerDisabled(this.name, 'boxDisregardURLOption', true)"/>
+		<preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
+				name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
+		<preference id="extensions.chaika.thread_redirector.enabled"
+				name="extensions.chaika.thread_redirector.enabled" type="bool"
+				onchange="setCcontainerDisabled(this.name, 'boxRedirectorAsk', true)"/>
+		<preference id="extensions.chaika.thread_redirector.ask"
+				name="extensions.chaika.thread_redirector.ask" type="bool"/>
+		<preference id="extensions.chaika.thread_redirector.throw_bookmarks"
+				name="extensions.chaika.thread_redirector.throw_bookmarks" type="bool"/>
+		<preference id="extensions.chaika.thread_redirector.disregard_url_option"
+				name="extensions.chaika.thread_redirector.disregard_url_option" type="bool"/>
+		<preference id="extensions.chaika.tab_load_in_foreground"
+				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
+	</preferences>
+
+	<settingbox label="コンテキストメニュー" orient="vertical">
+		<checkbox label="コンテキストメニューに chaika の項目を追加する"
+				preference="extensions.chaika.enable_browser_contextmenu"/>
+		<hbox id="boxDisregardURLOption" class="indent">
+		<checkbox label="URL の表示制限を無視して開く"
+				preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
+		</hbox>
+	</settingbox>
+
+	<settingbox label="タブ" orient="vertical">
+		<checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
+			preference="extensions.chaika.tab_load_in_foreground"/>
+	</settingbox>
+
+	<settingbox label="スレッドリダイレクタ" orient="vertical">
+		<checkbox label="2ch スレッド URL を自動的に chaika で開く"
+				preference="extensions.chaika.thread_redirector.enabled"/>
+		<vbox id="boxRedirectorAsk" class="indent">
+			<checkbox label="毎回確認する"
+				preference="extensions.chaika.thread_redirector.ask"/>
+			<checkbox label="ブックマークやスレッド表示からはそのまま開く"
+				preference="extensions.chaika.thread_redirector.throw_bookmarks"/>
+			<checkbox label="URL の表示制限を無視して開く"
+				preference="extensions.chaika.thread_redirector.disregard_url_option"/>
+		</vbox>
+	</settingbox>
+
+</prefpane>
+
+
+</overlay>

@@ -9,22 +9,6 @@
 			src="chrome://chaika/content/settings/general-pane.js"/>
 
 	<preferences>
-		<preference id="extensions.chaika.enable_browser_contextmenu"
-				name="extensions.chaika.enable_browser_contextmenu" type="bool"
-				onchange="setCcontainerDisabled(this.name, 'boxDisregardURLOption', true)"/>
-		<preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
-				name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.enabled"
-				name="extensions.chaika.thread_redirector.enabled" type="bool"
-				onchange="setCcontainerDisabled(this.name, 'boxRedirectorAsk', true)"/>
-		<preference id="extensions.chaika.thread_redirector.ask"
-				name="extensions.chaika.thread_redirector.ask" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.throw_bookmarks"
-				name="extensions.chaika.thread_redirector.throw_bookmarks" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.disregard_url_option"
-				name="extensions.chaika.thread_redirector.disregard_url_option" type="bool"/>
-		<preference id="extensions.chaika.tab_load_in_foreground"
-				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
 		<preference id="extensions.chaika.http_proxy_mode"
 				name="extensions.chaika.http_proxy_mode" type="int"
 				onchange="setCcontainerDisabled(this.name, 'txtProxyValue', '2')"/>
@@ -37,40 +21,6 @@
 				name="extensions.chaika.data_dir" type="unichar"/>
 	</preferences>
 
-	<settingbox label="ブラウザ" orient="vertical">
-		<checkbox label="コンテキストメニューに chaika の項目を追加する"
-				preference="extensions.chaika.enable_browser_contextmenu"/>
-		<hbox id="boxDisregardURLOption" class="indent">
-		<checkbox label="URL の表示制限を無視して開く"
-				preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
-		</hbox>
-		<checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
-			preference="extensions.chaika.tab_load_in_foreground"/>
-	</settingbox>
-
-	<settingbox label="スレッドリダイレクタ" orient="vertical">
-		<checkbox label="2ch スレッド URL を自動的に chaika で開く"
-				preference="extensions.chaika.thread_redirector.enabled"/>
-		<vbox id="boxRedirectorAsk" class="indent">
-			<checkbox label="毎回確認する"
-				preference="extensions.chaika.thread_redirector.ask"/>
-			<checkbox label="ブックマークやスレッド表示からはそのまま開く"
-				preference="extensions.chaika.thread_redirector.throw_bookmarks"/>
-			<checkbox label="URL の表示制限を無視して開く"
-				preference="extensions.chaika.thread_redirector.disregard_url_option"/>
-		</vbox>
-	</settingbox>
-
-	<settingbox label="プロキシ">
-		<menulist preference="extensions.chaika.http_proxy_mode">
-			<menupopup>
-				<menuitem value="0" label="ブラウザの設定に従う"/>
-				<menuitem value="1" label="直接接続する"/>
-				<menuitem value="2" label="独自に設定する"/>
-			</menupopup>
-		</menulist>
-		<textbox id="txtProxyValue" preference="extensions.chaika.http_proxy_value"/>
-	</settingbox>
 
 	<settingbox label="ログファイル" orient="vertical" flex="1">
 		<checkbox label="ログファイルの位置を指定する"
@@ -84,11 +34,21 @@
 		</hbox>
 	</settingbox>
 
-	<settingbox label="2ch ビューア" orient="vertical" flex="100" align="start">
+	<settingbox label="2ch ビューア" orient="vertical" align="start">
 		<button id="btnDataDirSelect" label="設定..."
 					oncommand="gGeneralPane.openMaruDialog()"/>
 	</settingbox>
 
+	<settingbox label="プロキシ" flex="100">
+		<menulist preference="extensions.chaika.http_proxy_mode">
+			<menupopup>
+				<menuitem value="0" label="ブラウザの設定に従う"/>
+				<menuitem value="1" label="直接接続する"/>
+				<menuitem value="2" label="独自に設定する"/>
+			</menupopup>
+		</menulist>
+		<textbox id="txtProxyValue" preference="extensions.chaika.http_proxy_value"/>
+	</settingbox>
 
 </prefpane>
 

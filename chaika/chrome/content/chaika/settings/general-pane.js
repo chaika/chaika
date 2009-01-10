@@ -37,15 +37,12 @@
 
 
 var gGeneralPane = {
+
 	startup: function(){
-		setCcontainerDisabled("extensions.chaika.enable_browser_contextmenu",
-				"boxDisregardURLOption", true);
 		setCcontainerDisabled("extensions.chaika.appoint_data_dir",
 				"boxDataDir", true);
 		setCcontainerDisabled("extensions.chaika.http_proxy_mode",
 				"txtProxyValue", "2");
-		setCcontainerDisabled("extensions.chaika.thread_redirector.enabled",
-				"boxRedirectorAsk", true);
 	},
 
 	selectDataDir: function(){
