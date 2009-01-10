@@ -246,6 +246,7 @@ ChaikaThread.prototype = {
 			this.maruGetted   = false;
 		}finally{
 			statement.reset();
+			statement.finalize();
 			storage.commitTransaction();
 		}
 
@@ -267,6 +268,7 @@ ChaikaThread.prototype = {
 				threadRowID = statement.getInt64(0);
 			}
 			statement.reset();
+			statement.finalize();
 			if(threadRowID){
 				statement = storage.createStatement(
 					"UPDATE thread_data SET url=?1, line_count=?2, http_last_modified=?3, " +
@@ -296,6 +298,7 @@ ChaikaThread.prototype = {
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 		}finally{
+			statement.finalize();
 			storage.commitTransaction();
 		}
 	},
@@ -316,6 +319,7 @@ ChaikaThread.prototype = {
 			ChaikaCore.logger.error(ex);
 		}finally{
 			statement.reset();
+			statement.finalize();
 			storage.commitTransaction();
 		}
 

@@ -440,6 +440,7 @@ ChaikaBoard.prototype = {
 			Components.utils.reportError(ex);
 		}finally{
 			statement.reset();
+			statement.finalize();
 			database.commitTransaction();
 		}
 
@@ -518,6 +519,7 @@ ChaikaBoard.prototype = {
 			throw makeException(ex.result);
 		}finally{
 			statement.reset();
+			statement.finalize();
 			database.commitTransaction();
 			fileStream.close();
 		}
@@ -542,6 +544,7 @@ ChaikaBoard.prototype = {
 				boardRowID = statement.getInt64(0);
 			}
 			statement.reset();
+			statement.finalize();
 
 			if(boardRowID){
 				statement = database.createStatement(
@@ -564,6 +567,7 @@ ChaikaBoard.prototype = {
 			ChaikaCore.logger.error(ex);
 		}finally{
 			statement.reset();
+			statement.finalize();
 			database.commitTransaction();
 		}
 	},
@@ -590,6 +594,7 @@ ChaikaBoard.prototype = {
 			ChaikaCore.logger.error(ex);
 		}finally{
 			statement.reset();
+			statement.finalize();
 			storage.commitTransaction();
 		}
 		return result;

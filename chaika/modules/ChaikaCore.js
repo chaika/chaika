@@ -195,6 +195,8 @@ var ChaikaCore = {
 
 		this.storage = this._openStorage();
 
+		this.history._startup();
+
 		this.logger.info("DataDir:     " + this.getDataDir().path);
 		this.logger.info("LogDir:      " + this.getLogDir().path);
 		this.logger.info("DefaultsDir: " + this.getDefaultsDir().path);
@@ -209,7 +211,7 @@ var ChaikaCore = {
 	 * @private
 	 */
 	_quit: function ChaikaCore__quit(){
-
+		this.history._quit();
 	},
 
 
@@ -1050,6 +1052,28 @@ function ChaikaHistory(){
 
 ChaikaHistory.prototype = {
 
+	_startup: function ChaikaHistory__startup(){
+		var sql = "";
+		this._statement = [];
+		var storage = ChaikaCore.storage;
+
+		sql = "SELECT ROWID FROM history WHERE id=?1";
+		this._statement["visitPage_SelectID"] = storage.createStatement(sql);
+		sql = "UPDATE history SET url=?1, title=?2, visit_count=visit_count+1, last_visited=?3 WHERE ROWID=?4;";
+		this._statement["visitPage_UpdateHistory"] = storage.createStatement(sql);
+		sql = "INSERT INTO history(id, url, title, last_visited, visit_count, type) VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
+		this._statement["visitPage_InsertHistory"] = storage.createStatement(sql);
+	},
+
+
+	_quit: function ChaikaHistory__startup(){
+		this._statement["visitPage_SelectID"].finalize();
+		this._statement["visitPage_UpdateHistory"].finalize();
+		this._statement["visitPage_InsertHistory"].finalize();
+		this._statement = null;
+	},
+
+
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
@@ -1067,8 +1091,7 @@ ChaikaHistory.prototype = {
 		try{
 			// ID で指定されたレコードがあるかチェック
 			var rowID = 0;
-			var sql = "SELECT ROWID FROM history WHERE id=?1";
-			var statement = storage.createStatement(sql);
+			var statement = this._statement["visitPage_SelectID"];
 			statement.bindStringParameter(0, aID);
 			if(statement.executeStep()){
 				rowID = statement.getInt32(0);
@@ -1077,16 +1100,14 @@ ChaikaHistory.prototype = {
 
 			var now = Date.now()/1000;
 			if(rowID){ // レコードがあれば更新
-				sql = "UPDATE history SET url=?1, title=?2, visit_count=visit_count+1, last_visited=?3 WHERE ROWID=?4;";
-				statement = storage.createStatement(sql);
+				statement = this._statement["visitPage_UpdateHistory"];
 				statement.bindStringParameter(0, aURL.spec);// url
 				statement.bindStringParameter(1, title);	// title
 				statement.bindInt32Parameter(2, now);		// last_visited
 				statement.bindStringParameter(3, rowID);	// id
 				statement.execute();
 			}else{ // レコードがなければ新規作成
-				sql = "INSERT INTO history(id, url, title, last_visited, visit_count, type) VALUES(?1, ?2, ?3, ?4, ?5, ?6);";
-				statement = storage.createStatement(sql);
+				statement = this._statement["visitPage_InsertHistory"];
 				statement.bindStringParameter(0, aID);		// id
 				statement.bindStringParameter(1, aURL.spec);// url
 				statement.bindStringParameter(2, title);	// title

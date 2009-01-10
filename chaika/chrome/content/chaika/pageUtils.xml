@@ -249,8 +249,8 @@
 						visitCountStatement, "thread", threadMax));
 			}
 
-			lastVisitedStatement.reset();
-			visitCountStatement.reset();
+			lastVisitedStatement.finalize();
+			visitCountStatement.finalize();
 
 			historyMenuPopup.appendChild(document.createElement("menuseparator"));
 			var historyMenuitem = document.createElement("menuitem");
