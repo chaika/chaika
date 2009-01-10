@@ -67,3 +67,17 @@
   list-style-image: url("chrome://chaika/skin/type-machi.gif") !important;
   -moz-image-region: rect(0px, 16px, 16px, 0px);
 }
+
+
+/* ***** find2ch ***** */
+
+.searchingPage {
+  -moz-appearance: listbox;
+  margin: 0px;
+  background-color: -moz-Field;
+  color: -moz-FieldText;
+}
+
+.searcingImage {
+  list-style-image:url("chrome://chaika/skin/loading.gif");
+}

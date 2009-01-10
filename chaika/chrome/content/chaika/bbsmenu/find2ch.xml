@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<bindings id="find2chBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="find2ch">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/bbsmenu-page.css"/>
+	</resources>
+
+	<content>
+		<xul:deck flex="1" anonid="deck">
+			<xul:vbox anonid="searchingPage" class="searchingPage" flex="1" align="center">
+				<xul:spacer flex="1"/>
+				<xul:hbox>
+					<xul:image class="searcingImage"/>
+					<xul:label class="searcingLabel" xbl:inherits="value=searchingLabel" value=""/>
+				</xul:hbox>
+				<xul:spacer flex="2"/>
+			</xul:vbox>
+			<xul:listbox anonid="find2chList" class="plain" flex="1"
+					datasources="#bbsmenuPage" ref="*" querytype="xml">
+				<xul:template>
+					<xul:query expr="thread"/>
+					<xul:action>
+						<xul:listitem uri="?" value="?url" label="?title"
+							tooltiptext="?title &#x0A;    ?category - ?lineCount"/>
+					</xul:action>	
+				</xul:template>
+			</xul:listbox>
+		</xul:deck>
+	</content>
+
+	<implementation>
+		<constructor><![CDATA[
+		]]></constructor>
+
+		<destructor><![CDATA[
+			this.cancel();
+		]]></destructor>
+
+
+		<field name="_httpReq">null</field>
+		<field name="list">document.getAnonymousElementByAttribute(this, "anonid", "find2chList")</field>
+
+		<method name="search">
+			<parameter name="aSearchStr"/>
+			<body><![CDATA[
+				const QUERY_URL = "http://find.2ch.net/rss.php/";
+
+				document.getAnonymousElementByAttribute(this, "anonid", "deck").selectedIndex = 0;
+
+				this._httpReq = new XMLHttpRequest();
+				this._httpReq._context = this;
+				this._httpReq.open("GET", QUERY_URL + encodeURIComponent(aSearchStr), true);
+				this._httpReq.onload = function(aEvent){
+					this._context._createTree(this.responseXML);
+				}
+				this._httpReq.send(null);
+			]]></body>
+		</method>
+
+		<method name="cancel">
+			<body><![CDATA[
+				if(this._httpReq){
+					this._httpReq.abort(0);
+					this._httpReq.onload = null;
+				}
+			]]></body>
+		</method>
+
+		<method name="_createTree">
+			<parameter name="aXML"/>
+			<body><![CDATA[
+				this._httpReq = null;
+
+				var httpReq = new XMLHttpRequest();
+				httpReq.open("GET", "chrome://chaika/content/bbsmenu/find2ch.xsl", false);
+				httpReq.send(null);
+				var xsltDoc = httpReq.responseXML;
+
+				var xslt = new XSLTProcessor();
+				xslt.importStylesheet(xsltDoc);
+				var resultDoc = xslt.transformToDocument(aXML);
+
+				var find2chList = document.getAnonymousElementByAttribute(this, "anonid", "find2chList");
+				find2chList.builder.datasource = resultDoc;
+				find2chList.builder.rebuild();
+
+				document.getAnonymousElementByAttribute(this, "anonid", "deck").selectedIndex = 1;
+				
+				find2chList.focus();
+			]]></body>
+		</method>
+
+	</implementation>
+</binding>
+
+
+</bindings>

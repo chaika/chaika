@@ -3,7 +3,7 @@
 <?xml-stylesheet href="chrome://chaika/skin/bbsmenu-page.css" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 
-<page id="pageMain" title="BBSMENU [chaika]"
+<page id="bbsmenuPage" title="BBSMENU [chaika]"
 	onload="startup()" onunload="shutdown()"
 	onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -25,10 +25,10 @@
 </popupset>
 
 <menubar id="mainMenubar">
-	<textbox id="search-box" value="" emptytext="板の検索" flex="1" type="autocomplete"
+	<textbox id="search-box" value="" emptytext="2ch検索" flex="1" type="autocomplete"
 			autocompletesearch="form-history"
-			autocompletesearchparam="bbs2ch-bbsmenu-history"
-			ontextentered="searchTitle(this.value)"/>
+			autocompletesearchparam="chaika-find2ch-history"
+			ontextentered="find2ch.search(this.value)"/>
 	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
 				position="after_end"
@@ -50,14 +50,21 @@
 	onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
 	style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
 
-<tree id="treeBbsMenu"  hidecolumnpicker="true" context="boardItemBbsMenuContext"
-		seltype="single"
-		onclick="treeBbsMenuClick(event)" onkeypress="treeBbsMenuKeyDown(event)"
-		persist="openedCategories" flags="dont-build-content" class="plain" flex="1">
-	<treecols>
-		<treecol id="title" flex="1" hideheader="true" primary="true"/>
-	</treecols>
-	<treechildren/>
-</tree>
+
+<deck id="deck" flex="1" >
+	<tree id="treeBbsMenu"  hidecolumnpicker="true" context="boardItemBbsMenuContext"
+			seltype="single"
+			onclick="treeBbsMenuClick(event)" onkeypress="treeBbsMenuKeyDown(event)"
+			persist="openedCategories" flags="dont-build-content" class="plain" flex="1">
+		<treecols>
+			<treecol id="title" flex="1" hideheader="true" primary="true"/>
+		</treecols>
+		<treechildren/>
+	</tree>
+
+	<hbox id="find2ch" flex="1" searchingLabel="検索中..."
+			onclick="find2ch.click(event)" onkeypress="find2ch.keyDown(event)"
+			style="-moz-binding:url(chrome://chaika/content/bbsmenu/find2ch.xml#find2ch)"/>
+</deck>
 
 </page>

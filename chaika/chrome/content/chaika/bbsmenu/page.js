@@ -397,23 +397,6 @@ function showBoardItemBbsMenuContext(aEvent){
 }
 
 
-function searchTitle(aSearchString){
-	if(aSearchString){
-			// フォーム履歴に検索文字列を追加
-		if(Components.interfaces.nsIFormHistory2){
-				// フォーム履歴に検索文字列を追加
-			var formHistory	= Components.classes["@mozilla.org/satchel/form-history;1"]
-					.getService(Components.interfaces.nsIFormHistory2);
-			formHistory.addEntry("bbs2ch-bbsmenu-history", aSearchString);
-		}
-
-		gTreeBbsMenuView.searchString = aSearchString;
-	}else{
-		gTreeBbsMenuView.searchString = "";
-	}
-}
-
-
 /**
  * 選択中の板の URL をクリップボードにコピー
  * @param {boolean} aAddTitle 真ならタイトルもコピーする
@@ -431,3 +414,89 @@ function copyURL(aAddTitle){
 		ChaikaClipboard.setString(boardURL);
 	}
 }
+
+
+
+
+var find2ch = {
+
+	search: function find2ch_search(aSearchString){
+		if(aSearchString){
+				// フォーム履歴に検索文字列を追加
+			if(Components.interfaces.nsIFormHistory2){
+					// フォーム履歴に検索文字列を追加
+				var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
+						.getService(Ci.nsIFormHistory2);
+				formHistory.addEntry("chaika-find2ch-history", aSearchString);
+			}
+
+			document.getElementById("deck").selectedIndex = 1;
+			document.getElementById("find2ch").search(aSearchString);
+		}else{
+			document.getElementById("deck").selectedIndex = 0;
+			document.getElementById("find2ch").cancel();
+		}
+	},
+
+
+	openThread: function find2ch_openThread(aAddTab){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var threadURLSpec = document.getElementById("find2ch").list.getSelectedItem(0).value;
+		var threadURL = ioService.newURI(threadURLSpec, null, null);
+		ChaikaCore.browser.openThread(threadURL, aAddTab, true, false);
+	},
+
+
+	click: function find2ch_search(aEvent){
+		if(aEvent.button >= 2){
+			return;
+		}
+
+		if(this._clickTimer){
+			clearTimeout(this._clickTimer);
+		}
+		this._clickTimer = setTimeout(find2ch._clickDelay, 5, aEvent);
+	},
+	_clickDelay: function find2ch__clickDelay(aEvent){
+		this._clickTimer = null;
+
+		var button = aEvent.button;
+		var detail = aEvent.detail;
+
+		var openActionPref;
+		if(button==0 && detail==1){
+				// クリック
+			openActionPref = "bbsmenu_click_action";
+		}else if(button==0 && detail==2){
+				// ダブルクリック
+			openActionPref = "bbsmenu_double_click_action";
+		}else if(button==1 && detail==1){
+				// ミドルクリック
+			openActionPref = "bbsmenu_middle_click_action";
+		}else{
+			return;
+		}
+
+		var openAction = ChaikaCore.pref.getInt(openActionPref);
+		if(openAction==1){
+			find2ch.openThread(false);
+		}else if(openAction==2){
+			find2ch.openThread(true);
+		}
+
+	},
+
+
+	keyDown: function find2ch_keyDown(aEvent){
+			// エンターキー以外なら終了
+		if(!(aEvent.keyCode==aEvent.DOM_VK_ENTER || aEvent.keyCode==aEvent.DOM_VK_RETURN)){
+			return;
+		}
+
+		if(aEvent.ctrlKey || aEvent.altKey){
+			find2ch.openThread(true);
+		}else{
+			find2ch.openThread(false);
+		}
+	}
+};
