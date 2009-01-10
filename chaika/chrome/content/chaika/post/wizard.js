@@ -256,7 +256,8 @@ var FormPage = {
 
 			// このレスにレス
 		if(gThread.url.fileName){
-			this._messeageForm.value = ">>" + gThread.url.fileName +"\n";
+			var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+			this._messeageForm.value = res ;
 		}
 
 		this._firstShow = false;
@@ -444,7 +445,7 @@ var SubmitPage = {
 			for(var i = 0; i < browsers.length; i++){
 				var currentURI = browsers[i].currentURI;
 				if(serverURL.hostPort != currentURI.hostPort) continue;
-				if(currentURI.filePath.indexOf(gThread.url.spec) != -1){
+				if(currentURI.filePath.indexOf(gThread.plainURL.spec) != -1){
 					browsers[i].reload();
 				}
 			}
