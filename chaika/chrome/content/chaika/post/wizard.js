@@ -86,6 +86,8 @@ function startup(){
 
 	switch(gBoard.type){
 		case ChaikaBoard.BOARD_TYPE_2CH:
+		case ChaikaBoard.BOARD_TYPE_JBBS:
+		case ChaikaBoard.BOARD_TYPE_MACHI:
 			break;
 		default:
 			Notification.critical("chaika での書き込みに対応していない掲示板です");
@@ -234,7 +236,19 @@ var FormPage = {
 		}
 		this.sageCheck();
 
-		gPost = new Post(gThread, gBoard);
+		switch(gBoard.type){
+			case ChaikaBoard.BOARD_TYPE_2CH:
+				gPost = new Post(gThread, gBoard);
+				break;
+			case ChaikaBoard.BOARD_TYPE_JBBS:
+				gPost = new PostJBBS(gThread, gBoard);
+				break;
+			case ChaikaBoard.BOARD_TYPE_MACHI:
+				gPost = new PostMachi(gThread, gBoard);
+				break;
+			default:
+				gPost = null;
+		}
 
 		if(gBoard.url.host.indexOf(".2ch.net")!=-1  && !this._cookieEnabled()){
 			Notification.warning(gBoard.url.host +" への Cookie アクセスを許可してください");

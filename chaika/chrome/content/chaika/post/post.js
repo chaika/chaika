@@ -183,7 +183,7 @@ Post.prototype = {
 	UNKNOWN:     0xFF,
 
 
-	responseCheck: function Post_responseCheck(aResponseData){
+	responseCheck: function Post_responseCheck(aResponseData, aResponseStatus){
 		var statuses = [];
 		statuses[this.SUCCESS    ] = ["書きこみました",
 		                              "書き込みました",
@@ -220,7 +220,7 @@ Post.prototype = {
 		uniConverter.charset = this.charset;
 		var responseData = uniConverter.ConvertToUnicode(aData);
 
-		var postStatus = this.responseCheck(responseData);
+		var postStatus = this.responseCheck(responseData, aStatus);
 
 		if(postStatus == this.SUCCESS){
 			this._listener.onSucceeded(this, responseData, postStatus);
@@ -309,6 +309,97 @@ Post.prototype = {
 
 
 
+function PostJBBS(aThread, aBoard){
+	this._thread = aThread;
+	this._board = aBoard;
+}
+
+PostJBBS.prototype = {
+
+	charset: "euc-jp",
+
+	submit: function PostJBBS_submit(aListener, additionalData){
+		this._listener = aListener;
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var postRUISpec = this._thread.plainURL.spec.replace("read.cgi", "write.cgi");
+		var postURI = ioService.newURI(postRUISpec, null, null);
+
+		this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
+
+
+		var postData = [];
+		postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
+		postData.push("DIR="    + this._board.url.directory.split("/")[1]);
+		postData.push("BBS="    + this._board.url.directory.split("/")[2]);
+		postData.push("KEY="    + this._thread.datID);
+		postData.push("TIME="   + Math.ceil(Date.now() / 1000));
+		postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+		postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+		postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+
+		if(additionalData){
+			postData = postData.concat(additionalData);
+		}
+
+		this._httpRequest.post(postData.join("&"));
+
+	}
+
+};
+PostJBBS.prototype.__proto__ = Post.prototype;
+
+
+
+function PostMachi(aThread, aBoard){
+	this._thread = aThread;
+	this._board = aBoard;
+}
+
+PostMachi.prototype = {
+
+	charset: "Shift_JIS",
+
+
+	submit: function PostMachi_submit(aListener, additionalData){
+		this._listener = aListener;
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var postRUISpec = this._thread.plainURL.spec.replace("read.cgi", "write.cgi");
+		var postURI = ioService.newURI("../bbs/write.cgi", null, this._board.url);
+
+		this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
+
+
+		var postData = [];
+		postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
+		postData.push("BBS="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
+		postData.push("KEY="    + this._thread.datID);
+		postData.push("TIME="   + Math.ceil(Date.now() / 1000));
+		postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+		postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+		postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+
+		if(additionalData){
+			postData = postData.concat(additionalData);
+		}
+
+		this._httpRequest.post(postData.join("&"));
+
+	},
+
+
+	responseCheck: function Post_responseCheck(aResponseData, aResponseStatus){
+		if(aResponseStatus == 302){
+			return this.SUCCESS;
+		}
+		return this.UNKNOWN;
+
+	}
+
+};
+PostMachi.prototype.__proto__ = Post.prototype;
+
+
+
 function HttpRequest(aURL, aReferrer, aListener){
 	this.url = aURL;
 	this.referrer = aReferrer;
@@ -338,6 +429,7 @@ HttpRequest.prototype = {
 		strStream.setData(postString, postString.length);
 		this._channel.setUploadStream(strStream, "application/x-www-form-urlencoded", -1);
 		this._channel.requestMethod = "POST";
+		this._channel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
 
 		try{
 			this._channel.asyncOpen(this, this);
@@ -388,8 +480,11 @@ HttpRequest.prototype = {
 	},
 
 
-	onStopRequest: function HttpRequest_onStopRequest(aRequest, aContext, aStatus) {
-		if(aStatus == 0){
+	onStopRequest: function HttpRequest_onStopRequest(aRequest, aContext, aStatus){
+		const NS_ERROR_MODULE_NETWORK      = 2152398848;
+		const NS_ERROR_REDIRECT_LOOP       = NS_ERROR_MODULE_NETWORK + 31;
+
+		if(aStatus == 0 || aStatus == NS_ERROR_REDIRECT_LOOP){
 			aRequest.QueryInterface(Ci.nsIHttpChannel);
 
 			this._headers = [];
