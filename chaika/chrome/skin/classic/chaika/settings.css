@@ -11,6 +11,9 @@ radio[pane]{
 radio[pane="paneGeneral"]{
   -moz-image-region: rect(0px, 32px, 32px, 0px);
 }
+radio[pane="paneBrowser"]{
+  -moz-image-region: rect(0px, 32px, 32px, 0px);
+}
 radio[pane="paneBbsmenu"]{
   -moz-image-region: rect(0px, 64px, 32px, 32px);
 }
