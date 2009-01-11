@@ -202,7 +202,7 @@ var ChaikaCore = {
 		this.logger.info("DataDir:     " + this.getDataDir().path);
 		this.logger.info("LogDir:      " + this.getLogDir().path);
 		this.logger.info("DefaultsDir: " + this.getDefaultsDir().path);
-		this.logger.info("UserAgetn:   " + this.getUserAgent());
+		this.logger.info("UserAgent:   " + this.getUserAgent());
 		this.logger.info("ServerURL:   " + this.getServerURL().spec);
 		this.logger.info("Storage:     " + this.storage.databaseFile.path);
 	},
