@@ -195,8 +195,10 @@ var ChaikaCore = {
 
 		this.storage = this._openStorage();
 
+		this.logger._startup();
 		this.history._startup();
 
+		this.logger.info("***** ***** ChaikaCore Startup ***** *****");
 		this.logger.info("DataDir:     " + this.getDataDir().path);
 		this.logger.info("LogDir:      " + this.getLogDir().path);
 		this.logger.info("DefaultsDir: " + this.getDefaultsDir().path);
@@ -211,6 +213,7 @@ var ChaikaCore = {
 	 * @private
 	 */
 	_quit: function ChaikaCore__quit(){
+		this.logger._quit();
 		this.history._quit();
 	},
 
@@ -485,7 +488,8 @@ var ChaikaCore = {
  * @constructor
  */
 function ChaikaLogger(){
-	this._init();
+	this._initialized = false;
+	this._stream = null;
 }
 
 ChaikaLogger.prototype = {
@@ -498,20 +502,49 @@ ChaikaLogger.prototype = {
 
 
 	/** @private */
-	_init: function ChaikaLogger__init(){
-		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-		this._level = pref.getIntPref("extensions.chaika.logger_level");
+	_startup: function ChaikaLogger__startup(){
+		this._level = ChaikaCore.pref.getInt("logger.level");
 
 		if(this._level >= this.LEVEL_ERROR){
-			var consoleService = Cc["@mozilla.org/consoleservice;1"].getService(Ci.nsIConsoleService);
+			var consoleService = Cc["@mozilla.org/consoleservice;1"]
+					.getService(Ci.nsIConsoleService);
 		    consoleService.registerListener(this);
+		}
+
+		if(ChaikaCore.pref.getBool("logger.file_dump")){
+			var logFile = ChaikaCore.getDataDir();
+			logFile.appendRelativePath("logger.log");
+			this._stream = ChaikaCore.io.getFileOutputStream(logFile, "UTF-8", true);
+		}
+		this._initialized = true;
+	},
+
+
+	_quit: function ChaikaLogger__quit(){
+		this._initialized = false;
+		if(this._stream){
+			this._stream.flush();
+			this._stream.close();
 		}
 	},
 
+
 	/** @private */
 	_insertLog: function ChaikaLogger__insertLog(atype, aMessage){
-		var stack = Components.stack.caller.caller;
-		dump(["[", stack.name, ":", stack.lineNumber, "] ", atype, " ", aMessage].join("") + "\n");
+		var stackName = "";
+		var stackLine = "";
+		if(Components.stack.caller.caller){
+			stackName = Components.stack.caller.caller.name;
+			stackLine = Components.stack.caller.caller.lineNumber;
+		}
+		var message = "[" + stackName + ":" + stackLine + "] " + atype +  " " + aMessage;
+
+		if(this._initialized && this._stream){
+			var nowTime = (new Date()).toLocaleFormat("%Y/%m/%d %H:%M ");
+			this._stream.writeString(nowTime + message + "\n");
+		}else{
+			dump(message + "\n");
+		}
 	},
 
 
@@ -531,7 +564,6 @@ ChaikaLogger.prototype = {
 		var message =  aMessage.message || aMessage.toString();
 		this._insertLog("WARNING", aMessage);
 	},
-
 	error: function ChaikaLogger_error(aMessage){
 		if(this._level < this.LEVEL_ERROR) return;
 
@@ -539,20 +571,20 @@ ChaikaLogger.prototype = {
 		this._insertLog("ERROR", message);
 	},
 
+
 	/** @private */
 	observe: function ChaikaLogger_observe(aMessage){
 		if(this._level < this.LEVEL_ERROR) return;
 
 		if(!(aMessage instanceof Ci.nsIScriptError)) return;
 		if(!(aMessage.flags & Ci.nsIScriptError.exceptionFlag))
-		if(aMessage.category != "chrome javascript") return;
 
 		var message = aMessage.message;
-		if(message.indexOf("/chaika")!=-1 ||
-				message.indexOf("/nsBbs2ch")!=-1 || message.indexOf("/b2r")!=-1){
-			dump(["[] LEVEL_ERROR ", aMessage.message].join("") + "\n");
+		if(message.indexOf("chaika")!=-1){
+			this._insertLog("ERROR", message);
 		}
 	},
+
 
 	/** @private */
 	QueryInterface: XPCOMUtils.generateQI([

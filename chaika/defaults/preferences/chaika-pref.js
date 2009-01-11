@@ -12,7 +12,8 @@ pref("extensions.chaika.server_port.other", 8825);
 
 pref("extensions.chaika.refController.enabled", true);
 
-pref("extensions.chaika.logger_level", 0);
+pref("extensions.chaika.logger.level", 2);
+pref("extensions.chaika.logger.file_dump", true);
 
 pref("extensions.chaika.history_expire_days", 60);
 
