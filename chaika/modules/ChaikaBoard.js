@@ -387,6 +387,7 @@ ChaikaBoard.prototype = {
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id",
 					"WHERE bs.board_id=?2",
+					"ORDER BY status DESC, number",
 					"LIMIT ?3;"
 				].join("\n");
 				statement = database.createStatement(sql);
