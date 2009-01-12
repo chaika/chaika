@@ -52,5 +52,5 @@ interface chIChaikaService : nsISupports
 	 * @param aReplaceViewLimit 真なら aThreadURL の表示制限を無視して chaika の設定を使う。
 	 * @return スレッド表示の URL。 開けない URL なら null。
 	 */
-	nsIURL getThreadURL(in nsIURL aBoardURL, in boolean aReplaceViewLimit);
+	nsIURL getThreadURL(in nsIURL aThreadURL, in boolean aReplaceViewLimit);
 };
