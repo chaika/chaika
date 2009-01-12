@@ -42,7 +42,7 @@ interface chIChaikaService : nsISupports
 	 * @param aThreadURL スレッドの URL
 	 * @param aAddTab 真なら新しいタブで開く。
 	 * @param aReplaceViewLimit 真なら aThreadURL の表示制限を無視して chaika の設定を使う。
-	 * @return 開かれたスレッド表示の URL。 開けない URI なら null。
+	 * @return 開かれたスレッド表示の URL。 開けない URL なら null。
 	 */
 	nsIURL openThread(in nsIURL aThreadURL, in boolean aAddTab, in boolean aReplaceViewLimit);
 
@@ -50,7 +50,7 @@ interface chIChaikaService : nsISupports
 	 * chaika のスレッド表示 URL を返す。
 	 * @param aThreadURL スレッドの URL
 	 * @param aReplaceViewLimit 真なら aThreadURL の表示制限を無視して chaika の設定を使う。
-	 * @return スレッド表示の URL。 開けない URI なら null。
+	 * @return スレッド表示の URL。 開けない URL なら null。
 	 */
-	nsIURI getThreadURL(in nsIURL aBoardURL, in boolean aReplaceViewLimit);
+	nsIURL getThreadURL(in nsIURL aBoardURL, in boolean aReplaceViewLimit);
 };
