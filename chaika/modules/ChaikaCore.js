@@ -744,7 +744,7 @@ ChaikaBrowser.prototype = {
 		try{
 			if((/^\d{9,10}$/).test(threadURI.fileName)){
 				threadURI = ioService.newURI(threadURI.spec + "/", null, null);
-				ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + threadURI.spec);
+				ChaikaCore.logger.warning("Fixed URL: " + threadURI.spec);
 			}
 				// スレッド表示数の制限
 			if(aReplaceViewLimit){
@@ -826,7 +826,7 @@ ChaikaBrowser.prototype = {
 
 		// Firefox/Seamonkey 以外のブラウザでの処理はここに書く
 
-		ChaikaCore.logger.warning("ブラウザウィンドウの取得失敗");
+		ChaikaCore.logger.warning("Acquisition of browser window failed");
 		this.openNewWindow(aURI);
 	},
 

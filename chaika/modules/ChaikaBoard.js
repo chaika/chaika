@@ -104,7 +104,7 @@ ChaikaBoard.prototype = {
 
 		this.url = aBoardURL;
 		if(this.url.fileName){ // URL の最後が "/" で終わっていないなら追加
-			ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + this.url.spec);
+			ChaikaCore.logger.warning("Fixed URL: " + this.url.spec);
 			this.url = ioService.newURI(this.url.spec + "/", null, null)
 							.QueryInterface(Ci.nsIURL);
 		}

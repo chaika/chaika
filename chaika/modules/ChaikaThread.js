@@ -157,9 +157,8 @@ ChaikaThread.prototype = {
 		if((/^\d{9,10}$/).test(this.url.fileName)){
 			this.url = ioService.newURI(this.url.spec + "/", null, null)
 					.QueryInterface(Components.interfaces.nsIURL);
-			ChaikaCore.logger.warning("/ で終わっていない URL の修正: " + this.url.spec);
+			ChaikaCore.logger.warning("Fixed URL: " + this.url.spec);
 		}
-
 
 		this.type = ChaikaBoard.getBoardType(this.url);
 			// 板のタイプが、BOARD_TYPE_PAGE でも、
