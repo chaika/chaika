@@ -212,7 +212,7 @@ b2rThread2ch.prototype = {
 				if(start > end) start = end;
 
 				var content = new Array();
-				for(var i=start; i<end; i++){
+				for(var i=start-1; i<end; i++){
 					content.push(this.datLineParse(datLines[i], i+1, false));
 				}
 				this.write(content.join("\n"));
