@@ -109,6 +109,17 @@ ChaikaService.prototype = {
 	},
 
 
+	getBoardURI: function ChaikaService_getBoardURI(aBoardURL){
+		try{
+			return ChaikaCore.browser._getBoardURI(aBoardURL);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
+	},
+
+
 	openThread: function ChaikaService_openThread(aThreadURL, aAddTab, aReplaceViewLimit){
 		try{
 			return ChaikaCore.browser.openThread(aThreadURL, aAddTab, aReplaceViewLimit, false);
@@ -118,6 +129,18 @@ ChaikaService.prototype = {
 
 		return null;
 	},
+
+
+	getThreadURL: function ChaikaService_getThreadURL(aThreadURL, aReplaceViewLimit){
+		try{
+			return ChaikaCore.browser._getThreadURL(aThreadURL, aReplaceViewLimit);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
+	},
+
 
 	// ********** ********* implements nsIObserver ********** **********
 

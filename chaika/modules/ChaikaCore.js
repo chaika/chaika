@@ -733,39 +733,57 @@ ChaikaBrowser.prototype = {
 	 */
 	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab,
 														aReplaceViewLimit, aOpenBrowser){
+
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+		try{
+			var threadURL = this._getThreadURL(aThreadURL, aReplaceViewLimit);
+		}catch(ex){
+			throw makeException(ex.result);
+		}
+
+		if(!aOpenBrowser){
+			threadURL = ioService.newURI("/thread/" + threadURL.spec,
+						null, ChaikaCore.getServerURL());
+		}
+
+		try{
+			this.openURL(threadURL, aAddTab);
+		}catch(ex){
+			throw makeException(ex.result);
+		}
+		return threadURL;
+	},
+
+
+	/** @private */
+	_getThreadURL: function ChaikaBrowser__getThreadURL(aThreadURL, aReplaceViewLimit){
 		if(!(aThreadURL instanceof Ci.nsIURL)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
-		var threadURI = aThreadURL;
-
+		var threadURL = aThreadURL;
 		try{
-			if((/^\d{9,10}$/).test(threadURI.fileName)){
-				threadURI = ioService.newURI(threadURI.spec + "/", null, null);
+			if((/^\d{9,10}$/).test(threadURL.fileName)){
+				threadURL = ioService.newURI(threadURL.spec + "/", null, null);
 				ChaikaCore.logger.warning("Fixed URL: " + threadURI.spec);
 			}
+
 				// スレッド表示数の制限
 			if(aReplaceViewLimit){
 				var threadViewLimit = ChaikaCore.pref.getInt("board_thread_view_limit");
 				if(threadViewLimit == 0){
-					threadURI = ioService.newURI("./", null, threadURI);
+					threadURL = ioService.newURI("./", null, threadURL);
 				}else{
-					threadURI = ioService.newURI("./l" + threadViewLimit, null, threadURI);
+					threadURL = ioService.newURI("./l" + threadViewLimit, null, threadURL);
 				}
 			}
-
-			if(!aOpenBrowser){
-				threadURI = ioService.newURI("/thread/" + threadURI.spec,
-							null, ChaikaCore.getServerURL());
-			}
-			this.openURL(threadURI, aAddTab);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
-		return threadURI;
+		return threadURL;
 	},
 
 
@@ -775,19 +793,25 @@ ChaikaBrowser.prototype = {
 	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
 	 */
 	openBoard: function ChaikaBrowser_openBoard(aBoardURL, aAddTab){
+		try{
+			var boardURI = this._getBoardURI(aBoardURL);
+			this.openURL(boardURI, aAddTab);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+			throw makeException(ex.result);
+		}
+		return boardURI;
+	},
+
+
+	/** @private */
+	_getBoardURI: function ChaikaBrowser__getBoardURI(aBoardURL){
 		if(!(aBoardURL instanceof Ci.nsIURL)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
 		var boardURI = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
 		boardURI.spec = "chaika://board/" + aBoardURL.spec;
-
-		try{
-			this.openURL(boardURI, aAddTab);
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-			throw makeException(ex.result);
-		}
 		return boardURI;
 	},
 
