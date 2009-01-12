@@ -31,12 +31,12 @@
 			ontextentered="find2ch.search(this.value)"/>
 	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
-				position="after_end"
+				position="after_end" tooltiptext=""
 				boardItemContext="boardItemHistoryContext"
 				threadItemContext="threadItemHistoryContext"/>
 	</menu>
 	<menu id="toolMenu" label="ツール" tooltiptext="ツール" class="menu-iconic">
-		<menupopup position="after_end">
+		<menupopup position="after_end" tooltiptext="">
 			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
 			<menuseparator/>
 			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
