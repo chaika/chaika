@@ -27,7 +27,7 @@
 				name="extensions.chaika.refController.enabled" type="bool"/>
 	</preferences>
 
-	<settingbox label="スキン">
+	<settingbox label="スキン" align="center">
 		<menulist id="lstThreadSkinList" preference="extensions.chaika.thread_skin">
 			<menupopup id="popThreadSkinList" onpopupshowing="gThreadPane.initThreadSkinList()"/>
 		</menulist>

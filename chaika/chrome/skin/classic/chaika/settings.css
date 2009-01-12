@@ -1,28 +1,20 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 prefpane {
-  padding-top: 2em;
+  padding-top: 1.5em;
+  padding-bottom: 0.5em;
 }
 
 radio[pane]{
-  list-style-image: url('chrome://chaika/skin/settings-pane.png');
+  list-style-image: none !important;
+  -moz-image-region: rect(0px, 0px,  0px, 0px) !important;
+  padding: 8px 2px 2px 8px !important;
 }
 
-radio[pane="paneGeneral"]{
-  -moz-image-region: rect(0px, 32px, 32px, 0px);
+.paneButtonIcon {
+  display: none;
 }
-radio[pane="paneBrowser"]{
-  -moz-image-region: rect(0px, 32px, 32px, 0px);
-}
-radio[pane="paneBbsmenu"]{
-  -moz-image-region: rect(0px, 64px, 32px, 32px);
-}
-radio[pane="paneBoard"]{
-  -moz-image-region: rect(0px, 96px, 32px, 64px);
-}
-radio[pane="paneThread"]{
-  -moz-image-region: rect(0px, 160px, 32px, 128px);
-}
+
 
 settingbox {
   -moz-binding: url('chrome://chaika/content/settings/setting-box.xml#settingBox');
