@@ -90,10 +90,10 @@
 	</toolbar>
 </toolbox>
 
-<dummyItems id="dummyItems" xmlns=""/>
+
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
 		onclick="boardTreeClick(event)" onkeypress="boardTreeKeyDown(event)"
-		datasources="#dummyItems" ref="*" querytype="xml" flags="dont-build-content">
+		datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
 	<treecols>
 		<treecol id="boardTreeCol-status" label="!"        sort="?status"     style="width:3em;"
 				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
