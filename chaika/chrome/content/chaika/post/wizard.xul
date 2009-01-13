@@ -44,9 +44,13 @@
 
 	<hbox align="center">
 		<label control="nameForm" value="名前 :"/>
-		<textbox id="nameForm" value="" flex="3"/>
+		<textbox id="nameForm" value="" flex="3"
+				type="autocomplete" autocompletesearch="form-history" enablehistory="true"
+				autocompletesearchparam="chaika-post-name-history"/>
 		<label control="mailForm" value="メール :"/>
-		<textbox id="mailForm" value="" flex="1"/>
+		<textbox id="mailForm" value="" flex="1"
+				type="autocomplete" autocompletesearch="form-history" enablehistory="true"
+				autocompletesearchparam="chaika-post-mail-history"/>
 		<checkbox id="sageCheck" label="sage" persist="checked"
 				oncommand="FormPage.sageCheck()"/>
 	</hbox>

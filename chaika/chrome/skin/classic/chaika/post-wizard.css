@@ -17,7 +17,12 @@
 
 /* ***** formPage ***** */
 
+#nameForm {
+  padding: 2px 1px;
+}
+
 #mailForm {
+  padding: 2px 1px;
   max-width: 11em;
 }
 

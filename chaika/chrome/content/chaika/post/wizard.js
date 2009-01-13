@@ -108,6 +108,8 @@ function shutdown(){
 		// checked の値を完全に覚えさせる
 	var sageCheck = document.getElementById("sageCheck");
 	if(!sageCheck.checked) sageCheck.setAttribute("checked", "false");
+
+	FormPage.addFormHistory();
 }
 
 
@@ -291,6 +293,18 @@ var FormPage = {
 			return true;
 		}
 		return false;
+	},
+
+
+	addFormHistory: function FormPage_addFormHistory(){
+		var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
+				.getService(Ci.nsIFormHistory2);
+		if(this._nameForm.value){
+			formHistory.addEntry("chaika-post-name-history", this._nameForm.value);
+		}
+		if(this._mailForm.value){
+			formHistory.addEntry("chaika-post-mail-history", this._mailForm.value);
+		}
 	},
 
 
