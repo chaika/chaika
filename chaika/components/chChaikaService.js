@@ -133,7 +133,7 @@ ChaikaService.prototype = {
 
 	getThreadURL: function ChaikaService_getThreadURL(aThreadURL, aReplaceViewLimit){
 		try{
-			return ChaikaCore.browser._getThreadURL(aThreadURL, aReplaceViewLimit);
+			return ChaikaCore.browser._getThreadURL(aThreadURL, aReplaceViewLimit, false);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 		}

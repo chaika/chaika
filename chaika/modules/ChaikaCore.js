@@ -733,18 +733,10 @@ ChaikaBrowser.prototype = {
 	 */
 	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab,
 														aReplaceViewLimit, aOpenBrowser){
-
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
 		try{
-			var threadURL = this._getThreadURL(aThreadURL, aReplaceViewLimit);
+			var threadURL = this._getThreadURL(aThreadURL, aReplaceViewLimit, aOpenBrowser);
 		}catch(ex){
 			throw makeException(ex.result);
-		}
-
-		if(!aOpenBrowser){
-			threadURL = ioService.newURI("/thread/" + threadURL.spec,
-						null, ChaikaCore.getServerURL());
 		}
 
 		try{
@@ -757,7 +749,7 @@ ChaikaBrowser.prototype = {
 
 
 	/** @private */
-	_getThreadURL: function ChaikaBrowser__getThreadURL(aThreadURL, aReplaceViewLimit){
+	_getThreadURL: function ChaikaBrowser__getThreadURL(aThreadURL, aReplaceViewLimit, aOpenBrowser){
 		if(!(aThreadURL instanceof Ci.nsIURL)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
@@ -767,7 +759,7 @@ ChaikaBrowser.prototype = {
 		try{
 			if((/^\d{9,10}$/).test(threadURL.fileName)){
 				threadURL = ioService.newURI(threadURL.spec + "/", null, null);
-				ChaikaCore.logger.warning("Fixed URL: " + threadURI.spec);
+				ChaikaCore.logger.warning("Fixed URL: " + threadURL.spec);
 			}
 
 				// スレッド表示数の制限
@@ -783,7 +775,13 @@ ChaikaBrowser.prototype = {
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}
-		return threadURL;
+
+		if(!aOpenBrowser){
+			threadURL = ioService.newURI("/thread/" + threadURL.spec,
+						null, ChaikaCore.getServerURL());
+		}
+
+		return threadURL.QueryInterface(Ci.nsIURL);
 	},
 
 
