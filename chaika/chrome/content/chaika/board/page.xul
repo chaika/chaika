@@ -67,26 +67,25 @@
 
 
 <toolbox>
-	<toolbar align="center">
-		<spacer flex="5"/>
-		<label value="検索: "/>
-		<textbox id="searchTextBox" value="" flex="1" type="autocomplete"
-				autocompletesearch="form-history"
-				autocompletesearchparam="bbs2ch-board-history"
-				onkeypress="searchTitle(event, this.value)"/>
+	<toolbar id="toolbar">
+		<spacer flex="10"/>
 
-		<label value="フィルタ: "/>
-		<menulist id="mlstFilterLimit" value="0" persist2="value" oncommand="initBoardTree()">
-			<menupopup>
-				<menuitem label="すべて" value="0"/>
-				<menuitem label="TOP 200" value="200"/>
-				<menuitem label="TOP 400" value="400"/>
-				<menuitem label="購読中" value="-2"/>
-				<menuitem label="DAT落ち" value="-1"/>
-			</menupopup>
-		</menulist>
+		<hbox align="center">
+			<textbox id="searchTextBox" value="" emptytext="スレッドフィルタ"
+					type="autocomplete" autocompletesearch="form-history"
+					autocompletesearchparam="bbs2ch-board-history"
+					onkeypress="searchTitle(event, this.value)"/>
+		</hbox>
 
-		<spacer class="small-margin"/>
+		<toolbarseparator/>
+
+		<hbox id="filterGroup" value="200" persist2="value" align="center" onchange="initBoardTree()"
+				style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#toolbar-group)">
+			<toolbarbutton label="すべて"  value="0"/>
+			<toolbarbutton label="TOP 200" value="200"/>
+			<toolbarbutton label="購読中"  value="-2"/>
+			<toolbarbutton label="DAT落ち" value="-1"/>
+		</hbox>
 	</toolbar>
 </toolbox>
 

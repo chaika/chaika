@@ -354,4 +354,71 @@
 
 </binding>
 
+
+<binding id="toolbar-group">
+	<content>
+		<children/>
+	</content>
+
+	<implementation>
+		<constructor><![CDATA[
+			var group = "group-" + Date.now();
+			var nodes = this.childNodes;
+			for(var i=0; i<nodes.length; i++){
+				var node = nodes[i];
+				node.setAttribute("type", "radio");
+				node.setAttribute("group", group);
+				if(this.value == node.getAttribute("value")){
+					node.setAttribute("checked", "true");
+				}
+			}
+		]]></constructor>
+
+		<property name="value"
+				onget="return this.getAttribute('value');"
+				onset="this.setAttribute('value', val); return val;"/>
+
+		<method name="_fireEvent">
+			<parameter name="aEventName"/>
+			<parameter name="aTarget"/>
+			<body><![CDATA[
+				try{
+					var event = document.createEvent("Events");
+					event.initEvent(aEventName, true, true);
+					var cancel = !aTarget.dispatchEvent(event);
+					if(aTarget.hasAttribute("on" + aEventName)){
+						var fn = new Function ("event", aTarget.getAttribute("on" + aEventName));
+						var rv = fn.call(aTarget, event);
+						if (rv == false) cancel = true;
+					}
+					return !cancel;
+				}catch(ex){ 
+					Components.utils.reportError(ex);
+				}
+				return false;
+			]]></body>
+		</method>
+	</implementation>
+
+	<handlers>
+		<handler event="command"><![CDATA[
+			var target = event.target;
+			if(target.localName != "toolbarbutton") return;
+			this.value = target.getAttribute("value");
+		]]></handler>
+
+		<handler event="DOMAttrModified" phase="target"><![CDATA[
+			if(event.attrName != "value") return;
+			var nodes = this.childNodes;
+			for(var i=0; i<nodes.length; i++){
+				var node = nodes[i];
+				if(this.value == node.getAttribute("value")){
+					node.checked = true;
+					this._fireEvent("change", this);
+				}
+			}
+		]]></handler>
+	</handlers>
+</binding>
+
 </bindings>

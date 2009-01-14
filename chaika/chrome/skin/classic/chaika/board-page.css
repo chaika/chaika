@@ -37,6 +37,29 @@
   color: #BBB;
 }
 
+#toolbar {
+  padding: 1px 5px 1px 1px;
+}
+
+#toolbar toolbarbutton {
+  padding: 1px 2px !important;
+  margin: 0px 1px !important;
+}
+
+#toolbar .toolbarbutton-icon {
+  display: none;
+}
+
+#toolbar .toolbarbutton-text {
+  padding: 0 !important;
+  margin: 1px 3px !important;
+}
+
+#searchTextBox {
+  padding: 2px;
+  width: 12em;
+}
+
 #boardTree[stripe="true"] treechildren:-moz-tree-row(odd){
   background-image: url("chrome://chaika/skin/tree-row-odd.png");
 }

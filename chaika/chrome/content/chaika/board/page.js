@@ -78,15 +78,6 @@ function startup(){
 	gBoardTree = document.getElementById("boardTree");
 	loadPersist();
 
-	var mlstFilterLimit = document.getElementById("mlstFilterLimit");
-	var menuItems = mlstFilterLimit.menupopup.getElementsByTagName("menuitem");
-	var mlstFilterLimitValue = mlstFilterLimit.getAttribute("value");
-	for(var i=0; i<menuItems.length; i++){
-		if(mlstFilterLimitValue == menuItems[i].value){
-			mlstFilterLimit.selectedIndex = i;
-			break;
-		}
-	}
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
@@ -194,14 +185,14 @@ function initBoardTree(){
 		gFirstInitBoardTree = false;
 	}
 
-	var aFilterLimit = Number(document.getElementById("mlstFilterLimit").getAttribute("value"));
+	var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
 
 	var searchStr = document.getElementById("searchTextBox").value;
 	if(searchStr){
 		searchStr = "%" + searchStr + "%";
 		gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
 	}else{
-		gBoard.refresh(aFilterLimit);
+		gBoard.refresh(filterLimit);
 	}
 	gBoardTree.builder.datasource = gBoard.itemsDoc.documentElement;
 	gBoardTree.builder.rebuild();
