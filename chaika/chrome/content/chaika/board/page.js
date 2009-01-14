@@ -80,8 +80,9 @@ function startup(){
 
 	var mlstFilterLimit = document.getElementById("mlstFilterLimit");
 	var menuItems = mlstFilterLimit.menupopup.getElementsByTagName("menuitem");
-	for(var i=0; menuItems.length; i++){
-		if(mlstFilterLimit.value == menuItems[i].value){
+	var mlstFilterLimitValue = mlstFilterLimit.getAttribute("value");
+	for(var i=0; i<menuItems.length; i++){
+		if(mlstFilterLimitValue == menuItems[i].value){
 			mlstFilterLimit.selectedIndex = i;
 			break;
 		}
@@ -134,46 +135,48 @@ function eventBubbleCheck(aEvent){
 
 
 function loadPersist(){
-	var persistPref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
-			.getBranch("extensions.chaika.board_persist.");
-	var prefList = persistPref.getChildList("", {});
-	for(var i=0; i<prefList.length; i++){
-		var prefName = prefList[i];
-		var prefValue = persistPref.getCharPref(prefName);
-		var elementId = prefName.split(".")[0];
-		var attrName = prefName.split(".")[1];
-		var element = document.getElementById(elementId);
-		if(element){
-			element.setAttribute(attrName, prefValue);
-			if(attrName == "value") element.value = prefValue;
+	var jsonFile = ChaikaCore.getDataDir();
+	jsonFile.appendRelativePath("boardPersist.json");
+	if(!jsonFile.exists()) return;
+
+	var json = Cc["@mozilla.org/dom/json;1"].createInstance(Ci.nsIJSON);
+	var persistData = json.decode(ChaikaCore.io.readString(jsonFile, "UTF-8"));
+	for(var i in persistData){
+		var element = document.getElementById(i);
+		if(!element) continue;
+		for(var j in persistData[i]){
+			var attrName = String(j);
+			var attrValue = String(persistData[i][j]);
+			element.setAttribute(attrName, attrValue);
 		}
 	}
 }
 
 
 function savePersist(){
-	var persistPref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService)
-			.getBranch("extensions.chaika.board_persist.");
-
+	var persistData = {};
 	var xpathResult = document.evaluate("descendant::*[@id][@persist2]", document, null,
 						XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
 
 	for (var i = 0; i < xpathResult.snapshotLength; i++){
-		var node = xpathResult.snapshotItem(i);
-		var persists = node.getAttribute("persist2").split(/\s/);
+		var element = xpathResult.snapshotItem(i);
+		var persists = element.getAttribute("persist2").split(/\s/);
 
 		for(var j=0; j<persists.length; j++){
 			var attrName = persists[j];
-			var attrValue = node.getAttribute(attrName);
-			var prefName = node.id +"."+ attrName;
-			if(attrValue != ""){
-				persistPref.setCharPref(prefName, attrValue);
-			}else if(persistPref.prefHasUserValue(prefName)){
-				persistPref.clearUserPref(prefName);
+			var attrValue = element.getAttribute(attrName);
+
+			if(attrValue != "" && attrValue != "undefined"){
+				if(!persistData[element.id]) persistData[element.id] = {};
+				persistData[element.id][attrName] = attrValue;
 			}
 		}
 	}
 
+	var jsonFile = ChaikaCore.getDataDir();
+	jsonFile.appendRelativePath("boardPersist.json");
+	var json = Cc["@mozilla.org/dom/json;1"].createInstance(Ci.nsIJSON);
+	ChaikaCore.io.writeString(jsonFile, "UTF-8", false, json.encode(persistData));
 }
 
 
