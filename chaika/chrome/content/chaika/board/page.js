@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
@@ -92,6 +93,8 @@ function startup(){
 	}else{
 		initBoardTree();
 	}
+
+	ThreadUpdateObserver.startup();
 }
 
 
@@ -112,6 +115,7 @@ function shutdown(){
 	if(gBoardMoveChecker && gBoardMoveChecker.checking)
 		gBoardMoveChecker.abort();
 
+	ThreadUpdateObserver.shutdown();
 }
 
 
@@ -662,3 +666,52 @@ b2rBoardMoveChecker.prototype = {
 	onChecked: function(aSuccess, aNewURL){}
 }
 
+
+
+
+var ThreadUpdateObserver = {
+
+	startup: function ThreadUpdateObserver_startup(){
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.addObserver(this, "itemContext:deleteLog", false);
+	},
+
+
+	shutdown: function ThreadUpdateObserver_shutdown(){
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.removeObserver(this, "itemContext:deleteLog");
+	},
+
+
+	deleteLogsTreeUpdate: function ThreadUpdateObserver_deleteLogsTreeUpdate(aURLs){
+		var xpathResult = gBoard.itemsDoc.evaluate("descendant::boarditem[@read>0]",
+					gBoard.itemsDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+
+		gBoardTree.boxObject.beginUpdateBatch();
+		for (var i=0; i<xpathResult.snapshotLength; i++){
+			var element = xpathResult.snapshotItem(i);
+			var url = element.getAttribute("url");
+			if(aURLs.indexOf(url) != -1){
+				element.setAttribute("status", "0");
+				element.setAttribute("unread", "0");
+				element.setAttribute("read", "0");
+			}
+		}
+		gBoardTree.boxObject.endUpdateBatch();
+	},
+
+
+	observe: function ThreadUpdateObserver_observe(aSubject, aTopic, aData){
+		if(aTopic == "itemContext:deleteLog"){
+			this.deleteLogsTreeUpdate(aData.split(","));
+		}
+	},
+
+
+	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsISupportsWeakReference,
+		Ci.nsIObserver,
+		Ci.nsISupports
+	])
+
+};
