@@ -293,7 +293,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    4 AS status,",
 					"    0 AS number,",
-					"    bs.thread_id AS thread_id,",
+					"    td.thread_id AS thread_id,",
 					"    td.dat_id AS dat_id,",
 					"    td.title AS title,",
 					"    0 AS line_count,",
