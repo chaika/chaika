@@ -293,6 +293,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    4 AS status,",
 					"    0 AS number,",
+					"    bs.thread_id AS thread_id,",
 					"    td.dat_id AS dat_id,",
 					"    td.title AS title,",
 					"    0 AS line_count,",
@@ -316,6 +317,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    1 + (bs.line_count > td.line_count) AS status,",
 					"    bs.ordinal AS number,",
+					"    bs.thread_id AS thread_id,",
 					"    bs.dat_id AS dat_id,",
 					"    bs.title AS title,",
 					"    bs.line_count AS line_count,",
@@ -336,6 +338,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    2 AS status,",
 					"    bs.ordinal AS number,",
+					"    bs.thread_id AS thread_id,",
 					"    bs.dat_id AS dat_id,",
 					"    bs.title AS title,",
 					"    bs.line_count AS line_count,",
@@ -356,6 +359,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    IFNULL((td.line_count != 0) + (bs.line_count > td.line_count), 0) AS status,",
 					"    bs.ordinal AS number,",
+					"    bs.thread_id AS thread_id,",
 					"    bs.dat_id AS dat_id,",
 					"    bs.title AS title,",
 					"    bs.line_count AS line_count,",
@@ -377,6 +381,7 @@ ChaikaBoard.prototype = {
 					"SELECT",
 					"    IFNULL((td.line_count != 0) + (bs.line_count > td.line_count), 0) AS status,",
 					"    bs.ordinal AS number,",
+					"    bs.thread_id AS thread_id,",
 					"    bs.dat_id AS dat_id,",
 					"    bs.title AS title,",
 					"    bs.line_count AS line_count,",
@@ -400,24 +405,24 @@ ChaikaBoard.prototype = {
 		database.beginTransaction();
 		try{
 			while(statement.executeStep()){
-				var status  = statement.getInt32(0);
-				var number  = statement.getInt32(1);
-				var datID   = statement.getString(2);
-				var title   = statement.getString(3);
-				var count   = statement.getInt32(4);
-				var read    = statement.getInt32(5);
-				var unread  = statement.getInt32(6);
-				var force   = statement.getInt32(7);
-				var created = statement.getString(8);
-				var url     = threadUrlSpec + datID + "/";
-
+				var status   = statement.getInt32(0);
+				var number   = statement.getInt32(1);
+				var threadID = statement.getString(2);
+				var datID    = statement.getString(3);
+				var title    = statement.getString(4);
+				var count    = statement.getInt32(5);
+				var read     = statement.getInt32(6);
+				var unread   = statement.getInt32(7);
+				var force    = statement.getInt32(8);
+				var created  = statement.getString(9);
+				var url      = threadUrlSpec + datID + "/";
 
 				var itemNode = this.itemsDoc.createElement("boarditem");
 				itemNode.setAttribute("status",     status);
 				itemNode.setAttribute("number",     number);
 				itemNode.setAttribute("numberSort", number + 10000);
 				itemNode.setAttribute("datID",      datID);
-				itemNode.setAttribute("id",         "item-" + datID);
+				itemNode.setAttribute("threadID",   threadID);
 				itemNode.setAttribute("title",      title);
 				itemNode.setAttribute("count",      count);
 				itemNode.setAttribute("countSort",  count + 10000);
