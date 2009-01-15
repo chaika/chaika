@@ -79,12 +79,12 @@
 
 		<toolbarseparator/>
 
-		<hbox id="filterGroup" value="200" persist2="value" align="center" onchange="initBoardTree()"
+		<hbox id="filterGroup" value="200" persist2="value" align="center"
 				style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#toolbar-group)">
-			<toolbarbutton label="すべて"  value="0"/>
-			<toolbarbutton label="TOP 200" value="200"/>
-			<toolbarbutton label="購読中"  value="-2"/>
-			<toolbarbutton label="DAT落ち" value="-1"/>
+			<toolbarbutton label="すべて"  value="0"   oncommand="setTimeout(initBoardTree, 0)"/>
+			<toolbarbutton label="TOP 200" value="200" oncommand="setTimeout(initBoardTree, 0)"/>
+			<toolbarbutton label="購読中"  value="-2"  oncommand="setTimeout(initBoardTree, 0)"/>
+			<toolbarbutton label="DAT落ち" value="-1"  oncommand="setTimeout(initBoardTree, 0)"/>
 		</hbox>
 	</toolbar>
 </toolbox>
