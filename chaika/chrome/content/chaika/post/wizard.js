@@ -458,9 +458,14 @@ var SubmitPage = {
 			var browsers = browserWindow.getBrowser().browsers;
 			for(var i = 0; i < browsers.length; i++){
 				var currentURI = browsers[i].currentURI;
-				if(serverURL.hostPort != currentURI.hostPort) continue;
-				if(currentURI.filePath.indexOf(gThread.plainURL.spec) != -1){
-					browsers[i].reload();
+				if(!(currentURI instanceof Ci.nsIURL)) continue;
+				try{
+					if(serverURL.hostPort != currentURI.hostPort) continue;
+					if(currentURI.filePath.indexOf(gThread.plainURL.spec) != -1){
+						browsers[i].reload();
+					}
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
 				}
 			}
 		}
