@@ -11,6 +11,8 @@
 	<preferences>
 		<preference id="extensions.chaika.thread_skin"
 				name="extensions.chaika.thread_skin" type="unichar"/>
+		<preference id="extensions.chaika.thread_show_be_icon"
+				name="extensions.chaika.thread_show_be_icon" type="bool"/>
 		<preference id="extensions.chaika.thread_font_name"
 				name="extensions.chaika.thread_font_name" type="unichar"/>
 		<preference id="extensions.chaika.thread_font_size"
@@ -29,12 +31,16 @@
 				name="extensions.chaika.refController.enabled" type="bool"/>
 	</preferences>
 
-	<settingbox label="スキン" align="center">
-		<menulist id="lstThreadSkinList" preference="extensions.chaika.thread_skin">
-			<menupopup id="popThreadSkinList" onpopupshowing="gThreadPane.initThreadSkinList()"/>
-		</menulist>
-		<button label="スキンディレクトリを開く"
-				oncommand="gThreadPane.openSkinDir()"/>
+	<settingbox label="スキン" orient="vertical">
+		<hbox align="center">
+			<menulist id="lstThreadSkinList" preference="extensions.chaika.thread_skin">
+				<menupopup id="popThreadSkinList" onpopupshowing="gThreadPane.initThreadSkinList()"/>
+			</menulist>
+			<button label="スキンディレクトリを開く"
+					oncommand="gThreadPane.openSkinDir()"/>
+		</hbox>
+		<checkbox label="Be アイコンの表示"
+				preference="extensions.chaika.thread_show_be_icon"/>
 	</settingbox>
 
 	<settingbox label="フォント" align="center">

@@ -135,6 +135,7 @@ b2rThread2ch.prototype = {
 
 		this._chainAboneNumbers = new Array();
 		this._enableChainAbone = ChaikaCore.pref.getBool("thread_chain_abone");
+		this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
 
 			// HTML ヘッダを送信したら true になる
 		this._headerResponded = false;
@@ -398,8 +399,8 @@ b2rThread2ch.prototype = {
 			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
 		}
 
-			// 通常リンク処理
-		if(resMes.indexOf("sssp://")!=-1){
+			// Beアイコン処理
+		if(this._showBeIcon && resMes.indexOf("sssp://")!=-1){
 			var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.gif)/g;
 			resMes = resMes.replace(regUrlLink,
 						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
