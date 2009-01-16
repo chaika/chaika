@@ -57,5 +57,3 @@ pref("extensions.chaika.thread_chain_abone", false);
 
 pref("extensions.chaika.livebookmarks_append_board_link", true);
 pref("extensions.chaika.livebookmarks_min_unread", 1);
-
-pref("extensions.chaika.post.wizard_uri", "chrome://chaika/content/post/wizard.xul");

@@ -146,8 +146,7 @@
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
 
-				var postWizardURLSpec = ChaikaCore.pref.getChar("post.wizard_uri");
-
+				var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
 				var threadPlainURL = (new ChaikaThread(threadURL)).plainURL;
 				window.openDialog(postWizardURLSpec, "_blank",
 							"chrome, resizable, dialog", threadPlainURL.spec);
