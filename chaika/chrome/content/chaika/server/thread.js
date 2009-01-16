@@ -950,6 +950,7 @@ b2rThreadConverter.prototype = {
 		var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
 		aaFontName = UniConverter.toSJIS(aaFontName);
 		var aaFontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
+		var aaLineSpace = ChaikaCore.pref.getInt("thread_aa_line_space");
 
 		return aString.replace(/<SKINPATH\/>/g, skinURISpec)
 				.replace(/<THREADURL\/>/g, this._threadURL.resolve("./"))
@@ -958,7 +959,8 @@ b2rThreadConverter.prototype = {
 				.replace(/<FONTNAME\/>/g, "\'" + fontName + "\'")
 				.replace(/<FONTSIZE\/>/g, fontSize + "px")
 				.replace(/<AAFONTNAME\/>/g, "\'" + aaFontName + "\'")
-				.replace(/<AAFONTSIZE\/>/g, aaFontSize + "px");
+				.replace(/<AAFONTSIZE\/>/g, aaFontSize + "px")
+				.replace(/<AALINEHEIGHT\/>/g, aaFontSize + aaLineSpace + "px");
 	},
 
 	getHeader: function(aTitle){

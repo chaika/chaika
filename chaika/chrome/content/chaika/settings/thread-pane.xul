@@ -19,6 +19,8 @@
 				name="extensions.chaika.thread_aa_font_name" type="unichar"/>
 		<preference id="extensions.chaika.thread_aa_font_size"
 				name="extensions.chaika.thread_aa_font_size" type="int"/>
+		<preference id="extensions.chaika.thread_aa_line_space"
+				name="extensions.chaika.thread_aa_line_space" type="int"/>
 		<preference id="extensions.chaika.thread_hide_abone"
 				name="extensions.chaika.thread_hide_abone" type="bool"/>
 		<preference id="extensions.chaika.thread_chain_abone"
@@ -36,71 +38,55 @@
 	</settingbox>
 
 	<settingbox label="フォント" align="center">
-		<menulist id="lstThreadFontList"
-				preference="extensions.chaika.thread_font_name">
-			<menupopup>
-				<menuitem label="明朝体 (Serif)" value="serif"/>
-				<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
-				<menuitem label="等幅 (Monospace)" value="monospace"/>
-				<menuseparator/>
-			</menupopup>
-		</menulist>
-		<menulist preference="extensions.chaika.thread_font_size">
-			<menupopup>
-				<menuitem value="9" label="9"/>
-				<menuitem value="10" label="10"/>
-				<menuitem value="11" label="11"/>
-				<menuitem value="12" label="12"/>
-				<menuitem value="13" label="13"/>
-				<menuitem value="14" label="14"/>
-				<menuitem value="15" label="15"/>
-				<menuitem value="16" label="16"/>
-				<menuitem value="17" label="17"/>
-				<menuitem value="18" label="18"/>
-				<menuitem value="20" label="20"/>
-				<menuitem value="22" label="22"/>
-				<menuitem value="24" label="24"/>
-				<menuitem value="26" label="26"/>
-				<menuitem value="28" label="28"/>
-				<menuitem value="30" label="30"/>
-				<menuitem value="32" label="32"/>
-			</menupopup>
-		</menulist>
+		<button label="フォント"     oncommand="gThreadPane.openFontPreview(this, 'fontPanel')"/>
+		<button label="AA用フォント" oncommand="gThreadPane.openFontPreview(this, 'aaFontPanel')"/>
 		<label value="(対応スキンでのみ有効)"/>
-	</settingbox>
-
-	<settingbox label="AA用フォント" align="center">
-		<menulist id="lstThreadAAFontList"
-				preference="extensions.chaika.thread_aa_font_name">
-			<menupopup>
-				<menuitem label="明朝体 (Serif)" value="serif"/>
-				<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
-				<menuitem label="等幅 (Monospace)" value="monospace"/>
-				<menuseparator/>
-			</menupopup>
-		</menulist>
-		<menulist preference="extensions.chaika.thread_aa_font_size">
-			<menupopup>
-				<menuitem value="9" label="9"/>
-				<menuitem value="10" label="10"/>
-				<menuitem value="11" label="11"/>
-				<menuitem value="12" label="12"/>
-				<menuitem value="13" label="13"/>
-				<menuitem value="14" label="14"/>
-				<menuitem value="15" label="15"/>
-				<menuitem value="16" label="16"/>
-				<menuitem value="17" label="17"/>
-				<menuitem value="18" label="18"/>
-				<menuitem value="20" label="20"/>
-				<menuitem value="22" label="22"/>
-				<menuitem value="24" label="24"/>
-				<menuitem value="26" label="26"/>
-				<menuitem value="28" label="28"/>
-				<menuitem value="30" label="30"/>
-				<menuitem value="32" label="32"/>
-			</menupopup>
-		</menulist>
-		<label value="(対応スキンでのみ有効)"/>
+		<popupset>
+			<panel id="fontPanel" position="after_start">
+				<hbox align="center">
+					<menulist id="lstThreadFontList"
+							preference="extensions.chaika.thread_font_name"
+							onselect="gThreadPane.setFontPreviewBoxFont()">
+						<menupopup>
+							<menuitem label="明朝体 (Serif)" value="serif"/>
+							<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
+							<menuitem label="等幅 (Monospace)" value="monospace"/>
+							<menuseparator/>
+						</menupopup>
+					</menulist>
+					<label value="サイズ :"/>
+					<textbox id="fontSize" value="16" type="number" min="8" max="32" style="width:3.5em;"
+							preference="extensions.chaika.thread_font_size"
+							onchange="gThreadPane.setFontPreviewBoxFont()"/>
+				</hbox>
+				<textbox id="fontPreview" multiline="true" wrap="off" readonly="true"
+						value="" style="width:420px; height:180px; padding:5px;" flex="1"/>
+			</panel>
+			<panel id="aaFontPanel" position="after_start">
+				<hbox align="center">
+					<menulist id="lstThreadAAFontList" sizetopopup="none" style="width:12em;"
+							preference="extensions.chaika.thread_aa_font_name"
+							onselect="gThreadPane.setAAFontPreviewBoxFont()">
+						<menupopup>
+							<menuitem label="明朝体 (Serif)" value="serif"/>
+							<menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
+							<menuitem label="等幅 (Monospace)" value="monospace"/>
+							<menuseparator/>
+						</menupopup>
+					</menulist>
+					<label value="サイズ :"/>
+					<textbox id="aaFontSize" value="16" type="number" min="8" max="32" style="width:3.5em;"
+							preference="extensions.chaika.thread_aa_font_size"
+							onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
+					<label value="高さ :"/>
+					<textbox value="1" id="aaLineHeight" type="number" min="0" max="20" style="width:3.5em;"
+						preference="extensions.chaika.thread_aa_line_space"
+						onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
+				</hbox>
+				<textbox id="aaFontPreview" multiline="true" wrap="off" readonly="true"
+						value="" style="width:420px; height:180px; padding:5px;" flex="1"/>
+			</panel>
+		</popupset>
 	</settingbox>
 
 	<settingbox label="あぼーん" orient="vertical" align="start">

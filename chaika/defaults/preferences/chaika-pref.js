@@ -51,6 +51,7 @@ pref("extensions.chaika.thread_font_name", "sans-serif");
 pref("extensions.chaika.thread_font_size", 16);
 pref("extensions.chaika.thread_aa_font_name", "sans-serif");
 pref("extensions.chaika.thread_aa_font_size", 16);
+pref("extensions.chaika.thread_aa_line_space", 2);
 pref("extensions.chaika.thread_hide_abone", false);
 pref("extensions.chaika.thread_chain_abone", false);
 

@@ -36,11 +36,31 @@
  * ***** END LICENSE BLOCK ***** */
 
 
+const FONT_PREVIEW = [
+		"出されたご飯は残さず食べる。",
+		"転んでも泣かない。",
+		"おいらのギャグには大爆笑する。"].join("\n");
+const AA_FONT_PREVIEW = [
+		"　 ┌───────────────┐ ",
+		"　 │ .右のAAのｽﾞﾚない環境が標準モナ.｜",
+		"　 └──y────────────‐┘ ",
+		" ∧＿∧　　　　　　| 　 　 |＼|／　|　　　　　｜ 　　｜",
+		"（　´∀｀）　　　　　 | ∧ ∧  |/⌒ヽ、| ∧＿∧ | ∧∧ |",
+		"（　　 　 つ 　 　 　 |(,,ﾟДﾟ)||,,ﾟ Θﾟ）|（； ´Д｀）|(=ﾟωﾟ)|"].join("\n");
+
+
 var gThreadPane = {
+	_initialized: false,
+
 	startup: function(){
 		this.initThreadSkinList();
 		this.initThreadFontList();
 		this.initThreadAAFontList();
+		document.getElementById("fontPreview").value = FONT_PREVIEW;
+		document.getElementById("aaFontPreview").value = AA_FONT_PREVIEW;
+		this._initialized = true;
+		this.setFontPreviewBoxFont();
+		this.setAAFontPreviewBoxFont();
 	},
 
 	initThreadSkinList: function(){
@@ -111,6 +131,7 @@ var gThreadPane = {
 		}
 	},
 
+
 	initThreadAAFontList: function(){
 		var lstThreadFontList = document.getElementById("lstThreadAAFontList");
 
@@ -135,6 +156,32 @@ var gThreadPane = {
 				lstThreadFontList.selectedIndex = 1;
 		}
 	},
+
+
+	openFontPreview: function(aAnchor, aPanelID){
+		var panel = document.getElementById(aPanelID);
+		panel.openPopup(aAnchor, "after_start", -40, 0, false);
+	},
+
+
+	setFontPreviewBoxFont: function(){
+		if(!this._initialized) return;
+		var fontPreview = document.getElementById("fontPreview");
+		var fontSize = parseInt(document.getElementById("fontSize").value);
+		var fontFamily = document.getElementById("lstThreadFontList").value;
+		fontPreview.style.font = [fontSize, "px '", fontFamily, "'"].join("");
+	},
+
+
+	setAAFontPreviewBoxFont: function(){
+		if(!this._initialized) return;
+		var fontPreview = document.getElementById("aaFontPreview");
+		var fontSize = parseInt(document.getElementById("aaFontSize").value);
+		var lineHeight = (parseInt(document.getElementById("aaLineHeight").value) + fontSize);
+		var fontFamily = document.getElementById("lstThreadAAFontList").value;
+		fontPreview.style.font = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+	},
+
 
 	openSkinDir: function(){
 		var skinDir = ChaikaCore.getDataDir();
