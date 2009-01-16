@@ -193,9 +193,8 @@ var ChaikaCore = {
 		this.refController = new ChaikaRefController();
 		this.refController.startup();
 
-		this.storage = this._openStorage();
-
 		this.logger._startup();
+		this.storage = this._openStorage();
 		this.history._startup();
 
 		this.logger.info("***** ***** ChaikaCore Startup ***** *****");
@@ -213,8 +212,13 @@ var ChaikaCore = {
 	 * @private
 	 */
 	_quit: function ChaikaCore__quit(){
-		this.logger._quit();
 		this.history._quit();
+		try{
+			this.storage.close();
+		}catch(ex){
+			this.logger.error(ex);
+		}
+		this.logger._quit();
 	},
 
 
