@@ -243,7 +243,7 @@ Post.prototype = {
 					additionalData.push(input.name +"="+ input.value);
 				}
 				this.submit(this._listener, additionalData);
-				ChaikaCore.logger.denug("AdditionalData: " + additionalData);
+				ChaikaCore.logger.debug("AdditionalData: " + additionalData);
 				return;
 			}catch(ex){
 				ChaikaCore.logger.error(ex);
