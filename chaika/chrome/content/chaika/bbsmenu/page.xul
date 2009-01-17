@@ -9,9 +9,9 @@
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 
-<script type="application/x-javascript" src="chrome://chaika/content/lib/xpc.js"/>
-<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
 <script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
+<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
+
 
 <popupset>
 	<popup id="boardItemHistoryContext" itemType="board"

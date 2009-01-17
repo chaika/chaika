@@ -6,7 +6,6 @@
 	onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/javascript; version=1.7" src="chrome://chaika/content/lib/xpc.js"/>
 <script type="application/javascript; version=1.7" src="chrome://chaika/content/board/page.js"/>
 
 <popupset>

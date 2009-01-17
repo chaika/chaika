@@ -40,6 +40,12 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
+
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
+
+
 var gBoardTree;
 var gBoard;
 var gSubjectDownloader;
@@ -390,7 +396,7 @@ function searchTitle(aEvent, aSearchStr){
 
 	if (aSearchStr){
 			// フォーム履歴に検索文字列を追加
-		var formHistory	= XPC.getService("@mozilla.org/satchel/form-history;1", "nsIFormHistory2");
+		var formHistory	= Cc["@mozilla.org/satchel/form-history;1"].getService(Ci.nsIFormHistory2);
 		formHistory.addEntry("bbs2ch-board-history", aSearchStr);
 	}
 

@@ -3,6 +3,11 @@ Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
 
 
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
+
+
 var gBbsmenuUpdater
 var gTreeBbsMenu;
 var gTreeBbsMenuView;
