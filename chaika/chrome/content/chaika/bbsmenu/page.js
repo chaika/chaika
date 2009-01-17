@@ -446,9 +446,11 @@ var find2ch = {
 
 	openThread: function find2ch_openThread(aAddTab){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var threadURLSpec = document.getElementById("find2ch").list.getSelectedItem(0).value;
-		var threadURL = ioService.newURI(threadURLSpec, null, null);
-		ChaikaCore.browser.openThread(threadURL, aAddTab, true, false);
+		var selectedItem = document.getElementById("find2ch").list.getSelectedItem(0);
+		if(selectedItem){
+			var threadURL = ioService.newURI(selectedItem.value, null, null);
+			ChaikaCore.browser.openThread(threadURL, aAddTab, true, false);
+		}
 	},
 
 
