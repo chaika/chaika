@@ -181,6 +181,7 @@
 			<body><![CDATA[
 				var view = this.view;
 
+				if(this.view.getLevel(aExceptIndex) != 0) return;
 				if(!this.view.isContainerOpen(aExceptIndex)) return;
 				if(!ChaikaCore.pref.getBool("bbsmenu_toggle_open_container")) return;
 
