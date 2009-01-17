@@ -4,24 +4,21 @@
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 
 <page id="bbsmenuPage" title="BBSMENU [chaika]"
-	onload="startup()" onunload="shutdown()"
-	onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
-	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+		onload="startup()" onunload="shutdown()"
+		onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
-<script type="application/x-javascript" src="chrome://chaika/content/bbsmenu/treeview.js"/>
-
+<script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 
 <popupset>
 	<popup id="boardItemHistoryContext" itemType="board"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 	<popup id="threadItemHistoryContext" itemType="thread"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 
-	<popup id="boardItemBbsMenuContext" itemType="board"
-		onpopupshowing="return showBoardItemBbsMenuContext(event)"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+	<popup id="boardItemBbsmenuTreeContext" itemType="board"
+			onpopupshowing="return document.getElementById('bbsmenuTree').popupshowing(event)"
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
 
 <menubar id="mainMenubar">
@@ -47,19 +44,61 @@
 </menubar>
 
 <hbox id="bbsmenuUpdater" collapsed="true"
-	onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
-	style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
-
+		onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
+		style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
 
 <deck id="deck" flex="1" >
-	<tree id="treeBbsMenu"  hidecolumnpicker="true" context="boardItemBbsMenuContext"
-			seltype="single"
-			onclick="treeBbsMenuClick(event)" onkeypress="treeBbsMenuKeyDown(event)"
-			persist="openedCategories" flags="dont-build-content" class="plain" flex="1">
+	<tree id="bbsmenuTree" seltype="single" hidecolumnpicker="true" class="plain" flex="2"
+			context="boardItemBbsmenuTreeContext"
+			persist="openedCategories" statedatasource="rdf:null"
+			datasources="#bbsmenuTree" ref="*" querytype="xml" flags="dont-build-content"
+			style="-moz-binding:url(chrome://chaika/content/bbsmenu/bbsmenuTree.xml#bbsmenuTree)">
 		<treecols>
-			<treecol id="title" flex="1" hideheader="true" primary="true"/>
+			<treecol id="bbsmenuTreeCol-title" hideheader="true" flex="10" primary="true"/>
+			<treecol id="bbsmenuTreeCol-type"  hideheader="true" hidden="true"/>
 		</treecols>
-		<treechildren/>
+		<template>
+			<query>
+				<assign var="?tagName" expr="name()"/>
+				<assign var="?hasChildNodes" expr="boolean(*)"/>
+			</query>
+
+			<rule>
+				<where subject="?tagName" rel="equals" value="separator"/>
+				<action>
+					<treechildren flex="1">
+						<treeseparator uri="?"/>
+					</treechildren>
+				</action>
+			</rule>
+			<rule>
+				<where subject="?tagName" rel="equals" value="category"/>
+				<where subject="?hasChildNodes" rel="equals" value="true"/>
+				<action>
+					<treechildren flex="1">
+						<treeitem uri="?" open="?open">
+							<treerow>
+								<treecell label="?title" properties="title"/>
+								<treecell label="?type" value="?type"/>
+							</treerow>
+						</treeitem> 
+					</treechildren>
+				</action>
+			</rule>
+			<rule>
+				<where subject="?tagName" rel="equals" value="board"/>
+				<action>
+					<treechildren flex="1">
+						<treeitem uri="?">
+							<treerow>
+								<treecell label="?title" value="?url" properties="title type-?type"/>
+								<treecell label="?type" value="?type"/>
+							</treerow>
+						</treeitem> 
+					</treechildren>
+				</action>
+			</rule>
+		</template>
 	</tree>
 
 	<hbox id="find2ch" flex="1" searchingLabel="検索中..."
