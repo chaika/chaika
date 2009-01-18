@@ -217,6 +217,7 @@
 						break;
 					}
 				}
+				this._persistOpenedCategories();
 			]]></body>
 		</method>
 
@@ -254,7 +255,6 @@
 			if(button==0 && detail==1 && obj.value=="twisty"){
 					// twisty ボタンを使ったコンテナのオープン
 				this._closeAllOpendContainers(event, row.value);
-				this._persistOpenedCategories();
 				return;
 			}else if(detail==2 && obj.value!="twisty" && isContainer){
 					// ダブルクリックによるコンテナのオープン
@@ -293,7 +293,7 @@
 		
 		
 		<handler event="OpenStateChange"><![CDATA[
-			this._persistOpenedCategories();
+			// this._persistOpenedCategories();
 		]]></handler>
 	</handlers>
 </binding>
