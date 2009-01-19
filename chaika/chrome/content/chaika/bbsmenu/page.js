@@ -66,31 +66,78 @@ function createBbsmenuXML(){
 	var threadReg2	= /^<A HREF=([^> ]+) TARGET=_blank>([^<]+)<\/A>/i;
 
 	var currentCategory = null;
+	var currentCategoryPath = "";
 	var doc = new DOMParser().parseFromString("<bbsmenu/>", "text/xml");
 
 	var ioService = Components.classes["@mozilla.org/network/io-service;1"]
 			.getService(Components.interfaces.nsIIOService);
 
-	for(var i=0; i<contentLines.length; i++){
-		var line = contentLines[i];
-		if(categoryReg.test(line)){
-			currentCategory = doc.createElement("category");
-			currentCategory.setAttribute("title", RegExp.$1);
-			doc.documentElement.appendChild(currentCategory);
-		}else if((threadReg.test(line) || threadReg2.test(line)) && currentCategory){
-			var board = doc.createElement("board");
-			board.setAttribute("title", RegExp.$2);
-			var urlSpec = RegExp.$1;
-			urlSpec = urlSpec.replace(/"/g, "");
-			board.setAttribute("url", urlSpec);
-			try{
-				var url = ioService.newURI(urlSpec, null, null);
-				board.setAttribute("type", ChaikaBoard.getBoardType(url));
+	var storage = ChaikaCore.storage;
+	var categoryInsertStatement = storage.createStatement(
+			"INSERT INTO bbsmenu(title, title_n, path, is_category) " +
+			"VALUES(?1, '', ?2, 1);");
+	var bosrdInsertStatement = storage.createStatement(
+			"INSERT INTO bbsmenu(title, title_n, url, path, board_type, board_id, is_category) " +
+			"VALUES(?1, '', ?2, ?3, ?4, ?5, 0);");
+
+
+	storage.beginTransaction();
+	try{
+		storage.executeSimpleSQL("DELETE FROM bbsmenu");
+		storage.executeSimpleSQL("INSERT INTO bbsmenu(title, title_n, path, is_category) " +
+			"VALUES('2ch', '', '/2ch/', 1);");
+
+		for(var i=0; i<contentLines.length; i++){
+			var line = contentLines[i];
+			if(categoryReg.test(line)){
+				var title = RegExp.$1;
+				currentCategoryPath = "/2ch/" + title.replace(/\//g, "_") + "/";
+
+				currentCategory = doc.createElement("category");
+				currentCategory.setAttribute("title", title);
+				doc.documentElement.appendChild(currentCategory);
+
+				categoryInsertStatement.bindStringParameter(0, title);
+				categoryInsertStatement.bindStringParameter(1, currentCategoryPath);
+				categoryInsertStatement.execute();
+			}else if((threadReg.test(line) || threadReg2.test(line)) && currentCategory){
+				var title = RegExp.$2;
+				var path = currentCategoryPath + title.replace(/\//g, "_") + "/";
+				var urlSpec = RegExp.$1.replace(/"/g, "");
+				var type = 0;
+				var boardID = "";
+				try{
+					var url = ioService.newURI(urlSpec, null, null);
+					type = ChaikaBoard.getBoardType(url);
+					if(type != ChaikaBoard.BOARD_TYPE_PAGE){
+						boardID = ChaikaBoard.getBoardID(url);
+					}
+				}catch(ex){
+					ChaikaCore.logger.error(RegExp.$1);
+				}
+
+				var board = doc.createElement("board");
+				board.setAttribute("title", title);
+				board.setAttribute("url", urlSpec);
+				board.setAttribute("type", type);
 				currentCategory.appendChild(board);
-			}catch(ex){
-				ChaikaCore.logger.error(RegExp.$1);
+
+				bosrdInsertStatement.bindStringParameter(0, title);
+				bosrdInsertStatement.bindStringParameter(1, urlSpec);
+				bosrdInsertStatement.bindStringParameter(2, path);
+				bosrdInsertStatement.bindInt32Parameter(3, type);
+				bosrdInsertStatement.bindStringParameter(4, boardID);
+				bosrdInsertStatement.execute();
 			}
 		}
+	}catch(ex){
+		categoryInsertStatement.reset();
+		bosrdInsertStatement.reset();
+		categoryInsertStatement.finalize();
+		bosrdInsertStatement.finalize();
+		ChaikaCore.logger.error(ex);
+	}finally{
+		storage.commitTransaction();
 	}
 	var xmlSource = new XMLSerializer().serializeToString(doc);
 	xmlSource = xmlSource.replace(/></gm, ">\n<");
