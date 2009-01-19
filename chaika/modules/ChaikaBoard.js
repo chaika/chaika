@@ -492,7 +492,7 @@ ChaikaBoard.prototype = {
 
 		var database = ChaikaCore.storage;
 		var statement = database.createStatement(
-				"INSERT INTO board_subject(thread_id, board_id, dat_id, title, title_n, line_count, ordinal) " +
+				"REPLACE INTO board_subject(thread_id, board_id, dat_id, title, title_n, line_count, ordinal) " +
 				"VALUES(?1,?2,?3,?4,?5,?6,?7);");
 
 		var boardID = this.id;
