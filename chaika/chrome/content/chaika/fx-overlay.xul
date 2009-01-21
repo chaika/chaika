@@ -8,7 +8,7 @@
 	<!-- Toolbar Button -->
 	<toolbarpalette id="BrowserToolbarPalette">
 		<toolbarbutton id="bbs2chreader-button" tooltiptext="chaika"
-			observes="viewBbs2chSidebar" class="toolbarbutton-1"/>
+			observes="viewBbs2chSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
 	</toolbarpalette>
 
 	<!-- SideBar Menu -->
