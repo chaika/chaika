@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<page id="logManager" title="ログマネージャ [chaika]"
+		onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
+		onload="startup()" onunload="shutdown()"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<script type="application/javascript;" src="chrome://chaika/content/board/log-manager.js"/>
+
+<popupset>
+
+	<popup id="boardTreeContext" itemType="board"
+		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+		onpopupshowing="return BoardTree.showContext(event)"/>
+
+	<popup id="threadTreeContext" itemType="thread"
+		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+		onpopupshowing="return ThreadTree.showContext(event)"/>
+
+</popupset>
+
+<toolbox>
+	<toolbar>
+		<toolbarbutton id="vacuumButton" label="データベースの最適化" oncommand="vacuum()"/>
+	</toolbar>
+</toolbox>
+
+<hbox flex="1">
+	<tree id="boardTree" class="plain" width="160" seltype="single" hidecolumnpicker="true"
+			onselect="BoardTree.select(event)" context="boardTreeContext"
+			datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
+		<treecols>
+			<treecol id="boardTree-title" label="板名" flex="1" ignoreincolumnpicker="true"/>
+			<treecol id="boardTree-url"   label="URL"  flex="1" hidden="true"/>
+		</treecols>
+
+		<template>
+			<query expr="boardItem"/>
+			<action>
+				<treechildren flex="1">
+					<treeitem uri="?">
+						<treerow>
+							<treecell label="?title" value="?id"/>
+							<treecell label="?url"   value="?type"/>
+						</treerow>
+					</treeitem> 
+				</treechildren>
+			</action>
+		</template>
+	</tree>
+
+	<splitter/>
+
+	<tree id="threadTree" class="plain" flex="4" context="threadTreeContext"
+			datasources="#threadTree" ref="*" querytype="xml" flags="dont-build-content">
+		<treecols>
+			<treecol id="threadTree-title" sort="?title"      label="スレッドタイトル" flex="1" ignoreincolumnpicker="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="threadTree-read"  sort="?readSort"   label="既読"   style="width:4.5em;"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="threadTree-force"  sort="?forceSort" label="勢い"   style="width:4.5em;" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="threadTree-created" sort="?datID"    label="作成日" style="width:9em;" hidden="true"/>
+			<splitter class="tree-splitter"/>
+			<treecol id="threadTree-board" sort="?boardTitle" label="板"     style="width:8em;"/>
+		</treecols>
+
+		<template>
+			<query expr="threadItem"/>
+			<action>
+				<treechildren flex="1">
+					<treeitem uri="?">
+						<treerow>
+							<treecell label="?title" value="?url"/>
+							<treecell label="?read"/>
+							<treecell label="?force"/>
+							<treecell label="?created"/>
+							<treecell label="?boardTitle"/>
+						</treerow>
+					</treeitem> 
+				</treechildren>
+			</action>
+		</template>
+	</tree>
+</hbox>
+
+</page>

@@ -36,6 +36,7 @@
 		<menupopup position="after_end" tooltiptext="">
 			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
 			<menuseparator/>
+			<menuitem label="ログマネージャ" oncommand="openLogManager()"/>
 			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
 			<menuitem label="オプション..." oncommand="openSettings()"/>
 			<menuitem label="chaika について" oncommand="openAbout()"/>

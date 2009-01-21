@@ -102,6 +102,9 @@ chProtocolHandler.prototype = {
 			case "board":
 				channel = this._getRedirectChannel("chrome://chaika/content/board/page.xul");
 				break;
+			case "log-manager":
+				channel = this._getRedirectChannel("chrome://chaika/content/board/log-manager.xul");
+				break;
 			default:
 				channel = this._getCommandChannel(aURI);
 				break;
