@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://chaika/skin/board-page.css" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/board/page.css" type="text/css"?>
 
 <page id="chaikaBoardPage" onload="startup()" onunload="shutdown()"
-	onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
-	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+		onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/javascript; version=1.7" src="chrome://chaika/content/board/page.js"/>
+<script type="application/javascript" src="chrome://chaika/content/board/page.js"/>
 
 <popupset>
 	<popup id="popAddBookmark" position="after_start">
@@ -26,13 +26,13 @@
 		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
 		onpopupshowing="return showBoardTreeContextMenu(event)"/>
 
-
 	<tooltip id="popBanner" position="after_end">
 		<image id="imgBanner" src=""/>
 	</tooltip>
 </popupset>
 
-<image id="imgHiddenBanner" src="" collapsed="true" onload="bannerLoaded()" onerror="bannerLoadError(event)"/>
+<image id="imgHiddenBanner" src="" collapsed="true"
+		onload="bannerLoaded()" onerror="bannerLoadError(event)"/>
 
 <vbox id="boxHeader">
 	<hbox flex="1" align="center">
@@ -44,11 +44,10 @@
 		<label id="lblStatus" crop="end" value="" flex="1"/>
 
 		<label id="lblShowBanner" class="text-link" value="バナー表示"
-			onclick="showBanner(event)"/>
+				onclick="showBanner(event)"/>
 		<label class="menu-separator" value=" | "/>
 
-		<label id="lblTools" class="text-link" value="ツール"
-			popup="popTools"/>
+		<label id="lblTools" class="text-link" value="ツール" popup="popTools"/>
 		<label class="menu-separator" value=" | "/>
 
 		<deck id="dckUpdate" selectedIndex="0">
@@ -59,8 +58,6 @@
 			<label id="lblMoveNewURL" class="text-link" value="移動"
 					onclick="moveNewURL(event)"/>
 		</deck>
-
-
 	</hbox>
 </vbox>
 
