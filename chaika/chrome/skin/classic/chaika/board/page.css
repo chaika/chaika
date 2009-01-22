@@ -60,13 +60,12 @@
   width: 12em;
 }
 
-#boardTree[stripe="true"] treechildren:-moz-tree-row(odd){
-  background-image: url("chrome://chaika/skin/tree-row-odd.png");
-}
+
+
 
 #boardTree treechildren::-moz-tree-image(icon){
   margin-left: 2px;
-  list-style-image: url("chrome://chaika/skin/board-status.gif") !important;
+  list-style-image: url("chrome://chaika/skin/board/status-icon.png") !important;
 }
 
 /*  STATUS_NEW  */
