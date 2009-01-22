@@ -230,6 +230,15 @@ var FormPage = {
 		this._sageCheck = document.getElementById("sageCheck");
 		this._messeageForm = document.getElementById("messeageForm");
 
+		if(ChaikaCore.pref.getBool("post.use_aa_font")){
+				// messeageForm のフォントを AA フォントにする
+			var fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+			var fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
+			var lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
+			var fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+			this._messeageForm.style.font = fontStyle;
+		}
+
 		setTitle();
 
 		var noName = gBoard.getSetting("BBS_NONAME_NAME");
@@ -368,6 +377,15 @@ var PreviewPage = {
 
 		previewDoc.body.style.backGroundColor = previewData["bgColor"];
 		previewDoc.body.style.color = previewData["color"];
+
+		if(ChaikaCore.pref.getBool("post.use_aa_font")){
+				// プレビューのフォントを AA フォントにする
+			var fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+			var fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
+			var lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
+			var fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+			previewDoc.body.style.font = fontStyle;
+		}
 
 		previewDoc.getElementById("title").innerHTML = previewData["title"];
 		previewDoc.getElementById("name").innerHTML = previewData["name"];

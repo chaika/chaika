@@ -58,3 +58,5 @@ pref("extensions.chaika.thread_show_be_icon", false);
 
 pref("extensions.chaika.livebookmarks_append_board_link", true);
 pref("extensions.chaika.livebookmarks_min_unread", 1);
+
+pref("extensions.chaika.post.use_aa_font", true);
