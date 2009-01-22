@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://chaika/skin/bbsmenu-page.css" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/bbsmenu/page.css" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 
 <page id="bbsmenuPage" title="BBSMENU [chaika]"
@@ -21,8 +21,8 @@
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
 
-<menubar id="mainMenubar">
-	<textbox id="search-box" value="" emptytext="2ch検索" flex="1" type="autocomplete"
+<menubar id="mainMenubar" align="stretch">
+	<textbox id="searchBox" value="" emptytext="2ch検索" flex="1" type="autocomplete"
 			autocompletesearch="form-history"
 			autocompletesearchparam="chaika-find2ch-history"
 			ontextentered="find2ch.search(this.value)"/>

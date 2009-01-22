@@ -7,7 +7,7 @@
 
 <binding id="find2ch">
 	<resources>
-		<stylesheet src="chrome://chaika/skin/bbsmenu-page.css"/>
+		<stylesheet src="chrome://chaika/skin/bbsmenu/page.css"/>
 	</resources>
 
 	<content>
