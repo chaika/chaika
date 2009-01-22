@@ -112,6 +112,22 @@ Post.prototype = {
 	},
 
 
+	getWarningMessages: function Post_getWarningMessages(){
+		var result = [];
+
+		var convertedMessage = this._convert(this.message, this.charset, true, false);
+
+		var bbsUnicode = this._board.getSetting("BBS_UNICODE");
+		if(bbsUnicode && bbsUnicode!="pass"){
+			if(convertedMessage != this.message){
+				result.push("この板では文字化けする可能性のある文字列が含まれています");
+			}
+		}
+
+		return result;
+	},
+
+
 	getPreview: function Post_getPreview(){
 		var preview = {};
 
@@ -171,7 +187,6 @@ Post.prototype = {
 			postData.push("sid=" + encodeURIComponent(Chaika2chViewer.sessionID));
 		}
 		this._httpRequest.post(postData.join("&"));
-
 	},
 
 

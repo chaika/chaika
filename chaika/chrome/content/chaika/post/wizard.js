@@ -343,7 +343,21 @@ var PreviewPage = {
 		gWizard.canRewind = true;
 		gWizard.canAdvance = false;
 
+		var warningMessages = gPost.getWarningMessages();
+		if(warningMessages.length > 0){
+			Notification.removeAll(true);
+			Notification.info(warningMessages[0]);
+		}
+
 		setTimeout("PreviewPage._createPreview()", 0);
+	},
+
+	pageRewound: function PreviewPage_pageRewound(aEvent){
+		Notification.removeAll(false);
+	},
+
+	pageAdvanced: function PreviewPage_pageAdvanced(aEvent){
+		Notification.removeAll(false);
 	},
 
 	_createPreview: function PreviewPage__createPreview(){

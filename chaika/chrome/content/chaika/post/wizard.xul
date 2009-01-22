@@ -60,7 +60,9 @@
 
 <wizardpage  pageid="previewPage" id="previewPage"
 		label="プレビュー" description="次へ進むと実際に書き込みます"
-		onpageshow="PreviewPage.pageShow(event)">
+		onpageshow="PreviewPage.pageShow(event)"
+		onpageadvanced="return PreviewPage.pageAdvanced(event)"
+		onpagerewound="return PreviewPage.pageRewound(event)">
 
 	<iframe id="previewFrame" src="chrome://chaika/content/post/preview.html" flex="1"
 			onload="event.stopPropagation()"/>
