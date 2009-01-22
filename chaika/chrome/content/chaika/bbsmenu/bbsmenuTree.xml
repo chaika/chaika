@@ -8,6 +8,34 @@
 <binding id="bbsmenuTree" extends="chrome://global/content/bindings/tree.xml#tree">
 
 	<implementation>
+		<constructor><![CDATA[
+			this._builderObserver = {
+			    canDrop: function(aIndex, aOrientation){},
+			    onDrop: function(aRow, aOrientation){},
+			    onToggleOpenState: function(aIndex){
+			    	if(this._timer) clearTimeout(this._timer);
+			    	this._timer = setTimeout(function(aTree){
+			    		aTree._persistOpenedCategories();
+			    	}, 100, this._context);
+			    },
+			    onCycleHeader: function(aColID, aElement){},
+			    onCycleCell: function(aRow, aColID){},
+			    onSelectionChanged: function(){},
+			    onPerformAction: function(aAction){},
+			    onPerformActionOnRow: function(aAction, aRow){},
+			    onPerformActionOnCell: function(aAction, aRow, aColID){}
+			};
+			this._builderObserver._context = this;
+		
+			this.builder.addObserver(this._builderObserver);
+		]]></constructor>
+
+		<destructor><![CDATA[
+			this.builder.removeObserver(this._builderObserver);
+		]]></destructor>
+
+		<field name="_builderObserver">null</field>
+
 		<method name="initTree">
 			<parameter name="aBbsmenuXMLFile"/>
 			<parameter name="aOutSideXMLFile"/>
@@ -217,7 +245,6 @@
 						break;
 					}
 				}
-				this._persistOpenedCategories();
 			]]></body>
 		</method>
 
@@ -289,11 +316,6 @@
 			}else{
 				this.openBoard(false);
 			}
-		]]></handler>
-		
-		
-		<handler event="OpenStateChange"><![CDATA[
-			// this._persistOpenedCategories();
 		]]></handler>
 	</handlers>
 </binding>
