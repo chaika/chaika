@@ -198,7 +198,7 @@ var BoardTree = {
 	firstInitBoardTree: true,
 
 
-	initTree: function BoardTree_initTree(){
+	initTree: function BoardTree_initTree(aNoFocus){
 		this.tree = document.getElementById("boardTree");
 
 		setPageTitle();
@@ -241,7 +241,7 @@ var BoardTree = {
 		}
 
 			// フォーカス
-		if(!searchStr && this.tree.treeBoxObject.view.selection){
+		if(!aNoFocus){
 			this.tree.focus();
 			this.tree.treeBoxObject.view.selection.select(0);
 		}
@@ -379,26 +379,7 @@ var BoardTree = {
 		var index = this.tree.currentIndex;
 		if(index == -1) return null;
 		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true);
-	},
-
-
-	search: function BoardTree_search(aEvent, aSearchStr){
-			// keypress イベント時にエンター以外が押された
-		if((aEvent.type == "keypress") &&
-			((aEvent.keyCode != KeyEvent.DOM_VK_ENTER) &&
-				(aEvent.keyCode != KeyEvent.DOM_VK_RETURN)))
-					return;
-
-		if (aSearchStr){
-				// フォーム履歴に検索文字列を追加
-			var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
-					.getService(Ci.nsIFormHistory2);
-			formHistory.addEntry("bbs2ch-board-history", aSearchStr);
-		}
-
-		this.initTree();
 	}
-
 
 };
 

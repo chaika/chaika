@@ -68,9 +68,7 @@
 
 		<hbox align="center">
 			<textbox id="searchTextBox" value="" emptytext="スレッドフィルタ"
-					type="autocomplete" autocompletesearch="form-history"
-					autocompletesearchparam="bbs2ch-board-history"
-					onkeypress="BoardTree.search(event, this.value)"/>
+					type="timed" timeout="500" oncommand="BoardTree.initTree(true)"/>
 		</hbox>
 
 		<toolbarseparator/>
