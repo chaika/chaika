@@ -24,7 +24,7 @@
 
 	<popup id="boardTreeContextMenu" itemType="thread"
 		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-		onpopupshowing="return showBoardTreeContextMenu(event)"/>
+		onpopupshowing="return BoardTree.showContext(event)"/>
 
 	<tooltip id="popBanner" position="after_end">
 		<image id="imgBanner" src=""/>
@@ -70,24 +70,24 @@
 			<textbox id="searchTextBox" value="" emptytext="スレッドフィルタ"
 					type="autocomplete" autocompletesearch="form-history"
 					autocompletesearchparam="bbs2ch-board-history"
-					onkeypress="searchTitle(event, this.value)"/>
+					onkeypress="BoardTree.search(event, this.value)"/>
 		</hbox>
 
 		<toolbarseparator/>
 
 		<hbox id="filterGroup" value="200" persist2="value" align="center"
 				style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#toolbar-group)">
-			<toolbarbutton label="すべて"  value="0"   oncommand="setTimeout(initBoardTree, 0)"/>
-			<toolbarbutton label="TOP 200" value="200" oncommand="setTimeout(initBoardTree, 0)"/>
-			<toolbarbutton label="購読中"  value="-2"  oncommand="setTimeout(initBoardTree, 0)"/>
-			<toolbarbutton label="DAT落ち" value="-1"  oncommand="setTimeout(initBoardTree, 0)"/>
+			<toolbarbutton label="すべて"  value="0"   oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+			<toolbarbutton label="TOP 200" value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+			<toolbarbutton label="購読中"  value="-2"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+			<toolbarbutton label="DAT落ち" value="-1"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
 		</hbox>
 	</toolbar>
 </toolbox>
 
 
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
-		onclick="boardTreeClick(event)" onkeypress="boardTreeKeyDown(event)"
+		onclick="BoardTree.click(event)" onkeypress="BoardTree.keyDown(event)"
 		datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
 	<treecols>
 		<treecol id="boardTreeCol-status" label="!"        sort="?status"     style="width:3em;"

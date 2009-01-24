@@ -46,13 +46,11 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
-var gBoardTree;
 var gBoard;
 var gSubjectDownloader;
 var gSettingDownloader;
 var gBoardMoveChecker;
 var gNewURL;
-var gFirstInitBoardTree = true;
 
 
 /**
@@ -82,7 +80,6 @@ function startup(){
 	}
 
 
-	gBoardTree = document.getElementById("boardTree");
 	loadPersist();
 
 
@@ -97,7 +94,7 @@ function startup(){
 	}else if(!settingFile.exists() || settingFile.fileSize==0){
 		settingUpdate();
 	}else{
-		initBoardTree();
+		BoardTree.initTree();
 	}
 
 	ThreadUpdateObserver.startup();
@@ -109,7 +106,7 @@ function startup(){
  */
 function shutdown(){
 
-	if(!gFirstInitBoardTree){
+	if(!BoardTree.firstInitBoardTree){
 		savePersist();
 	}
 
@@ -141,15 +138,20 @@ function loadPersist(){
 	if(!jsonFile.exists()) return;
 
 	var json = Cc["@mozilla.org/dom/json;1"].createInstance(Ci.nsIJSON);
-	var persistData = json.decode(ChaikaCore.io.readString(jsonFile, "UTF-8"));
-	for(var i in persistData){
-		var element = document.getElementById(i);
-		if(!element) continue;
-		for(var j in persistData[i]){
-			var attrName = String(j);
-			var attrValue = String(persistData[i][j]);
-			element.setAttribute(attrName, attrValue);
+	var content = ChaikaCore.io.readString(jsonFile, "UTF-8");
+	try{
+		var persistData = json.decode(content);
+		for(var i in persistData){
+			var element = document.getElementById(i);
+			if(!element) continue;
+			for(var j in persistData[i]){
+				var attrName = String(j);
+				var attrValue = String(persistData[i][j]);
+				element.setAttribute(attrName, attrValue);
+			}
 		}
+	}catch(ex){
+		ChaikaCore.logger.error(ex + " : " + content);
 	}
 }
 
@@ -181,228 +183,226 @@ function savePersist(){
 }
 
 
-/**
- * boardTree の初期化
- */
-function initBoardTree(){
+function setPageTitle(){
 	var boardTitle = gBoard.getTitle();
 	document.title = boardTitle + " [chaika]";
 	document.getElementById("lblTitle").setAttribute("value", boardTitle);
+}
 
-	if(gFirstInitBoardTree){
-		ChaikaCore.history.visitPage(gBoard.url,
-				ChaikaBoard.getBoardID(gBoard.url), boardTitle, 0);
-		gFirstInitBoardTree = false;
-	}
 
-	var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
 
-	var searchStr = document.getElementById("searchTextBox").value;
-	if(searchStr){
-		searchStr = "%" + searchStr + "%";
-		gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
-	}else{
-		gBoard.refresh(filterLimit);
-	}
-	gBoardTree.builder.datasource = gBoard.itemsDoc.documentElement;
-	gBoardTree.builder.rebuild();
 
-		// 前回のソートを復元
-	var colNodes = document.getElementsByClassName("boardTreeCol");
-	for(var i=0; i<colNodes.length; i++){
-		if(colNodes[i].getAttribute("sortActive") == "true"){
-			var sortDirection = colNodes[i].getAttribute("sortDirection");
-			if(sortDirection == "descending"){
-				colNodes[i].setAttribute("sortDirection", "ascending");
-			}else if(sortDirection == "natural"){
-				colNodes[i].setAttribute("sortDirection", "descending");
-			}else{
-				colNodes[i].setAttribute("sortDirection", "natural");
+var BoardTree = {
+
+	tree: null,
+	firstInitBoardTree: true,
+
+
+	initTree: function BoardTree_initTree(){
+		this.tree = document.getElementById("boardTree");
+
+		setPageTitle();
+		if(this.firstInitBoardTree){
+			ChaikaCore.history.visitPage(gBoard.url,
+					ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
+			this.firstInitBoardTree = false;
+		}
+
+		var startTime = Date.now();
+
+		var searchStr = document.getElementById("searchTextBox").value;
+		if(searchStr){
+			searchStr = "%" + searchStr + "%";
+			gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
+		}else{
+			var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
+			gBoard.refresh(filterLimit);
+		}
+
+		this.tree.builder.datasource = gBoard.itemsDoc.documentElement;
+		this.tree.builder.rebuild();
+
+		ChaikaCore.logger.debug("Tree Build Time: " + (Date.now() - startTime));
+
+			// 前回のソートを復元
+		var colNodes = document.getElementsByClassName("boardTreeCol");
+		for(var i=0; i<colNodes.length; i++){
+			if(colNodes[i].getAttribute("sortActive") == "true"){
+				var sortDirection = colNodes[i].getAttribute("sortDirection");
+				if(sortDirection == "descending"){
+					colNodes[i].setAttribute("sortDirection", "ascending");
+				}else if(sortDirection == "natural"){
+					colNodes[i].setAttribute("sortDirection", "descending");
+				}else{
+					colNodes[i].setAttribute("sortDirection", "natural");
+				}
+				this.tree.builderView.sort(colNodes[i]);
 			}
-			gBoardTree.builderView.sort(colNodes[i]);
 		}
-	}
 
-		// フォーカス
-	if(!searchStr && gBoardTree.treeBoxObject.view.selection){
-		gBoardTree.focus();
-		gBoardTree.treeBoxObject.view.selection.select(0);
-	}
-}
-
-
-/**
- * ツリーをクリックした時に呼ばれる
- * aEvent event クリック時のイベントオブジェクト
- */
-function boardTreeClick(aEvent){
-		// ツリーのアイテム以外をクリック
-	if(getClickItemIndex(aEvent) == -1) return;
-
-	if(gBoardTree._timer){
-		clearTimeout(gBoardTree._timer);
-	}
-	gBoardTree._timer = setTimeout(boardTreeClickDelay, 5, aEvent);
-}
-
-
-function boardTreeClickDelay(aEvent){
-	gBoardTree._timer = null;
-
-	var button = aEvent.button;
-	var detail = aEvent.detail;
-
-	var openActionPref;
-	if(button==0 && detail==1){
-			// クリック
-		openActionPref = "board_click_action";
-	}else if(button==0 && detail==2){
-			// ダブルクリック
-		openActionPref = "board_double_click_action";
-	}else if(button==1 && detail==1){
-			// ミドルクリック
-		openActionPref = "board_middle_click_action";
-	}else{
-		return;
-	}
-
-	var openAction = ChaikaCore.pref.getInt(openActionPref);
-	if(openAction==1){
-		openThread(false);
-	}else if(openAction==2){
-		openThread(true);
-	}
-}
-
-
-/**
- * ツリーでキーボードダウン
- * aEvent event キーボードダウン時のイベントオブジェクト
- */
-function boardTreeKeyDown(aEvent){
-	if(gBoardTree.currentIndex == -1) return;
-
-		// エンターキー以外なら終了
-	if(!(aEvent.keyCode==aEvent.DOM_VK_ENTER || aEvent.keyCode==aEvent.DOM_VK_RETURN))
-		return;
-
-	if(aEvent.ctrlKey || aEvent.altKey){
-		openThread(true);
-	}else{
-		openThread(false);
-	}
-}
-
-
-/**
- * 選択中のスレッドをブラウザで開く
- * @param aAddTab boolean true なら新しいタブで開く
- */
-function openThread(aAddTab){
-	var index = gBoardTree.currentIndex;
-	if(index == -1) return null;
-
-	ChaikaCore.browser.openThread(getItemURL(index), aAddTab, true);
-}
-
-
-function getItemURL(aIndex){
-	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
-	var titleColumn = gBoardTree.columns.getNamedColumn("boardTreeCol-title");
-	var spec = gBoardTree.builder.getCellValue(aIndex, titleColumn);
-
-	return ioService.newURI(spec, null, null);
-}
-
-
-function getItemTitle(aIndex){
-	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
-	var titleColumn = gBoardTree.columns.getNamedColumn("boardTreeCol-title");
-	return gBoardTree.builder.getCellText(aIndex, titleColumn);
-}
-
-
-/**
- * ツリーのコンテキストメニューが表示されるときに呼ばれる
- */
-function showBoardTreeContextMenu(aEvent){
-		// ツリーのアイテム以外をクリック
-	if(getClickItemIndex(aEvent) == -1) return false;
-
-	var currentIndex = gBoardTree.currentIndex;
-	var selectionIndices = getSelectionIndices();
-
-	selectionIndices = selectionIndices.filter(function(aElement, aIndex, aArray){
-		return (aElement != currentIndex);
-	});
-	selectionIndices.unshift(currentIndex);
-
-	var urls = selectionIndices.map(function(aElement, aIndex, aArray){
-		return getItemURL(aElement).spec;
-	});
-
-	var boardTreeContextMenu = document.getElementById("boardTreeContextMenu");
-	boardTreeContextMenu.itemTitle = getItemTitle(currentIndex);
-	boardTreeContextMenu.itemURL = urls.join(",");
-
-	return true;
-}
-
-
-/**
- * 選択中のスレッドのインデックスを配列として返す
- * @return array
- */
-function getSelectionIndices(){
-	var resultArray = new Array();
-
-	var rangeCount = gBoardTree.treeBoxObject.view.selection.getRangeCount();
-	for(var i=0; i<rangeCount; i++){
-		var rangeMin = {};
-		var rangeMax = {};
-
-		gBoardTree.treeBoxObject.view.selection.getRangeAt(i, rangeMin, rangeMax);
-		for (var j=rangeMin.value; j<=rangeMax.value; j++){
-			resultArray.push(j);
+			// フォーカス
+		if(!searchStr && this.tree.treeBoxObject.view.selection){
+			this.tree.focus();
+			this.tree.treeBoxObject.view.selection.select(0);
 		}
+
+	},
+
+
+	click: function BoardTree_click(aEvent){
+			// ツリーのアイテム以外をクリック
+		if(this.getClickItemIndex(aEvent) == -1) return;
+
+		if(this._clickTimer){
+			clearTimeout(this._clickTimer);
+		}
+		this._clickTimer = setTimeout(function(aEvent){
+			BoardTree.clickDelay(aEvent);
+		}, 50, aEvent);
+	},
+
+
+	clickDelay: function BoardTree_clickDelay(aEvent){
+		this._clickTimer = null;
+
+		var button = aEvent.button;
+		var detail = aEvent.detail;
+
+		var openActionPref;
+		if(button==0 && detail==1){
+				// クリック
+			openActionPref = "board_click_action";
+		}else if(button==0 && detail==2){
+				// ダブルクリック
+			openActionPref = "board_double_click_action";
+		}else if(button==1 && detail==1){
+				// ミドルクリック
+			openActionPref = "board_middle_click_action";
+		}else{
+			return;
+		}
+
+		var openAction = ChaikaCore.pref.getInt(openActionPref);
+		if(openAction==1){
+			this.openThread(false);
+		}else if(openAction==2){
+			this.openThread(true);
+		}
+	},
+
+
+	keyDown: function BoardTree_keyDown(aEvent){
+		if(this.tree.currentIndex == -1) return;
+
+			// エンターキー以外なら終了
+		if(!(aEvent.keyCode==aEvent.DOM_VK_ENTER || aEvent.keyCode==aEvent.DOM_VK_RETURN)){
+			return;
+		}
+
+		if(aEvent.ctrlKey || aEvent.altKey){
+			this.openThread(true);
+		}else{
+			this.openThread(false);
+		}
+	},
+
+
+	showContext: function BoardTree_showContext(aEvent){
+			// ツリーのアイテム以外をクリック
+		if(this.getClickItemIndex(aEvent) == -1) return false;
+
+		var currentIndex = this.tree.currentIndex;
+		var selectionIndices = this.getSelectionIndices();
+
+		selectionIndices = selectionIndices.filter(function(aElement, aIndex, aArray){
+			return (aElement != currentIndex);
+		});
+		selectionIndices.unshift(currentIndex);
+
+		var urls = selectionIndices.map(function(aElement, aIndex, aArray){
+			return BoardTree.getItemURL(aElement).spec;
+		});
+
+		var boardTreeContextMenu = document.getElementById("boardTreeContextMenu");
+		boardTreeContextMenu.itemTitle = this.getItemTitle(currentIndex);
+		boardTreeContextMenu.itemURL = urls.join(",");
+
+		return true;
+	},
+
+
+	getClickItemIndex: function BoardTree_getClickItemIndex(aEvent){
+		var row = {}
+		var obj = {}
+		this.tree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
+		if(!obj.value) return -1;
+		return row.value;
+	},
+
+
+	getItemURL: function BoardTree_getItemURL(aIndex){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+		var titleColumn = this.tree.columns.getNamedColumn("boardTreeCol-title");
+		var spec = this.tree.builder.getCellValue(aIndex, titleColumn);
+
+		return ioService.newURI(spec, null, null);
+	},
+
+
+	getItemTitle: function BoardTree_getItemTitle(aIndex){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+		var titleColumn = this.tree.columns.getNamedColumn("boardTreeCol-title");
+		return this.tree.builder.getCellText(aIndex, titleColumn);
+	},
+
+
+	getSelectionIndices: function BoardTree_getSelectionIndices(){
+		var resultArray = new Array();
+
+		var rangeCount = this.tree.treeBoxObject.view.selection.getRangeCount();
+		for(var i=0; i<rangeCount; i++){
+			var rangeMin = {};
+			var rangeMax = {};
+
+			this.tree.treeBoxObject.view.selection.getRangeAt(i, rangeMin, rangeMax);
+			for (var j=rangeMin.value; j<=rangeMax.value; j++){
+				resultArray.push(j);
+			}
+		}
+		return resultArray;
+	},
+
+
+	openThread: function BoardTree_openThread(aAddTab){
+		var index = this.tree.currentIndex;
+		if(index == -1) return null;
+		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true);
+	},
+
+
+	search: function BoardTree_search(aEvent, aSearchStr){
+			// keypress イベント時にエンター以外が押された
+		if((aEvent.type == "keypress") &&
+			((aEvent.keyCode != KeyEvent.DOM_VK_ENTER) &&
+				(aEvent.keyCode != KeyEvent.DOM_VK_RETURN)))
+					return;
+
+		if (aSearchStr){
+				// フォーム履歴に検索文字列を追加
+			var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
+					.getService(Ci.nsIFormHistory2);
+			formHistory.addEntry("bbs2ch-board-history", aSearchStr);
+		}
+
+		this.initTree();
 	}
-	return resultArray;
-}
 
 
-/**
- * gBoardTree のクリックされたアイテムのインデックスを返す
- * アイテム以外をクリックしたときは、-1 を返す
- * @param aEvent event onClick のイベント
- * @return number アイテムのインデックス
- */
-function getClickItemIndex(aEvent){
-	var row = {}
-	var obj = {}
-	gBoardTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
-	if(!obj.value) return -1;
-	return row.value;
-}
+};
 
 
-function searchTitle(aEvent, aSearchStr){
-		// keypress イベント時にエンター以外が押された
-	if((aEvent.type == "keypress") &&
-		((aEvent.keyCode != KeyEvent.DOM_VK_ENTER) &&
-			(aEvent.keyCode != KeyEvent.DOM_VK_RETURN)))
-				return;
-
-	if (aSearchStr){
-			// フォーム履歴に検索文字列を追加
-		var formHistory	= Cc["@mozilla.org/satchel/form-history;1"].getService(Ci.nsIFormHistory2);
-		formHistory.addEntry("bbs2ch-board-history", aSearchStr);
-	}
-
-	initBoardTree();
-
-}
 
 
 function setStatus(aString){
@@ -429,7 +429,7 @@ function subjectUpdate(aEvent){
 			if(!settingFile.exists() || settingFile.fileSize==0){
 				settingUpdate();
 			}else{
-				initBoardTree();
+				BoardTree.initTree();
 			}
 			return;
 		}
@@ -457,7 +457,7 @@ function subjectUpdate(aEvent){
 		if(!settingFile.exists() || settingFile.fileSize==0){
 			settingUpdate();
 		}else{
-			initBoardTree();
+			BoardTree.initTree();
 		}
 	};
 	gSubjectDownloader.onProgressChange = function(aDownloader, aPercentage){
@@ -496,7 +496,7 @@ function settingUpdate(){
 	};
 	gSettingDownloader.onStop = function(aDownloader, aStatus){
 		setStatus("");
-		initBoardTree();
+		BoardTree.initTree();
 	};
 	gSettingDownloader.onProgressChange = function(aDownloader, aPercentage){
 		setStatus("downloading: " + aPercentage + "%");
@@ -693,7 +693,7 @@ var ThreadUpdateObserver = {
 		var xpathResult = gBoard.itemsDoc.evaluate("descendant::boarditem[@read>0]",
 					gBoard.itemsDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
 
-		gBoardTree.boxObject.beginUpdateBatch();
+		BoardTree.tree.boxObject.beginUpdateBatch();
 		for (var i=0; i<xpathResult.snapshotLength; i++){
 			var element = xpathResult.snapshotItem(i);
 			var url = element.getAttribute("url");
@@ -703,7 +703,7 @@ var ThreadUpdateObserver = {
 				element.setAttribute("read", "0");
 			}
 		}
-		gBoardTree.boxObject.endUpdateBatch();
+		BoardTree.tree.boxObject.endUpdateBatch();
 	},
 
 
