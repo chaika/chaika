@@ -43,7 +43,7 @@ pref("extensions.chaika.board_auto_update", false);
 pref("extensions.chaika.board_click_action", 0);
 pref("extensions.chaika.board_double_click_action", 1);
 pref("extensions.chaika.board_middle_click_action", 2);
-pref("extensions.chaika.board_update_interval_limit", 120);
+pref("extensions.chaika.board_update_interval_limit", 45);
 pref("extensions.chaika.board_thread_view_limit", 50);
 
 pref("extensions.chaika.thread_skin", "");
@@ -55,8 +55,5 @@ pref("extensions.chaika.thread_aa_line_space", 2);
 pref("extensions.chaika.thread_hide_abone", false);
 pref("extensions.chaika.thread_chain_abone", false);
 pref("extensions.chaika.thread_show_be_icon", false);
-
-pref("extensions.chaika.livebookmarks_append_board_link", true);
-pref("extensions.chaika.livebookmarks_min_unread", 1);
 
 pref("extensions.chaika.post.use_aa_font", true);

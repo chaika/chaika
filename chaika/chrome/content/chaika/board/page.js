@@ -402,9 +402,9 @@ function subjectUpdate(aEvent){
 	if(subjectFile.exists()){
 		var interval = new Date().getTime() - subjectFile.lastModifiedTime;
 		var updateIntervalLimit =  ChaikaCore.pref.getInt("board_update_interval_limit");
-			// 不正な値や、15 秒以下なら 15 秒にする
-		if(isNaN(parseInt(updateIntervalLimit)) || updateIntervalLimit < 15)
-			updateIntervalLimit = 15;
+			// 不正な値や、10 秒以下なら 10 秒にする
+		if(isNaN(parseInt(updateIntervalLimit)) || updateIntervalLimit < 10)
+			updateIntervalLimit = 10;
 
 		if(interval < updateIntervalLimit * 1000){
 			if(!settingFile.exists() || settingFile.fileSize==0){
