@@ -1,0 +1,38 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+
+.thread-statusbar-button {
+  -moz-appearance: none !important;
+  list-style-image: url("chrome://chaika/skin/browser/thread-statusbar.png") !important;
+  padding: 0px !important;
+  margin: 0px 1px 0px 1px !important;
+}
+
+.thread-statusbar-button .toolbarbutton-text {
+  display: none;
+}
+
+.thread-statusbar-button .toolbarbutton-icon {
+  margin-right: 0px;
+}
+
+
+.thread-statusbar-button[anonid="btnGoToBoard"] {
+  -moz-image-region: rect(0px, 12px, 12px, 0px);
+}
+
+.thread-statusbar-button[anonid="btnWrite"] {
+  -moz-image-region: rect(0px, 24px, 12px, 12px);
+}
+
+.thread-statusbar-button[anonid="btnDeleteLog"] {
+  -moz-image-region: rect(0px, 36px, 12px, 24px);
+}
+
+.thread-statusbar-button[anonid="btnViewChange"] {
+  -moz-image-region: rect(0px, 48px, 12px, 36px);
+}
+
+.thread-statusbar-button[anonid="btnAboneManager"] {
+  -moz-image-region: rect(0px, 60px, 12px, 48px);
+}
