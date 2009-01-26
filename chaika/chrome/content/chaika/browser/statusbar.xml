@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 
-<bindings id="b2rstatusbarBindings"
+<bindings id="threadStatusbarBindings"
 		xmlns="http://www.mozilla.org/xbl"
 		xmlns:xbl="http://www.mozilla.org/xbl"
 		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
-<binding id="b2rstatusbar">
+<binding id="threadStatusbar">
 	<content>
-		<xul:toolbarbutton anonid="btnGoToBoard" class="b2rstatusbar-button"
+		<xul:toolbarbutton anonid="btnGoToBoard" class="thread-statusbar-button"
 				label="スレ一覧" tooltiptext="スレッド一覧を開く"/>
-		<xul:toolbarbutton anonid="btnWrite" class="b2rstatusbar-button"
+		<xul:toolbarbutton anonid="btnWrite" class="thread-statusbar-button"
 				label="書き込み" tooltiptext="このスレッドに書き込む"/>
-		<xul:toolbarbutton anonid="btnDeleteLog" class="b2rstatusbar-button"
+		<xul:toolbarbutton anonid="btnDeleteLog" class="thread-statusbar-button"
 				label="ログ削除" tooltiptext="このスレッドのログを削除"/>
 
-		<xul:toolbarbutton anonid="btnViewChange" type="menu" class="b2rstatusbar-button"
+		<xul:toolbarbutton anonid="btnViewChange" type="menu" class="thread-statusbar-button"
 				label="View">
 			<xul:menupopup anonid="popViewChange" position="before_end">
 				<xul:menuitem label="すべて" anonid="mnuViewAll"/>
@@ -26,12 +26,12 @@
 			</xul:menupopup>
 		</xul:toolbarbutton>
 
-		<xul:toolbarbutton anonid="btnAboneManager" class="b2rstatusbar-button"
+		<xul:toolbarbutton anonid="btnAboneManager" class="thread-statusbar-button"
 				label="あぼーんマネージャ" tooltiptext="あぼーんマネージャを開く"/>
 	</content>
 
 	<resources>
-		<stylesheet src="chrome://chaika/skin/fx-statusbar.css"/>
+		<stylesheet src="chrome://chaika/skin/browser/thread-statusbar.css"/>
 	</resources>
 
 	<implementation>

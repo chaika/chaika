@@ -1,41 +1,41 @@
 <?xml version="1.0"?>
 
 <overlay id="ChaikaBrowserOverlay"
-			xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<script type="application/x-javascript" src="chrome://chaika/content/fx-overlay.js"/>
+	<script type="application/javascript" src="chrome://chaika/content/browser/overlay.js"/>
 
 	<!-- Toolbar Button -->
 	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="bbs2chreader-button" tooltiptext="chaika"
-			observes="viewBbs2chSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
+		<toolbarbutton id="chaika-toolbarbutton" tooltiptext="chaika"
+			observes="viewChaikaSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
 	</toolbarpalette>
 
 	<!-- SideBar Menu -->
 	<menupopup id="viewSidebarMenu">
-		<menuitem key="key_viewBbs2chSidebar" observes="viewBbs2chSidebar"/>
+		<menuitem key="key_viewChaikaSidebar" observes="viewChaikaSidebar"/>
 	</menupopup>
 
 	<!-- Open SideBar Shortcut Key -->
 	<keyset id="mainKeyset">
-		<key id="key_viewBbs2chSidebar" command="viewBbs2chSidebar"
+		<key id="key_viewChaikaSidebar" command="viewChaikaSidebar"
 			key="&quot;" modifiers="accel"/>
 	</keyset>
 
 	<!-- Open SideBar Command -->
 	<broadcasterset id="mainBroadcasterSet">
-		<broadcaster id="viewBbs2chSidebar"
+		<broadcaster id="viewChaikaSidebar"
 			autoCheck="false"
 			label="chaika"
 			type="checkbox" group="sidebar"
 			sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
 			sidebartitle="chaika"
-			oncommand="toggleSidebar('viewBbs2chSidebar');"/>
+			oncommand="toggleSidebar('viewChaikaSidebar');"/>
 	</broadcasterset>
 
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">
-		<menu id="context-bbs2chreader" label="chaika" hidden="true"
+		<menu id="context-chaika" label="chaika" hidden="true"
 							insertbefore="context-bookmarklink">
 			<menupopup>
 				<menuitem label="Open"
@@ -48,9 +48,9 @@
 
 	<!-- Statusbar -->
 	<statusbar id="status-bar">
-		<statusbarpanel id="statusbar-bbs2chreader"
+		<statusbarpanel id="statusbar-chaika"
 			insertafter="statusbar-progresspanel" hidden="true"
-			style="-moz-binding:url(chrome://chaika/content/statusbar.xml#b2rstatusbar)"/>
+			style="-moz-binding:url(chrome://chaika/content/browser/statusbar.xml#threadStatusbar)"/>
 	</statusbar>
 
 </overlay>

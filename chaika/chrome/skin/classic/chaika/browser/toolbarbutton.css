@@ -1,0 +1,31 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+
+#chaika-toolbarbutton {
+  list-style-image: url("chrome://chaika/skin/browser/toolbarbutton.png") !important;
+  -moz-image-region: rect(0px, 24px, 24px, 0px);
+}
+
+#chaika-toolbarbutton:hover,
+#chaika-toolbarbutton[buttonover="true"] {
+  -moz-image-region: rect(24px 24px 48px 0px);
+}
+
+#chaika-toolbarbutton:hover:active {
+  -moz-image-region: rect(72px 24px 96px 0px);
+}
+
+
+toolbar[iconsize="small"] #chaika-toolbarbutton {
+  list-style-image: url("chrome://chaika/skin/browser/toolbarbutton-small.png") !important;
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+
+toolbar[iconsize="small"] #chaika-toolbarbutton:hover,
+toolbar[iconsize="small"] #chaika-toolbarbutton[buttonover="true"]{
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
+
+toolbar[iconsize="small"] #chaika-toolbarbutton:hover:active {
+  -moz-image-region: rect(0px, 16px, 16px, 0px);
+}
