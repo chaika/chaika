@@ -8,7 +8,7 @@
 
 <binding id="settingBox">
 	<resources>
-		<stylesheet src="chrome://chaika/skin/settings.css"/>
+		<stylesheet src="chrome://chaika/skin/settings/settings.css"/>
 	</resources>
 
 	<content>
