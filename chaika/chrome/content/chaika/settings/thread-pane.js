@@ -114,7 +114,7 @@ var gThreadPane = {
 
 		var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
 		fonts.sort();
-		for(let i=0; i<fonts.length; i++){
+		for(var i=0; i<fonts.length; i++){
 			var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
 		}
 
@@ -140,7 +140,7 @@ var gThreadPane = {
 
 		var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
 		fonts.sort();
-		for(let i=0; i<fonts.length; i++){
+		for(var i=0; i<fonts.length; i++){
 			var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
 		}
 
@@ -200,6 +200,6 @@ var gThreadPane = {
 
 	openAboneManager: function(){
 		var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-		window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar");
+		document.documentElement.openWindow("", aboneManagerURL);
 	}
 };
