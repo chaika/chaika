@@ -55,6 +55,16 @@
 				oncommand="FormPage.sageCheck()"/>
 	</hbox>
 	<textbox id="messeageForm" value="" multiline="true" flex="1"/>
+
+	<hbox align="center" pack="end">
+		<toolbarbutton label="ツール" type="menu">
+			<menupopup position="before_end">
+				<menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
+						type="checkbox" checked="false" persist="checked"
+						oncommand="FormPage.setUseAAFont()"/>
+			</menupopup>
+		</toolbarbutton>
+	</hbox>
 </wizardpage>
 
 

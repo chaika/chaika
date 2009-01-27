@@ -108,6 +108,10 @@ function shutdown(){
 		// checked の値を完全に覚えさせる
 	var sageCheck = document.getElementById("sageCheck");
 	if(!sageCheck.checked) sageCheck.setAttribute("checked", "false");
+	var useAAFontCheck = document.getElementById("useAAFontCheck");
+	if(!useAAFontCheck.hasAttribute("checked")){
+		useAAFontCheck.setAttribute("checked", "false");
+	}
 
 	FormPage.addFormHistory();
 }
@@ -230,14 +234,7 @@ var FormPage = {
 		this._sageCheck = document.getElementById("sageCheck");
 		this._messeageForm = document.getElementById("messeageForm");
 
-		if(ChaikaCore.pref.getBool("post.use_aa_font")){
-				// messeageForm のフォントを AA フォントにする
-			var fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
-			var fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
-			var lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
-			var fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
-			this._messeageForm.style.font = fontStyle;
-		}
+		this.setUseAAFont();
 
 		setTitle();
 
@@ -334,13 +331,26 @@ var FormPage = {
 	},
 
 
-	sageCheck: function FormPage__sageCheck(){
+	sageCheck: function FormPage_sageCheck(){
 		var sageChecked = FormPage._sageCheck.checked;
 		this._mailForm.emptyText = sageChecked ? "sage" : " ";
 
 		return sageChecked;
-	}
+	},
 
+	setUseAAFont: function FormPage_setUseAAFont(){
+		var useAAFontCheck = document.getElementById("useAAFontCheck");
+		var useAAFont = (useAAFontCheck.getAttribute("checked") == "true");
+
+		var fontStyle = "";
+		if(useAAFont){
+			var fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+			var fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
+			var lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
+			fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+		}
+		this._messeageForm.style.font = fontStyle;
+	}	
 };
 
 
@@ -378,15 +388,20 @@ var PreviewPage = {
 		previewDoc.body.style.backGroundColor = previewData["bgColor"];
 		previewDoc.body.style.color = previewData["color"];
 
-		if(ChaikaCore.pref.getBool("post.use_aa_font")){
-				// プレビューのフォントを AA フォントにする
+		var useAAFontCheck = document.getElementById("useAAFontCheck");
+		var useAAFont = (useAAFontCheck.getAttribute("checked") == "true");
+
+			// プレビューのフォントを AA フォントにする
+		var fontStyle = "";
+		if(useAAFont){
 			var fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
 			var fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
 			var lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
-			var fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
-			previewDoc.body.style.font = fontStyle;
+			fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
 		}
+		previewDoc.body.style.font = fontStyle;
 
+		
 		previewDoc.getElementById("title").innerHTML = previewData["title"];
 		previewDoc.getElementById("name").innerHTML = previewData["name"];
 		previewDoc.getElementById("mail").innerHTML = previewData["mail"];
