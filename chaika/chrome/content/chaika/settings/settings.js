@@ -43,9 +43,11 @@ var gIoService = Components.classes["@mozilla.org/network/io-service;1"]
 
 function startup(){
 	var paneID = window.location.hash.substring(1);
-	var paneElement = document.getElementById(paneID);
-	if(paneElement && paneElement.localName=="prefpane"){
-		document.documentElement.showPane(paneElement);
+	if(paneID){
+		var paneElement = document.getElementById(paneID);
+		if(paneElement && paneElement.localName=="prefpane"){
+			document.documentElement.showPane(paneElement);
+		}
 	}
 }
 
