@@ -184,13 +184,12 @@ ChaikaDownloader.prototype = {
 				aRequest.QueryInterface(Ci.nsIHttpChannel);
 
 				if(aStatus==0 || aStatus==NS_ERROR_REDIRECT_LOOP){
-					this._context._saveOrRemoveFile();
+					this._context._saveFile();
 					this._context.onStop(this._context, aRequest.responseStatus);
 				}else{
 					ChaikaCore.logger.error([aRequest.URI.spec,
 							aStateFlags.toString(16), aStatus.toString(16)]);
 						// TODO 詳細なエラーを出す
-					this._context._saveOrRemoveFile();
 					this._context.onError(this._context, ChaikaDownloader.ERROR_FAILURE);
 				}
 			}
@@ -210,14 +209,12 @@ ChaikaDownloader.prototype = {
 	 * ダウンロード終了時に Temp ファイルを削除、コピーを行う。
 	 * @private
 	 */
-	_saveOrRemoveFile: function ChaikaDownloader__saveOrRemoveFile(){
+	_saveFile: function ChaikaDownloader__saveFile(){
 		this._tempFile = this._tempFile.clone().QueryInterface(Ci.nsILocalFile);
 
 		try{
 			if(this._tempFile.fileSize == 0){
-				this._tempFile.remove(false);
-				ChaikaCore.logger.debug("Remove: " + this._tempFile.path);
-				return;
+				ChaikaCore.logger.debug("Empty File: " + this._tempFile.path);
 			}
 
 				// temp ファイルを ファイルに上書き
