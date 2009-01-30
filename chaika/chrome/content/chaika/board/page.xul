@@ -7,6 +7,7 @@
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript" src="chrome://chaika/content/board/page.js"/>
+<script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 
 <popupset>
 	<popup id="popAddBookmark" position="after_start">
@@ -86,6 +87,7 @@
 
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
 		onclick="BoardTree.click(event)" onkeypress="BoardTree.keyDown(event)"
+		ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
 		datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
 	<treecols>
 		<treecol id="boardTreeCol-status" label="!"        sort="?status"     style="width:3em;"

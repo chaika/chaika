@@ -262,6 +262,28 @@
 				this.setAttribute("openedCategories", openedCategories.join(","));
 			]]></body>
 		</method>
+
+
+		<method name="onDragStart">
+			<parameter name="aEvent"/>
+			<parameter name="aTransferData"/>
+			<parameter name="aDragAction"/>
+			<body><![CDATA[
+				var row = {};
+				var obj = {};
+				this.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
+
+					// ツリーのアイテム以外をドラッグ
+				if(row.value == -1) return;
+					// コンテナをドラッグ
+				if(this.view.isContainer(row.value)) return;
+
+				var item = this._getItem(this.currentIndex);
+				aTransferData.data = new TransferData();
+				aTransferData.data.addDataForFlavour("text/x-moz-url", item.urlSpec + "\n" + item.title);
+				aTransferData.data.addDataForFlavour("text/unicode", item.urlSpec);
+			]]></body>
+		</method>
 	</implementation>
 
 
@@ -317,6 +339,13 @@
 				this.openBoard(false);
 			}
 		]]></handler>
+
+
+		<handler event="draggesture"><![CDATA[
+			nsDragAndDrop.startDrag(event, this);
+		]]></handler>
+
+
 	</handlers>
 </binding>
 

@@ -379,6 +379,20 @@ var BoardTree = {
 		var index = this.tree.currentIndex;
 		if(index == -1) return null;
 		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true);
+	},
+
+
+		// nsDragAndDrop Observer
+	onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
+		var itemIndex = this.getClickItemIndex(aEvent);
+		if(itemIndex == -1) return;
+		if(this.getSelectionIndices().length != 1) return;
+
+		var url = this.getItemURL(itemIndex).spec;
+		var title = this.getItemTitle(itemIndex);
+		aTransferData.data = new TransferData();
+		aTransferData.data.addDataForFlavour("text/x-moz-url", url + "\n" + title);
+		aTransferData.data.addDataForFlavour("text/unicode", url);
 	}
 
 };

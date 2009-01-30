@@ -8,7 +8,7 @@
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
-
+<script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 <popupset>
 	<popup id="boardItemHistoryContext" itemType="board"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>

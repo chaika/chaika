@@ -7,6 +7,7 @@
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript;" src="chrome://chaika/content/board/log-manager.js"/>
+<script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 
 <popupset>
 
@@ -29,6 +30,7 @@
 <hbox flex="1">
 	<tree id="boardTree" class="plain" width="160" seltype="single" hidecolumnpicker="true"
 			onselect="BoardTree.select(event)" context="boardTreeContext"
+			ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
 			datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
 		<treecols>
 			<treecol id="boardTree-title" label="板名" flex="1" ignoreincolumnpicker="true"/>
@@ -53,6 +55,7 @@
 	<splitter/>
 
 	<tree id="threadTree" class="plain" flex="4" context="threadTreeContext"
+			ondraggesture="nsDragAndDrop.startDrag(event, ThreadTree);"
 			datasources="#threadTree" ref="*" querytype="xml" flags="dont-build-content">
 		<treecols>
 			<treecol id="threadTree-title" sort="?title"      label="スレッドタイトル" flex="1" ignoreincolumnpicker="true"/>

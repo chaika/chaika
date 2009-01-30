@@ -218,6 +218,18 @@ var BoardTree = {
 		item.type    = parseInt(view.getCellValue(aIndex, urlColumn));
 
 		return item;
+	},
+
+
+		// nsDragAndDrop Observer
+	onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
+		var itemIndex = this.getClickItemIndex(aEvent);
+		if(itemIndex == -1) return;
+
+		var item = this._getItem(itemIndex);
+		aTransferData.data = new TransferData();
+		aTransferData.data.addDataForFlavour("text/x-moz-url", item.urlSpec + "\n" + item.title);
+		aTransferData.data.addDataForFlavour("text/unicode", item.urlSpec);
 	}
 
 };
@@ -371,6 +383,19 @@ var ThreadTree = {
 		item.url     = (item.urlSpec) ? ioService.newURI(item.urlSpec, null, null) : null;
 
 		return item;
+	},
+
+
+		// nsDragAndDrop Observer
+	onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
+		var itemIndex = this.getClickItemIndex(aEvent);
+		if(itemIndex == -1) return;
+		if(this.getSelectionIndices().length != 1) return;
+
+		var item = this._getItem(itemIndex);
+		aTransferData.data = new TransferData();
+		aTransferData.data.addDataForFlavour("text/x-moz-url", item.urlSpec + "\n" + item.title);
+		aTransferData.data.addDataForFlavour("text/unicode", item.urlSpec);
 	}
 
 };
