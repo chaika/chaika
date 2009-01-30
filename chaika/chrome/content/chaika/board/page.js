@@ -671,6 +671,8 @@ var ThreadUpdateObserver = {
 
 
 	deleteLogsTreeUpdate: function ThreadUpdateObserver_deleteLogsTreeUpdate(aURLs){
+		if(!BoardTree.tree.boxObject.beginUpdateBatch) return;
+
 		var xpathResult = gBoard.itemsDoc.evaluate("descendant::boarditem[@read>0]",
 					gBoard.itemsDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
 
