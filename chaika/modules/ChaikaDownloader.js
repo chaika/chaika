@@ -177,10 +177,10 @@ ChaikaDownloader.prototype = {
 								aWebProgress, aRequest, aStateFlags, aStatus){
 
 			if(aStateFlags & Ci.nsIWebProgressListener.STATE_START){
-				this._context._loading = true;
+				this._context.loading = true;
 				this._context.onStart(this._context);
 			}else if(aStateFlags & Ci.nsIWebProgressListener.STATE_STOP){
-				this._context._loading = false;
+				this._context.loading = false;
 				aRequest.QueryInterface(Ci.nsIHttpChannel);
 
 				if(aStatus==0 || aStatus==NS_ERROR_REDIRECT_LOOP){
@@ -191,6 +191,16 @@ ChaikaDownloader.prototype = {
 							aStateFlags.toString(16), aStatus.toString(16)]);
 						// TODO 詳細なエラーを出す
 					this._context.onError(this._context, ChaikaDownloader.ERROR_FAILURE);
+
+					try{
+						var tempFile = this._context._tempFile.clone().QueryInterface(Ci.nsILocalFile);
+						if(tempFile.exists()){
+							tempFile.remove(false);
+							ChaikaCore.logger.debug("Remove File: " + tempFile.path);
+						}
+					}catch(ex){
+						this._context.onError(ex);
+					}
 				}
 			}
 		},
@@ -242,9 +252,18 @@ ChaikaDownloader.prototype = {
 
 		if(!aSilent) this.onError(this, ChaikaDownloader.ERROR_CANCEL);
 
-		this._loading = false;
+		this._clearEventHandler();
+
+		this.loading = false;
 	},
 
+
+	_clearEventHandler: function ChaikaDownloader__clearEventHandler(){
+		this.onStart = function(aDownloader){};
+		this.onStop = function(aDownloader, aStatus){};
+		this.onProgressChange = function(aDownloader, aPercentage){};
+		this.onError = function(aDownloader, aErrorCode){};
+	},
 
 	/**
 	 * ダウンロード開始時に呼ばれる。
