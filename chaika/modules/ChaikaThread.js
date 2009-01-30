@@ -383,6 +383,7 @@ ChaikaThread.getBoardURL = function ChaikaThread_getBoardURL(aThreadURL){
 	switch(type){
 		case ChaikaBoard.BOARD_TYPE_2CH:
 		case ChaikaBoard.BOARD_TYPE_BE2CH:
+		case ChaikaBoard.BOARD_TYPE_PAGE:
 			boardURLSpec = boardURLSpec.replace("/test/read.cgi/", "/");
 			break;
 		case ChaikaBoard.BOARD_TYPE_JBBS:
