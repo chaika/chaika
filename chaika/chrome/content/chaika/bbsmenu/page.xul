@@ -37,7 +37,11 @@
 			<menuseparator/>
 			<menuitem label="ログマネージャ" oncommand="openLogManager()"/>
 			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
+			<menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
+					hidden="true" oncommand="viewFoxAge2ch()"/>
+			<menuseparator/>
 			<menuitem label="オプション..." oncommand="openSettings()"/>
+			<menuseparator/>
 			<menuitem label="chaika について" oncommand="openAbout()"/>
 		</menupopup>
 	</menu>

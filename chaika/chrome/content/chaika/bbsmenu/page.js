@@ -24,6 +24,7 @@ function startup(){
 
 	var historyMenu = document.getElementById("historyMenu");
 	historyMenu.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
+	showViewFoxAge2chMenu();
 
 
 	if(gBbsMenuXMLFile.exists()){
@@ -229,12 +230,12 @@ function openSettings(){
  * エクステンションマネージャを使った About の表示
  */
 function openAbout(){
-	var ExtensionManager = Components.classes["@mozilla.org/extensions/manager;1"]
-								.getService(Components.interfaces.nsIExtensionManager);
+	var ExtensionManager = Cc["@mozilla.org/extensions/manager;1"]
+			.getService(Ci.nsIExtensionManager);
 	var emDS = ExtensionManager.datasource;
 	var ExtensionID = "urn:mozilla:item:chaika@chaika.xrea.jp";
 	window.openDialog("chrome://mozapps/content/extensions/about.xul", "",
-				"chrome, modal", ExtensionID, emDS);
+			"chrome,centerscreen,modal", ExtensionID, emDS);
 }
 /**
  * About ダイアログがホームページを開く時に利用するメソッド
@@ -242,6 +243,26 @@ function openAbout(){
 function openURL(aURLSpec){
 	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 	ChaikaCore.browser.openURL(ioService.newURI(aURLSpec, null, null), true);
+}
+
+
+function showViewFoxAge2chMenu(){
+	var browser = Cc["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Ci.nsIWindowMediator)
+			.getMostRecentWindow("navigator:browser");
+	if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
+		document.getElementById("viewFoxAge2chMenu").hidden = false;
+	}
+}
+
+
+function viewFoxAge2ch(){
+	var browser = Cc["@mozilla.org/appshell/window-mediator;1"]
+			.getService(Ci.nsIWindowMediator)
+			.getMostRecentWindow("navigator:browser");
+	if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
+		browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
+	}
 }
 
 
