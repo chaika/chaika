@@ -32,60 +32,14 @@
 	<settingbox label="メニュー" orient="vertical">
 		<checkbox label="履歴メニューを表示する"
 				preference="extensions.chaika.bbsmenu_historymenu_show"/>
-		<grid class="indent">
-			<columns>
-				<column flex="1"/>
-				<column flex="1"/>
-			</columns>
-			<rows>
-				<row align="center" id="boxHistoryMenuBoardMax">
-					<label value="板の最大表示数 :" style="text-align:right;"/>
-					<menulist preference="extensions.chaika.bbsmenu_historymenu_board_max">
-						<menupopup>
-							<menuitem label=" 0" value="0"/>
-							<menuitem label=" 1" value="1"/>
-							<menuitem label=" 2" value="2"/>
-							<menuitem label=" 3" value="3"/>
-							<menuitem label=" 4" value="4"/>
-							<menuitem label=" 5" value="5"/>
-							<menuitem label=" 6" value="6"/>
-							<menuitem label=" 7" value="7"/>
-							<menuitem label=" 8" value="8"/>
-							<menuitem label=" 9" value="9"/>
-							<menuitem label="10" value="10"/>
-							<menuitem label="11" value="11"/>
-							<menuitem label="12" value="12"/>
-							<menuitem label="13" value="13"/>
-							<menuitem label="14" value="14"/>
-							<menuitem label="15" value="15"/>
-						</menupopup>
-					</menulist>
-				</row>
-				<row align="center" id="boxHistoryMenuThreadMax">
-					<label value="スレッドの最大表示数 :" style="text-align:right;"/>
-					<menulist preference="extensions.chaika.bbsmenu_historymenu_thread_max">
-						<menupopup>
-							<menuitem label=" 0" value="0"/>
-							<menuitem label=" 1" value="1"/>
-							<menuitem label=" 2" value="2"/>
-							<menuitem label=" 3" value="3"/>
-							<menuitem label=" 4" value="4"/>
-							<menuitem label=" 5" value="5"/>
-							<menuitem label=" 6" value="6"/>
-							<menuitem label=" 7" value="7"/>
-							<menuitem label=" 8" value="8"/>
-							<menuitem label=" 9" value="9"/>
-							<menuitem label="10" value="10"/>
-							<menuitem label="11" value="11"/>
-							<menuitem label="12" value="12"/>
-							<menuitem label="13" value="13"/>
-							<menuitem label="14" value="14"/>
-							<menuitem label="15" value="15"/>
-						</menupopup>
-					</menulist>
-				</row>
-			</rows>
-		</grid>
+		<hbox class="indent" align="center" id="historyMenuMaxBox">
+			<label value="板の表示数 :"/>
+			<textbox id="fontSize" value="16" type="number" min="0" max="20" style="width:3.5em;"
+					preference="extensions.chaika.bbsmenu_historymenu_board_max"/>
+			<label value="スレッドの表示数 :"/>
+			<textbox id="fontSize" value="16" type="number" min="0" max="20" style="width:3.5em;"
+					preference="extensions.chaika.bbsmenu_historymenu_thread_max"/>
+		</hbox>
 	</settingbox>
 
 	<settingbox label="ツリー">

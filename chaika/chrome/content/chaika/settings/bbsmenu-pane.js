@@ -39,8 +39,6 @@
 var gBbsmenuPane = {
 	startup: function(){
 		setCcontainerDisabled("extensions.chaika.bbsmenu_historymenu_show",
-					"boxHistoryMenuBoardMax", true);
-		setCcontainerDisabled("extensions.chaika.bbsmenu_historymenu_show",
-					"boxHistoryMenuThreadMax", true);
+					"historyMenuMaxBox", true);
 	}
 };
