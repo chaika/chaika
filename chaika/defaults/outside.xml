@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="SHIFT_JIS"?>
+<?xml version="1.0"?>
 <!--
-	type ’l
-	0 = 2ch Œ^ BBS
-	1 = ‹Œ 2ch Œ^ BBS (–¢‘Î‰ž)
+	type å€¤
+	0 = 2ch åž‹ BBS
+	1 = æ—§ 2ch åž‹ BBS (æœªå¯¾å¿œ)
 	2 = Be@2ch BBS
-	3 = livedoor ‚µ‚½‚ç‚Î BBS
-	4 = ‚Ü‚¿BBS (–¢‘Î‰ž)
-	5 = ’Êíƒy[ƒW
+	3 = livedoor ã—ãŸã‚‰ã° BBS
+	4 = ã¾ã¡BBS (æœªå¯¾å¿œ)
+	5 = é€šå¸¸ãƒšãƒ¼ã‚¸
 -->
 <bbsmenu>
-<category title="ŠO•””Â">
-	<board title="bbs2ch ŒöŽ®ƒTƒCƒg" url="http://bbs2ch.sourceforge.jp/" type="5"/>
-	<board title="bbs2ch ƒeƒXƒg”Â" url="http://yy22.kakiko.com/bbs2ch/" type="0"/>
+<category title="å¤–éƒ¨æ¿">
+	<board title="chaika å…¬å¼ã‚µã‚¤ãƒˆ" url="http://chaika.xrea.jp/" type="5"/>
 	<category title="2ch Browser">
+		<board title="Monazilla" url="http://www.monazilla.org/" type="5"/>
 		<board title="Monazilla@JBBS" url="http://jbbs.livedoor.jp/computer/351/" type="3"/>
-		<board title="ƒXƒLƒ“•W€‰»”Â" url="http://dtao.cside.com/distrust/stdskin/" type="0"/>
-		<board title="Moz2chŠJ”­”Â" url="http://baniisan.s12.xrea.com/x/moz2ch/" type="0"/>
-		<board title="Jane‘‡ŒfŽ¦”Â" url="http://jane.s28.xrea.com/bbs/" type="1"/>
-		<board title="”ñŒöŽ®ƒMƒRƒiƒr”Â" url="http://flounder.s27.xrea.com/bbs/giko/" type="1"/>
-		<board title="”ñŒöŽ®ƒzƒbƒgƒ]ƒk”Â" url="http://zonutan.hacca.jp/bbs/zonu/" type="0"/>
-		<board title="ƒ}ƒJ[—pB" url="http://tmhkym.net/maka/bbs/maka/" type="0"/>
+		<board title="ã‚¹ã‚­ãƒ³æ¨™æº–åŒ–æ¿" url="http://dtao.cside.com/distrust/stdskin/" type="0"/>
+		<board title="Moz2ché–‹ç™ºæ¿" url="http://baniisan.s12.xrea.com/x/moz2ch/" type="0"/>
+		<board title="Janeç·åˆæŽ²ç¤ºæ¿" url="http://jane.s28.xrea.com/bbs/" type="1"/>
+		<board title="éžå…¬å¼ã‚®ã‚³ãƒŠãƒ“æ¿" url="http://flounder.s27.xrea.com/bbs/giko/" type="1"/>
+		<board title="éžå…¬å¼ãƒ›ãƒƒãƒˆã‚¾ãƒŒæ¿" url="http://zonutan.hacca.jp/bbs/zonu/" type="0"/>
+		<board title="ãƒžã‚«ãƒ¼ç”¨ã€‚" url="http://tmhkym.net/maka/bbs/maka/" type="0"/>
 	</category>
 </category>
 
