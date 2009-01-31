@@ -25,10 +25,9 @@ pref("extensions.chaika.maru_id", "");
 pref("extensions.chaika.maru_password", "");
 pref("extensions.chaika.maru_session_id", "");
 
-pref("extensions.chaika.thread_redirector.enabled", false);
-pref("extensions.chaika.thread_redirector.ask", true);
-pref("extensions.chaika.thread_redirector.throw_bookmarks", false);
-pref("extensions.chaika.thread_redirector.disregard_url_option", true);
+pref("extensions.chaika.browser.redirector.enabled", false);
+pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
+pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 
 pref("extensions.chaika.bbsmenu_load_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu_toggle_open_container", false);

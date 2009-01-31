@@ -37,9 +37,7 @@
 
 var gBrowserPane = {
 	startup: function(){
-		setCcontainerDisabled("extensions.chaika.thread_redirector.enabled",
-				"boxRedirectorAsk", true);
-		setCcontainerDisabled("extensions.chaika.enable_browser_contextmenu",
-				"boxDisregardURLOption", true);
+		setCcontainerDisabled("extensions.chaika.browser.redirector.enabled",
+				"redirectorSubBox", true);
 	}
 };

@@ -14,15 +14,15 @@
 				onchange="setCcontainerDisabled(this.name, 'boxDisregardURLOption', true)"/>
 		<preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
 				name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.enabled"
-				name="extensions.chaika.thread_redirector.enabled" type="bool"
-				onchange="setCcontainerDisabled(this.name, 'boxRedirectorAsk', true)"/>
+		<preference id="extensions.chaika.browser.redirector.enabled"
+				name="extensions.chaika.browser.redirector.enabled" type="bool"
+				onchange="setCcontainerDisabled(this.name, 'redirectorSubBox', true)"/>
 		<preference id="extensions.chaika.thread_redirector.ask"
 				name="extensions.chaika.thread_redirector.ask" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.throw_bookmarks"
-				name="extensions.chaika.thread_redirector.throw_bookmarks" type="bool"/>
-		<preference id="extensions.chaika.thread_redirector.disregard_url_option"
-				name="extensions.chaika.thread_redirector.disregard_url_option" type="bool"/>
+		<preference id="extensions.chaika.browser.redirector.throw_bookmarks"
+				name="extensions.chaika.browser.redirector.throw_bookmarks" type="bool"/>
+		<preference id="extensions.chaika.browser.redirector.replace_view_limit"
+				name="extensions.chaika.browser.redirector.replace_view_limit" type="bool"/>
 		<preference id="extensions.chaika.tab_load_in_foreground"
 				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
 	</preferences>
@@ -43,14 +43,12 @@
 
 	<settingbox label="スレッドリダイレクタ" orient="vertical">
 		<checkbox label="2ch スレッド URL を自動的に chaika で開く"
-				preference="extensions.chaika.thread_redirector.enabled"/>
-		<vbox id="boxRedirectorAsk" class="indent">
-			<checkbox label="毎回確認する"
-				preference="extensions.chaika.thread_redirector.ask"/>
+				preference="extensions.chaika.browser.redirector.enabled"/>
+		<vbox id="redirectorSubBox" class="indent">
 			<checkbox label="ブックマークやスレッド表示からはそのまま開く"
-				preference="extensions.chaika.thread_redirector.throw_bookmarks"/>
-			<checkbox label="URL の表示制限を無視して開く"
-				preference="extensions.chaika.thread_redirector.disregard_url_option"/>
+				preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
+			<checkbox label="URL の表示制限を書き換えて開く"
+				preference="extensions.chaika.browser.redirector.replace_view_limit"/>
 		</vbox>
 	</settingbox>
 
