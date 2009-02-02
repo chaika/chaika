@@ -9,12 +9,12 @@
 
 #mainMenubar > menu {
   padding: 0px !important;
-  margin: 1px 0px;
+  margin: 1px 0px !important;
   list-style-image: url("chrome://chaika/skin/bbsmenu/toolbar-icon.png") !important;
 }
 
 #mainMenubar > menu .menubar-left {
-  margin: 2px 4px !important;
+  margin: 0px 2px !important;
 }
 
 #mainMenubar > menu .menubar-text {

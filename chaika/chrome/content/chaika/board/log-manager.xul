@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 
-<page id="logManager" title="ログマネージャ [chaika]"
+<page id="chaikaLogManager" title="ログマネージャ [chaika]"
 		onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
 		onload="startup()" onunload="shutdown()"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
