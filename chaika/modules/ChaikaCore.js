@@ -493,6 +493,7 @@ var ChaikaCore = {
  */
 function ChaikaLogger(){
 	this._initialized = false;
+	this._registConsole = false;
 	this._stream = null;
 }
 
@@ -512,7 +513,8 @@ ChaikaLogger.prototype = {
 		if(this._level >= this.LEVEL_ERROR){
 			var consoleService = Cc["@mozilla.org/consoleservice;1"]
 					.getService(Ci.nsIConsoleService);
-		    consoleService.registerListener(this);
+			consoleService.registerListener(this);
+			this._registConsole = true;
 		}
 
 		if(ChaikaCore.pref.getBool("logger.file_dump")){
@@ -525,6 +527,12 @@ ChaikaLogger.prototype = {
 
 
 	_quit: function ChaikaLogger__quit(){
+		if(this._registConsole){
+			var consoleService = Cc["@mozilla.org/consoleservice;1"]
+					.getService(Ci.nsIConsoleService);
+			consoleService.unregisterListener(this);
+		}
+
 		this._initialized = false;
 		if(this._stream){
 			this._stream.flush();
