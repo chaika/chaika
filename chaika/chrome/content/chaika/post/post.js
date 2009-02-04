@@ -428,7 +428,7 @@ HttpRequest.prototype = {
 
 			// リファラの設定
 		if(this.referrer){
-			this._channel.referrer = this.referrer;
+			this._channel.setRequestHeader("Referer", this.referrer.spec, false);
 		}
 
 		this._channel.setRequestHeader("Content-Type",
