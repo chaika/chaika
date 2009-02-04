@@ -5,7 +5,7 @@
 
 <prefwindow id="BrowserPreferences" title="設定 [chaika]"
 	onload="startup()" onunload="shutdown()"
-	style="width:52em; min-height:40em;"
+	style="width:50em; min-height:36em;"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <prefpane id="paneGeneral" label="全般" flex="1" src="chrome://chaika/content/settings/general-pane.xul"/>

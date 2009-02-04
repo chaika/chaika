@@ -5,9 +5,6 @@
 
 <prefpane id="paneGeneral" onpaneload="gGeneralPane.startup()">
 
-	<script type="application/x-javascript; version=1.7"
-			src="chrome://chaika/content/settings/general-pane.js"/>
-
 	<preferences>
 		<preference id="extensions.chaika.http_proxy_mode"
 				name="extensions.chaika.http_proxy_mode" type="int"
@@ -21,34 +18,56 @@
 				name="extensions.chaika.data_dir" type="unichar"/>
 	</preferences>
 
+	<script type="application/x-javascript; version=1.7"
+			src="chrome://chaika/content/settings/general-pane.js"/>
 
-	<settingbox label="ログファイル" orient="vertical" flex="1">
-		<checkbox label="ログファイルの位置を指定する"
-					preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
-		<hbox id="boxDataDir" class="indent" flex="1" align="center">
-			<textbox id="txtDataDir" flex="2"
-					preference="extensions.chaika.data_dir"
-					onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
-			<button id="btnDataDirSelect" label="参照..."
-					oncommand="gGeneralPane.selectDataDir()"/>
-		</hbox>
-	</settingbox>
+	<grid  flex="1">
+		<columns>
+			<column flex="1"/>
+			<column flex="6"/>
+		</columns>
+		<rows>
 
-	<settingbox label="2ch ビューア" orient="vertical" align="start">
-		<button id="btnDataDirSelect" label="設定..."
-					oncommand="gGeneralPane.openMaruDialog()"/>
-	</settingbox>
+			<row class="setting-row">
+				<description class="setting-description">ログファイル :</description>
+				<vbox>
+					<checkbox label="ログファイルの位置を指定する"
+							preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
+					<hbox id="boxDataDir" class="indent" flex="1" align="start">
+						<textbox id="txtDataDir" flex="8"
+								preference="extensions.chaika.data_dir"
+								onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
+						<button id="btnDataDirSelect" label="参照..."
+								oncommand="gGeneralPane.selectDataDir()"/>
+						<spacer flex="1"/>
+					</hbox>
+				</vbox>
+			</row>
 
-	<settingbox label="プロキシ" flex="100">
-		<menulist preference="extensions.chaika.http_proxy_mode">
-			<menupopup>
-				<menuitem value="0" label="ブラウザの設定に従う"/>
-				<menuitem value="1" label="直接接続する"/>
-				<menuitem value="2" label="独自に設定する"/>
-			</menupopup>
-		</menulist>
-		<textbox id="txtProxyValue" preference="extensions.chaika.http_proxy_value"/>
-	</settingbox>
+			<row class="setting-row">
+				<description class="setting-description">2ch ビューア :</description>
+				<vbox align="start">
+					<button id="btnDataDirSelect" label="設定..."
+								oncommand="gGeneralPane.openMaruDialog()"/>
+				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description">プロキシ :</description>
+				<hbox align="start">
+					<menulist preference="extensions.chaika.http_proxy_mode">
+						<menupopup>
+							<menuitem value="0" label="ブラウザの設定に従う"/>
+							<menuitem value="1" label="直接接続する"/>
+							<menuitem value="2" label="独自に設定する"/>
+						</menupopup>
+					</menulist>
+					<textbox id="txtProxyValue" preference="extensions.chaika.http_proxy_value"/>
+				</hbox>
+			</row>
+
+		</rows>
+	</grid>
 
 </prefpane>
 

@@ -5,9 +5,6 @@
 
 <prefpane id="paneBrowser" onpaneload="gBrowserPane.startup()">
 
-	<script type="application/x-javascript; version=1.7"
-			src="chrome://chaika/content/settings/browser-pane.js"/>
-
 	<preferences>
 		<preference id="extensions.chaika.enable_browser_contextmenu"
 				name="extensions.chaika.enable_browser_contextmenu" type="bool"
@@ -27,30 +24,52 @@
 				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
 	</preferences>
 
-	<settingbox label="コンテキストメニュー" orient="vertical">
-		<checkbox label="コンテキストメニューに chaika の項目を追加する"
-				preference="extensions.chaika.enable_browser_contextmenu"/>
-		<hbox id="boxDisregardURLOption" class="indent">
-		<checkbox label="URL の表示制限を無視して開く"
-				preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
-		</hbox>
-	</settingbox>
+	<script type="application/x-javascript; version=1.7"
+			src="chrome://chaika/content/settings/browser-pane.js"/>
 
-	<settingbox label="タブ" orient="vertical">
-		<checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
-			preference="extensions.chaika.tab_load_in_foreground"/>
-	</settingbox>
+	<grid  flex="1">
+		<columns>
+			<column flex="1"/>
+			<column flex="6"/>
+		</columns>
+		<rows>
 
-	<settingbox label="スレッドリダイレクタ" orient="vertical">
-		<checkbox label="2ch スレッド URL を自動的に chaika で開く"
-				preference="extensions.chaika.browser.redirector.enabled"/>
-		<vbox id="redirectorSubBox" class="indent">
-			<checkbox label="ブックマークやスレッド表示からはそのまま開く"
-				preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
-			<checkbox label="URL の表示制限を書き換えて開く"
-				preference="extensions.chaika.browser.redirector.replace_view_limit"/>
-		</vbox>
-	</settingbox>
+			<row class="setting-row">
+				<description class="setting-description">コンテキストメニュー :</description>
+				<vbox>
+					<checkbox label="コンテキストメニューに chaika の項目を追加する"
+							preference="extensions.chaika.enable_browser_contextmenu"/>
+					<hbox id="boxDisregardURLOption" class="indent">
+						<checkbox label="URL の表示制限を無視して開く"
+								preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
+					</hbox>
+				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description">タブ :</description>
+				<vbox>
+					<checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
+							preference="extensions.chaika.tab_load_in_foreground"/>
+				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description">スレッドリダイレクタ :</description>
+				<vbox>
+					<checkbox label="2ch スレッド URL を自動的に chaika で開く"
+							preference="extensions.chaika.browser.redirector.enabled"/>
+					<vbox id="redirectorSubBox" class="indent">
+						<checkbox label="ブックマークやスレッド表示からはそのまま開く"
+								preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
+						<checkbox label="URL の表示制限を書き換えて開く"
+								preference="extensions.chaika.browser.redirector.replace_view_limit"/>
+					</vbox>
+				</vbox>
+			</row>
+
+		</rows>
+	</grid>
 
 </prefpane>
 

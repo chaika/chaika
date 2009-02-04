@@ -16,22 +16,15 @@ radio[pane]{
 }
 
 
-settingbox {
-  -moz-binding: url('chrome://chaika/content/settings/setting-box.xml#settingBox');
-  margin: 0.2em 2px 0.6em 2px;
+
+
+row.setting-row {
+  margin-bottom: 1em;
 }
 
-.settingbox-label-box {
-  width: 11em;
-  border-right: 2px solid GrayText;
-  margin: 0px 0.5em 0px 0px;
-  padding-right: 0.5em;
-}
-
-.settingbox-label {
-  font-size:0.9em;
+description.setting-description {
+  margin: 2px;
+  padding: 0px 4px 0px 0px;
+  font-size: 0.9em;
   text-align: right;
-}
-
-.settingbox-content-box {
 }
