@@ -318,9 +318,12 @@ var FormPage = {
 		var permManager = Cc["@mozilla.org/permissionmanager;1"]
 				.getService(Ci.nsIPermissionManager);
 		var cookiePermission = permManager.testPermission (gBoard.url , "cookie");
+
 		if(cookiePermission == Ci.nsIPermissionManager.DENY_ACTION){
 			return false;
 		}else if(cookiePermission == Ci.nsIPermissionManager.ALLOW_ACTION){
+			return true;
+		}else if(cookiePermission == Ci.nsICookiePermission.ACCESS_SESSION){
 			return true;
 		}
 
