@@ -591,14 +591,12 @@ ChaikaLogger.prototype = {
 		if(!(aMessage instanceof Ci.nsIScriptError)) return;
 		if(!(aMessage.flags & Ci.nsIScriptError.exceptionFlag))
 
-		if(!(aMessage.category == "chrome javascript" ||
-				aMessage.category == "XPConnect JavaScript")){
-			return;
-		}
-
-		var message = aMessage.message;
-		if(message.indexOf("chaika")!=-1){
-			this._insertLog("ERROR", message);
+		var category = aMessage.category
+		if(category == "chrome javascript" || category == "XPConnect JavaScript"){
+			var message = aMessage.message;
+			if(message.indexOf("chaika")!=-1){
+				this._insertLog("ERROR", message);
+			}
 		}
 	},
 
