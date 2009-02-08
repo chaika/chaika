@@ -1,9 +1,57 @@
+/* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an "AS IS" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is chaika.
+ *
+ * The Initial Developer of the Original Code is
+ * chaika.xrea.jp
+ * Portions created by the Initial Developer are Copyright (C) 2009
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s):
+ *    flyson <flyson.moz at gmail.com>
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the "GPL"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+
+EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 
-this.script = {
+
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
+
+
+function ThreadServerScript(){
+}
+
+ThreadServerScript.prototype  = {
 
 	start: function(aServerHandler){
 		aServerHandler.setResponseHeader("Content-Type", "text/html; charset=Shift_JIS");
@@ -17,8 +65,8 @@ this.script = {
 		}
 		var boardURL = ChaikaThread.getBoardURL(threadURL);
 		var type = ChaikaBoard.getBoardType(threadURL);
-			// ”Â‚Ìƒ^ƒCƒv‚ªABOARD_TYPE_PAGE ‚Å‚àA
-			// URL ‚É /test/read.cgi/ ‚ğŠÜ‚ñ‚Å‚¢‚½‚ç 2chŒİŠ·‚Æ‚İ‚È‚·
+			// æ¿ã®ã‚¿ã‚¤ãƒ—ãŒã€BOARD_TYPE_PAGE ã§ã‚‚ã€
+			// URL ã« /test/read.cgi/ ã‚’å«ã‚“ã§ã„ãŸã‚‰ 2chäº’æ›ã¨ã¿ãªã™
 		if(type == ChaikaBoard.BOARD_TYPE_PAGE &&
 					threadURL.spec.indexOf("/test/read.cgi/") != -1){
 			type = ChaikaBoard.BOARD_TYPE_2CH;
@@ -27,13 +75,13 @@ this.script = {
 
 		switch(type){
 			case ChaikaBoard.BOARD_TYPE_2CH:
-				this.thread = new b2rThread2ch();
+				this.thread = new Thread2ch();
 				break;
 			case ChaikaBoard.BOARD_TYPE_JBBS:
-				this.thread = new b2rThreadJbbs();
+				this.thread = new ThreadJbbs();
 				break;
 			case ChaikaBoard.BOARD_TYPE_MACHI:
-				this.thread = new b2rThreadMachi();
+				this.thread = new ThreadMachi();
 				break;
 			default:
 				this.thread = null;
@@ -63,7 +111,7 @@ this.script = {
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		try{
 			var threadURL = ioService.newURI(threadURLSpec, null, null).QueryInterface(Ci.nsIURL);
-				// URL ‚ªADAT ID ‚ÅI‚í‚é‚Æ‚«‚Í "/" ‚ğ’Ç‰Á‚·‚é
+				// URL ãŒã€DAT ID ã§çµ‚ã‚ã‚‹ã¨ãã¯ "/" ã‚’è¿½åŠ ã™ã‚‹
 			if(threadURL.fileName.match(/^\d{9,10}$/)){
 				threadURL = ioService.newURI(threadURLSpec + "/", null, null)
 						.QueryInterface(Ci.nsIURL);
@@ -105,11 +153,11 @@ var UniConverter = {
 };
 
 
-// ***** ***** ***** ***** ***** b2rThread2ch ***** ***** ***** ***** *****
-function b2rThread2ch(){
+// ***** ***** ***** ***** ***** Thread2ch ***** ***** ***** ***** *****
+function Thread2ch(){
 }
 
-b2rThread2ch.prototype = {
+Thread2ch.prototype = {
 
 	get optionsOnes(){
 		return (this.thread.url.fileName.match(/^(\d+)n?$/)) ? parseInt(RegExp.$1) : null;
@@ -137,7 +185,7 @@ b2rThread2ch.prototype = {
 		this._enableChainAbone = ChaikaCore.pref.getBool("thread_chain_abone");
 		this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
 
-			// HTML ƒwƒbƒ_‚ğ‘—M‚µ‚½‚ç true ‚É‚È‚é
+			// HTML ãƒ˜ãƒƒãƒ€ã‚’é€ä¿¡ã—ãŸã‚‰ true ã«ãªã‚‹
 		this._headerResponded = false;
 		this._opend = true;
 		this.httpChannel = null;
@@ -158,8 +206,8 @@ b2rThread2ch.prototype = {
 			if(ex == Components.results.NS_ERROR_FILE_NOT_FOUND){
 				var skinName = ChaikaCore.pref.getUniChar("thread_skin");
 				skinName = UniConverter.toSJIS(skinName);
-				this.write("ƒXƒLƒ“ ("+ skinName +") ‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚½‚½‚ßA");
-				this.write("İ’è‚ğƒfƒtƒHƒ‹ƒgƒXƒLƒ“‚É–ß‚µ‚Ü‚µ‚½B<br>ƒy[ƒW‚ğXV‚µ‚Ä‚­‚¾‚³‚¢B");
+				this.write("ã‚¹ã‚­ãƒ³ ("+ skinName +") ã®èª­ã¿è¾¼ã¿ã«å¤±æ•—ã—ãŸãŸã‚ã€");
+				this.write("è¨­å®šã‚’ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã‚¹ã‚­ãƒ³ã«æˆ»ã—ã¾ã—ãŸã€‚<br>ãƒšãƒ¼ã‚¸ã‚’æ›´æ–°ã—ã¦ãã ã•ã„ã€‚");
 				this.close();
 				ChaikaCore.pref.setChar("thread_skin", "");
 				return;
@@ -182,7 +230,7 @@ b2rThread2ch.prototype = {
 		*/
 
 		this._logLineCount = 0;
-			// æ“¾Ï‚İƒƒO‚Ì‘—M
+			// å–å¾—æ¸ˆã¿ãƒ­ã‚°ã®é€ä¿¡
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
 			datLines.pop();
@@ -333,20 +381,20 @@ b2rThread2ch.prototype = {
 			resDate	= this.htmlToText(resDate);
 		}
 
-			// resDate ‚ğ DATEABeID ‚É•ªŠ„
+			// resDate ã‚’ DATEã€BeID ã«åˆ†å‰²
 		if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
 			resDate = RegExp.$1;
 			resBeID = RegExp.$2;
 		}
-			// resDate ‚ğ DATE ‚Æ ID ‚É•ªŠ„
+			// resDate ã‚’ DATE ã¨ ID ã«åˆ†å‰²
 		if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:(.+)/)){
 			resDate = RegExp.$1;
 			resID = RegExp.$2;
 		}
 
 		/*
-			// resDate ‚É IP ‚ªŠÜ‚Ü‚ê‚Ä‚¢‚éê‡‚Í IP ‚ğ ID ‚Æ‚µ‚Äˆµ‚¤
-		if(resDate.match(/(.+)”­MŒ³:(.+)/)){
+			// resDate ã« IP ãŒå«ã¾ã‚Œã¦ã„ã‚‹å ´åˆã¯ IP ã‚’ ID ã¨ã—ã¦æ‰±ã†
+		if(resDate.match(/(.+)ç™ºä¿¡å…ƒ:(.+)/)){
 			resDate = RegExp.$1;
 			resID = RegExp.$2;
 		}
@@ -369,14 +417,14 @@ b2rThread2ch.prototype = {
 			}
 		}
 
-			// JS‚Å‚Í "\" ‚ª“Áê‚ÈˆÓ–¡‚ğ‚Â‚½‚ßA”’l•¶šQÆ‚É•ÏŠ·
+			// JSã§ã¯ "\" ãŒç‰¹æ®Šãªæ„å‘³ã‚’æŒã¤ãŸã‚ã€æ•°å€¤æ–‡å­—å‚ç…§ã«å¤‰æ›
 		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 
 		var resMailName = resName;
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
-			// ƒŒƒX”ÔƒŠƒ“ƒNˆ— & ˜A½‚ ‚Ú[‚ñ
+			// ãƒ¬ã‚¹ç•ªãƒªãƒ³ã‚¯å‡¦ç† & é€£é–ã‚ã¼ãƒ¼ã‚“
 		var regResPointer = /(?:<a .*?>)?(&gt;&gt;|&gt;)([0-9]{1,4})(\-[0-9]{1,4})?(?:<\/a>)?/g;
 
 		var chainAboneNumbers = this._chainAboneNumbers;
@@ -393,24 +441,24 @@ b2rThread2ch.prototype = {
 			}
 		}
 
-			// ’ÊíƒŠƒ“ƒNˆ—
+			// é€šå¸¸ãƒªãƒ³ã‚¯å‡¦ç†
 		if(resMes.indexOf("ttp")!=-1){
 			var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
 			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
 		}
 
-			// BeƒAƒCƒRƒ“ˆ—
+			// Beã‚¢ã‚¤ã‚³ãƒ³å‡¦ç†
 		if(this._showBeIcon && resMes.indexOf("sssp://")!=-1){
 			var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.gif)/g;
 			resMes = resMes.replace(regUrlLink,
 						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
 		}
 
-			// ƒŒƒXID
+			// ãƒ¬ã‚¹ID
 		var regResID = / (ID:)([0-9a-z\+\/]+)/ig;
 		resMes = resMes.replace(regResID, ' <span class="resMesID"><span class="mesID_$2">$1$2</span></span>');
 
-			// ƒXƒŒƒbƒh‚Ìƒ^ƒCƒgƒ‹‚ªŒ©‚Â‚©‚Á‚½‚Æ‚«‚Í HTML ƒwƒbƒ_‚ğ’Ç‰Á‚µ‚Ä‘—‚é
+			// ã‚¹ãƒ¬ãƒƒãƒ‰ã®ã‚¿ã‚¤ãƒˆãƒ«ãŒè¦‹ã¤ã‹ã£ãŸã¨ãã¯ HTML ãƒ˜ãƒƒãƒ€ã‚’è¿½åŠ ã—ã¦é€ã‚‹
 		if(!this._headerResponded && resArray[4]){
 			this._headerResponded = true;
 			var title = resArray[4];
@@ -446,12 +494,12 @@ b2rThread2ch.prototype = {
 			this._kakoDatDownload = false;
 		}
 		this.httpChannel.requestMethod = "GET";
-		this.httpChannel.redirectionLimit = 0; // 302 “™‚ÌƒŠƒ_ƒCƒŒƒNƒg‚ğs‚í‚È‚¢
+		this.httpChannel.redirectionLimit = 0; // 302 ç­‰ã®ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã‚’è¡Œã‚ãªã„
 		this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
 		this._aboneChecked = true;
 		this._threadAbone = false;
 
-			// ·•ªGET
+			// å·®åˆ†GET
 		if(this.thread.datFile.exists() && this.thread.lastModified){
 			var lastModified = this.thread.lastModified;
 			var range = this.thread.datFile.fileSize - 1;
@@ -478,7 +526,7 @@ b2rThread2ch.prototype = {
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		var httpStatus = aRequest.responseStatus;
-			// •K—v‚Èî•ñ‚ª‚È‚¢‚È‚çI—¹
+			// å¿…è¦ãªæƒ…å ±ãŒãªã„ãªã‚‰çµ‚äº†
 		if(!(httpStatus==200 || httpStatus==206)) return;
 		if(aCount == 0) return;
 
@@ -506,23 +554,23 @@ b2rThread2ch.prototype = {
 			}
 		}
 
-			// NULL •¶š
+			// NULL æ–‡å­—
 		availableData = availableData.replace(/\x00/g, "*");
-			// •ÏŠ·‘O‚Ì DAT ‚ğ•Û‘¶‚µ‚Ä‚¨‚­
+			// å¤‰æ›å‰ã® DAT ã‚’ä¿å­˜ã—ã¦ãŠã
 		this._data.push(availableData);
 
 		var availableData = this._datBuffer + availableData;
-			// ‰üs‚ğŠÜ‚Ü‚È‚¢‚È‚çƒoƒbƒtƒ@‚É’Ç‰Á‚µ‚ÄI—¹
+			// æ”¹è¡Œã‚’å«ã¾ãªã„ãªã‚‰ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ ã—ã¦çµ‚äº†
 		if(!availableData.match(/\n/)){
 			this._datBuffer = availableData;
 			return;
 		}
 
-			// æ“¾‚µ‚½ DAT ‚ğs‚²‚Æ‚É”z—ñ‚É‚µAÅŒã‚Ìs‚ğƒoƒbƒtƒ@‚É’Ç‰Á
+			// å–å¾—ã—ãŸ DAT ã‚’è¡Œã”ã¨ã«é…åˆ—ã«ã—ã€æœ€å¾Œã®è¡Œã‚’ãƒãƒƒãƒ•ã‚¡ã«è¿½åŠ 
 		var datLines = availableData.split("\n");
 		this._datBuffer = (datLines.length>1) ? datLines.pop() : "";
 
-			// DAT ‚ğ •ÏŠ·‚µ‚Ä‘‚«o‚·
+			// DAT ã‚’ å¤‰æ›ã—ã¦æ›¸ãå‡ºã™
 		for(var i=0; i<datLines.length; i++){
 			this.thread.lineCount++;
 			datLines[i] = this.datLineParse(datLines[i], this.thread.lineCount, true);
@@ -548,10 +596,10 @@ b2rThread2ch.prototype = {
 		}catch(ex){}
 
 		switch(httpStatus){
-			case 200: // ’ÊíGET OK
-			case 206: // ·•ªGET OK
+			case 200: // é€šå¸¸GET OK
+			case 206: // å·®åˆ†GET OK
 				break;
-			case 302: // DAT—‚¿
+			case 302: // DATè½ã¡
 				if(this._kakoDatDownload){
 					this.write(this.converter.getFooter("dat_down"));
 					this.close();
@@ -559,27 +607,27 @@ b2rThread2ch.prototype = {
 					this.datDownload(true);
 				}
 				return;
-			case 304: // –¢XV
+			case 304: // æœªæ›´æ–°
 				this.write(this.converter.getFooter("not_modified"));
 				this.close();
 				return;
-			case 416: //‚ ‚Ú[‚ñ
+			case 416: //ã‚ã¼ãƒ¼ã‚“
 				this.write(this.converter.getFooter("abone"));
 				this.close();
 				return;
-			default: // HTTP ƒGƒ‰[
+			default: // HTTP ã‚¨ãƒ©ãƒ¼
 				this.write(this.converter.getFooter(httpStatus));
 				this.close();
 				return;
 		}
 
-		if(this._threadAbone){ //‚ ‚Ú[‚ñ
+		if(this._threadAbone){ //ã‚ã¼ãƒ¼ã‚“
 			this.write(this.converter.getFooter("abone"));
 			this.close();
 			return;
 		}
 
-			// XXX TODO ˆê•”ŒİŠ·ƒXƒNƒŠƒvƒg‚É‚ÍA–¢XV‚Å‚à 206 ‚ğ•Ô‚·‚à‚Ì‚ª‚ ‚é?
+			// XXX TODO ä¸€éƒ¨äº’æ›ã‚¹ã‚¯ãƒªãƒ—ãƒˆã«ã¯ã€æœªæ›´æ–°ã§ã‚‚ 206 ã‚’è¿”ã™ã‚‚ã®ãŒã‚ã‚‹?
 		var newResLength = this.thread.lineCount - this._logLineCount;
 		if(newResLength == 0){
 			this.write(this.converter.getFooter("not_modified"));
@@ -603,7 +651,7 @@ b2rThread2ch.prototype = {
 	},
 
 	datSave: function(aDatContent){
-				// ‘‚«‚İ‚ÌƒoƒbƒeƒBƒ“ƒO‚ğ”ğ‚¯‚é
+				// æ›¸ãè¾¼ã¿ã®ãƒãƒƒãƒ†ã‚£ãƒ³ã‚°ã‚’é¿ã‘ã‚‹
 		var tmpLineCount = 0;
 		try{
 			var thread = new ChaikaThread(this.thread.url);
@@ -611,7 +659,7 @@ b2rThread2ch.prototype = {
 		}catch(ex){}
 
 		if(this.thread.lineCount > tmpLineCount){
-				// .dat ‚Ì’Ç‹L‘‚«‚İ
+				// .dat ã®è¿½è¨˜æ›¸ãè¾¼ã¿
 			this.thread.appendContent(aDatContent);
 
 			if(this._maruMode) this.thread.maruGetted = true;
@@ -623,17 +671,17 @@ b2rThread2ch.prototype = {
 };
 
 
-// ***** ***** ***** ***** ***** b2rThreadJbbs ***** ***** ***** ***** *****
-function b2rThreadJbbs(){
+// ***** ***** ***** ***** ***** ThreadJbbs ***** ***** ***** ***** *****
+function ThreadJbbs(){
 }
 
-b2rThreadJbbs.prototype = {
+ThreadJbbs.prototype = {
 	datDownload: function(){
 		var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "rawmode.cgi");
 		this._aboneChecked = true;
 		this._threadAbone = false;
 
-			// ·•ªGET
+			// å·®åˆ†GET
 		if(this.thread.datFile.exists() && this.thread.lineCount){
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
@@ -643,7 +691,7 @@ b2rThreadJbbs.prototype = {
 
 		this.httpChannel = ChaikaCore.getHttpChannel(datURL);
 		this.httpChannel.requestMethod = "GET";
-		this.httpChannel.redirectionLimit = 0; // 302 “™‚ÌƒŠƒ_ƒCƒŒƒNƒg‚ğs‚í‚È‚¢
+		this.httpChannel.redirectionLimit = 0; // 302 ç­‰ã®ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã‚’è¡Œã‚ãªã„
 		this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
 
 		this.httpChannel.asyncOpen(this, null);
@@ -652,7 +700,7 @@ b2rThreadJbbs.prototype = {
 	datLineParse: function(aLine, aNumber, aNew){
 		if(!aLine) return "";
 
-			// EUC-JP ‚©‚ç SJIS ‚Ö•ÏŠ·
+			// EUC-JP ã‹ã‚‰ SJIS ã¸å¤‰æ›
 		var line = UniConverter.fromEUC(aLine);
 		line = UniConverter.toSJIS(line);
 		var resArray = line.split("<>");
@@ -679,7 +727,7 @@ b2rThreadJbbs.prototype = {
 			}
 		}
 
-			// JS‚Å‚Í "\" ‚ª“Áê‚ÈˆÓ–¡‚ğ‚Â‚½‚ßA”’l•¶šQÆ‚É•ÏŠ·
+			// JSã§ã¯ "\" ãŒç‰¹æ®Šãªæ„å‘³ã‚’æŒã¤ãŸã‚ã€æ•°å€¤æ–‡å­—å‚ç…§ã«å¤‰æ›
 		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 
@@ -687,7 +735,7 @@ b2rThreadJbbs.prototype = {
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
 
-			// ƒŒƒX”ÔƒŠƒ“ƒNˆ— & ˜A½‚ ‚Ú[‚ñ
+			// ãƒ¬ã‚¹ç•ªãƒªãƒ³ã‚¯å‡¦ç† & é€£é–ã‚ã¼ãƒ¼ã‚“
 		var regResPointer = /(?:<a .*?>)?(&gt;&gt;|&gt;)([0-9]{1,4})(\-[0-9]{1,4})?(?:<\/a>)?/g;
 
 		var chainAboneNumbers = this._chainAboneNumbers;
@@ -704,13 +752,13 @@ b2rThreadJbbs.prototype = {
 			}
 		}
 
-			// ’ÊíƒŠƒ“ƒNˆ—
+			// é€šå¸¸ãƒªãƒ³ã‚¯å‡¦ç†
 		if(resMes.indexOf("ttp")!=-1){
 			var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
 			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
 		}
 
-			// ƒXƒŒƒbƒh‚Ìƒ^ƒCƒgƒ‹‚ªŒ©‚Â‚©‚Á‚½‚Æ‚«‚Í HTML ƒwƒbƒ_‚ğ’Ç‰Á‚µ‚Ä‘—‚é
+			// ã‚¹ãƒ¬ãƒƒãƒ‰ã®ã‚¿ã‚¤ãƒˆãƒ«ãŒè¦‹ã¤ã‹ã£ãŸã¨ãã¯ HTML ãƒ˜ãƒƒãƒ€ã‚’è¿½åŠ ã—ã¦é€ã‚‹
 		if(!this._headerResponded && resArray[5]!= ""){
 			this._headerResponded = true;
 			var title = resArray[5];
@@ -764,20 +812,20 @@ b2rThreadJbbs.prototype = {
 	}
 };
 
-b2rThreadJbbs.prototype.__proto__ = b2rThread2ch.prototype;
+ThreadJbbs.prototype.__proto__ = Thread2ch.prototype;
 
 
-// ***** ***** ***** ***** ***** b2rThreadMachi ***** ***** ***** ***** *****
-function b2rThreadMachi(){
+// ***** ***** ***** ***** ***** ThreadMachi ***** ***** ***** ***** *****
+function ThreadMachi(){
 }
 
-b2rThreadMachi.prototype = {
+ThreadMachi.prototype = {
 	datDownload: function(){
 		var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi");
 		this._aboneChecked = true;
 		this._threadAbone = false;
 
-				// ·•ªGET
+				// å·®åˆ†GET
 		if(this.thread.datFile.exists() && this.thread.lineCount){
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
@@ -786,7 +834,7 @@ b2rThreadMachi.prototype = {
 
 		this.httpChannel = ChaikaCore.getHttpChannel(datURL);
 		this.httpChannel.requestMethod = "GET";
-		this.httpChannel.redirectionLimit = 0; // 302 “™‚ÌƒŠƒ_ƒCƒŒƒNƒg‚ğs‚í‚È‚¢
+		this.httpChannel.redirectionLimit = 0; // 302 ç­‰ã®ãƒªãƒ€ã‚¤ãƒ¬ã‚¯ãƒˆã‚’è¡Œã‚ãªã„
 		this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
 
 		this.httpChannel.asyncOpen(this, null);
@@ -795,39 +843,39 @@ b2rThreadMachi.prototype = {
 	datLineParse: function(aLine, aNumber, aNew){
 		var resArray = aLine.split("<>");
 		var trueNumber = parseInt(resArray.shift());
-		var superClass = b2rThread2ch.prototype.datLineParse;
+		var superClass = Thread2ch.prototype.datLineParse;
 		return superClass.apply(this, [resArray.join("<>"), trueNumber, aNew]);
  	},
 
 
  	datSave: function(aDatContent){
 		if(aDatContent){
-				// ƒT[ƒo‘¤“§–¾‚ ‚Ú[‚ñ‚É‚æ‚è DAT s”‚ÆÅIƒŒƒXƒiƒ“ƒo[‚ª
-				// ˆê’v‚µ‚È‚¢‚±‚Æ‚ª‚ ‚é‚½‚ßAs”‚ğÅIƒŒƒX‚Ìƒiƒ“ƒo[‚©‚çæ“¾
+				// ã‚µãƒ¼ãƒå´é€æ˜ã‚ã¼ãƒ¼ã‚“ã«ã‚ˆã‚Š DAT è¡Œæ•°ã¨æœ€çµ‚ãƒ¬ã‚¹ãƒŠãƒ³ãƒãƒ¼ãŒ
+				// ä¸€è‡´ã—ãªã„ã“ã¨ãŒã‚ã‚‹ãŸã‚ã€è¡Œæ•°ã‚’æœ€çµ‚ãƒ¬ã‚¹ã®ãƒŠãƒ³ãƒãƒ¼ã‹ã‚‰å–å¾—
 			var lines = aDatContent.split("\n");
-			var lastLine = lines.pop(); // ‘½•ª‹ós
+			var lastLine = lines.pop(); // å¤šåˆ†ç©ºè¡Œ
 			if(!lastLine) lastLine = lines.pop();
 			this.thread.lineCount = parseInt(lastLine.match(/^\d+/));
 		}
-		var superClass = b2rThread2ch.prototype.datSave;
+		var superClass = Thread2ch.prototype.datSave;
 		return superClass.apply(this, arguments);
 	}
 
 };
 
-b2rThreadMachi.prototype.__proto__ = b2rThread2ch.prototype;
+ThreadMachi.prototype.__proto__ = Thread2ch.prototype;
 
 
 
 
-// ***** ***** ***** ***** ***** b2rId2Color ***** ***** ***** ***** *****
+// ***** ***** ***** ***** ***** Id2Color ***** ***** ***** ***** *****
 /**
- * id‚©‚çF‚ğ•Ô‚µ‚Ü‚·B
+ * idã‹ã‚‰è‰²ã‚’è¿”ã—ã¾ã™ã€‚
  */
-function b2rId2Color(){
+function Id2Color(){
 }
 
-b2rId2Color.prototype = {
+Id2Color.prototype = {
 	_char64To8: new Array(),
 	_cache: new Array(),
 	_bgcache: new Array(),
@@ -842,12 +890,12 @@ b2rId2Color.prototype = {
 	},
 
 	/**
-	 * id‚©‚çCSS‚ÌF‚ğ•Ô‚µ‚Ü‚·B
+	 * idã‹ã‚‰CSSã®è‰²ã‚’è¿”ã—ã¾ã™ã€‚
 	 *
-	 * @param aID {string} 2ch‚ÌID
-	 * @param aIsBackground {bool} ”wŒi‚©
+	 * @param aID {string} 2chã®ID
+	 * @param aIsBackground {bool} èƒŒæ™¯ã‹
 	 * @type string
-	 * @return CSS‚ÌF
+	 * @return CSSã®è‰²
 	 */
 	getColor: function(aID, aIsBackground){
 		if(aID.length < 8) return "inherit";
@@ -890,8 +938,8 @@ b2rThreadConverter.prototype = {
 		this._boardURL = aBoardURL;
 		this._type = aType;
 
-		this._dd2Color = new b2rId2Color();
-		this._dd2Color.init();
+		this._id2Color = new Id2Color();
+		this._id2Color.init();
 
 		try{
 			this._tmpHeader   = ChaikaCore.io.readData(this._resolveSkinFile("Header.html"));
@@ -904,7 +952,7 @@ b2rThreadConverter.prototype = {
 			throw Components.results.NS_ERROR_FILE_NOT_FOUND;
 		}
 
-			// Šî–{ƒXƒLƒ“ƒ^ƒO‚Ì’uŠ·
+			// åŸºæœ¬ã‚¹ã‚­ãƒ³ã‚¿ã‚°ã®ç½®æ›
 		this._tmpHeader = this._replaceBaseTag(this._tmpHeader);
 		this._tmpFooter = this._replaceBaseTag(this._tmpFooter);
 		this._tmpRes = this._replaceBaseTag(this._tmpRes);
@@ -914,7 +962,7 @@ b2rThreadConverter.prototype = {
 		this._tmpGetRes = this.toFunction(this._tmpRes);
 		this._tmpGetNewRes = this.toFunction(this._tmpNewRes);
 
-				// ‹Œd—l‚ÌŒİŠ·«Šm•Û
+				// æ—§ä»•æ§˜ã®äº’æ›æ€§ç¢ºä¿
 		if(!this._tmpFooter.match(/<STATUS\/>/)){
 			this._tmpFooter = '<p class="info"><STATUS/></p>\n' + this._tmpFooter;
 		}
@@ -937,8 +985,8 @@ b2rThreadConverter.prototype = {
 	},
 
 	/**
-	 * Šî–{ƒXƒLƒ“ƒ^ƒO‚Ì’uŠ·
-	 * @param aString string ’uŠ·‚³‚ê‚é•¶š—ñ
+	 * åŸºæœ¬ã‚¹ã‚­ãƒ³ã‚¿ã‚°ã®ç½®æ›
+	 * @param aString string ç½®æ›ã•ã‚Œã‚‹æ–‡å­—åˆ—
 	 */
 	_replaceBaseTag: function(aString){
 		var requestURL = this._context._handler.requestURL;
@@ -989,9 +1037,9 @@ b2rThreadConverter.prototype = {
 
 	getStatusText: function(aStatus){
 	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
-                                      .getService(Ci.nsIStringBundleService);
+					.getService(Ci.nsIStringBundleService);
 		var statusBundle = strBundleService.createBundle(
-								"chrome://chaika/content/server/thread-status.properties");
+					"resource://chaika-modules/server/thread-status.properties");
 		var statusText = "";
 		if(typeof(aStatus) == "string"){
 			try{
@@ -1036,9 +1084,9 @@ b2rThreadConverter.prototype = {
 			aDate = aDate + " Be:" + aBeID;
 
 		var resIDColor = (template.search(/<IDCOLOR\/>/) != -1) ?
-				this._dd2Color.getColor(aID, false) : "inherit";
+				this._id2Color.getColor(aID, false) : "inherit";
 		var resIDBgColor = (template.search(/<IDBACKGROUNDCOLOR\/>/) != -1) ?
-				this._dd2Color.getColor(aID, true) : "inherit";
+				this._id2Color.getColor(aID, true) : "inherit";
 
 		if(this.isAA(aMessage)){
 			aMessage = '<span class="aaRes">' + aMessage + '</span>';
@@ -1058,7 +1106,7 @@ b2rThreadConverter.prototype = {
 	isAA: function(aMessage) {
 		var lineCount = aMessage.match(/<br>/g);
 		if(lineCount && lineCount.length >= 3){
-			var spaceCount = aMessage.match(/[ @\.:i\|]/g);
+			var spaceCount = aMessage.match(/[ ã€€\.:i\|]/g);
 			if(spaceCount && (spaceCount.length / aMessage.length) >= 0.3){
 				return true;
 			}
