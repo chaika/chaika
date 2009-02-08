@@ -7,9 +7,15 @@
 
 	<!-- Toolbar Button -->
 	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="chaika-toolbarbutton" tooltiptext="chaika"
+		<toolbarbutton id="chaika-toolbarbutton" tooltiptext="chaika" context="chaika-history-popup"
 			observes="viewChaikaSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
 	</toolbarpalette>
+
+	<!-- PopupSet -->
+	<popupset id="mainPopupSet">
+		<menupopup id="chaika-history-popup" tooltiptext=""
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
+	</popupset>
 
 	<!-- SideBar Menu -->
 	<menupopup id="viewSidebarMenu">
