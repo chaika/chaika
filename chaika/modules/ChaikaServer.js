@@ -268,7 +268,8 @@ ChaikaServerHandler.prototype = {
 			this._script.start(this);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
-			var message = (typeof(ex) == "string") ? ex : ex.message + "\n" + ex.fileName +" : "+ ex.lineNumber;
+			var message = (typeof(ex) == "string") ? ex :
+					(ex.message + "\n" + ex.fileName +" : "+ ex.lineNumber);
 			this.sendErrorPage(500, message);
 		}
 	},
@@ -278,9 +279,9 @@ ChaikaServerHandler.prototype = {
 		if(this.isAlive){
 			var str = String(aString);
 			this._output.write(str, str.length);
-		}else if(this._scope && this._scope.script){
-			this._scope.script.cancel();
-			this._scope = null;
+		}else if(this._script){
+			this._script.cancel();
+			this._script = null;
 		}
 	},
 
