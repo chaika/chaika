@@ -1106,7 +1106,8 @@ b2rThreadConverter.prototype = {
 	isAA: function(aMessage) {
 		var lineCount = aMessage.match(/<br>/g);
 		if(lineCount && lineCount.length >= 3){
-			var spaceCount = aMessage.match(/[ 　\.:i\|]/g);
+				// \x8140 = 全角空白(Shift_JIS)
+			var spaceCount = aMessage.match(/[ \x8140\.:i\|]/g);
 			if(spaceCount && (spaceCount.length / aMessage.length) >= 0.3){
 				return true;
 			}
