@@ -269,6 +269,8 @@
 			<parameter name="aTransferData"/>
 			<parameter name="aDragAction"/>
 			<body><![CDATA[
+				if(aEvent.originalTarget.localName != "treechildren") return;
+
 				var row = {};
 				var obj = {};
 				this.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
