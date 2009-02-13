@@ -417,19 +417,27 @@ ChaikaBoard.prototype = {
 				var created  = statement.getString(9);
 				var url      = threadUrlSpec + datID + "/";
 
+				var statusSort = status + 10000;
+				var numberSort = number + 10000;
+				var numberReverse = 20000 - number;
+				var countSort  = count + 10000;
+				var readSort   = read + 10000;
+				var unreadSort = unread + 10000;
+
 				var itemNode = this.itemsDoc.createElement("boarditem");
 				itemNode.setAttribute("status",     status);
+				itemNode.setAttribute("statusSort", statusSort +":"+ numberReverse);
 				itemNode.setAttribute("number",     number);
-				itemNode.setAttribute("numberSort", number + 10000);
+				itemNode.setAttribute("numberSort", numberSort);
 				itemNode.setAttribute("datID",      datID);
 				itemNode.setAttribute("threadID",   threadID);
 				itemNode.setAttribute("title",      title);
 				itemNode.setAttribute("count",      count);
-				itemNode.setAttribute("countSort",  count + 10000);
+				itemNode.setAttribute("countSort",  countSort +":"+ numberReverse);
 				itemNode.setAttribute("read",       read);
-				itemNode.setAttribute("readSort",   read + 10000);
+				itemNode.setAttribute("readSort",   readSort +":"+ numberReverse);
 				itemNode.setAttribute("unread",     unread);
-				itemNode.setAttribute("unreadSort", (unread + 10000) +" "+ (read + 10000));
+				itemNode.setAttribute("unreadSort", unreadSort +":"+ readSort +":"+ numberReverse);
 
 				if(force > 60){
 					itemNode.setAttribute("force",  Math.round(force/24) +"/h");
