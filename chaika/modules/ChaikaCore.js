@@ -1066,7 +1066,7 @@ ChaikaIO.prototype = {
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
 		}finally{
-			binaryStream.close();
+			// binaryStream.close();
 			fileStream.close();
 		}
 
