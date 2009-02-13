@@ -205,9 +205,15 @@ Thread2ch.prototype = {
 		}catch(ex){
 			if(ex == Components.results.NS_ERROR_FILE_NOT_FOUND){
 				var skinName = ChaikaCore.pref.getUniChar("thread_skin");
-				skinName = UniConverter.toSJIS(skinName);
-				this.write("スキン ("+ skinName +") の読み込みに失敗したため、");
-				this.write("設定をデフォルトスキンに戻しました。<br>ページを更新してください。");
+
+			    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+						.getService(Ci.nsIStringBundleService);
+				var statusBundle = strBundleService.createBundle(
+						"resource://chaika-modules/server/thread-status.properties");
+				var skinLoadErrorString = statusBundle.formatStringFromName(
+						"skin_load_error", [skinName], 1);
+				skinLoadErrorString = UniConverter.toSJIS(skinLoadErrorString);
+				this.write(skinLoadErrorString);
 				this.close();
 				ChaikaCore.pref.setChar("thread_skin", "");
 				return;
@@ -391,14 +397,6 @@ Thread2ch.prototype = {
 			resDate = RegExp.$1;
 			resID = RegExp.$2;
 		}
-
-		/*
-			// resDate に IP が含まれている場合は IP を ID として扱う
-		if(resDate.match(/(.+)発信元:(.+)/)){
-			resDate = RegExp.$1;
-			resID = RegExp.$2;
-		}
-		*/
 
 		if(resBeID){
 			var regBeID = /^(\d+)/;
