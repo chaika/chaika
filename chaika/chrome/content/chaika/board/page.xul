@@ -88,6 +88,8 @@
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
 		onclick="BoardTree.click(event)" onkeypress="BoardTree.keyDown(event)"
 		ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
+ 		onmousemove="BoardTree.mouseMove(event)"
+ 		onmouseout="BoardTree.mouseOut(event)"
 		datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
 	<treecols>
 		<treecol id="boardTreeCol-status" label="!"        sort="?statusSort" style="width:3em;"
@@ -120,15 +122,15 @@
 		<action>
 			<treechildren flex="1">
 				<treeitem uri="?">
-					<treerow>
-						<treecell label="" properties="icon s?status"/>
-						<treecell label="?number"/>
-						<treecell label="?title" value="?url"/>
-						<treecell label="?count"/>
-						<treecell label="?read"/>
-						<treecell label="?unread"/>
-						<treecell label="?force"/>
-						<treecell label="?created"/>
+					<treerow properties="s?status">
+						<treecell label=""         properties="s?status status"/>
+						<treecell label="?number"  properties="s?status number"/>
+						<treecell label="?title"   properties="s?status title" value="?url"/>
+						<treecell label="?count"   properties="s?status count"/>
+						<treecell label="?read"    properties="s?status read"/>
+						<treecell label="?unread"  properties="s?status unread"/>
+						<treecell label="?force"   properties="s?status force"/>
+						<treecell label="?created" properties="s?status created"/>
 					</treerow>
 				</treeitem> 
 			</treechildren>

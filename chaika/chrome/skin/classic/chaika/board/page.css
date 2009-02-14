@@ -62,33 +62,33 @@
 
 
 
-#boardTree treechildren::-moz-tree-image(icon){
+#boardTree treechildren::-moz-tree-image(status){
   margin-left: 2px;
   list-style-image: url("chrome://chaika/skin/board/status-icon.png") !important;
 }
 
 /*  STATUS_NEW  */
-#boardTree treechildren::-moz-tree-image(icon, s3){
+#boardTree treechildren::-moz-tree-image(status, s3){
   -moz-image-region: rect(0px, 12px, 12px, 0px);
 }
 
 /*  STATUS_UNREAD  */
-#boardTree treechildren::-moz-tree-image(icon, s2){
+#boardTree treechildren::-moz-tree-image(status, s2){
   -moz-image-region: rect(0px, 24px, 12px, 12px);
 }
 
 /*  STATUS_SUBSCRIBE  */
-#boardTree treechildren::-moz-tree-image(icon, s1){
+#boardTree treechildren::-moz-tree-image(status, s1){
   -moz-image-region: rect(0px, 36px, 12px, 24px);
 }
 
 /*  STATUS_NONE  */
-#boardTree treechildren::-moz-tree-image(icon, s0){
+#boardTree treechildren::-moz-tree-image(status, s0){
   -moz-image-region: rect(0px, 48px, 12px, 36px);
 }
 
 /*  STATUS_DOWN  */
-#boardTree treechildren::-moz-tree-image(icon, s4){
+#boardTree treechildren::-moz-tree-image(status, s4){
   -moz-image-region: rect(0px, 60px, 12px, 48px);
 }
 
@@ -106,5 +106,11 @@
 }
 
 #boardTree treechildren::-moz-tree-cell {
+  cursor: pointer;
   margin-right: 4px;
+}
+
+#boardTree treechildren::-moz-tree-cell-text(title, hover) {
+  cursor: pointer;
+  text-decoration: underline;
 }

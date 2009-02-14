@@ -28,13 +28,23 @@
 			this._builderObserver._context = this;
 		
 			this.builder.addObserver(this._builderObserver);
+
+			var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+					.getService(Components.interfaces.nsIWindowMediator);
+			var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+			if(browserWindow && browserWindow.XULBrowserWindow){
+				this._XULBrowserWindow = browserWindow.XULBrowserWindow;
+			}
 		]]></constructor>
 
 		<destructor><![CDATA[
 			this.builder.removeObserver(this._builderObserver);
+			this.builder._XULBrowserWindow = null;
 		]]></destructor>
 
 		<field name="_builderObserver">null</field>
+		<field name="_XULBrowserWindow">null</field>
+		<field name="_lastMouseOverIndex">null</field>
 
 		<method name="initTree">
 			<parameter name="aBbsmenuXMLFile"/>
@@ -324,6 +334,30 @@
 				self._clickDelay(aEvent);
 			}, 150, event);
 
+		]]></handler>
+
+
+		<handler event="mousemove"><![CDATA[
+			if(!this._XULBrowserWindow) return;
+			if(event.originalTarget.localName != "treechildren") return;
+			var row = {}
+			var obj = {};
+			this.treeBoxObject.getCellAt(event.clientX, event.clientY, row, {}, obj);
+			if(row.value == -1) return;	// ツリーのアイテム以外
+			if(row.value == this._lastMouseOverIndex) return;
+
+			if(this.view.isContainer(row.value) || this.view.isContainer(row.value)){
+				this._XULBrowserWindow.setOverLink("", null);
+			}else{
+				this._XULBrowserWindow.setOverLink(this._getItem(row.value).urlSpec, null);
+			}
+			this._lastMouseOverIndex = row.value;
+		]]></handler>
+
+
+		<handler event="mouseout"><![CDATA[
+			if(!this._XULBrowserWindow) return;
+			this._XULBrowserWindow.setOverLink("", null);
 		]]></handler>
 
 

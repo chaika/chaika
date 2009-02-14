@@ -67,7 +67,15 @@
   -moz-image-region: rect(0px, 96px, 16px, 80px);
 }
 
+#bbsmenuTree treechildren::-moz-tree-cell(leaf),
+#bbsmenuTree treechildren::-moz-tree-image(leaf) {
+  cursor: pointer;
+}
 
+#bbsmenuTree treechildren::-moz-tree-cell-text(leaf, hover) {
+  cursor: pointer;
+  text-decoration: underline;
+}
 
 
 /* ***** find2ch ***** */

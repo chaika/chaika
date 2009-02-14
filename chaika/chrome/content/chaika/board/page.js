@@ -208,6 +208,13 @@ var BoardTree = {
 			this.firstInitBoardTree = false;
 		}
 
+		var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+				.getService(Components.interfaces.nsIWindowMediator);
+		var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+		if(browserWindow && browserWindow.XULBrowserWindow){
+			this._XULBrowserWindow = browserWindow.XULBrowserWindow;
+		}
+
 		var startTime = Date.now();
 
 		var searchStr = document.getElementById("searchTextBox").value;
@@ -304,6 +311,27 @@ var BoardTree = {
 		}else{
 			this.openThread(false);
 		}
+	},
+
+
+	mouseMove: function BoardTree_mouseMove(aEvent){
+		if(!this._XULBrowserWindow) return;
+		if(aEvent.originalTarget.localName != "treechildren") return;
+
+		var index = this.getClickItemIndex(aEvent);
+		if(index == -1) return;
+		if(index == this._lastMouseOverIndex) return;
+
+		this._XULBrowserWindow.setOverLink(this.getItemURL(index).spec, null);
+
+		this._lastMouseOverIndex = index;
+	},
+
+
+	mouseOut: function BoardTree_mouseOut(aEvent){
+		if(!this._XULBrowserWindow) return;
+
+		this._XULBrowserWindow.setOverLink("", null);
 	},
 
 
