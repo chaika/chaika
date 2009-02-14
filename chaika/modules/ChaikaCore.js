@@ -511,7 +511,9 @@ ChaikaLogger.prototype = {
 		if(this._level >= this.LEVEL_ERROR){
 			var consoleService = Cc["@mozilla.org/consoleservice;1"]
 					.getService(Ci.nsIConsoleService);
-			consoleService.registerListener(this);
+
+			// TODO Fx3.1 で再起動時にクラッシュすることがあるので、解決策が見つかるまでコメントアウト
+			// consoleService.registerListener(this);
 			this._registConsole = true;
 		}
 
@@ -528,7 +530,7 @@ ChaikaLogger.prototype = {
 		if(this._registConsole){
 			var consoleService = Cc["@mozilla.org/consoleservice;1"]
 					.getService(Ci.nsIConsoleService);
-			consoleService.unregisterListener(this);
+			// consoleService.unregisterListener(this);
 		}
 
 		this._initialized = false;
