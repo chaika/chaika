@@ -118,7 +118,9 @@ function shutdown(){
 
 
 function finish(){
-	SubmitPage.reloadThreadPage();
+	if(ChaikaCore.pref.getBool("post.thread_reload")){
+		SubmitPage.reloadThreadPage();
+	}
 
 	return true;
 }
@@ -471,6 +473,11 @@ var SubmitPage = {
 		gWizard.getButton("finish").disabled = false;
 		document.getElementById("reSubmitButton").disabled = true;
 		document.getElementById("submitProgress").hidden = true;
+
+		if(ChaikaCore.pref.getBool("post.auto_finish")){
+			var delay = ChaikaCore.pref.getInt("post.auto_finish_delay");
+			setTimeout(function(){ gWizard.advance(null); }, delay);
+		}
 	},
 
 

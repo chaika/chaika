@@ -54,3 +54,7 @@ pref("extensions.chaika.thread_aa_line_space", 2);
 pref("extensions.chaika.thread_hide_abone", false);
 pref("extensions.chaika.thread_chain_abone", false);
 pref("extensions.chaika.thread_show_be_icon", false);
+
+pref("extensions.chaika.post.thread_reload", true);
+pref("extensions.chaika.post.auto_finish", false);
+pref("extensions.chaika.post.auto_finish_delay", 750);
