@@ -326,14 +326,22 @@
 			if(isContainer) return;
 			if(button>1) return;
 
-			if(this._clickTimer){
-				clearTimeout(this._clickTimer);
-			}
-			var self = this;
-			this._clickTimer = setTimeout(function(aEvent){
-				self._clickDelay(aEvent);
-			}, 150, event);
+			var clickAction = ChaikaCore.pref.getInt("bbsmenu_click_action");
+			var doubleClickAction = ChaikaCore.pref.getInt("bbsmenu_double_click_action");
 
+			if(button==1 || doubleClickAction == 0 || clickAction==doubleClickAction){
+					// ダブルクリックの動作が指定されていない場合や
+					// クリックと同じ動作ならダブルクリック判定を行わない
+				this._clickDelay(event);
+			}else{
+				if(this._clickTimer){
+					clearTimeout(this._clickTimer);
+				}
+				var self = this;
+				this._clickTimer = setTimeout(function(aEvent){
+					self._clickDelay(aEvent);
+				}, 350, event);
+			}
 		]]></handler>
 
 

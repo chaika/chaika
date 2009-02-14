@@ -260,12 +260,23 @@ var BoardTree = {
 			// ツリーのアイテム以外をクリック
 		if(this.getClickItemIndex(aEvent) == -1) return;
 
-		if(this._clickTimer){
-			clearTimeout(this._clickTimer);
-		}
-		this._clickTimer = setTimeout(function(aEvent){
+		if(aEvent.ctrlKey || aEvent.shiftKey) return;
+
+		var clickAction = ChaikaCore.pref.getInt("board_click_action");
+		var doubleClickAction = ChaikaCore.pref.getInt("board_double_click_action");
+
+		if(aEvent.button==1 || doubleClickAction == 0 || clickAction==doubleClickAction){
+				// ダブルクリックの動作が指定されていない場合や
+				// クリックと同じ動作ならダブルクリック判定を行わない
 			BoardTree.clickDelay(aEvent);
-		}, 50, aEvent);
+		}else{
+			if(this._clickTimer){
+				clearTimeout(this._clickTimer);
+			}
+			this._clickTimer = setTimeout(function(aEvent){
+				BoardTree.clickDelay(aEvent);
+			}, 350, aEvent);
+		}
 	},
 
 
