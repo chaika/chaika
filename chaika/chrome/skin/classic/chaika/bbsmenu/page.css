@@ -90,3 +90,12 @@
 .searcingImage {
   list-style-image:url("chrome://chaika/skin/bbsmenu/searching.png");
 }
+
+#find2ch listitem {
+  cursor: pointer;
+}
+
+#find2ch listitem:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}

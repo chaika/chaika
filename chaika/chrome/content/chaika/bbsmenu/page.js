@@ -298,15 +298,23 @@ var find2ch = {
 
 
 	click: function find2ch_search(aEvent){
-		if(aEvent.button >= 2){
-			return;
-		}
+		if(aEvent.originalTarget.localName != "listitem") return;
+		if(aEvent.button >= 2) return;
 
-		if(this._clickTimer){
-			clearTimeout(this._clickTimer);
+		var clickAction = ChaikaCore.pref.getInt("bbsmenu_click_action");
+		var doubleClickAction = ChaikaCore.pref.getInt("bbsmenu_double_click_action");
+
+		if(aEvent.button==1 || doubleClickAction == 0 || clickAction==doubleClickAction){
+				// ダブルクリックの動作が指定されていない場合や
+				// クリックと同じ動作ならダブルクリック判定を行わない
+			find2ch._clickDelay(aEvent);
+		}else{
+			if(this._clickTimer) clearTimeout(this._clickTimer);
+			this._clickTimer = setTimeout(find2ch._clickDelay, 350, aEvent);
 		}
-		this._clickTimer = setTimeout(find2ch._clickDelay, 5, aEvent);
 	},
+
+
 	_clickDelay: function find2ch__clickDelay(aEvent){
 		this._clickTimer = null;
 
@@ -333,7 +341,6 @@ var find2ch = {
 		}else if(openAction==2){
 			find2ch.openThread(true);
 		}
-
 	},
 
 
