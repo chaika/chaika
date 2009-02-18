@@ -321,6 +321,10 @@
 					// ダブルクリックによるコンテナのオープン
 				this._closeAllOpendContainers(event, row.value);
 				return;
+			}else if(detail==1 && obj.value!="twisty" && isContainer){
+				this.view.toggleOpenState(row.value);
+				this._closeAllOpendContainers(event, row.value);
+				return;
 			}
 
 			if(isContainer) return;
