@@ -369,6 +369,7 @@ Thread2ch.prototype = {
 		var resID = "";
 		var resBeID = "";
 		var resMes	= "";
+		var isAbone = false;
 
 		if(resArray.length > 3){
 			resName = resArray[0]; //.replace(/<\/?b>|/g, "");
@@ -409,7 +410,7 @@ Thread2ch.prototype = {
 
 		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
-			resName = resMail = resDate = resMes = "ABONE";
+			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
@@ -433,7 +434,7 @@ Thread2ch.prototype = {
 		});
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
-			resName = resMail = resDate = resMes = "ABONE";
+			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
@@ -467,7 +468,7 @@ Thread2ch.prototype = {
 			this._handler.flush();
 		}
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
-								resMailName, resDate, resID, resBeID, resMes);
+								resMailName, resDate, resID, resBeID, resMes, isAbone);
 		return response;
 	},
 
@@ -709,6 +710,7 @@ ThreadJbbs.prototype = {
 		var resID = "";
 		var resBeID = "";
 		var resMes	= "";
+		var isAbone = false;
 
 		if(resArray.length > 5){
 			resName = resArray[1].replace(/<\/?b>|/g, "");
@@ -719,7 +721,8 @@ ThreadJbbs.prototype = {
 		}
 
 		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
-			resName = resMail = resDate = resMes = "ABONE";
+			this._chainAboneNumbers.push(aNumber);
+			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
@@ -744,7 +747,7 @@ ThreadJbbs.prototype = {
 		});
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
-			resName = resMail = resDate = resMes = "ABONE";
+			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
@@ -766,7 +769,7 @@ ThreadJbbs.prototype = {
 			this._handler.flush();
 		}
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
-								resMailName, resDate, resID, resBeID, resMes);
+								resMailName, resDate, resID, resBeID, resMes, isAbone);
 		return response;
 	},
 
@@ -950,6 +953,14 @@ b2rThreadConverter.prototype = {
 			throw Components.results.NS_ERROR_FILE_NOT_FOUND;
 		}
 
+		try{
+			this._tmpNGRes	  = ChaikaCore.io.readData(this._resolveSkinFile("NGRes.html"));
+			this._tmpNGNewRes = ChaikaCore.io.readData(this._resolveSkinFile("NGNewRes.html"));
+		}catch(ex){
+			this._tmpNGRes    = null;
+			this._tmpNGNewRes = null;
+		}
+
 			// 基本スキンタグの置換
 		this._tmpHeader = this._replaceBaseTag(this._tmpHeader);
 		this._tmpFooter = this._replaceBaseTag(this._tmpFooter);
@@ -959,6 +970,13 @@ b2rThreadConverter.prototype = {
 
 		this._tmpGetRes = this.toFunction(this._tmpRes);
 		this._tmpGetNewRes = this.toFunction(this._tmpNewRes);
+
+		if(this._tmpNGRes && this._tmpNGNewRes){
+			this._tmpNGRes    = this._replaceBaseTag(this._tmpNGRes);
+			this._tmpNGNewRes = this._replaceBaseTag(this._tmpNGNewRes);
+			this._tmpGetNGRes    = this.toFunction(this._tmpNGRes);
+			this._tmpGetNGNewRes = this.toFunction(this._tmpNGNewRes);
+		}
 
 				// 旧仕様の互換性確保
 		if(!this._tmpFooter.match(/<STATUS\/>/)){
@@ -1074,7 +1092,14 @@ b2rThreadConverter.prototype = {
 		);
 	},
 
-	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage){
+	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone){
+
+		if(aIsAbone && !(this._tmpGetNGNewRes && this._tmpGetNGRes)){
+			aName = aMail = aMailName = aDate = aMessage = "ABONE";
+			aID = aBeID = "";
+		}
+
+
 		var template = aNew ? this._tmpNewRes : this._tmpRes;
 		if(!template.match(/<ID\/>/))
 			aDate = aDate + " ID:" + aID;
@@ -1090,15 +1115,24 @@ b2rThreadConverter.prototype = {
 			aMessage = '<span class="aaRes">' + aMessage + '</span>';
 		}
 
-		var result;
-		if(aNew){
-			result = this._tmpGetNewRes(aNumber, aName, aMail, aMailName, aDate, aID,
-						resIDColor, resIDBgColor,aBeID, aMessage);
+
+		var resFunc;
+		if(aIsAbone && this._tmpGetNGNewRes && this._tmpGetNGRes){
+			if(aNew){
+				resFunc = this._tmpGetNGNewRes;
+			}else{
+				resFunc = this._tmpGetNGRes;
+			}
 		}else{
-			result = this._tmpGetRes(aNumber, aName, aMail, aMailName, aDate, aID,
-						resIDColor, resIDBgColor,aBeID, aMessage);
+			if(aNew){
+				resFunc = this._tmpGetNewRes
+			}else{
+				resFunc = this._tmpGetRes;
+			}
 		}
-		return result;
+
+		return resFunc(aNumber, aName, aMail, aMailName, aDate, aID,
+						resIDColor, resIDBgColor,aBeID, aMessage);
 	},
 
 	isAA: function(aMessage) {
