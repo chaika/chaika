@@ -1,15 +1,56 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+
+#chaikaBbsmenuPage,
+#bbsmenuTree,
+#find2ch listbox[anonid="find2chList"],
+#find2ch .searchingPage {
+  background-color: transparent !important;
+  -moz-appearance: none !important;
+  border: none !important;
+}
+
+#bbsmenuTree treechildren::-moz-tree-row {
+  background-color: transparent;
+  border-color: transparent;
+  padding-bottom: 1px;
+  -moz-appearance: none;
+  margin: 0;
+  border: none;
+}
+
+
+#bbsmenuTree treechildren::-moz-tree-row(selected) {  
+  background-color: #6f81a9;
+  background-image: url("chrome://chaika/skin/bbsmenu/selected-gradient.png");
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  border-top: 1px solid #979797;
+}
+
+#bbsmenuTree treechildren::-moz-tree-row(selected,focus) {  
+  background-image: url("chrome://chaika/skin/bbsmenu/selected-focused-gradient.png");
+  background-color: #8a8a8a !important;
+  border-top: 1px solid #91a0c0;
+}
+
+#bbsmenuTree treechildren::-moz-tree-cell-text(selected) {  
+  font-weight: bold !important;
+  color: #ffffff !important;
+}
+
 #mainMenubar {
   -moz-appearance:none;
   padding: 1px 2px 1px 1px;
   border-style: none;
+  border-bottom: 2px solid;
+  -moz-border-bottom-colors: rgba(255,255,255,0.3) rgba(100,100,100,0.3);
   margin: 0px;
 }
 
 #mainMenubar > menu {
   padding: 0px !important;
-  margin: 1px 0px !important;
+  margin: 1px 1px !important;
   list-style-image: url("chrome://chaika/skin/bbsmenu/toolbar-icon.png") !important;
 }
 
