@@ -79,9 +79,14 @@ function startup(){
 		return;
 	}
 
-
 	loadPersist();
 
+	var clickAction = ChaikaCore.pref.getInt("board_click_action");
+	if(clickAction == 0){
+		document.getElementById("boardTree").setAttribute("singleclickmode", "false");
+	}else{
+		document.getElementById("boardTree").setAttribute("singleclickmode", "true");
+	}
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();

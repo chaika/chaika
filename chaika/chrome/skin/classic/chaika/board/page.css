@@ -106,11 +106,14 @@
 }
 
 #boardTree treechildren::-moz-tree-cell {
-  cursor: pointer;
-  margin-right: 4px;
+  margin-right: 2px;
 }
 
-#boardTree treechildren::-moz-tree-cell-text(title, hover) {
+#boardTree[singleclickmode="true"] treechildren::-moz-tree-cell {
+  cursor: pointer;
+}
+
+#boardTree[singleclickmode="true"] treechildren::-moz-tree-cell-text(title, hover) {
   cursor: pointer;
   text-decoration: underline;
 }

@@ -26,6 +26,12 @@ function startup(){
 	historyMenu.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
 	showViewFoxAge2chMenu();
 
+	var clickAction = ChaikaCore.pref.getInt("bbsmenu_click_action");
+	if(clickAction == 0){
+		document.getElementById("find2ch").setAttribute("singleclickmode", "false");
+	}else{
+		document.getElementById("find2ch").setAttribute("singleclickmode", "true");
+	}
 
 	if(gBbsMenuXMLFile.exists()){
 		if(!gBbsMenuXMLFile.exists()){

@@ -67,12 +67,12 @@
   -moz-image-region: rect(0px, 96px, 16px, 80px);
 }
 
-#bbsmenuTree treechildren::-moz-tree-cell(leaf),
-#bbsmenuTree treechildren::-moz-tree-image(leaf) {
+#bbsmenuTree[singleclickmode="true"] treechildren::-moz-tree-cell(leaf),
+#bbsmenuTree[singleclickmode="true"] treechildren::-moz-tree-image(leaf) {
   cursor: pointer;
 }
 
-#bbsmenuTree treechildren::-moz-tree-cell-text(leaf, hover) {
+#bbsmenuTree[singleclickmode="true"] treechildren::-moz-tree-cell-text(leaf, hover) {
   cursor: pointer;
   text-decoration: underline;
 }
@@ -91,11 +91,11 @@
   list-style-image:url("chrome://chaika/skin/bbsmenu/searching.png");
 }
 
-#find2ch listitem {
+#find2ch[singleclickmode="true"] listitem {
   cursor: pointer;
 }
 
-#find2ch listitem:hover {
+#find2ch[singleclickmode="true"] listitem:hover {
   cursor: pointer;
   text-decoration: underline;
 }

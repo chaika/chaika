@@ -29,6 +29,13 @@
 		
 			this.builder.addObserver(this._builderObserver);
 
+			var clickAction = ChaikaCore.pref.getInt("bbsmenu_click_action");
+			if(clickAction == 0){
+				this.setAttribute("singleclickmode", "false");
+			}else{
+				this.setAttribute("singleclickmode", "true");
+			}
+
 			var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
 					.getService(Components.interfaces.nsIWindowMediator);
 			var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
