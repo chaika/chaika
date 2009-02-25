@@ -360,7 +360,9 @@
 
 <binding id="toolbar-group">
 	<content>
-		<children/>
+		<xul:hbox class="toolbar-group-inner-box" flex="1">
+			<children/>
+		</xul:hbox>
 	</content>
 
 	<implementation>
