@@ -53,12 +53,10 @@ b2rAboneManager.prototype = {
 	_startup: function(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		this._loadAboneData();
-		dump("b2rAboneManager.startup\n");
 	},
 
 	_shutdown: function(){
 		this._saveAboneData();
-		dump("b2rAboneManager.shutdown\n");
 	},
 
 	_loadAboneData: function(){
@@ -222,7 +220,6 @@ b2rAboneManager.prototype = {
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		switch(aTopic){
 			case "app-startup":
-				dump("b2rAboneManager\n");
 				os.addObserver(this, "profile-after-change", false);
 				os.addObserver(this, "quit-application", false);
 				break;
