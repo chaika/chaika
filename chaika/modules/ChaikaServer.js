@@ -47,12 +47,34 @@ const Cr = Components.results;
 
 
 var gServerScriptList = [];
+var gWindow = null;
 
 
 /** @ignore */
 function makeException(aResult, aMessage){
 	var stack = Components.stack.caller.caller;
 	return new Components.Exception(aMessage || "exception", aResult, stack);
+}
+
+
+/** @ignore */
+function sleep(aWait) {
+	var timer = { timeup: false };
+
+	if(!gWindow){
+		gWindow = Cc["@mozilla.org/appshell/appShellService;1"]
+			.getService(Ci.nsIAppShellService).hiddenDOMWindow;
+	}
+
+	var interval = gWindow.setInterval(function(){
+		timer.timeup = true;
+	}, aWait);
+
+	var thread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
+	while(!timer.timeup){
+		thread.processNextEvent(true);
+	}
+	gWindow.clearInterval(interval);
 }
 
 
@@ -280,8 +302,8 @@ ChaikaServerHandler.prototype = {
 
 	write: function ChaikaServerHandler_write(aString){
 		if(this.isAlive){
-			var str = String(aString);
-			this._output.write(str, str.length);
+			sleep(0);
+			this._output.write(aString, aString.length);
 		}else if(this._script){
 			this._script.cancel();
 			this._script = null;
@@ -291,6 +313,7 @@ ChaikaServerHandler.prototype = {
 
 	flush: function ChaikaServerHandler_flush(aString){
 		if(this.isAlive){
+			sleep(100);
 			this._output.flush();
 		}
 	},
