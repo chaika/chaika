@@ -95,18 +95,19 @@ chRedirector.prototype = {
 			}
 		}
 
+		var spec = aContentLocation.spec;
 			// Be Profile Page
-		if(aContentLocation.spec.indexOf("http://be.2ch.net/test/p.php") != -1){
+		if(spec.indexOf("http://be.2ch.net/test/p.php")!=-1){
 			return Ci.nsIContentPolicy.ACCEPT;
 		}
 
-		if(aContentLocation.spec.indexOf("/read.cgi/") == -1){
+		if(spec.indexOf("/read.cgi/")==-1 && spec.indexOf("/test/read.html/")==-1){
 			return Ci.nsIContentPolicy.ACCEPT;
 		}
 
 		var replaceViewLimit = ChaikaCore.pref.getBool("browser.redirector.replace_view_limit");
 		var threadURL = ChaikaCore.browser._getThreadURL(aContentLocation, replaceViewLimit, false);
-		aContentLocation.spec = threadURL.spec;
+		aContentLocation.spec = threadURL.spec.replace("/test/read.html/", "/test/read.cgi/");
 
 		return Ci.nsIContentPolicy.ACCEPT;
 	},

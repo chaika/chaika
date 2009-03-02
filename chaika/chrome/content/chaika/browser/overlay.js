@@ -32,6 +32,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 		var pathname = gContextMenu.link.pathname;
 		if(pathname.indexOf("/test/read.cgi/")==-1 &&
+				pathname.indexOf("/test/read.html/")==-1 &&
 				pathname.indexOf("/bbs/read.cgi/")==-1) return;
 
 		document.getElementById("context-chaika").hidden = false;
@@ -48,7 +49,9 @@ ChaikaBrowserOverlay.contextMenu = {
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 		try{
-			var threadURL = ioService.newURI(gContextMenu.link, null, null);
+			var threadURLSpec = gContextMenu.link.href;
+			threadURLSpec = threadURLSpec.replace("/test/read.html/", "/test/read.cgi/");
+			var threadURL = ioService.newURI(threadURLSpec, null, null);
 			ChaikaCore.browser.openThread(threadURL, aAddTab, disregardURLOption, false);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
