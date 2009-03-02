@@ -37,7 +37,7 @@
 			<row class="setting-row">
 				<description class="setting-description">コンテキストメニュー :</description>
 				<vbox>
-					<checkbox label="コンテキストメニューに chaika の項目を追加する"
+					<checkbox label="コンテキストメニューに chaika の項目を追加する *"
 							preference="extensions.chaika.enable_browser_contextmenu"/>
 					<hbox id="boxDisregardURLOption" class="indent">
 						<checkbox label="URL の表示制限を無視して開く"
@@ -57,7 +57,7 @@
 			<row class="setting-row">
 				<description class="setting-description">スレッドリダイレクタ :</description>
 				<vbox>
-					<checkbox label="2ch スレッド URL を自動的に chaika で開く"
+					<checkbox label="2ch スレッド URL を自動的に chaika で開く *"
 							preference="extensions.chaika.browser.redirector.enabled"/>
 					<vbox id="redirectorSubBox" class="indent">
 						<checkbox label="ブックマークやスレッド表示からはそのまま開く"
@@ -70,6 +70,9 @@
 
 		</rows>
 	</grid>
+	<hbox style="margin:0.5em 0px 0px 0.5em">
+		<description>* 設定変更はブラウザ再起動後に反映されます</description>
+	</hbox>
 
 </prefpane>
 

@@ -31,7 +31,7 @@
 			<row class="setting-row">
 				<description class="setting-description">ログファイル :</description>
 				<vbox>
-					<checkbox label="ログファイルの位置を指定する"
+					<checkbox label="ログファイルの位置を指定する *"
 							preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
 					<hbox id="boxDataDir" class="indent" flex="1" align="start">
 						<textbox id="txtDataDir" flex="8"
@@ -68,6 +68,9 @@
 
 		</rows>
 	</grid>
+	<hbox style="margin:0.5em 0px 0px 0.5em">
+		<description>* 設定変更はブラウザ再起動後に反映されます</description>
+	</hbox>
 
 </prefpane>
 
