@@ -41,6 +41,7 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 
 
 const Ci = Components.interfaces;
@@ -177,9 +178,6 @@ Thread2ch.prototype = {
 
 	init: function(aHandler, aThreadURL, aBoardURL, aType){
 		this._handler = aHandler;
-
-		this._aboneManager = Cc["@mozilla.org/b2r-abone-manager;1"]
-					.getService(Ci.b2rIAboneManager);
 
 		this._chainAboneNumbers = new Array();
 		this._enableChainAbone = ChaikaCore.pref.getBool("thread_chain_abone");
@@ -408,7 +406,7 @@ Thread2ch.prototype = {
 			}
 		}
 
-		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
+		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
@@ -720,7 +718,7 @@ ThreadJbbs.prototype = {
 			resID = resArray[6];
 		}
 
-		if(this._aboneManager.shouldAbone(resName, resMail, resID, resMes)){
+		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
 			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){

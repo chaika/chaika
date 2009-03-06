@@ -61,12 +61,17 @@ ChaikaService.prototype = {
 		Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 		ChaikaServer._startup();
 
+		Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+		ChaikaAboneManager._startup();
+
+
 		Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 	},
 
 
 	_quitApp: function ChaikaService__quitApp(){
+		ChaikaAboneManager._quit();
 		ChaikaCore._quit();
 		Chaika2chViewer._quit();
 		ChaikaServer._quit();

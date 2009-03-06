@@ -21,8 +21,8 @@
 		<tabpanel orient="vertical">
 			<hbox>
 				<textbox id="aboneNameTextBox" flex="1"/>
-				<button label="追加" onclick="addAbone(b2rIAboneManager.ABONE_TYPE_NAME)"/>
-				<button label="削除" onclick="removeAbone(b2rIAboneManager.ABONE_TYPE_NAME)"/>
+				<button label="追加" onclick="addAbone(ChaikaAboneManager.ABONE_TYPE_NAME)"/>
+				<button label="削除" onclick="removeAbone(ChaikaAboneManager.ABONE_TYPE_NAME)"/>
 			</hbox>
 			<listbox id="aboneNameListBox" flex="1"/>
 		</tabpanel>
@@ -30,8 +30,8 @@
 		<tabpanel orient="vertical">
 			<hbox>
 				<textbox id="aboneMailTextBox" flex="1"/>
-				<button label="追加" onclick="addAbone(b2rIAboneManager.ABONE_TYPE_MAIL)"/>
-				<button label="削除" onclick="removeAbone(b2rIAboneManager.ABONE_TYPE_MAIL)"/>
+				<button label="追加" onclick="addAbone(ChaikaAboneManager.ABONE_TYPE_MAIL)"/>
+				<button label="削除" onclick="removeAbone(ChaikaAboneManager.ABONE_TYPE_MAIL)"/>
 			</hbox>
 			<listbox id="aboneMailListBox" flex="1"/>
 		</tabpanel>
@@ -39,8 +39,8 @@
 		<tabpanel orient="vertical">
 			<hbox>
 				<textbox id="aboneIDTextBox" flex="1"/>
-				<button label="追加" onclick="addAbone(b2rIAboneManager.ABONE_TYPE_ID)"/>
-				<button label="削除" onclick="removeAbone(b2rIAboneManager.ABONE_TYPE_ID)"/>
+				<button label="追加" onclick="addAbone(ChaikaAboneManager.ABONE_TYPE_ID)"/>
+				<button label="削除" onclick="removeAbone(ChaikaAboneManager.ABONE_TYPE_ID)"/>
 			</hbox>
 			<listbox id="aboneIDListBox" flex="1"/>
 		</tabpanel>
@@ -48,8 +48,8 @@
 		<tabpanel orient="vertical">
 			<hbox>
 				<textbox id="aboneWordTextBox" flex="1"/>
-				<button label="追加" onclick="addAbone(b2rIAboneManager.ABONE_TYPE_WORD)"/>
-				<button label="削除" onclick="removeAbone(b2rIAboneManager.ABONE_TYPE_WORD)"/>
+				<button label="追加" onclick="addAbone(ChaikaAboneManager.ABONE_TYPE_WORD)"/>
+				<button label="削除" onclick="removeAbone(ChaikaAboneManager.ABONE_TYPE_WORD)"/>
 			</hbox>
 			<listbox id="aboneWordListBox" flex="1"/>
 		</tabpanel>

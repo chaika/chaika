@@ -35,11 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-const b2rIAboneManager = Components.interfaces.b2rIAboneManager;
-
-var gAboneManager = Components.classes["@mozilla.org/b2r-abone-manager;1"]
-					.getService(b2rIAboneManager);
-
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 
 var gAboneObserver = {
 	observe: function(aSubject, aTopic, aData){
@@ -55,20 +51,20 @@ var gAboneObserver = {
 
 		var aboneListBox;
 		switch(aboneType){
-			case b2rIAboneManager.ABONE_TYPE_NAME:
+			case ChaikaAboneManager.ABONE_TYPE_NAME:
 				aboneListBox = document.getElementById("aboneNameListBox");
 				break;
-			case b2rIAboneManager.ABONE_TYPE_MAIL:
+			case ChaikaAboneManager.ABONE_TYPE_MAIL:
 				aboneListBox = document.getElementById("aboneMailListBox");
 				break;
-			case b2rIAboneManager.ABONE_TYPE_ID:
+			case ChaikaAboneManager.ABONE_TYPE_ID:
 				aboneListBox = document.getElementById("aboneIDListBox");
 				break;
-			case b2rIAboneManager.ABONE_TYPE_WORD:
+			case ChaikaAboneManager.ABONE_TYPE_WORD:
 				aboneListBox = document.getElementById("aboneWordListBox");
 				break;
 		}
-		var aboneData = gAboneManager.getAboneData(aboneType);
+		var aboneData = ChaikaAboneManager.getAboneData(aboneType);
 		initList(aboneData, aboneListBox);
 	}
 };
@@ -81,10 +77,10 @@ function startup(){
 	var aboneWordListBox = document.getElementById("aboneWordListBox");
 
 
-	initList(gAboneManager.getAboneData(b2rIAboneManager.ABONE_TYPE_NAME), aboneNameListBox);
-	initList(gAboneManager.getAboneData(b2rIAboneManager.ABONE_TYPE_MAIL), aboneMailListBox);
-	initList(gAboneManager.getAboneData(b2rIAboneManager.ABONE_TYPE_ID), aboneIDListBox);
-	initList(gAboneManager.getAboneData(b2rIAboneManager.ABONE_TYPE_WORD), aboneWordListBox);
+	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_NAME), aboneNameListBox);
+	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_MAIL), aboneMailListBox);
+	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_ID), aboneIDListBox);
+	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_WORD), aboneWordListBox);
 
 	var os = Components.classes["@mozilla.org/observer-service;1"]
 				.getService(Components.interfaces.nsIObserverService);
@@ -123,47 +119,47 @@ function addAbone(aType){
 	var aboneListBox;
 
 	switch(aType){
-		case b2rIAboneManager.ABONE_TYPE_NAME:
+		case ChaikaAboneManager.ABONE_TYPE_NAME:
 			aboneWord = document.getElementById("aboneNameTextBox").value;
 			aboneListBox = document.getElementById("aboneNameListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_MAIL:
+		case ChaikaAboneManager.ABONE_TYPE_MAIL:
 			aboneWord = document.getElementById("aboneMailTextBox").value;
 			aboneListBox = document.getElementById("aboneMailListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_ID:
+		case ChaikaAboneManager.ABONE_TYPE_ID:
 			aboneWord = document.getElementById("aboneIDTextBox").value;
 			aboneListBox = document.getElementById("aboneIDListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_WORD:
+		case ChaikaAboneManager.ABONE_TYPE_WORD:
 			aboneWord = document.getElementById("aboneWordTextBox").value;
 			aboneListBox = document.getElementById("aboneWordListBox");
 			break;
 	}
 	if(!aboneWord) return;
 
-	gAboneManager.addAbone(aboneWord, aType);
+	ChaikaAboneManager.addAbone(aboneWord, aType);
 }
 
 
 function removeAbone(aType){
 	var aboneListBox;
 	switch(aType){
-		case b2rIAboneManager.ABONE_TYPE_NAME:
+		case ChaikaAboneManager.ABONE_TYPE_NAME:
 			aboneListBox = document.getElementById("aboneNameListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_MAIL:
+		case ChaikaAboneManager.ABONE_TYPE_MAIL:
 			aboneListBox = document.getElementById("aboneMailListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_ID:
+		case ChaikaAboneManager.ABONE_TYPE_ID:
 			aboneListBox = document.getElementById("aboneIDListBox");
 			break;
-		case b2rIAboneManager.ABONE_TYPE_WORD:
+		case ChaikaAboneManager.ABONE_TYPE_WORD:
 			aboneListBox = document.getElementById("aboneWordListBox");
 			break;
 	}
 	if(aboneListBox.selectedIndex == -1) return;
 	var aboneWord = aboneListBox.selectedItem.value;
 
-	gAboneManager.removeAbone(aboneWord, aType);
+	ChaikaAboneManager.removeAbone(aboneWord, aType);
 }
