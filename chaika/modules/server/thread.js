@@ -453,7 +453,7 @@ Thread2ch.prototype = {
 
 			// レスID
 		var regResID = / (ID:)([0-9a-z\+\/]+)/ig;
-		resMes = resMes.replace(regResID, ' <span class="resMesID"><span class="mesID_$2">$1$2</span></span>');
+		resMes = resMes.replace(regResID, ' <span class="resMesID" resID="$2"><span class="mesID_$2">$1$2</span></span>');
 
 			// スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
 		if(!this._headerResponded && resArray[4]){
