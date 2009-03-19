@@ -1,14 +1,10 @@
-html * {
-  -moz-box-sizing:border-box;
-}
-
 html {
   background-color: #F6F6F6;
 }
 
 body {
   color: #111;
-  margin: 4em 0px 0px 0px;
+  margin: 4.5em 0px 0px 0px;
 }
 
 h1 {
@@ -85,116 +81,128 @@ h1 {
   opacity: 1;
 }
 
-#pStatus {
-  margin: 60px auto 20px auto;
-  max-width: 350px;
-  padding: 5px;
-  font-size: 0.8em;
-  border: 1px dashed #999;
-  color: #666;
-  font-weight: bold;
+#status {
+  margin: 4em 0px 15px 0px;
   text-align: center;
 }
 
-/* ***** ***** レス ***** ***** */
-dl.resContainer {
-  margin: 5px 10px 25px 10px;
+#status span {
+  padding: 6px 24px;
+  font-size: 0.7em;
+  border: 1px solid #BBB;
+  -moz-border-radius: 6px;
+  color: #888;
 }
+
+
+/* ***** ***** レス ***** ***** */
+
+dl.resContainer {
+  margin: 0.5em 15px 0.5em 15px;
+}
+
 dt.resHeader {
-  margin: 0px 0px 5px 0px;
+  background-color: transparent;
   padding: 2px 4px;
   font-size: 0.8em;
+  color: #777;
+}
+
+dd.resBody {
+  margin: 0px 0px 20px 0px;
+  padding: 12px 35px 12px 25px;
 }
 
 span.resNumber {
   font-weight: bold;
+  color: #111;
 }
 
 dl.resNew span.resNumber {
-  font-weight: bold;
   color: #E63;
 }
 
 span.resName {
   font-weight: bold;
+  font-size: 1.1em;
   color: #369;
-  font-size: 1.2em;
 }
 
 span.resSystem {
   font-weight: normal;
   color: #477;
-} 
+}
 
 span.resID,
 span.resMesID {
   text-decoration: underline;
 }
 
+/* ***** ***** あぼーん レス ***** ***** */
 
-img.beIcon {
-  width: 32px;
-  height: 32px;
+dl[isAbone="true"] dd.resBody {
+  display: none;
+  color: #999;
 }
+
+dl[isAbone="true"] span.resHeaderContent {
+  display: none;
+}
+
+dl[isAbone="true"] dd.resBody * {
+  color: #888;
+}
+
+dl[isAbone="true"] span.resHeaderAboneContent:after {
+  content: "ABONE";
+  font-weight: bold;
+  color: #369;
+  font-size: 1.1em;
+}
+
 
 /* ***** ***** ポップアップ ***** ***** */
 div.popup {
-  padding: 10px;
-  -moz-border-radius: 8px;
-  background-color: rgba(60, 60, 60, 0.85);
-  color: #F6F6F6;
-  position: absolute;
   font-size: 0.8em;
-  overflow: auto;
-  left: -1000px;
-  top: -1000px;
+  padding: 8px;
+  -moz-border-radius: 8px;
+  -moz-box-shadow: #333 0px 0px 12px;
+  background-color: rgba(60, 60, 60, 0.85);
+  position: absolute;
 }
+
+div.popupInner {
+  min-width: 18em;
+  min-height: 3em;
+  max-height: 25em;
+  max-width: 55em;
+  overflow: auto;
+}
+
+div.popup dl.resContainer {
+  margin: 1px;
+}
+
+
+div.popup *,
+div.popup span.resHeaderAboneContent:after {
+  color: #EEE;
+}
+
+
+img.small {
+  width: 200px;
+}
+
+
+div.loadError:after {
+  content: "Load Error";
+}
+
 
 div.imagePopup {
-  padding: 0px;
-  border: 1px solid #555;
-  background-color: rgba(60, 60, 60, 0.85);
-  position: absolute;
-  left: -1000px;
-  top: -1000px;
-}
-
-div.popup a:link,
-div.popup a:visited {
-  color: #76D6F9;
-  text-decoration: none;
-}
-div.popup span.resName {
-  color: #F6F6F6;
-}
-
-div.popup span.resSystem {
-  color: #F6F6F6;
-} 
-
-/* ***** ***** 設定フォーム ***** ***** */
-#prefForm {
-  font-size: 0.9em;
-  margin: 10px 10%;
-  padding: 10px 15px;
-  border: 2px solid #999;
-  background-color: #E9E9E9;
-}
-
-#prefForm fieldset {
-  margin-bottom: 15px;
-}
-
-#prefForm ul {
-  list-style: none;
-  margin: 0px;
-  padding: 2px;
-}
-
-#prefForm li {
-  padding-bottom: 2px;
-}
-
-#prefForm ul ul{
-  padding-left: 2em;
+  min-width:  100px;
+  min-height: 0px;
+  max-height: none;
+  max-width: none;
 }
