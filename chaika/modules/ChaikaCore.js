@@ -900,6 +900,20 @@ ChaikaBrowser.prototype = {
 		var windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
 				.getService(Ci.nsIWindowMediator);
 		return windowMediator.getMostRecentWindow("navigator:browser");
+	},
+
+
+	/**
+	 * 指定したバージョン文字列と現在の Gecko のバージョンを比較する
+	 * @param {String} aVersion バージョン文字列(e.g. "1.8" "1.7.5")
+	 * @return {Number} 指定したバージョンの方が新しければ 0より上、同じなら 0、古ければ 0より下
+	 * @see nsIVersionComparator
+	 */
+	geckoVersionCompare: function ChaikaBrowser_geckoVersionCompare(aVersion){
+		var versionComparator = Cc["@mozilla.org/xpcom/version-comparator;1"]
+				.getService(Ci.nsIVersionComparator);
+		var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
+		return versionComparator.compare(aVersion, appInfo.platformVersion);
 	}
 
 };
