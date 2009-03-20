@@ -57,6 +57,7 @@ var gNewURL;
  * 開始時の処理
  */
 function startup(){
+
 	document.title = location.href;
 	document.getElementById("lblTitle").setAttribute("value", location.href);
 
@@ -78,6 +79,14 @@ function startup(){
 		alert("BAD URL");
 		return;
 	}
+
+
+	if(ChaikaCore.browser.geckoVersionCompare("1.9.0.*") == 1){
+		document.getElementById("searchTextBox").setAttribute("type", "timed");
+	}else{
+		document.getElementById("searchTextBox").setAttribute("type", "search");
+	}
+
 
 	loadPersist();
 

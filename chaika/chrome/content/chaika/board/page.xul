@@ -69,7 +69,7 @@
 
 		<hbox align="center">
 			<textbox id="searchTextBox" value="" emptytext="スレッドフィルタ"
-					type="timed" timeout="500" oncommand="BoardTree.initTree(true)"/>
+					timeout="500" oncommand="BoardTree.initTree(true)"/>
 		</hbox>
 
 		<toolbarseparator/>
