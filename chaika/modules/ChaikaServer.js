@@ -313,7 +313,7 @@ ChaikaServerHandler.prototype = {
 
 	flush: function ChaikaServerHandler_flush(aString){
 		if(this.isAlive){
-			sleep(100);
+			sleep(0);
 			this._output.flush();
 		}
 	},
@@ -331,11 +331,12 @@ ChaikaServerHandler.prototype = {
 
 
 	writeResponseHeader: function ChaikaServerHandler_writeResponseHeader(aStatusCode){
-		this.write("HTTP/1.1 " + StatusCode.getStatusCode(aStatusCode) + "\r\n");
+		var response = [];
+		response.push("HTTP/1.1 " + StatusCode.getStatusCode(aStatusCode));
 		for(var i in this.responseHeaders){
-			this.write(i + ": " + this.responseHeaders[i] + "\r\n");
+			response.push(i + ": " + this.responseHeaders[i]);
 		}
-		this.write("\r\n");
+		this.write(response.join("\r\n") + "\r\n\r\n");
 	},
 
 
