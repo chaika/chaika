@@ -186,16 +186,7 @@ var gThreadPane = {
 	openSkinDir: function(){
 		var skinDir = ChaikaCore.getDataDir();
 		skinDir.appendRelativePath("skin");
-		try{
-			skinDir.launch();
-		}catch(ex){
-				// for Unix
-			var skinDirURI = gIoService.newFileURI(skinDir);
-		    var protocolService = Components.classes
-		    		["@mozilla.org/uriloader/external-protocol-service;1"]
-    					.getService(Components.interfaces.nsIExternalProtocolService);
-			protocolService.loadUrl(skinDirURI);
-		}
+		ChaikaCore.io.revealDir(skinDir);
 	},
 
 	openAboneManager: function(){

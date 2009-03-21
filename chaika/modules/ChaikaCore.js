@@ -1117,8 +1117,45 @@ ChaikaIO.prototype = {
 			fileStream.close();
 		}
 		return true;
-	}
+	},
 
+
+	/**
+	 * ファイラで指定したディレクトリを開く
+	 * @param {nsILocalFile} aDir 開くディレクトリ
+	 * @return {Boolean} 成功したら真を返す
+	 */
+	revealDir: function ChaikaIO_revealDir(aDir){
+		if(!(aDir instanceof Ci.nsILocalFile)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+		if(!aDir.isDirectory()){
+			throw makeException(Cr.NS_ERROR_INVALID_ARG);
+		}
+
+		try{ // ディレクトリに関連づけられたファイラで開く
+			aDir.launch();
+			return true;
+		}catch(ex){}
+
+		try{ // OS の機能でディレクトリを開く
+			aDir.reveal();
+			return true;
+		}catch(ex){}
+		
+		try{ // file: プロトコルで開く
+			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);	
+			var dirURI = ioService.newFileURI(aDir);
+		    var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
+    					.getService(Ci.nsIExternalProtocolService);
+			protocolService.loadUrl(dirURI);
+			return true;
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return false;
+	}
 };
 
 

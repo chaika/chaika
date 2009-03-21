@@ -198,19 +198,7 @@ function openLogManager(){
  */
 function openLogsDir(){
 	var logDir = ChaikaCore.getDataDir();
-
-	try{
-		logDir.reveal();
-	}catch(ex){
-			// for Unix
-		var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-				.getService(Components.interfaces.nsIIOService);
-	    var protocolService = Components.classes
-	    		["@mozilla.org/uriloader/external-protocol-service;1"]
-    				.getService(Components.interfaces.nsIExternalProtocolService);
-		var logDirURI = ioService.newFileURI(logDir);
-		protocolService.loadUrl(logDirURI);
-	}
+	ChaikaCore.io.revealDir(logDir);
 }
 
 

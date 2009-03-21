@@ -569,16 +569,7 @@ function showBrowser(aTab){
 
 function openLogsDir(){
 	var logDir = gBoard.subjectFile.parent.QueryInterface(Ci.nsILocalFile);
-	try{
-		logDir.reveal();
-	}catch(ex){
-			// for Unix
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-	    var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
-    				.getService(Ci.nsIExternalProtocolService);
-		var logDirURI = ioService.newFileURI(logDir);
-		protocolService.loadUrl(logDirURI);
-	}
+	ChaikaCore.io.revealDir(logDir);
 }
 
 function openSettings(){
