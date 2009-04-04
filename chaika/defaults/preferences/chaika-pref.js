@@ -25,6 +25,10 @@ pref("extensions.chaika.maru_id", "");
 pref("extensions.chaika.maru_password", "");
 pref("extensions.chaika.maru_session_id", "");
 
+pref("extensions.chaika.login.be.login_url", "http://be.2ch.net/test/login.php");
+pref("extensions.chaika.login.be.id", "");
+pref("extensions.chaika.login.be.password", "");
+
 pref("extensions.chaika.browser.redirector.enabled", false);
 pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
 pref("extensions.chaika.browser.redirector.replace_view_limit", true);

@@ -56,7 +56,8 @@
 	</hbox>
 	<textbox id="messeageForm" value="" multiline="true" flex="1"/>
 
-	<hbox align="center" pack="end">
+	<hbox id="toolbox" align="center" pack="end">
+		<checkbox id="beCheck" label="Be" oncommand="FormPage.toggleBeLogin()"/>
 		<toolbarbutton label="ツール" type="menu">
 			<menupopup position="before_end">
 				<menuitem id="useAAFontCheck" label="AA 用フォントを利用する"

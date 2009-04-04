@@ -41,7 +41,7 @@ Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
-
+Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -95,6 +95,10 @@ function startup(){
 			break;
 	}
 
+	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login", false);
+	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout", false);
+	
 	if(gBoard.type == ChaikaBoard.BOARD_TYPE_2CH && !gBoard.settingFile.exists()){
 		gWizard.goTo("boardSettingPage");
 	}else{
@@ -112,6 +116,9 @@ function shutdown(){
 	if(!useAAFontCheck.hasAttribute("checked")){
 		useAAFontCheck.setAttribute("checked", "false");
 	}
+	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+	os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
+	os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
 
 	FormPage.addFormHistory();
 }
@@ -230,14 +237,14 @@ var FormPage = {
 		document.getElementById("messeageForm").focus();
 		if(!this._firstShow) return;
 
-
+	
 		this._nameForm = document.getElementById("nameForm");
 		this._mailForm = document.getElementById("mailForm");
 		this._sageCheck = document.getElementById("sageCheck");
 		this._messeageForm = document.getElementById("messeageForm");
+		this._beCheck = document.getElementById("beCheck");
 
 		this.setUseAAFont();
-
 		setTitle();
 
 		var noName = gBoard.getSetting("BBS_NONAME_NAME");
@@ -245,7 +252,8 @@ var FormPage = {
 			this._nameForm.emptyText = noName;
 		}
 		this.sageCheck();
-
+		this._beCheck.checked = ChaikaBeLogin.isLoggdIn();
+		
 		switch(gBoard.type){
 			case ChaikaBoard.BOARD_TYPE_2CH:
 				gPost = new Post(gThread, gBoard);
@@ -335,7 +343,27 @@ var FormPage = {
 		return pref.getIntPref("network.cookie.cookieBehavior") != COOKIE_BEHAVIOR_REJECT;
 	},
 
+	toggleBeLogin: function FormPage_toggleBeLogin(){
+		var beChecked = FormPage._beCheck.checked;
+		if(beChecked){
+			FormPage._beCheck.checked = false;
+			openDialog("chrome://chaika/content/post/belogin.xul", "", "chrome, modal,centerscreen");
+		}else{
+			ChaikaBeLogin.logout();
+		}
+	}, 
 
+	beLoginObserver: {
+		observe: function(aSubject, aTopic, aData){
+			if(aTopic == "ChaikaBeLogin:Login" && aData == "OK"){
+				FormPage._beCheck.checked = true;
+			}
+			if(aTopic == "ChaikaBeLogin:Logout" && aData == "OK"){
+				FormPage._beCheck.checked = false;
+			}
+		}
+	},
+	
 	sageCheck: function FormPage_sageCheck(){
 		var sageChecked = FormPage._sageCheck.checked;
 		this._mailForm.emptyText = sageChecked ? "sage" : " ";
