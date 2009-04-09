@@ -87,9 +87,11 @@ function startup(){
 		document.getElementById("searchTextBox").setAttribute("type", "search");
 	}
 
-
 	loadPersist();
 
+	var filterGroup = document.getElementById("filterGroup");
+	filterGroup.selectedItem = filterGroup.getElementsByAttribute("value", filterGroup.value)[0];
+	
 	var clickAction = ChaikaCore.pref.getInt("board_click_action");
 	if(clickAction == 0){
 		document.getElementById("boardTree").setAttribute("singleclickmode", "false");
@@ -200,7 +202,7 @@ function savePersist(){
 function setPageTitle(){
 	var boardTitle = gBoard.getTitle();
 	document.title = boardTitle + " [chaika]";
-	document.getElementById("lblTitle").setAttribute("value", boardTitle);
+	document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/[@＠].+$/, ""));
 }
 
 
@@ -454,6 +456,7 @@ var BoardTree = {
 
 
 function setStatus(aString){
+	document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0; 
 	document.getElementById("lblStatus").value = aString;
 }
 
