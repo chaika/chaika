@@ -6,114 +6,14 @@
   color: #F6F6F6;
 }
 
-
 #lblStatus {
  color: #CCC;
 }
 
 
-#toolbar {
-  padding: 2px 2px 3px 2px;
-  background: #666 url("chrome://chaika/skin/board/toolbar-bg.png") repeat-x left center;
-  border-bottom: 1px solid #333;
-}
-
-
-#filterGroup {
-  -moz-appearance: none !important;
-  margin: 1px 1px 0px 0px !important;
-  padding: 0px !important;
-  border: 1px solid transparent;
-  border-bottom-color: #666;
-  -moz-border-radius: 0px 0px 5px 5px;
-}
-
-
-#filterGroup > radio {
-  -moz-appearance: none !important;
-  font-size: 12px;
-  color: #F3F3F3;
-  padding: 2px 3px !important;
-  margin: 0px !important;
-  background-color: rgba(255,255,255,0.15);
-
-  border: 1px solid #222;
-  border-right-width: 0px;
-}
-#filterGroup > radio[selected="true"] {
-  background-color: rgba(0,0,0,0.15);
-}
-
-#filterGroup > radio:first-child {
-  -moz-border-radius: 4px 0px 0px 4px;
-}
-
-#filterGroup > radio:last-child {
-  border-right-width: 1px;
-  -moz-border-radius: 0px 4px 4px 0px;
-}
-
-#filterGroup > radio .radio-check,
-#filterGroup > radio .radio-check-box1,
-#filterGroup > radio .radio-icon {
-  display: none;
-}
-
-#filterGroup > radio .radio-label-box,
-#filterGroup > radio .radio-label {
-  padding: 0px !important;
-  margin: 0px !important;
-  border: 0px !important;
-}
-
-#toolbar button {
-  -moz-appearance: none !important;
-  min-width: 0px;
-  min-height: 0px;
-  font-size: 12px;
-  color: #F3F3F3;
-  margin: 1px 1px 0px 0px !important;
-  padding: 0px !important;
-  border: 1px solid transparent !important;
-  border-bottom-color: #666;
-  -moz-border-radius: 0px 0px 5px 5px;
-  background: transparent none !important;
-}
-
-#toolbar button:focus,
-#toolbar button:hover:active,
-#toolbar button[open="true"],
-#toolbar button[checked="true"]{
-  border: 1px solid transparent !important;
-  -moz-border-top-colors: transparent !important;
-  -moz-border-right-colors: transparent !important;
-  -moz-border-bottom-colors: transparent !important;
-  -moz-border-left-colors: transparent !important;
-}
-
-#toolbar button .button-box {
-  padding: 2px 3px !important;
-  background-color: rgba(255,255,255,0.15) !important;
-  border: 1px solid #222 !important;
-  outline: 0px !important;
-  -moz-border-radius: 4px;
-}
-
-#toolbar button .button-icon,
-#toolbar button .button-menu-dropmarker {
-  display: none;
-}
-
-
-#toolbar button:hover:active .button-box,
-#toolbar button[open="true"] .button-box {
-  background-color: rgba(20,20,20,0.2) !important;
-}
-
-
 #searchTextBox {
   margin: 0px 4px;
-  width: 10em;
+  width: 9em;
 }
 
 

@@ -81,23 +81,7 @@ function startup(){
 	}
 
 
-	if(ChaikaCore.browser.geckoVersionCompare("1.9.0.*") == 1){
-		document.getElementById("searchTextBox").setAttribute("type", "timed");
-	}else{
-		document.getElementById("searchTextBox").setAttribute("type", "search");
-	}
-
 	loadPersist();
-
-	var filterGroup = document.getElementById("filterGroup");
-	filterGroup.selectedItem = filterGroup.getElementsByAttribute("value", filterGroup.value)[0];
-	
-	var clickAction = ChaikaCore.pref.getInt("board_click_action");
-	if(clickAction == 0){
-		document.getElementById("boardTree").setAttribute("singleclickmode", "false");
-	}else{
-		document.getElementById("boardTree").setAttribute("singleclickmode", "true");
-	}
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();

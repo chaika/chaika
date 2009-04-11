@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+
+<bindings id="marbleStyleBindings"
+		xmlns="http://www.mozilla.org/xbl"
+		xmlns:xbl="http://www.mozilla.org/xbl"
+		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		xmlns:html="http://www.w3.org/1999/xhtml">
+
+<binding id="toolbar" extends="chrome://global/content/bindings/toolbar.xml#toolbar">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+	<content>
+		<xul:stack flex="1">
+			<xul:image class="background" width="1" height="1" flex="1"/>
+			<xul:hbox class="children-box" xbl:inherits="align,dir,pack,orient"
+					align="center" pack="center" flex="1">
+				<children/>
+			</xul:hbox>
+		</xul:stack>
+	</content>
+</binding>
+
+
+<binding id="button" extends="chrome://global/content/bindings/button.xml#button">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+	<content>
+		<children includes="observes|template|menupopup|tooltip"/>
+		<xul:hbox class="button-box" xbl:inherits="align,dir,pack,orient"
+				align="center" pack="center" flex="1">
+			<children>
+				<xul:label class="button-label" xbl:inherits="value=label"/>
+			</children>
+		</xul:hbox>
+	</content>
+</binding>
+
+
+<binding id="menu-button" extends="chrome://global/content/bindings/button.xml#menu">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+	<content>
+		<children includes="observes|template|menupopup|tooltip"/>
+		<xul:hbox class="button-box" xbl:inherits="align,dir,pack,orient"
+				align="center" pack="center" flex="1">
+			<children>
+				<xul:label class="button-label" xbl:inherits="value=label"/>
+			</children>
+		</xul:hbox>
+	</content>
+</binding>
+
+
+<binding id="buttongroup">
+	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+
+	<content>
+		<xul:hbox class="buttongroup-box" xbl:inherits="align,dir,pack,orient"
+				align="center" pack="center" flex="1">
+			<children/>
+		</xul:hbox>
+	</content>
+
+	<implementation>
+		<constructor><![CDATA[
+			var group = "group-" + Date.now();
+			var nodes = this.childNodes;
+			for(var i=0; i<nodes.length; i++){
+				var node = nodes[i];
+				node.setAttribute("type", "radio");
+				node.setAttribute("group", group);
+				if(this.value == node.getAttribute("value")){
+					node.setAttribute("checked", "true");
+				}
+			}
+		]]></constructor>
+
+		<property name="value"
+				onget="return this.getAttribute('value');"
+				onset="this.setAttribute('value', val); return val;"/>
+
+		<method name="_fireEvent">
+			<parameter name="aEventName"/>
+			<parameter name="aTarget"/>
+			<body><![CDATA[
+				try{
+					var event = document.createEvent("Events");
+					event.initEvent(aEventName, true, true);
+					var cancel = !aTarget.dispatchEvent(event);
+					if(aTarget.hasAttribute("on" + aEventName)){
+						var fn = new Function ("event", aTarget.getAttribute("on" + aEventName));
+						var rv = fn.call(aTarget, event);
+						if (rv == false) cancel = true;
+					}
+					return !cancel;
+				}catch(ex){ 
+					Components.utils.reportError(ex);
+				}
+				return false;
+			]]></body>
+		</method>
+	</implementation>
+
+	<handlers>
+		<handler event="command"><![CDATA[
+			var target = event.target;
+			if(target.hasAttribute("group") && target.hasAttribute("value")){
+				this.value = target.getAttribute("value");
+			}
+		]]></handler>
+
+		<handler event="DOMAttrModified" phase="target"><![CDATA[
+			if(event.attrName != "value") return;
+			var nodes = this.childNodes;
+			for(var i=0; i<nodes.length; i++){
+				var node = nodes[i];
+				if(this.value == node.getAttribute("value")){
+					node.checked = true;
+					this._fireEvent("change", this);
+				}
+			}
+		]]></handler>
+	</handlers>
+</binding>
+
+
+ <binding id="textbox" extends="chrome://global/content/bindings/textbox.xml#textbox">
+ 	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+ </binding>
+ 
+ <binding id="search-textbox" extends="chrome://global/content/bindings/textbox.xml#textbox">
+ 	<resources>
+		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
+	</resources>
+    <content>
+      <children/>
+      <xul:hbox class="textbox-input-box" flex="1" xbl:inherits="context,spellcheck" align="center">
+        <html:input class="textbox-input" flex="1" anonid="input"
+                    xbl:inherits="onfocus,onblur,value,type,maxlength,disabled,size,readonly,tabindex,accesskey"/>
+        <xul:deck class="textbox-search-icons" anonid="search-icons">
+          <xul:image class="textbox-search-icon"
+                     onclick="document.getBindingParent(this)._iconClick();"
+                     xbl:inherits="src=image,searchbutton,disabled"/>
+          <xul:image class="textbox-search-clear"
+                     onclick="document.getBindingParent(this)._clearSearch();"
+                     xbl:inherits="disabled"/>
+        </xul:deck>
+      </xul:hbox>
+    </content>
+    <implementation>
+      <field name="_timer">null</field>
+      <field name="_searchIcons">
+        document.getAnonymousElementByAttribute(this, "anonid", "search-icons");
+      </field>
+      <property name="timeout"
+                onset="this.setAttribute('timeout', val); return val;"
+                onget="return parseInt(this.getAttribute('timeout')) || 500;"/>
+      <property name="searchButton"
+                onget="return this.getAttribute('searchbutton') == 'true';">
+        <setter><![CDATA[
+          if (val) {
+            this.setAttribute("searchbutton", "true");
+            this.removeAttribute("aria-autocomplete");
+          } else {
+            this.removeAttribute("searchbutton");
+            this.setAttribute("aria-autocomplete", "list");
+          }
+          return val;
+        ]]></setter>
+      </property>
+      <property name="value"
+                onget="return this.hasAttribute('empty') ? '' : this.inputField.value;">
+        <setter><![CDATA[
+          if (val) {
+            // clear the emptyText _before_ setting a new non-empty value
+            this._clearEmptyText();
+            this.inputField.value = val;
+            this._searchIcons.selectedIndex = this.searchButton ? 0 : 1;
+          } else {
+            // display the emptyText _after_ setting a value that's an empty string
+            this.inputField.value = val;
+            this._updateVisibleText();
+            this._searchIcons.selectedIndex = 0;
+          }
+          if (this._timer)
+            clearTimeout(this._timer);
+          return val;
+        ]]></setter>
+      </property>
+      <constructor><![CDATA[
+        if (this.searchButton)
+          this.removeAttribute("aria-autocomplete");
+        else
+          this.setAttribute("aria-autocomplete", "list");
+      ]]></constructor>
+      <method name="_fireCommand">
+        <parameter name="me"/>
+        <body><![CDATA[
+          if (me._timer)
+            clearTimeout(me._timer);
+          me._timer = null;
+          me.doCommand();
+        ]]></body>
+      </method>
+      <method name="_iconClick">
+        <body><![CDATA[
+          if (this.searchButton)
+            this._enterSearch();
+          else
+            this.focus();
+        ]]></body>
+      </method>
+      <method name="_enterSearch">
+        <body><![CDATA[
+          if (this.disabled)
+            return;
+          if (this.searchButton && this.value && !this.readOnly)
+            this._searchIcons.selectedIndex = 1;
+          this._fireCommand(this);
+        ]]></body>
+      </method>
+      <method name="_clearSearch">
+        <body><![CDATA[
+          if (!this.disabled && !this.readOnly && this.value) {
+            this.value = "";
+            this._fireCommand(this);
+            this._searchIcons.selectedIndex = 0;
+            return true;
+          }
+          return false;
+        ]]></body>
+      </method>
+    </implementation>
+    <handlers>
+      <handler event="input">
+        <![CDATA[
+          if (this.searchButton) {
+            this._searchIcons.selectedIndex = 0;
+            return;
+          }
+          if (this._timer)
+            clearTimeout(this._timer);
+          this._timer = this.timeout && setTimeout(this._fireCommand, this.timeout, this);
+          this._searchIcons.selectedIndex = this.value ? 1 : 0;
+        ]]>
+      </handler>
+      <handler event="keypress" keycode="VK_ESCAPE">
+        <![CDATA[
+          if (this._clearSearch()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+        ]]>
+      </handler>
+      <handler event="keypress" keycode="VK_RETURN">
+        <![CDATA[
+          this._enterSearch();
+          event.preventDefault();
+          event.stopPropagation();
+        ]]>
+      </handler>
+    </handlers>
+  </binding>
+
+</bindings>

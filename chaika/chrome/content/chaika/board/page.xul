@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/content/board/marble.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/board/page.css" type="text/css"?>
 
 <page id="chaikaBoardPage" onload="startup()" onunload="shutdown()"
@@ -16,7 +17,7 @@
 </popupset>
 
 
-<hbox id="toolbar" align="center">
+<marbletoolbar id="toolbar" align="center">
 	<deck id="statusDeck" flex="1">
 		<hbox align="center" flex="1">
 			<label id="lblTitle" crop="end" value="" flex="1"/>
@@ -26,18 +27,18 @@
 		</hbox>
 	</deck>
 
-	<textbox id="searchTextBox" value="" emptytext="フィルタ"
+	<marbletextbox id="searchTextBox" value="" emptytext="フィルタ" type="search"
 			timeout="500" oncommand="BoardTree.initTree(true)"/>
-	<radiogroup id="filterGroup" value="0" persist2="value" orient="horizontal">
-	  <radio label="すべて" value="0" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-	  <radio label="TOP200" value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-	  <radio label="購読中" value="-2" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-	  <radio label="DAT落ち" value="-1" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-	</radiogroup>
+	<marblebuttongroup id="filterGroup" value="0" persist2="value">
+		<marblebutton label="すべて"  value="0"   oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+		<marblebutton label="TOP200"  value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+		<marblebutton label="購読中"  value="-2"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+		<marblebutton label="DAT落ち" value="-1"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+	</marblebuttongroup>
 
 	<spacer width="3"/>
 
-	<button label="ツール" type="menu">
+	<marblebutton label="ツール" type="menu">
 		<menupopup id="popTools" position="after_end">
 			<menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
 				onclick="if(event.button==1)showBrowser(true)"/>
@@ -45,14 +46,14 @@
 			<menuseparator/>
 			<menuitem label="オプション..." oncommand="openSettings()"/>
 		</menupopup>
-	</button>
+	</marblebutton>
 
 	<deck id="dckUpdate" selectedIndex="0">
-		<button id="lblUpdate" label="更新" oncommand="subjectUpdate(event)"/>
-		<button id="lblMoveCheck" label="確認" oncommand="boardMoveCheck(event)"/>
-		<button id="lblMoveNewURL" label="移動" oncommand="moveNewURL(event)"/>
+		<marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)"/>
+		<marblebutton id="MoveCheck"  label="確認" oncommand="boardMoveCheck(event)"/>
+		<marblebutton id="MoveNewURL" label="移動" oncommand="moveNewURL(event)"/>
 	</deck>
-</hbox>
+</marbletoolbar>
 
 
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
