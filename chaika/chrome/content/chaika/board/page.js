@@ -257,6 +257,8 @@ var BoardTree = {
 
 
 	click: function BoardTree_click(aEvent){
+		if(aEvent.originalTarget.localName != "treechildren") return;
+		
 			// ツリーのアイテム以外をクリック
 		if(this.getClickItemIndex(aEvent) == -1) return;
 
