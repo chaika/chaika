@@ -1,5 +1,10 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+#searchBox dropmarker {
+  -moz-appearance:none; 
+  background-color: transparent;
+  width: 12px;
+}
 
 #chaikaBbsmenuPage,
 #bbsmenuTree,

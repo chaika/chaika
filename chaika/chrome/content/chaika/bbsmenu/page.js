@@ -26,6 +26,8 @@ function startup(){
 	historyMenu.hidden = !ChaikaCore.pref.getBool("bbsmenu_historymenu_show");
 	showViewFoxAge2chMenu();
 
+	SearchBox.init();
+
 	var clickAction = ChaikaCore.pref.getInt("bbsmenu_click_action");
 	if(clickAction == 0){
 		document.getElementById("find2ch").setAttribute("singleclickmode", "false");
@@ -260,18 +262,59 @@ function viewFoxAge2ch(){
 }
 
 
+function search(aSearchStr){
+	document.getElementById("bbsmenuTree").search(aSearchStr);
+}
+
+var SearchBox = {
+
+	init: function SearchBox_init(){
+		if(!this._textbox) this._textbox = document.getElementById("searchBox");
+
+		switch(this.getSearchMode()){
+			case "find2ch":
+				this._textbox.emptyText = "2ch検索";
+				break;
+			case "boardFilter":
+				this._textbox.emptyText = "フィルタ";
+				break;
+		}
+	},
+
+	search: function SearchBox_search(aSearchStr){
+		switch(this.getSearchMode()){
+			case "find2ch":
+				document.getElementById("bbsmenuTree").search("");
+				find2ch.search(aSearchStr);
+				break;
+			case "boardFilter":
+				find2ch.search("");
+				document.getElementById("bbsmenuTree").search(aSearchStr);
+				break;
+		}
+	},
+
+	getSearchMode: function SearchBox_getSearchMode(){
+		return this._textbox.getAttribute("searchmode");
+	},
+
+	setSearchMode: function SearchBox_setSearchMode(aValue){
+		this._textbox.setAttribute("searchmode", aValue);
+		this.init();
+		return aValue;
+	},
+
+	searchModeMenuShowing: function SearchBox_searchModeMenuShowing(aEvent){
+		var target = aEvent.target;
+		target.getElementsByAttribute("value", SearchBox.getSearchMode())[0].setAttribute("checked", "true");
+	}
+};
+
+
 var find2ch = {
 
 	search: function find2ch_search(aSearchString){
 		if(aSearchString){
-				// フォーム履歴に検索文字列を追加
-			if(Components.interfaces.nsIFormHistory2){
-					// フォーム履歴に検索文字列を追加
-				var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
-						.getService(Ci.nsIFormHistory2);
-				formHistory.addEntry("chaika-find2ch-history", aSearchString);
-			}
-
 			document.getElementById("deck").selectedIndex = 1;
 			document.getElementById("find2ch").search(aSearchString);
 		}else{

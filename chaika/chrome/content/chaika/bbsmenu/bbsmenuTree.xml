@@ -81,10 +81,11 @@
 					firstNode = newNode.nextSibling;
 				}
 
+				this._bbsmenuDoc = bbsmenuDoc;
 				var builder = this.builder;
 				builder.datasource = bbsmenuDoc.documentElement;
 				builder.rebuild();
-				
+
 				var openedCategories = this.getAttribute("openedCategories");
 				if(openedCategories){
 					openedCategories = decodeURIComponent(openedCategories).split(",");
@@ -103,6 +104,65 @@
 						}
 					}
 				}
+			]]></body>
+		</method>
+
+		<method name="search">
+			<parameter name="aSerchStr"/>
+			<body><![CDATA[
+				if(!this._bbsmenuDoc) return;
+
+				var builder = this.builder;
+				if(!aSerchStr){
+					builder.datasource = this._bbsmenuDoc.documentElement;
+					builder.rebuild();
+
+					var openedCategories = this.getAttribute("openedCategories");
+					if(openedCategories){
+						openedCategories = decodeURIComponent(openedCategories).split(",");
+						var view = this.view;
+						var titleColumn = this.columns.getNamedColumn("bbsmenuTreeCol-title");
+						var view = this.view;
+
+						for(var i=0; i<openedCategories.length; i++){
+							var rowCount = view.rowCount;
+							for(var j=0; j<rowCount; j++){
+								var title = view.getCellText(j, titleColumn);
+								if(decodeURIComponent(openedCategories[i]) == title){
+									view.toggleOpenState(j);
+									rowCount = 0;
+								}
+							}
+						}
+					}
+
+					return;
+				}
+
+				function normalize(aStr){
+					var unicodeNormalizer = Cc["@mozilla.org/intl/unicodenormalizer;1"]
+							.createInstance(Ci.nsIUnicodeNormalizer);
+					var normalizedStr = {};
+					unicodeNormalizer.NormalizeUnicodeNFKC(aStr, normalizedStr);
+					return normalizedStr.value.toLowerCase();
+				}
+
+				var searchStr = normalize(aSerchStr);
+				var searchDoc = new DOMParser().parseFromString("<bbsmenu/>", "text/xml");
+				var firstNode = null;
+				var nodes = this._bbsmenuDoc.getElementsByTagName("board");
+				for(var i=0; i<nodes.length; i++){
+					var node = nodes[i];
+					if(normalize(node.getAttribute("title")).indexOf(searchStr) == -1){
+						continue;
+					}
+					var newNode = this._bbsmenuDoc.importNode(node, true);
+					searchDoc.documentElement.insertBefore(newNode, firstNode);
+					firstNode = newNode.nextSibling;
+				}
+				
+				builder.datasource = searchDoc.documentElement;
+				builder.rebuild();
 			]]></body>
 		</method>
 
@@ -308,6 +368,8 @@
 
 	<handlers>
 		<handler event="click"><![CDATA[
+			if(event.originalTarget.localName != "treechildren") return;
+
 			var row = {}
 			var obj = {};
 			this.treeBoxObject.getCellAt(event.clientX, event.clientY, row, {}, obj);
@@ -381,6 +443,8 @@
 
 
 		<handler event="keydown"><![CDATA[
+			if(event.originalTarget != this) return;
+
 			var currentIndex = this.currentIndex;
 			if(currentIndex == -1) return;
 

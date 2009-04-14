@@ -30,6 +30,11 @@
 }
 
 
+#searchBox dropmarker {
+  -moz-appearance:none; 
+  background-color: transparent;
+  width: 12px;
+}
 
 
 /* ***** bbsmenuTree ***** */

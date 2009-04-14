@@ -10,6 +10,13 @@
 <script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 <popupset>
+	<menupopup id="searchModeMenu" onpopupshowing="SearchBox.searchModeMenuShowing(event)">
+	     <menuitem label="find.2ch 検索" value="find2ch"     type="radio" name="searchModeMenuItem"
+	     		oncommand="SearchBox.setSearchMode('find2ch')"/>
+	     <menuitem label="板名フィルタ"  value="boardFilter" type="radio" name="searchModeMenuItem"
+	     		oncommand="SearchBox.setSearchMode('boardFilter')"/>
+	</menupopup>
+
 	<popup id="boardItemHistoryContext" itemType="board"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 	<popup id="threadItemHistoryContext" itemType="thread"
@@ -21,10 +28,13 @@
 </popupset>
 
 <menubar id="mainMenubar" align="stretch">
-	<textbox id="searchBox" value="" emptytext="2ch検索" flex="1" type="autocomplete"
-			autocompletesearch="form-history"
-			autocompletesearchparam="chaika-find2ch-history"
-			ontextentered="find2ch.search(this.value)"/>
+
+	<textbox id="searchBox" value="" emptytext="" flex="1" type="autocomplete"
+			searchmode="find2ch" persist="searchmode"
+			ontextentered="SearchBox.search(this.value)">
+		<box><dropmarker popup="searchModeMenu" class="plain"/></box>
+	</textbox>
+
 	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
 				position="after_end" tooltiptext=""
