@@ -398,7 +398,7 @@ var PreviewPage = {
 		var warningMessages = gPost.getWarningMessages();
 		if(warningMessages.length > 0){
 			Notification.removeAll(true);
-			Notification.info(warningMessages[0]);
+			Notification.warning(warningMessages[0]);
 		}
 
 		setTimeout("PreviewPage._createPreview()", 0);
