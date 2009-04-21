@@ -490,9 +490,6 @@ var ChaikaCore = {
  * @constructor
  */
 function ChaikaLogger(){
-	this._initialized = false;
-	this._registConsole = false;
-	this._stream = null;
 }
 
 ChaikaLogger.prototype = {
@@ -507,37 +504,12 @@ ChaikaLogger.prototype = {
 	/** @private */
 	_startup: function ChaikaLogger__startup(){
 		this._level = ChaikaCore.pref.getInt("logger.level");
-
-		if(this._level >= this.LEVEL_ERROR){
-			var consoleService = Cc["@mozilla.org/consoleservice;1"]
-					.getService(Ci.nsIConsoleService);
-
-			// TODO Fx3.1 で再起動時にクラッシュすることがあるので、解決策が見つかるまでコメントアウト
-			// consoleService.registerListener(this);
-			this._registConsole = true;
-		}
-
-		if(ChaikaCore.pref.getBool("logger.file_dump")){
-			var logFile = ChaikaCore.getDataDir();
-			logFile.appendRelativePath("logger.log");
-			this._stream = ChaikaCore.io.getFileOutputStream(logFile, "UTF-8", true);
-		}
-		this._initialized = true;
+		this._console = Cc["@mozilla.org/consoleservice;1"]
+				.getService(Ci.nsIConsoleService);
 	},
 
 
 	_quit: function ChaikaLogger__quit(){
-		if(this._registConsole){
-			var consoleService = Cc["@mozilla.org/consoleservice;1"]
-					.getService(Ci.nsIConsoleService);
-			// consoleService.unregisterListener(this);
-		}
-
-		this._initialized = false;
-		if(this._stream){
-			this._stream.flush();
-			this._stream.close();
-		}
 	},
 
 
@@ -550,13 +522,7 @@ ChaikaLogger.prototype = {
 			stackLine = Components.stack.caller.caller.lineNumber;
 		}
 		var message = "[" + stackName + ":" + stackLine + "] " + atype +  " " + aMessage;
-
-		if(this._initialized && this._stream){
-			var nowTime = (new Date()).toLocaleFormat("%Y/%m/%d %H:%M ");
-			this._stream.writeString(nowTime + message + "\n");
-		}else{
-			dump(message + "\n");
-		}
+		this._console.logStringMessage(message);
 	},
 
 
@@ -581,32 +547,7 @@ ChaikaLogger.prototype = {
 
 		var message =  aMessage.message || aMessage.toString();
 		this._insertLog("ERROR", message);
-	},
-
-
-	/** @private */
-	observe: function ChaikaLogger_observe(aMessage){
-		if(this._level < this.LEVEL_ERROR) return;
-
-		if(!(aMessage instanceof Ci.nsIScriptError)) return;
-		if(!(aMessage.flags & Ci.nsIScriptError.exceptionFlag))
-
-		var category = aMessage.category
-		if(category == "chrome javascript" || category == "XPConnect JavaScript"){
-			var message = aMessage.message;
-			if(message.indexOf("chaika")!=-1){
-				this._insertLog("ERROR", message);
-			}
-		}
-	},
-
-
-	/** @private */
-	QueryInterface: XPCOMUtils.generateQI([
-		Ci.nsIConsoleListener,
-		Ci.nsISupportsWeakReference,
-		Ci.nsISupports
-	])
+	}
 
 };
 
