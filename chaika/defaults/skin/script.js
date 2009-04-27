@@ -16,12 +16,20 @@ $(document).ready(function(){
 var ResCollapse = {
 
 	startup: function(){
-		$(".resHeader").click(ResCollapse.toggleCollapse);
+		$(document).click(ResCollapse.toggleCollapse);
 	},
 
 
 	toggleCollapse: function(aEvent){
-		var resContainer = $(this).parents(".resContainer");
+		var target = aEvent.originalTarget;
+		if(!(target instanceof HTMLElement)) return;
+
+		if(target.className != "resHeader"){
+			target = ($(target).parents(".resHeader").get(0));
+			if(!target) return;
+		}
+
+		var resContainer = $(target).parents(".resContainer");
 		var isAbone = (resContainer.attr("isAbone") == "true");
 
 		if(!isAbone) return;
