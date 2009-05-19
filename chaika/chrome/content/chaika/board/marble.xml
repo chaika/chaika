@@ -4,6 +4,7 @@
 		xmlns="http://www.mozilla.org/xbl"
 		xmlns:xbl="http://www.mozilla.org/xbl"
 		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+		xmlns:svg="http://www.w3.org/2000/svg"
 		xmlns:html="http://www.w3.org/1999/xhtml">
 
 <binding id="toolbar" extends="chrome://global/content/bindings/toolbar.xml#toolbar">
@@ -12,7 +13,19 @@
 	</resources>
 	<content>
 		<xul:stack flex="1">
-			<xul:image class="background" width="1" height="1" flex="1"/>
+			<xul:vbox flex="1" align="stretch">
+				<svg:svg width="10" height="20" flex="1">]
+					<svg:defs>
+						<svg:linearGradient id="background-gradient" x1="0" y1="0" x2="0" y2="1">
+							<svg:stop offset="0%"   class="background-gradient-stop1"/>
+							<svg:stop offset="50%"  class="background-gradient-stop2"/>
+							<svg:stop offset="50%"  class="background-gradient-stop3"/>
+							<svg:stop offset="100%" class="background-gradient-stop4"/>
+						</svg:linearGradient>
+					</svg:defs>
+					<svg:rect x="0" y="0" width="100%" height="100%" fill="url(#background-gradient)"/>
+				</svg:svg>
+			</xul:vbox>
 			<xul:hbox class="children-box" xbl:inherits="align,dir,pack,orient"
 					align="center" pack="center" flex="1">
 				<children/>
