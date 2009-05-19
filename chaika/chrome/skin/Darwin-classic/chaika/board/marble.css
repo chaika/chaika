@@ -1,17 +1,27 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+@namespace svg url("http://www.w3.org/2000/svg");
 
 /* ----- TOOLBAR ----- */
-marbletoolbar {
+marbletoolbar * {
+  -moz-appearance: none !important;
 }
 
 marbletoolbar .children-box {
   padding: 3px 2px 3px 2px;
 }
 
-marbletoolbar .background {
-  list-style-image: url("chrome://chaika/skin/board/toolbar-bg.png") !important;
+svg|stop.background-gradient-stop1 {
+  stop-color: #848484;
 }
-
+svg|stop.background-gradient-stop2 {
+  stop-color: #4F4F4F;
+}
+svg|stop.background-gradient-stop3 {
+  stop-color: #3C3C3C;
+}
+svg|stop.background-gradient-stop4 {
+  stop-color: #444444;
+}
 
 /* ----- BUTTON ----- */
 marblebutton {
