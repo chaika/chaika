@@ -253,7 +253,9 @@ var FormPage = {
 		}
 		this.sageCheck();
 		this._beCheck.checked = ChaikaBeLogin.isLoggdIn();
-		
+
+		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
+
 		switch(gBoard.type){
 			case ChaikaBoard.BOARD_TYPE_2CH:
 				gPost = new Post(gThread, gBoard);
