@@ -86,7 +86,7 @@ chProtocolHandler.prototype = {
 
 	newURI: function chProtocolHandler_newURI(aSpec, aCharset, aBaseURI){
 		var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
-		uri.init(Ci.nsIStandardURL.URLTYPE_NO_AUTHORITY, -1, aSpec, aCharset, aBaseURI);
+		uri.init(Ci.nsIStandardURL.URLTYPE_STANDARD, -1, aSpec, aCharset, aBaseURI);
 		uri.QueryInterface(Ci.nsIURL);
 		return uri;
 	},
@@ -145,7 +145,7 @@ b2rProtocolHandler.prototype = {
 					.replace("bbs2ch:", "chaika://");
 
 		var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
-		uri.init(Ci.nsIStandardURL.URLTYPE_NO_AUTHORITY, -1, aSpec, aCharset, null);
+		uri.init(Ci.nsIStandardURL.URLTYPE_STANDARD, -1, aSpec, aCharset, null);
 		uri.QueryInterface(Ci.nsIURL);
 		return uri;
 	},
