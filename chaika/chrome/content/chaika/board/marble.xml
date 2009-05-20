@@ -14,7 +14,7 @@
 	<content>
 		<xul:stack flex="1">
 			<xul:vbox flex="1" align="stretch">
-				<svg:svg width="10" height="20" flex="1">]
+				<svg:svg width="10" height="20" flex="1">
 					<svg:defs>
 						<svg:linearGradient id="background-gradient" x1="0" y1="0" x2="0" y2="1">
 							<svg:stop offset="0%"   class="background-gradient-stop1"/>
