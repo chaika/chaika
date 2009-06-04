@@ -144,7 +144,24 @@ ChaikaBoard.prototype = {
 	 * @return {String}
 	 */
 	getTitle: function ChaikaBoard_getTitle(){
-		return this.getSetting("BBS_TITLE") || this.url.spec;
+		return this.getSetting("BBS_TITLE") || this.getMachiTitle() || this.url.spec;
+	},
+
+
+	getMachiTitle: function(){
+		if(this.type != ChaikaBoard.BOARD_TYPE_MACHI) return null;
+
+	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+				.getService(Ci.nsIStringBundleService);
+		var statusBundle = strBundleService.createBundle(
+				"resource://chaika-modules/machiBoardTitle.properties");
+		try{
+			return statusBundle.GetStringFromName(this.id);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
 	},
 
 
@@ -451,7 +468,7 @@ ChaikaBoard.prototype = {
 				this.itemsDoc.documentElement.appendChild(itemNode);
 			}
 		}catch(ex){
-			Components.utils.reportError(ex);
+			ChaikaCore.logger.error(ex);
 		}finally{
 			statement.reset();
 			statement.finalize();
