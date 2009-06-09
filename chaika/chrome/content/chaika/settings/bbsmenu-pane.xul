@@ -105,9 +105,9 @@
 
 			<row class="setting-row">
 				<description class="setting-description">板一覧取得 URL :</description>
-				<hbox>
-					<textbox preference="extensions.chaika.bbsmenu_load_url" flex="8"/>
-					<spacer flex="1"/>
+				<hbox align="center">
+					<textbox preference="extensions.chaika.bbsmenu_load_url" flex="1"/>
+					<button label="規定値" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
 				</hbox>
 			</row>
 		</rows>
