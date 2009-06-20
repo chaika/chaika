@@ -154,7 +154,7 @@ Post.prototype = {
 		}
 
 		preview["title"]   = convertEntity(this._thread.title);
-		preview["name"]    = convertEntity(this.name || getSetting("BBS_NONAME_NAME") || "");
+
 		preview["mail"]    = convertEntity(this.mail);
 		preview["message"] = convertEntity(this.message).replace("\n", "<br>", "g");
 
@@ -165,6 +165,31 @@ Post.prototype = {
 		preview["linkColor"]  = getSetting("BBS_LINK_COLOR");
 		preview["alinkColor"] = getSetting("BBS_ALINK_COLOR");
 		preview["vlinkColor"] = getSetting("BBS_VLINK_COLOR");
+
+
+		var name = convertEntity(this.name || getSetting("BBS_NONAME_NAME") || "");
+		name = name.replace("◆", "◇");
+
+			// トリップ変換
+		var tripPos = name.indexOf("#");
+		if(tripPos != -1){
+			var tripKey = name.substring(tripPos);
+
+			var uniConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+					.createInstance(Ci.nsIScriptableUnicodeConverter)
+			uniConverter.charset = gPost.charset;
+			tripKey = uniConverter.convertToByteArray(tripKey, {}).map(
+				function(aElement, aIndex, aArray){
+					return String.fromCharCode(aElement);
+				}
+			).join("");
+
+			var trip = Trip.getTrip(tripKey);
+			name = [name.substring(0, tripPos),
+						"<span class='resSystem'>", "◆", trip, "</span>"].join("");
+		}
+		preview["name"] = name;
+
 
 		return preview;
 	},

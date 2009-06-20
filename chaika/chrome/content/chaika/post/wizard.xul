@@ -13,7 +13,7 @@
 
 <script type="application/javascript" src="chrome://chaika/content/post/wizard.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/post.js"/>
-
+<script type="application/javascript" src="chrome://chaika/content/post/trip.js"/>
 
 <stack id="titleHeaderContainer">
 	<label id="titleHeader" crop="center" value=""/>
