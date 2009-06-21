@@ -45,11 +45,6 @@ var Trip = {
 			 // http://qb5.2ch.net/test/read.cgi/operate/1244993904/309n
 		if(tripKey.length >= 12){
 
-				// #$トリップキーは将来の拡張に予約されている
-			if(tripKey.substring(0, 1) == "$"){
-				return "???";
-			}
-
 				// crypt(DES) の キーと salt を直接指定
 				// ##xxxxxxxxxxxxxxxxnn
 				// xx = 16進文字列(8byte) nn = salt(2文字以下なら "." で埋める)
@@ -58,7 +53,14 @@ var Trip = {
 				return this.getDirectTrip(aTripKey);
 			}
 
-				// 12文字トリップ(SHA-1 を Base64 に変換した値の先頭12文字)
+				// #$ や直接指定の ## 以外のトリップキーは将来の拡張に予約されている
+			var mark = tripKey.substring(0, 1);
+			if(mark == "$" || mark == "#"){
+				return "???";
+			}
+
+				// 新12文字トリップ
+				// SHA-1 を Base64 に変換した値の先頭12文字("+"は"."に置換される)
 			return this.getSHA1Trip(aTripKey);
 		}
 
@@ -78,7 +80,7 @@ var Trip = {
 		cryptoHash.init(Ci.nsICryptoHash.SHA1);
 		cryptoHash.update(data, data.length);
 
-		return cryptoHash.finish(true).substring(0,12);
+		return cryptoHash.finish(true).substring(0,12).replace("+", ".", "g");
 	},
 
 
