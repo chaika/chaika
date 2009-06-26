@@ -472,6 +472,9 @@ Thread2ch.prototype = {
 
 
 	datDownload: function(aKako){
+		this._maruMode = false;
+		this._mimizunMode = false;
+
 		if(aKako){
 			if(Chaika2chViewer.logined){
 				var sid = encodeURIComponent(Chaika2chViewer.sessionID);
@@ -481,6 +484,25 @@ Thread2ch.prototype = {
 				var datKakoURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
 				this.httpChannel = ChaikaCore.getHttpChannel(datKakoURL);
 				this._maruMode = true;
+			}else if(ChaikaCore.pref.getBool("thread_get_log_from_mimizun")){
+				var mimizunURLSpec  = [
+					"http://mimizun.com/log/2ch",
+					this.thread.boardURL.filePath,
+					this.thread.boardURL.host,
+					this.thread.boardURL.filePath,
+					"kako/",
+					this.thread.datID.substring(0, 4),
+					"/",
+					this.thread.datID.substring(0, 5),
+					"/",
+					this.thread.datID,
+					".dat"
+				].join("");
+
+				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+				var mimizunURL = ioService.newURI(mimizunURLSpec, null, null).QueryInterface(Ci.nsIURL);
+				this.httpChannel = ChaikaCore.getHttpChannel(mimizunURL);
+				this._mimizunMode = true;
 			}else{
 				this.httpChannel = ChaikaCore.getHttpChannel(this.thread.datKakoURL);
 			}
@@ -543,7 +565,7 @@ Thread2ch.prototype = {
 		this._aboneChecked = true;
 
 
-		if(this._maruMode && this._data.length == 0){
+		if(this._maruMode && !this._mimizunMode &&  this._data.length == 0){
 			if(availableData.match(/\n/)){
 				availableData = RegExp.rightContext;
 			}else{
@@ -659,10 +681,36 @@ Thread2ch.prototype = {
 				// .dat の追記書き込み
 			this.thread.appendContent(aDatContent);
 
-			if(this._maruMode) this.thread.maruGetted = true;
+			if(this._maruMode || this._mimizunMode){
+				this.thread.maruGetted = true;
+				this._alertGotLog();
+			}
 			this.thread.setThreadData();
 		}
 
+	},
+
+
+	_alertGotLog: function(){
+		if(!ChaikaCore.pref.getBool("thread_alert_got_log")) return;
+
+	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+				.getService(Ci.nsIStringBundleService);
+		var statusBundle = strBundleService.createBundle(
+				"resource://chaika-modules/server/thread-status.properties");
+
+		var alertStrID = "";
+		if(this._maruMode){
+			alertStrID = "got_a_log_from_maru";
+		}else if(this._mimizunMode){
+			alertStrID = "got_a_log_from_mimizun";
+		}else{
+			return;
+		}
+
+		var alertStr = statusBundle.formatStringFromName(alertStrID, [this.thread.title], 1);
+		var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+		alertsService.showAlertNotification("", "Chaika", alertStr, false, "", null);
 	}
 
 };
