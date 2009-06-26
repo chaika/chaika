@@ -386,7 +386,25 @@ ChaikaBoard.prototype = {
 					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id",
-					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?3)"
+					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?3)",
+					"UNION ALL",
+					"SELECT",
+					"    4 AS status,",
+					"    0 AS number,",
+					"    td.thread_id AS thread_id,",
+					"    CAST(td.dat_id AS TEXT) AS dat_id,",
+					"    td.title AS title,",
+					"    0 AS line_count,",
+					"    td.line_count AS read,",
+					"    0 AS unread,",
+					"    0 AS force,",
+					"    STRFTIME(?1, td.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"FROM thread_data AS td",
+					"WHERE board_id=?2 AND dat_id IN (",
+					"    SELECT dat_id FROM thread_data WHERE board_id=?2",
+					"    EXCEPT",
+					"    SELECT dat_id FROM board_subject WHERE board_id=?2",
+					") AND x_normalize(td.title) LIKE x_normalize(?3);"
 				].join("\n");
 				statement = database.createStatement(sql);
 				statement.bindStringParameter(0, "%Y/%m/%d %H:%M");
