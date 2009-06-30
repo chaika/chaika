@@ -245,6 +245,7 @@ var FormPage = {
 		this._beCheck = document.getElementById("beCheck");
 
 		this.setUseAAFont();
+		this._setDefaultMailName();
 		setTitle();
 
 		var noName = gBoard.getSetting("BBS_NONAME_NAME");
@@ -385,7 +386,42 @@ var FormPage = {
 			fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
 		}
 		this._messeageForm.style.font = fontStyle;
-	}	
+	},
+
+
+	_setDefaultMailName: function FormPage_setDefaultMailName(){
+
+		function getDefaultData(aFileName){
+			var defaultDataFile = ChaikaCore.getDataDir();
+			defaultDataFile.appendRelativePath(aFileName);
+
+			if(!defaultDataFile.exists()){
+				var defaultsFile = ChaikaCore.getDefaultsDir();
+				defaultsFile.appendRelativePath(defaultDataFile.leafName);
+				defaultsFile.copyTo(defaultDataFile.parent, null);
+				defaultDataFile = defaultDataFile.clone().QueryInterface(Ci.nsILocalFile);
+			}
+
+			var threadURLSpec = gThread.url.spec;
+			var lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
+							.replace(/\r/g, "\n").split(/\n+/);
+			for(var i=0; i<lines.length; i++){
+				dump(lines[i] + "\n");
+				var data = lines[i].split(/\t+/);
+				if(!(/^\s*;|'|#|\/\//).test(data[0]) && threadURLSpec.indexOf(data[0]) != -1){
+					return (data[1]);
+				}
+			}
+			return null;
+		}
+
+
+		var defaultData = getDefaultData("defaultmail.txt");
+		if(defaultData) this._mailForm.value = defaultData;
+
+		defaultData = getDefaultData("defaultname.txt");
+		if(defaultData) this._nameForm.value = defaultData;
+	}
 };
 
 
