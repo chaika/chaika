@@ -406,7 +406,6 @@ var FormPage = {
 			var lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
 							.replace(/\r/g, "\n").split(/\n+/);
 			for(var i=0; i<lines.length; i++){
-				dump(lines[i] + "\n");
 				var data = lines[i].split(/\t+/);
 				if(!(/^\s*;|'|#|\/\//).test(data[0]) && threadURLSpec.indexOf(data[0]) != -1){
 					return (data[1]);
