@@ -137,6 +137,11 @@ Post.prototype = {
 	},
 
 
+	getThreadTitle:function Post_getThreadTitle(){
+		return this._thread.title;
+	},
+
+
 	getPreview: function Post_getPreview(){
 		var preview = {};
 
@@ -153,7 +158,7 @@ Post.prototype = {
 							.replace(">", "&gt;", "g");
 		}
 
-		preview["title"]   = convertEntity(this._thread.title);
+		preview["title"]   = convertEntity(this.getThreadTitle());
 
 		preview["mail"]    = convertEntity(this.mail);
 		preview["message"] = convertEntity(this.message).replace("\n", "<br>", "g");
@@ -446,6 +451,68 @@ PostMachi.prototype = {
 
 };
 PostMachi.prototype.__proto__ = Post.prototype;
+
+
+
+function Post2chNewThread(aBoard){
+	this._thread = null;
+	this._board = aBoard;
+}
+
+
+Post2chNewThread.prototype = {
+	getErrorMessages: function Post2chNewThread_getErrorMessages(){
+		var result = [];
+
+
+		var convertedTitle = this._convert(this.title, this.charset, true, false);
+			// タイトルの未記入チェック
+		if(convertedTitle == ""){
+			result.push("タイトルが空です");
+		}
+
+		var superClassMethod = Post.prototype.getErrorMessages;
+		return result.concat(superClassMethod.apply(this));
+	},
+
+
+	getThreadTitle:function Post2chNewThread_getThreadTitle(){
+		return this.title;
+	},
+
+
+	submit: function Post2chNewThread_submit(aListener, additionalData){
+		this._listener = aListener;
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var postURI = ioService.newURI("../test/bbs.cgi?guid=ON", null, this._board.url);
+
+		this._httpRequest = new HttpRequest(postURI, this._board.url, this);
+
+		var postData = [];
+		postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
+		postData.push("bbs="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
+		postData.push("time="   + Math.ceil(Date.now() / 1000));
+
+		postData.push("subject=" + this._convert(this.title, this.charset, false, true));
+		postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+		postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
+		postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
+
+		if(additionalData){
+			postData = postData.concat(additionalData);
+		}
+
+
+		if(Chaika2chViewer.logined){
+			postData.push("sid=" + encodeURIComponent(Chaika2chViewer.sessionID));
+		}
+		this._httpRequest.post(postData.join("&"));
+	}
+
+};
+
+Post2chNewThread.prototype.__proto__ = Post.prototype;
+
 
 
 

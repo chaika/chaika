@@ -561,6 +561,14 @@ function openLogsDir(){
 	ChaikaCore.io.revealDir(logDir);
 }
 
+
+function postNewThread(){
+	var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
+	window.openDialog(postWizardURLSpec, "_blank",
+		"chrome, resizable, dialog", gBoard.url.spec, true);
+}
+
+
 function openSettings(){
 	var settingDialogURL = "chrome://chaika/content/settings/settings.xul#paneBoard";
 

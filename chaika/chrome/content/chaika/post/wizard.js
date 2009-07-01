@@ -47,11 +47,14 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
 
+const WIZ_TYPE_RES = 0;
+const WIZ_TYPE_NEW_THREAD = 1;
 
 var gWizard = null;
 var gThread = null;
 var gBoard  = null;
 var gPost   = null;
+var gWizType = WIZ_TYPE_RES;
 
 
 function startup(){
@@ -65,40 +68,77 @@ function startup(){
 		return;
 	}
 
+	if(window.arguments[1]){
+		gWizType = WIZ_TYPE_NEW_THREAD;
+	}
+
 	var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-	var threadURL;
-	try{
-		threadURL = ioService.newURI(window.arguments[0], null, null)
-							.QueryInterface(Components.interfaces.nsIURL);
-	}catch(ex){
-			// 認識できない URL
-		Notification.critical("認識できない URL です");
-		return;
-	}
 
-	gThread = new ChaikaThread(threadURL);
-	gBoard = new ChaikaBoard(gThread.boardURL);
-
-	if(gThread.lineCount == 0){
-		Notification.critical("一度も読んでいないスレッドには書き込みできません");
-		return;
-	}
-
-	switch(gBoard.type){
-		case ChaikaBoard.BOARD_TYPE_2CH:
-		case ChaikaBoard.BOARD_TYPE_JBBS:
-		case ChaikaBoard.BOARD_TYPE_MACHI:
-			break;
-		default:
-			Notification.critical("chaika での書き込みに対応していない掲示板です");
+	if(gWizType == WIZ_TYPE_RES){
+		var threadURL;
+		try{
+			threadURL = ioService.newURI(window.arguments[0], null, null)
+								.QueryInterface(Components.interfaces.nsIURL);
+		}catch(ex){
+				// 認識できない URL
+			Notification.critical("認識できない URL です");
 			return;
-			break;
+		}
+
+		gThread = new ChaikaThread(threadURL);
+		gBoard = new ChaikaBoard(gThread.boardURL);
+
+		if(gThread.lineCount == 0){
+			Notification.critical("一度も読んでいないスレッドには書き込みできません");
+			return;
+		}
+
+		switch(gBoard.type){
+			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
+			case ChaikaBoard.BOARD_TYPE_MACHI:
+				break;
+			default:
+				Notification.critical("chaika での書き込みに対応していない掲示板です");
+				return;
+				break;
+		}
+
+	}else if(gWizType == WIZ_TYPE_NEW_THREAD){
+		gThread = null;
+
+		var boardURL;
+		try{
+			boardURL = ioService.newURI(window.arguments[0], null, null)
+								.QueryInterface(Components.interfaces.nsIURL);
+		}catch(ex){
+				// 認識できない URL
+			Notification.critical("認識できない URL です");
+			return;
+		}
+		gBoard = new ChaikaBoard(boardURL);
+
+		switch(gBoard.type){
+			case ChaikaBoard.BOARD_TYPE_2CH:
+				break;
+			default:
+				Notification.critical("chaika での新規スレッド作成に対応していない掲示板です");
+				return;
+				break;
+		}
+
+	}else{
+		ChaikaCore.logger.warning("UNKNOWN WIZ TYPE: " + window.arguments[0]);
+		return;
 	}
+
+
+
 
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login", false);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout", false);
-	
+
 	if(gBoard.type == ChaikaBoard.BOARD_TYPE_2CH && !gBoard.settingFile.exists()){
 		gWizard.goTo("boardSettingPage");
 	}else{
@@ -125,7 +165,7 @@ function shutdown(){
 
 
 function finish(){
-	if(ChaikaCore.pref.getBool("post.thread_reload")){
+	if(gWizType == WIZ_TYPE_RES && ChaikaCore.pref.getBool("post.thread_reload")){
 		SubmitPage.reloadThreadPage();
 	}
 
@@ -148,8 +188,13 @@ function cancelCheck(aEvent){
 
 
 function setTitle(){
-	gWizard.title = "書き込み: " + gThread.title + " [chaika]";
-	document.getElementById("titleHeader").value = gThread.title;
+	if(gWizType == WIZ_TYPE_RES){
+		gWizard.title = "書き込み: " + gThread.title + " [chaika]";
+		document.getElementById("titleHeader").value = gThread.title;
+	}else if(gWizType == WIZ_TYPE_NEW_THREAD){
+		gWizard.title = gBoard.getTitle() + " への新規スレッド作成"  + " [chaika]";
+		document.getElementById("titleHeader").value = gBoard.getTitle() + " への新規スレッド作成";
+	}
 }
 
 
@@ -217,8 +262,8 @@ var BoardSettingPage = {
 
 	_downloaded: function BoardSettingPage__downloaded(){
 		BoardSettingPage._progress.mode = "determined";
-		gBoard = new ChaikaBoard(gThread.boardURL);
-		setTimeout("gWizard.goTo('formPage')", 750);
+		gBoard = new ChaikaBoard(gBoard.url); // gBoard の再初期化
+		setTimeout("gWizard.goTo('formPage')", 500);
 	}
 
 };
@@ -237,7 +282,7 @@ var FormPage = {
 		document.getElementById("messeageForm").focus();
 		if(!this._firstShow) return;
 
-	
+		this._titleForm = document.getElementById("titleForm");
 		this._nameForm = document.getElementById("nameForm");
 		this._mailForm = document.getElementById("mailForm");
 		this._sageCheck = document.getElementById("sageCheck");
@@ -257,28 +302,38 @@ var FormPage = {
 
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
-		switch(gBoard.type){
-			case ChaikaBoard.BOARD_TYPE_2CH:
-				gPost = new Post(gThread, gBoard);
-				break;
-			case ChaikaBoard.BOARD_TYPE_JBBS:
-				gPost = new PostJBBS(gThread, gBoard);
-				break;
-			case ChaikaBoard.BOARD_TYPE_MACHI:
-				gPost = new PostMachi(gThread, gBoard);
-				break;
-			default:
-				gPost = null;
+
+		if(gWizType == WIZ_TYPE_RES){
+			switch(gBoard.type){
+				case ChaikaBoard.BOARD_TYPE_2CH:
+					gPost = new Post(gThread, gBoard);
+					break;
+				case ChaikaBoard.BOARD_TYPE_JBBS:
+					gPost = new PostJBBS(gThread, gBoard);
+					break;
+				case ChaikaBoard.BOARD_TYPE_MACHI:
+					gPost = new PostMachi(gThread, gBoard);
+					break;
+				default:
+					gPost = null;
+			}
+
+				// このレスにレス
+			if(gThread.url.fileName){
+				var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+				this._messeageForm.value = res ;
+			}
+
+		}else if(gWizType == WIZ_TYPE_NEW_THREAD){
+			gPost = new Post2chNewThread(gBoard);
+
+				// タイトルフォームの表示
+			document.getElementById("titleFormContainer").hidden = false;
 		}
+
 
 		if(gBoard.url.host.indexOf(".2ch.net")!=-1  && !this._cookieEnabled()){
 			Notification.warning(gBoard.url.host +" への Cookie アクセスを許可してください");
-		}
-
-			// このレスにレス
-		if(gThread.url.fileName){
-			var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
-			this._messeageForm.value = res ;
 		}
 
 		this._firstShow = false;
@@ -286,7 +341,7 @@ var FormPage = {
 
 
 	pageAdvanced: function FormPage_pageAdvanced(aEvent){
-		var title   = "";
+		var title   = this._titleForm.value;
 		var name    = this._nameForm.value;
 		var mail    = this._mailForm.value;
 		var message = this._messeageForm.value;
@@ -402,12 +457,12 @@ var FormPage = {
 				defaultDataFile = defaultDataFile.clone().QueryInterface(Ci.nsILocalFile);
 			}
 
-			var threadURLSpec = gThread.url.spec;
+			var urlSpec = gBoard.url.spec;
 			var lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
 							.replace(/\r/g, "\n").split(/\n+/);
 			for(var i=0; i<lines.length; i++){
 				var data = lines[i].split(/\t+/);
-				if(!(/^\s*;|'|#|\/\//).test(data[0]) && threadURLSpec.indexOf(data[0]) != -1){
+				if(!(/^\s*;|'|#|\/\//).test(data[0]) && urlSpec.indexOf(data[0]) != -1){
 					return (data[1]);
 				}
 			}
