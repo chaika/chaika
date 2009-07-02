@@ -157,9 +157,11 @@ function shutdown(){
 		useAAFontCheck.setAttribute("checked", "false");
 	}
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-	os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
-	os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
-
+	try{
+		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
+		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
+	}catch(ex){
+	}
 	FormPage.addFormHistory();
 }
 
@@ -373,10 +375,10 @@ var FormPage = {
 	addFormHistory: function FormPage_addFormHistory(){
 		var formHistory	= Cc["@mozilla.org/satchel/form-history;1"]
 				.getService(Ci.nsIFormHistory2);
-		if(this._nameForm.value){
+		if(this._nameForm && this._nameForm.value){
 			formHistory.addEntry("chaika-post-name-history", this._nameForm.value);
 		}
-		if(this._mailForm.value){
+		if(this._nameForm && this._mailForm.value){
 			formHistory.addEntry("chaika-post-mail-history", this._mailForm.value);
 		}
 	},
