@@ -491,7 +491,7 @@ Post2chNewThread.prototype = {
 		var postData = [];
 		postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
 		postData.push("bbs="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
-		postData.push("time="   + Math.ceil(Date.now() / 1000));
+		postData.push("time="   + (Math.ceil(Date.now() / 1000) - 300)); // 5分前の時間を指定
 
 		postData.push("subject=" + this._convert(this.title, this.charset, false, true));
 		postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
