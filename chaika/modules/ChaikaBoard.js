@@ -458,6 +458,7 @@ ChaikaBoard.prototype = {
 				var countSort  = count + 10000;
 				var readSort   = read + 10000;
 				var unreadSort = unread + 10000;
+				var createdSort = parseInt(datID) + 10000000000;
 
 				var itemNode = this.itemsDoc.createElement("boarditem");
 				itemNode.setAttribute("status",     status);
@@ -479,9 +480,10 @@ ChaikaBoard.prototype = {
 				}else{
 					itemNode.setAttribute("force",  force + "/d");
 				}
-				itemNode.setAttribute("forceSort",  force + 100000);
-				itemNode.setAttribute("created",    created);
-				itemNode.setAttribute("url",        url);
+				itemNode.setAttribute("forceSort",   force + 100000);
+				itemNode.setAttribute("created",     created);
+				itemNode.setAttribute("createdSort", createdSort);
+				itemNode.setAttribute("url",         url);
 
 				this.itemsDoc.documentElement.appendChild(itemNode);
 			}

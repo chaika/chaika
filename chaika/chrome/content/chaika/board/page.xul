@@ -85,7 +85,7 @@
 		<treecol id="boardTreeCol-force"   label="勢い"    sort="?forceSort"  style="width:4em;"
 				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-created" label="作成日"  sort="?datID"      style="width:9em;"
+		<treecol id="boardTreeCol-created" label="作成日"  sort="?createdSort" style="width:9em;"
 				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
 	</treecols>
 
