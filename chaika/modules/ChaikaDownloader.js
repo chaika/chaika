@@ -47,9 +47,15 @@ const Cr = Components.results;
 
 const PR_PERMS_DIR = 0755;
 const PR_PERMS_FILE = 0644;
+const PR_RDONLY = 0x01;
+const PR_WRONLY = 0x02;
+const PR_CREATE_FILE = 0x08;
+const PR_APPEND = 0x10;
+const PR_TRUNCATE = 0x20;
 
 // nsNetError.h
 const NS_ERROR_MODULE_NETWORK      = 2152398848;
+const NS_BINDING_ABORTED           = NS_ERROR_MODULE_NETWORK + 2;
 const NS_ERROR_NET_TIMEOUT         = NS_ERROR_MODULE_NETWORK + 14;
 const NS_ERROR_UNKNOWN_HOST        = NS_ERROR_MODULE_NETWORK + 30;
 const NS_ERROR_REDIRECT_LOOP       = NS_ERROR_MODULE_NETWORK + 31;
@@ -80,8 +86,6 @@ function ChaikaDownloader(aURL, aLocalFile){
 	this.url = aURL;
 	this.file = aLocalFile;
 
-	this._tempFile = null;
-	this._browserPersist = null;
 	this.loading = false;
 }
 
@@ -107,104 +111,98 @@ ChaikaDownloader.prototype = {
 	 */
 	download: function ChaikaDownloader_download(){
 		this.loading = false;
-		if(this._browserPersist){
-			this._browserPersist.cancelSave();
-			this._browserPersist = null;
-		}
 
 		try{
-			if(!this.file.parent.exists()){
-				this.file.parent.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+			try{
+				if(!this.file.parent.exists()){
+					this.file.parent.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+				}
+			}catch(ex){
+				ChaikaCore.logger.error(ex);
+				this.onError(this, ChaikaDownloader.ERROR_BAD_FILE);
+				return;
 			}
-
-			this._tempFile = this.file.clone();
-			this._tempFile.createUnique(Ci.nsILocalFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
-
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			this.onError(this, ChaikaDownloader.ERROR_BAD_FILE);
 			return;
 		}
 
-		this._browserPersist = Cc["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"]
-					.createInstance(Ci.nsIWebBrowserPersist);
-		this._browserPersist.persistFlags |=
-					Ci.nsIWebBrowserPersist.PERSIST_FLAGS_BYPASS_CACHE |
-					Ci.nsIWebBrowserPersist.PERSIST_FLAGS_REPLACE_EXISTING_FILES |
-					Ci.nsIWebBrowserPersist.PERSIST_FLAGS_CLEANUP_ON_FAILURE |
-					Ci.nsIWebBrowserPersist.PERSIST_FLAGS_AUTODETECT_APPLY_CONVERSION;
+		this.wrappedJSObject = this;
 
-		var httpChannel = ChaikaCore.getHttpChannel(this.url);
-		httpChannel.requestMethod = "GET";
-		httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
-		httpChannel.loadFlags |= Ci.nsIHttpChannel.LOAD_BYPASS_CACHE;
-		httpChannel.notificationCallbacks = this._browserPersist;
-
-		this._listener._context = this;
-		this._browserPersist.progressListener = this._listener;
-		this._browserPersist.saveChannel(httpChannel, this._tempFile);
+		this._httpChannel = ChaikaCore.getHttpChannel(this.url);
+		this._httpChannel.requestMethod = "GET";
+		this._httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
+		this._httpChannel.loadFlags |= Ci.nsIHttpChannel.LOAD_BYPASS_CACHE;
+		this._httpChannel.asyncOpen(this._listener, this);
 	},
 
 
-	/**
-	 * ダウンロードを監視する nsIWebProgressListener 実装。
-	 * @private
-	 */
 	_listener: {
-		/** @private */
-		onLocationChange: function(aWebProgress, aRequest, aLocation){},
-		/** @private */
-		onSecurityChange: function(aWebProgress, aRequest, aState){},
-		/** @private */
-		onStatusChange: function(aWebProgress, aRequest, aStatus, aMessage){},
 
+		onStartRequest: function (aRequest, aContext) {
+			var context = aContext.wrappedJSObject;
 
-		/** @private */
-		onProgressChange: function ChaikaDownloader__listener_onProgressChange(
-								aWebProgress, aRequest,	aCurSelfProgress,
-								aMaxSelfProgress, aCurTotalProgress, aMaxTotalProgress){
+			context.loading = true;
+			context.onStart(context);
 
-			var percentage = -1;
-			if(aMaxTotalProgress != -1){
-				percentage = Math.floor(aCurTotalProgress / aMaxTotalProgress * 100);
-			}
-			this._context.onProgressChange(this._context, percentage);
+			this._data = [];
 		},
 
 
-		/** @private */
-		onStateChange: function ChaikaDownloader__listener_onStateChange(
-								aWebProgress, aRequest, aStateFlags, aStatus){
+		onDataAvailable: function (aRequest, aContext, aStream, aSourceOffset, aLength) {
+			if(aLength == 0) return;
 
-			if(aStateFlags & Ci.nsIWebProgressListener.STATE_START){
-				this._context.loading = true;
-				this._context.onStart(this._context);
-			}else if(aStateFlags & Ci.nsIWebProgressListener.STATE_STOP){
-				this._context.loading = false;
-				aRequest.QueryInterface(Ci.nsIHttpChannel);
+			var context = aContext.wrappedJSObject;
 
-				if(aStatus==0 || aStatus==NS_ERROR_REDIRECT_LOOP){
-					this._context._saveFile();
-					this._context.onStop(this._context, aRequest.responseStatus);
-				}else{
-					ChaikaCore.logger.error([aRequest.URI.spec,
-							aStateFlags.toString(16), aStatus.toString(16)]);
-						// TODO 詳細なエラーを出す
-					this._context.onError(this._context, ChaikaDownloader.ERROR_FAILURE);
+			aRequest.QueryInterface(Ci.nsIHttpChannel);
+			var httpStatus = aRequest.responseStatus;
 
-					try{
-						var tempFile = this._context._tempFile.clone().QueryInterface(Ci.nsILocalFile);
-						if(tempFile.exists()){
-							tempFile.remove(false);
-							ChaikaCore.logger.debug("Remove File: " + tempFile.path);
-						}
-					}catch(ex){
-						this._context.onError(ex);
-					}
+
+			if(aRequest.contentLength != -1){
+				var percentage = Math.floor((aSourceOffset * 100.0) / aRequest.contentLength);
+				context.onProgressChange(context, percentage);
+			}
+
+
+			var inputStream = Cc["@mozilla.org/binaryinputstream;1"]
+					.createInstance(Ci.nsIBinaryInputStream);
+			inputStream.setInputStream(aStream);
+			this._data.push(inputStream.readBytes(aLength));
+		},
+
+
+		onStopRequest: function (aRequest, aContext, aStatus){
+			var context = aContext.wrappedJSObject;
+			context.loading = false;
+
+			aRequest.QueryInterface(Ci.nsIHttpChannel);
+
+
+			if(Components.isSuccessCode(aStatus)) {
+				try{
+					var outputStream = Cc["@mozilla.org/network/safe-file-output-stream;1"]
+						.createInstance(Ci.nsIFileOutputStream)
+							.QueryInterface(Ci.nsISafeOutputStream);
+					var ioFlag = PR_WRONLY | PR_CREATE_FILE | PR_TRUNCATE;
+					outputStream.init(context.file, ioFlag, PR_PERMS_FILE, 0);
+
+					var data = this._data.join("");
+					outputStream.write(data, data.length);
+					outputStream.finish();
+					outputStream.close();
+				}catch(ex){
+					ChaikaCore.logger.error(ex);
 				}
+				context.onStop(context, aRequest.responseStatus);
+			}else if(aStatus == NS_BINDING_ABORTED){
+				// キャンセル
+			}else{
+				ChaikaCore.logger.error([aRequest.URI.spec, aStatus.toString(16)]);
+						// TODO 詳細なエラーを出す
+				context.onError(context, ChaikaDownloader.ERROR_FAILURE);
 			}
 		},
-
 
 		/** @private */
 		QueryInterface: XPCOMUtils.generateQI([
@@ -216,38 +214,13 @@ ChaikaDownloader.prototype = {
 
 
 	/**
-	 * ダウンロード終了時に Temp ファイルを削除、コピーを行う。
-	 * @private
-	 */
-	_saveFile: function ChaikaDownloader__saveFile(){
-		this._tempFile = this._tempFile.clone().QueryInterface(Ci.nsILocalFile);
-
-		try{
-			if(this._tempFile.fileSize == 0){
-				ChaikaCore.logger.debug("Empty File: " + this._tempFile.path);
-			}
-
-				// temp ファイルを ファイルに上書き
-			if(!this.file.equals(this._tempFile)){
-				this._tempFile.moveTo(this.file.parent, this.file.leafName);
-				this._tempFile = null;
-				this.file = this.file.clone().QueryInterface(Ci.nsILocalFile);
-			}
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}
-
-	},
-
-
-	/**
 	 * ダウンロードを中止する。
 	 * @param {Boolean} aSilent 真なら ERROR_CANCEL エラーを発生させない。
 	 */
 	abort: function ChaikaDownloader_abort(aSilent){
 		try{
-			this._browserPersist.cancelSave();
-			this._browserPersist = null;
+			this._httpChannel.cancel(NS_BINDING_ABORTED);
+			this._httpChannel = null;
 		}catch(ex){}
 
 		if(!aSilent) this.onError(this, ChaikaDownloader.ERROR_CANCEL);
@@ -264,6 +237,7 @@ ChaikaDownloader.prototype = {
 		this.onProgressChange = function(aDownloader, aPercentage){};
 		this.onError = function(aDownloader, aErrorCode){};
 	},
+
 
 	/**
 	 * ダウンロード開始時に呼ばれる。
@@ -288,7 +262,6 @@ ChaikaDownloader.prototype = {
 	 * @param {Number} aErrorCode エラーコード(ERROR_XXX)
 	 */
 	onError: function(aDownloader, aErrorCode){}
-
 };
 
 
