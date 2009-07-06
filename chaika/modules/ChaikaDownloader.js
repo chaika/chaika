@@ -107,6 +107,13 @@ ChaikaDownloader.prototype = {
 
 
 	/**
+	 * ダウンロード中なら真。
+	 * @type Boolean
+	 */
+	loading: false,
+
+
+	/**
 	 * ダウンロードを開始する。
 	 */
 	download: function ChaikaDownloader_download(){
@@ -138,9 +145,11 @@ ChaikaDownloader.prototype = {
 	},
 
 
+	/** @private */
 	_listener: {
 
-		onStartRequest: function (aRequest, aContext) {
+		/** @private */
+		onStartRequest: function ChaikaDownloader__listener_onStartRequest(aRequest, aContext) {
 			var context = aContext.wrappedJSObject;
 
 			context.loading = true;
@@ -149,8 +158,9 @@ ChaikaDownloader.prototype = {
 			this._data = [];
 		},
 
-
-		onDataAvailable: function (aRequest, aContext, aStream, aSourceOffset, aLength) {
+		/** @private */
+		onDataAvailable: function ChaikaDownloader__listener_onDataAvailable(aRequest,
+										aContext, aStream, aSourceOffset, aLength) {
 			if(aLength == 0) return;
 
 			var context = aContext.wrappedJSObject;
@@ -171,8 +181,9 @@ ChaikaDownloader.prototype = {
 			this._data.push(inputStream.readBytes(aLength));
 		},
 
-
-		onStopRequest: function (aRequest, aContext, aStatus){
+		/** @private */
+		onStopRequest: function ChaikaDownloader__listener_onStopRequest(aRequest,
+										aContext, aStatus){
 			var context = aContext.wrappedJSObject;
 			context.loading = false;
 
@@ -206,7 +217,7 @@ ChaikaDownloader.prototype = {
 
 		/** @private */
 		QueryInterface: XPCOMUtils.generateQI([
-			Ci.nsIWebProgressListener,
+			Ci.nsIStreamListener,
 			Ci.nsISupportsWeakReference,
 			Ci.nsISupports
 		])
