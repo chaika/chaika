@@ -190,7 +190,7 @@ ChaikaDownloader.prototype = {
 			aRequest.QueryInterface(Ci.nsIHttpChannel);
 
 
-			if(Components.isSuccessCode(aStatus)) {
+			if(aStatus == 0){
 				try{
 					var outputStream = Cc["@mozilla.org/network/safe-file-output-stream;1"]
 						.createInstance(Ci.nsIFileOutputStream)
@@ -205,6 +205,8 @@ ChaikaDownloader.prototype = {
 				}catch(ex){
 					ChaikaCore.logger.error(ex);
 				}
+				context.onStop(context, aRequest.responseStatus);
+			}else if(aStatus == NS_ERROR_REDIRECT_LOOP){
 				context.onStop(context, aRequest.responseStatus);
 			}else if(aStatus == NS_BINDING_ABORTED){
 				// キャンセル
