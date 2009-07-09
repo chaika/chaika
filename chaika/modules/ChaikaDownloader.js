@@ -155,7 +155,7 @@ ChaikaDownloader.prototype = {
 			context.loading = true;
 			context.onStart(context);
 
-			this._data = [];
+			context._data = [];
 		},
 
 		/** @private */
@@ -178,7 +178,7 @@ ChaikaDownloader.prototype = {
 			var inputStream = Cc["@mozilla.org/binaryinputstream;1"]
 					.createInstance(Ci.nsIBinaryInputStream);
 			inputStream.setInputStream(aStream);
-			this._data.push(inputStream.readBytes(aLength));
+			context._data.push(inputStream.readBytes(aLength));
 		},
 
 		/** @private */
@@ -198,7 +198,8 @@ ChaikaDownloader.prototype = {
 					var ioFlag = PR_WRONLY | PR_CREATE_FILE | PR_TRUNCATE;
 					outputStream.init(context.file, ioFlag, PR_PERMS_FILE, 0);
 
-					var data = this._data.join("");
+					var data = context._data.join("");
+					context._data = null;
 					outputStream.write(data, data.length);
 					outputStream.finish();
 					outputStream.close();
