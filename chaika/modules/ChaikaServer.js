@@ -96,7 +96,7 @@ var ChaikaServer = {
 		try{
 			Components.utils.import("resource://chaika-modules/server/skin.js");
 			Components.utils.import("resource://chaika-modules/server/thread.js");
-			gServerScriptList["skin"] = SkinServerScript;
+			gServerScriptList["skin"]   = SkinServerScript;
 			gServerScriptList["thread"] = ThreadServerScript;
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
@@ -150,7 +150,7 @@ var ChaikaServer = {
   	// ********** ********* implements nsIServerSocketListener ********** **********
 
 	onSocketAccepted: function ChaikaServer_onSocketAccepted(aServerSocket, aTransport){
-		(new ChaikaServerHandler(aServerSocket, aTransport));
+		(new ChaikaServerHandler(aTransport));
 	},
 
 
@@ -185,106 +185,67 @@ var ChaikaServer = {
 
 
 
-function ChaikaServerHandler(aServerSocket, aTransport){
-	this._init(aServerSocket, aTransport);
+
+function ChaikaServerHandler(aTransport){
+	this._init(aTransport);
 }
 
 
 ChaikaServerHandler.prototype = {
 
-	_init: function ChaikaServerHandler__init(aServerSocket, aTransport){
+	_init: function ChaikaServerHandler__init(aTransport){
+		this.isAlive = false;
+
 		aTransport.setTimeout(Ci.nsITransport.TIMEOUT_CONNECT, 30);
 		aTransport.setTimeout(Ci.nsITransport.TIMEOUT_READ_WRITE, 30);
 
-
 		this._transport = aTransport;
-		this._input = aTransport.openInputStream(0, 1024*8, 1024)
-							.QueryInterface(Ci.nsIAsyncInputStream);
-		this._output = aTransport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING,
-							1024*512, 1024);
+
+		var inputStream = aTransport.openInputStream(0, 1024*8, 1024);
+		var outputStream = aTransport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING,
+				1024*512, 1024).QueryInterface(Ci.nsIAsyncOutputStream);
+
+		outputStream.asyncWait(this, Ci.nsIAsyncOutputStream.WAIT_CLOSURE_ONLY, 0,
+						Cc["@mozilla.org/thread-manager;1"].getService().mainThread);
 
 
+		this.response = new ChaikaServerResponse(outputStream);
 		this.isAlive = true;
 
-		this.method = "";
-		this.httpVersion = "";
-		this.requestHeaders = [];
-		this.responseHeaders = [];
-		this.requestURL = null;
-		this.getData = [];
-
-		this._requestBuffer = "";
-
-		var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
-		this._input.asyncWait(this, 0, 0, mainThread);
-	},
-
-
-	_parseRequestData: function ChaikaServerHandler__parseRequestData(){
-		var lines = this._requestBuffer.split("\r\n");
-		this._requestBuffer = "";
-		var headerLine = lines.shift();
-
-			// リクエストヘッダ部分
-		for(var [i, line] in Iterator(lines)){
-			if(line == "") break;
-			if(line.match(/([^: ]+)[: ]*(.+)/i)){
-				this.requestHeaders[RegExp.$1] = RegExp.$2;
-			}
-		}
-
-		var uri = "";
-		if(headerLine.match(/(.+) (.+) (.+)/)){
-			this.method = RegExp.$1;
-			uri = RegExp.$2;
-			this.httpVersion = RegExp.$3;
-		}
-
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		try{
-			var baseURI = ChaikaCore.getServerURL();
-			this.requestURL = ioService.newURI(uri, null, baseURI).QueryInterface(Ci.nsIURL);
-		}catch(ex){}
+			this.request = new ChaikaServerRequest(inputStream);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
 
-		if(this.requestURL){
-			var tmpqueries = this.requestURL.query.split("&");
-			for(var i=0; i<tmpqueries.length; i++){
-				var query = tmpqueries[i].split("=");
-				this.getData[query[0]] = query[1];
-			}
+			inputStream.close();
+			this.sendErrorPage(400, "Invalid Request");
+			return;
 		}
 
-		this.responseHeaders["Host"] = this.requestURL.host;
-		this.responseHeaders["Date"] = new Date().toUTCString();
-		this.responseHeaders["Content-Type"] = "text/plain; charset=UTF-8";
-		this.responseHeaders["Connection"] = "close";
 		this._startScript();
 	},
 
 
 	_startScript: function ChaikaServerHandler__startScript(){
-		ChaikaCore.logger.debug([
-			"From: ",
-			this._transport.host,
-			":",
-			this._transport.port,
-			" RequestURL: ",
-			this.requestURL.spec
-		].join(""));
+		this.response.setHeader("Host",         this.request.url.host);
+		this.response.setHeader("Date",         (new Date()).toUTCString());
+		this.response.setHeader("Content-Type", "text/plain; charset=UTF-8");
+		this.response.setHeader("Connection",   "close");
 
-		if(this.method != "GET"){
-			this.sendErrorPage(501, this.method + " Is Not Implemented");
+
+		if(this.request.method != "GET"){
+			this.sendErrorPage(501, this.request.method + " Is Not Implemented");
 			return;
 		}
 
-		var mode = (this.requestURL.directory.match(/^\/([^\/]+)\//)) ? RegExp.$1 : null;
+		var mode = (this.request.url.directory.match(/^\/([^\/]+)\//)) ? RegExp.$1 : null;
 		if(!mode){
-			this.sendErrorPage(404, this.requestURL.spec);
+			this.sendErrorPage(404, this.request.url.spec);
 			return;
 		}
 
 		if(!gServerScriptList[mode]){
-			this.sendErrorPage(404, this.requestURL.spec);
+			this.sendErrorPage(404, this.request.url.spec);
 			return;
 		}
 
@@ -300,106 +261,222 @@ ChaikaServerHandler.prototype = {
 	},
 
 
-	write: function ChaikaServerHandler_write(aString){
-		if(this.isAlive){
-			sleep(0);
-			this._output.write(aString, aString.length);
-		}else if(this._script){
-			this._script.cancel();
-			this._script = null;
-		}
-	},
-
-
-	flush: function ChaikaServerHandler_flush(aString){
-		if(this.isAlive){
-			sleep(0);
-			this._output.flush();
-		}
-	},
-
-
-	setResponseHeader: function ChaikaServerHandler_setResponseHeader(aName, aValue){
-		if(aValue === null){
-			if(aName in this.responseHeaders){
-				delete this.responseHeaders[aName];
-			}
-		}else{
-			this.responseHeaders[aName] = aValue;
-		}
-	},
-
-
-	writeResponseHeader: function ChaikaServerHandler_writeResponseHeader(aStatusCode){
-		var response = [];
-		response.push("HTTP/1.1 " + StatusCode.getStatusCode(aStatusCode));
-		for(var i in this.responseHeaders){
-			response.push(i + ": " + this.responseHeaders[i]);
-		}
-		this.write(response.join("\r\n") + "\r\n\r\n");
-	},
-
-
 	close: function ChaikaServerHandler_close(){
 		if(this.isAlive){
-			this._output.close();
-			this._input.close();
-			this._output = null;
-			this._input = null;
+			if(this.response){
+				this.response.close();
+				this.response = null;
+			}
+			if(this.request){
+				this.request.close();
+				this.request = null;
+			}
 			this._transport = null;
 		}
 		this.isAlive = false;
-		this._scope = null;
+		this._script = null;
+	},
+
+
+	onCancelled: function ChaikaServerHandler_onCancelled(){
+		if(this._script){
+			ChaikaCore.logger.warning("Cancelled");
+			this._script.cancel();
+			this._script = null;
+		}
+
+		this.close();
 	},
 
 
 	sendErrorPage: function ChaikaServerHandler_sendErrorPage(aStatusCode, aMessage){
-		var message = aMessage||"";
+		var message = aMessage || "";
 
-		this.setResponseHeader("Content-Type", "text/html; charset=UTF-8");
-		this.writeResponseHeader(aStatusCode);
+		this.response.setHeader("Content-Type", "text/html; charset=UTF-8");
+		this.response.writeHeaders(aStatusCode);
 
 		var status = StatusCode.getStatusCode(aStatusCode);
 
 		var html = <html>
-			<head><title>{status} [bbs2chserver]</title></head>
+			<head><title>{status} [ChaikaServer]</title></head>
 			<body>
 				<h1>{status}</h1>
 				<pre>{message}</pre>
 			</body>
 		</html>;
 
-		this.write(html.toXMLString());
+		this.response.write(html.toXMLString());
 		this.close();
 	},
 
 
-	// ********** ********* implements nsIInputStreamCallback ********** **********
+	// ********** ********* implements nsIOutputStreamCallback ********** **********
 
-	onInputStreamReady: function ChaikaServerHandler_onInputStreamReady(aInput){
-		var available = aInput.available();
-		var bInputStream = Cc["@mozilla.org/binaryinputstream;1"]
-				.createInstance(Ci.nsIBinaryInputStream);
-		bInputStream.setInputStream(aInput);
-
-		this._requestBuffer += bInputStream.readBytes(available);
-		if((/\r\n\r\n/).test(this._requestBuffer)){
-			this._parseRequestData();
-		}else{
-			var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
-			this._input.asyncWait(this, 0, 0, mainThread);
+	onOutputStreamReady: function ChaikaServerHandler_onOutputStreamReady(aStream){
+		if(this.isAlive){
+			this.onCancelled();
 		}
+
+		this.close();
 	},
 
 
 	// ********** ********* implements nsISupports ********** **********
 
 	QueryInterface: XPCOMUtils.generateQI([
-		Ci.nsIInputStreamCallback,
+		Ci.nsIOutputStreamCallback,
 		Ci.nsISupportsWeakReference,
 		Ci.nsISupports
 	])
 }
+
+
+
+
+function ChaikaServerRequest(aInputStream){
+	this.stream = aInputStream;
+
+	this.requestLine = null;
+	this.method = null;
+	this.url = null;
+	this.httpVersion = null;
+	this.headers = [];
+	this.queries = [];
+
+	this._init();
+};
+
+
+ChaikaServerRequest.prototype = {
+
+	_init: function ChaikaServerRequest__init(){
+		sleep(0);
+
+		var binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
+				.createInstance(Ci.nsIBinaryInputStream);
+		binaryStream.setInputStream(this.stream);
+
+		var data = binaryStream.readBytes(this.stream.available());
+		if(data.indexOf("\r\n\r\n") == -1){
+			throw makeException(Cr.NS_ERROR_INVALID_ARG, "Invalid Request");
+		}
+
+		var lines = data.split("\r\n");
+		this.requestLine = lines.shift();
+
+			// リクエストラインの解析
+		var urlSpec;
+		if((/(.+) (.+) (HTTP\/\d+\.\d+)/).test(this.requestLine)){
+			this.method = RegExp.$1;
+			urlSpec = RegExp.$2;
+			this.httpVersion = RegExp.$3;
+		}else{
+			throw makeException(Cr.NS_ERROR_INVALID_ARG, "Invalid Request");
+		}
+
+		try{
+			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+			var baseURI = ChaikaCore.getServerURL();
+			this.url = ioService.newURI(urlSpec, null, baseURI).QueryInterface(Ci.nsIURL);
+		}catch(ex){
+			throw makeException(Cr.NS_ERROR_INVALID_ARG, "Invalid Request");
+		}
+
+
+			// リクエストヘッダの解析
+		var headerReg = /([^: ]+)[: ]+(.+)/;
+		for each (var line in lines){
+			if(line == "") break;
+			if(headerReg.test(line)){
+				this.headers[RegExp.$1] = RegExp.$2;
+			}
+		}
+
+
+			// リクエスト URL クエリの解析
+		var queries = this.url.query.split("&");
+		for each (var item in queries){
+			var query = item.split("=");
+			this.queries[query[0]] = query[1];
+		}
+	},
+
+
+	close: function ChaikaServerResponse_close(){
+		this.stream.close();
+		this.stream = null;
+	}
+
+};
+
+
+
+
+function ChaikaServerResponse(aTransport){
+	this.stream = null;
+	this.headers = [];
+
+	this._init(aTransport);
+}
+
+
+ChaikaServerResponse.prototype = {
+
+	_init: function ChaikaServerResponse__init(aOutputStream){
+		this.stream = aOutputStream;
+	},
+
+
+	setHeader: function ChaikaServerResponse_setHeader(aName, aValue){
+		if(aValue === null){
+			if(aName in this.headers){
+				delete this.headers[aName];
+			}
+		}else{
+			this.headers[aName] = aValue;
+		}
+	},
+
+
+	writeHeaders: function ChaikaServerResponse_writeHeaders(aStatusCode){
+		var response = [];
+		response.push("HTTP/1.1 " + StatusCode.getStatusCode(aStatusCode));
+
+		for(var i in this.headers){
+			response.push(i + ": " + this.headers[i]);
+		}
+
+		this.write(response.join("\r\n") + "\r\n\r\n");
+	},
+
+
+	write: function ChaikaServerResponse_write(aString){
+		if(this.stream){
+			sleep(0);
+			this.stream.write(aString, aString.length);
+		}else{
+			ChaikaCore.logger.warning("Stream Closed");
+		}
+	},
+
+
+	flush: function ChaikaServerResponse_flush(){
+		if(this.stream){
+			sleep(0);
+			this.stream.flush();
+		}else{
+			ChaikaCore.logger.warning("Stream Closed");
+		}
+	},
+
+
+	close: function ChaikaServerResponse_close(){
+		this.stream.close();
+		this.stream = null;
+	}
+
+};
+
 
 
 

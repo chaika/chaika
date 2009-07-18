@@ -55,12 +55,12 @@ function ThreadServerScript(){
 ThreadServerScript.prototype  = {
 
 	start: function(aServerHandler){
-		aServerHandler.setResponseHeader("Content-Type", "text/html; charset=Shift_JIS");
-		aServerHandler.writeResponseHeader(200);
+		aServerHandler.response.setHeader("Content-Type", "text/html; charset=Shift_JIS");
+		aServerHandler.response.writeHeaders(200);
 
-		var threadURL = this.getThreadURL(aServerHandler.requestURL);
+		var threadURL = this.getThreadURL(aServerHandler.request.url);
 		if(!threadURL){
-			aServerHandler.write("BAD URL");
+			aServerHandler.response.write("INVALID URL");
 			aServerHandler.close();
 			return;
 		}
@@ -316,12 +316,12 @@ Thread2ch.prototype = {
 			this.close();
 		}
 
-		this._handler.flush();
+		this._handler.response.flush();
 		this.datDownload();
 	},
 
 	write: function(aString){
-		this._handler.write(aString);
+		this._handler.response.write(aString);
 	},
 
 	close: function(){
@@ -463,7 +463,7 @@ Thread2ch.prototype = {
 
 			var header = this.converter.getHeader(title);
 			this.write(header);
-			this._handler.flush();
+			this._handler.response.flush();
 		}
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
 								resMailName, resDate, resID, resBeID, resMes, isAbone);
@@ -812,7 +812,7 @@ ThreadJbbs.prototype = {
 			this.thread.title = UniConverter.fromSJIS(title);
 			var header = this.converter.getHeader(title);
 			this.write(header);
-			this._handler.flush();
+			this._handler.response.flush();
 		}
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
 								resMailName, resDate, resID, resBeID, resMes, isAbone);
@@ -1051,7 +1051,7 @@ b2rThreadConverter.prototype = {
 	 * @param aString string 置換される文字列
 	 */
 	_replaceBaseTag: function(aString){
-		var requestURL = this._context._handler.requestURL;
+		var requestURL = this._context._handler.request.url;
 		var threadURLSpec = requestURL.path.substring(8);
 		var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
 		var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
