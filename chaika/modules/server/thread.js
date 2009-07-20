@@ -999,10 +999,17 @@ b2rThreadConverter.prototype = {
 			throw Components.results.NS_ERROR_FILE_NOT_FOUND;
 		}
 
+		this._tmpNGRes    = null;
+		this._tmpNGNewRes = null;
 		try{
-			this._tmpNGRes	  = ChaikaCore.io.readData(this._resolveSkinFile("NGRes.html"));
-			this._tmpNGNewRes = ChaikaCore.io.readData(this._resolveSkinFile("NGNewRes.html"));
+			var ngResFile = this._resolveSkinFile("NGRes.html");
+			var ngNewResFile = this._resolveSkinFile("NGNewRes.html");
+			if(ngResFile.exists() && ngNewResFile.exists()){
+				this._tmpNGRes	  = ChaikaCore.io.readData(ngResFile);
+				this._tmpNGNewRes = ChaikaCore.io.readData(ngNewResFile);
+			}
 		}catch(ex){
+			ChaikaCore.logger.error(ex);
 			this._tmpNGRes    = null;
 			this._tmpNGNewRes = null;
 		}
