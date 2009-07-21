@@ -350,13 +350,18 @@ function ChaikaServerRequest(aInputStream){
 ChaikaServerRequest.prototype = {
 
 	_init: function ChaikaServerRequest__init(){
-		sleep(0);
-
 		var binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
 				.createInstance(Ci.nsIBinaryInputStream);
 		binaryStream.setInputStream(this.stream);
 
+		sleep(0);
 		var data = binaryStream.readBytes(this.stream.available());
+		for(var i=0; i<10; i++){
+			if(data.indexOf("\r\n\r\n") != -1) break;
+			sleep(0);
+			data += binaryStream.readBytes(this.stream.available());
+		}
+
 		if(data.indexOf("\r\n\r\n") == -1){
 			throw makeException(Cr.NS_ERROR_INVALID_ARG, "Invalid Request");
 		}
