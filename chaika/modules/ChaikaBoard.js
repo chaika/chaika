@@ -121,8 +121,13 @@ ChaikaBoard.prototype = {
 		this.subjectFile = ChaikaBoard.getLogFileAtURL(this.subjectURL);
 
 		this.settingURL = ioService.newURI("SETTING.TXT", null, this.url)
-					.QueryInterface(Ci.nsIURL);
+				.QueryInterface(Ci.nsIURL);
 		this.settingFile = ChaikaBoard.getLogFileAtURL(this.settingURL);
+		if(this.type == ChaikaBoard.BOARD_TYPE_JBBS){
+			var spec = this.url.spec.replace(".livedoor.jp/", ".livedoor.jp/bbs/api/setting.cgi/");
+			this.settingURL = ioService.newURI(spec, null, null).QueryInterface(Ci.nsIURL);
+		}
+
 
 		this.itemsDoc = null;
 
