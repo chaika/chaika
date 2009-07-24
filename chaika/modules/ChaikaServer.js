@@ -201,19 +201,25 @@ ChaikaServerHandler.prototype = {
 
 		this._transport = aTransport;
 
-		var inputStream = aTransport.openInputStream(0, 1024*8, 1024);
-		var outputStream = aTransport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING,
+		var inputStream = aTransport.openInputStream(0, 1024*8, 1024)
+								.QueryInterface(Ci.nsIAsyncInputStream);
+		var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
+		inputStream.asyncWait(this, 0, 0, mainThread);
+	},
+
+
+	onInputStreamReady: function ChaikaServerHandler_onInputStreamReady(aInputStream){
+		var outputStream = this._transport.openOutputStream(Ci.nsITransport.OPEN_BLOCKING,
 				1024*512, 1024).QueryInterface(Ci.nsIAsyncOutputStream);
 
-		outputStream.asyncWait(this, Ci.nsIAsyncOutputStream.WAIT_CLOSURE_ONLY, 0,
-						Cc["@mozilla.org/thread-manager;1"].getService().mainThread);
-
+		var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
+		outputStream.asyncWait(this, Ci.nsIAsyncOutputStream.WAIT_CLOSURE_ONLY, 0, mainThread);
 
 		this.response = new ChaikaServerResponse(outputStream);
 		this.isAlive = true;
 
 		try{
-			this.request = new ChaikaServerRequest(inputStream);
+			this.request = new ChaikaServerRequest(aInputStream);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 
@@ -324,6 +330,7 @@ ChaikaServerHandler.prototype = {
 	// ********** ********* implements nsISupports ********** **********
 
 	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsIInputStreamCallback,
 		Ci.nsIOutputStreamCallback,
 		Ci.nsISupportsWeakReference,
 		Ci.nsISupports
