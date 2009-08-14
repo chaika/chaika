@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-EXPORTED_SYMBOLS = ["ChaikaDownloader"];
+EXPORTED_SYMBOLS = ["ChaikaDownloader", "ChaikaSimpleDownloader"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
@@ -314,3 +314,185 @@ ChaikaDownloader.ERROR_NOT_CACHED   = 6;
  * @constant
  */
 ChaikaDownloader.ERROR_CANCEL       = 7;
+
+
+
+
+function ChaikaSimpleDownloader(){
+	this.loading = false;
+}
+
+
+ChaikaSimpleDownloader.prototype = {
+
+	download: function ChaikaSimpleDownloader_download(aURL, aCharset, aObserver){
+		if(!(aURL instanceof Ci.nsIURL)){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+		if(typeof aObserver != "object"){
+			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+		}
+
+		if(this._channel){
+			this.abort(true);
+		}
+
+		this._charset = aCharset;
+		this._observer = Components.utils.getWeakReference(aObserver);
+
+		this._streamLoader = Cc["@mozilla.org/network/stream-loader;1"]
+				.createInstance(Ci.nsIStreamLoader);
+		this._streamLoader.init(this);
+
+		this._channel = ChaikaCore.getHttpChannel(aURL);
+		this.loading = true;
+		this.wrappedJSObject = this;
+		this._channel.asyncOpen(this._streamLoader, this);
+	},
+
+
+	onStreamComplete: function ChaikaSimpleDownloader_onStreamComplete(
+									aLoader, aContext, aStatus, aLength, aResult){
+		var context = aContext.wrappedJSObject;
+
+		switch(aStatus){
+			case 0:
+				var response = context._readResponse(aResult);
+				context._onStop(response, context._channel.responseStatus);
+				break;
+
+			case NS_ERROR_REDIRECT_LOOP:
+				context._onStop(null, context._channel.responseStatus);
+				break;
+
+			case NS_BINDING_ABORTED:
+				// キャンセル
+				break;
+
+			case NS_ERROR_UNKNOWN_HOST:
+				ChaikaCore.logger.error("unknown host: " + context._channel.URI.spec);
+				context._onError(ChaikaSimpleDownloader.ERROR_UNKNOWN_HOST);
+				break;
+
+			case NS_ERROR_DOCUMENT_NOT_CACHED:
+				ChaikaCore.logger.error("not cached: " + context._channel.URI.spec);
+				context._onError(ChaikaSimpleDownloader.ERROR_NOT_CACHED);
+				break;
+
+			default:
+				ChaikaCore.logger.error("failure: " + context._channel.URI.spec);
+				context._onError(ChaikaSimpleDownloader.ERROR_FAILURE);
+				break;
+		}
+
+
+		this.loading = false;
+		this._channel = null;
+		this._streamLoader = null
+	},
+
+
+	_readResponse: function ChaikaSimpleDownloader__readResponse(aResult){
+		var storageStream = Cc["@mozilla.org/storagestream;1"]
+				.createInstance(Ci.nsIStorageStream);
+		var binaryOutputStream = Cc["@mozilla.org/binaryoutputstream;1"]
+				.createInstance(Ci.nsIBinaryOutputStream);
+		var converterInputStream = Cc["@mozilla.org/intl/converter-input-stream;1"]
+				.createInstance(Ci.nsIConverterInputStream);
+
+		storageStream.init(1024*8, -1, null);
+		binaryOutputStream.setOutputStream(storageStream.getOutputStream(0));
+		binaryOutputStream.writeByteArray(aResult, aResult.length);
+
+		try{
+			converterInputStream.init(storageStream.newInputStream(0), this._charset, 0, 0);
+		}catch(ex){
+			ChaikaCore.logger.warning("invalid Charser: " + this._charset);
+			converterInputStream.init(storageStream.newInputStream(0), "UTF-8", 0, 0);
+		}
+
+		var str = {};
+		var result = [];
+		while (converterInputStream.readString(1024*32, str) != 0){
+		  result.push(str.value);
+		}
+
+		converterInputStream.close();
+		binaryOutputStream.close();
+
+		return result.join("");
+	},
+
+
+	_onStop: function ChaikaSimpleDownloader__onStop(aResponse, aHttpStatus){
+		var observer = this._observer.get();
+		if(observer && observer.onStop){
+			observer.onStop(this, aResponse, aHttpStatus);
+		}
+	},
+
+
+	_onError: function ChaikaSimpleDownloader__onError(aErrorCode){
+		var observer = this._observer.get();
+		if(observer && observer.onError){
+			observer.onError(this, aErrorCode);
+		}
+	},
+
+
+	/**
+	 * ダウンロードを中止する。
+	 * @param {Boolean} aSilent 真なら ERROR_CANCEL エラーを発生させない。
+	 */
+	abort: function ChaikaSimpleDownloader_abort(aSilent){
+		if(!this.loading) return;
+
+		try{
+			this._channel.cancel(NS_BINDING_ABORTED);
+			this._channel = null;
+			this._streamLoader = null
+		}catch(ex){}
+
+		if(!aSilent) this._onError(ChaikaSimpleDownloader.ERROR_CANCEL);
+
+		this.loading = false;
+	},
+
+	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsIStreamLoaderObserver,
+		Ci.nsISupportsWeakReference,
+		Ci.nsISupports
+	]),
+
+};
+
+/**
+ * 不正な URL。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_BAD_URL      = 1;
+/**
+ * リクエストの失敗。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_FAILURE      = 3;
+/**
+ * タイムアウト。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_NET_TIMEOUT  = 4;
+/**
+ * 接続先が見付からない。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_UNKNOWN_HOST = 5;
+/**
+ * キャッシュがない(オフライン)。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_NOT_CACHED   = 6;
+/**
+ * キャンセルされた。
+ * @constant
+ */
+ChaikaSimpleDownloader.ERROR_CANCEL       = 7;
