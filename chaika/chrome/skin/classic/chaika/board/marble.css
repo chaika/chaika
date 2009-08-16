@@ -2,10 +2,6 @@
 @namespace svg url("http://www.w3.org/2000/svg");
 
 /* ----- TOOLBAR ----- */
-marbletoolbar * {
-  -moz-appearance: none !important;
-}
-
 marbletoolbar .children-box {
   padding: 3px 2px 3px 2px;
 }
