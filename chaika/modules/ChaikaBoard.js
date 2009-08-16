@@ -457,13 +457,20 @@ ChaikaBoard.prototype = {
 				var created  = statement.getString(9);
 				var url      = threadUrlSpec + datID + "/";
 
-				var statusSort = status + 10000;
-				var numberSort = number + 10000;
-				var numberReverse = 20000 - number;
-				var countSort  = count + 10000;
-				var readSort   = read + 10000;
-				var unreadSort = unread + 10000;
-				var createdSort = parseInt(datID) + 10000000000;
+				var sortPlace = 20000;
+				var sortPlaceR = 10000;
+				if(status == 4){ // DAT落ち
+					sortPlace = 10000;
+					sortPlaceR = 20000;
+				}
+				var statusSort = status + sortPlace;
+				var numberSort = number + sortPlaceR;
+				var numberReverse = (sortPlace * 2) - number;
+				var countSort  = count + sortPlace;
+				var readSort   = read + sortPlace;
+				var unreadSort = unread + sortPlace;
+				var forceSort = force + sortPlace;
+				var createdSort = parseInt(datID) + (sortPlace * 1000000);
 
 				var itemNode = this.itemsDoc.createElement("boarditem");
 				itemNode.setAttribute("status",     status);
@@ -485,7 +492,7 @@ ChaikaBoard.prototype = {
 				}else{
 					itemNode.setAttribute("force",  force + "/d");
 				}
-				itemNode.setAttribute("forceSort",   force + 100000);
+				itemNode.setAttribute("forceSort",   forceSort);
 				itemNode.setAttribute("created",     created);
 				itemNode.setAttribute("createdSort", createdSort);
 				itemNode.setAttribute("url",         url);
