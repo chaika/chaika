@@ -33,26 +33,26 @@ marblebutton {
 marblebutton[type="menu"] {
 }
 
-marblebutton .button-box {
+marblebutton .marblebutton-box {
   padding: 0px 1px;
   background-color: rgba(255,255,255,0.15);
   border: 1px solid #222;
   -moz-border-radius: 4px;
 }
 
-marblebutton .button-label {
+marblebutton .marblebutton-label {
   padding: 0px !important;
   margin: 2px !important;
   border: 0px !important;
 }
 
-marblebutton:focus .button-box {
+marblebutton:focus .marblebutton-box {
   background-color: rgba(255,255,255,0.25);
 }
 
-marblebutton:hover:active .button-box,
-marblebutton[open="true"] .button-box,
-marblebutton[checked="true"] .button-box {
+marblebutton:hover:active .marblebutton-box,
+marblebutton[open="true"] .marblebutton-box,
+marblebutton[checked="true"] .marblebutton-box {
   background-color: rgba(20,20,20,0.2) !important;
 }
 
@@ -68,7 +68,7 @@ marblebuttongroup > marblebutton {
   -moz-border-radius: 0px;
 }
 
-marblebuttongroup > marblebutton .button-box {
+marblebuttongroup > marblebutton .marblebutton-box {
   padding: 0px 1px;
   background-color: rgba(255,255,255,0.15);
   border: 1px solid #222;
@@ -86,11 +86,11 @@ marblebuttongroup > marblebutton:last-child {
   -moz-border-radius: 0px 4px 4px 0px;
 }
 
-marblebuttongroup > marblebutton:first-child .button-box {
+marblebuttongroup > marblebutton:first-child .marblebutton-box {
   -moz-border-radius: 4px 0px 0px 4px;
 }
 
-marblebuttongroup > marblebutton:last-child .button-box {
+marblebuttongroup > marblebutton:last-child .marblebutton-box {
   border-right-width: 1px;
   -moz-border-radius: 0px 4px 4px 0px;
 }

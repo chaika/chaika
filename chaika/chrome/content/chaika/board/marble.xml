@@ -41,10 +41,10 @@
 	</resources>
 	<content>
 		<children includes="observes|template|menupopup|tooltip"/>
-		<xul:hbox class="button-box" xbl:inherits="align,dir,pack,orient"
+		<xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
 				align="center" pack="center" flex="1">
 			<children>
-				<xul:label class="button-label" xbl:inherits="value=label"/>
+				<xul:label class="marblebutton-label" xbl:inherits="value=label"/>
 			</children>
 		</xul:hbox>
 	</content>
@@ -57,10 +57,10 @@
 	</resources>
 	<content>
 		<children includes="observes|template|menupopup|tooltip"/>
-		<xul:hbox class="button-box" xbl:inherits="align,dir,pack,orient"
+		<xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
 				align="center" pack="center" flex="1">
 			<children>
-				<xul:label class="button-label" xbl:inherits="value=label"/>
+				<xul:label class="marblebutton-label" xbl:inherits="value=label"/>
 			</children>
 		</xul:hbox>
 	</content>
