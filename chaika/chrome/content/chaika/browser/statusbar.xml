@@ -36,8 +36,8 @@
 
 	<implementation>
 		<constructor><![CDATA[
-			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-			Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
 		]]></constructor>
 
 		<method name ="showCheck">
@@ -63,7 +63,7 @@
 					 threadURL = ioService.newURI(currentURI.path.substring(8), null, null)
 							 .QueryInterface(Ci.nsIURL);					
 				}catch(ex){
-					ChaikaCore.logger.error(ex);
+					this.ChaikaCore.logger.error(ex);
 				}
 				
 				return threadURL;
@@ -136,8 +136,8 @@
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
 
-				var boardURL = ChaikaThread.getBoardURL(threadURL);
-				ChaikaCore.browser.openBoard(boardURL, aAddTab);
+				var boardURL = this.ChaikaThread.getBoardURL(threadURL);
+				this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
 			]]></body>
 		</method>
 
@@ -147,7 +147,7 @@
 				if(!threadURL) return;
 
 				var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-				var threadPlainURL = (new ChaikaThread(threadURL)).plainURL;
+				var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
 				window.openDialog(postWizardURLSpec, "_blank",
 							"chrome, resizable, dialog", threadPlainURL.spec);
 			]]></body>
@@ -165,10 +165,10 @@
 				if(!result) return;
 
 				try{
-					var thread = new ChaikaThread(threadURL);
+					var thread = new this.ChaikaThread(threadURL);
 					thread.deteleThreadData();
 				}catch(ex){
-					ChaikaCore.logger.error(ex);
+					this.ChaikaCore.logger.error(ex);
 				}
 			]]></body>
 		</method>
@@ -182,7 +182,7 @@
 
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
-				ChaikaCore.browser.openThread(threadURL, aAddTab, false, true);
+				this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, true);
 			]]></body>
 		</method>
 
@@ -199,11 +199,11 @@
 
 				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 				try{
-					var threadPlainURL = (new ChaikaThread(threadURL)).plainURL;
+					var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
 					threadURL = ioService.newURI(aOption, null, threadPlainURL);
-					ChaikaCore.browser.openThread(threadURL, aAddTab, false, false);
+					this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, false);
 				}catch(ex){
-					ChaikaCore.logger.error(ex);
+					this.ChaikaCore.logger.error(ex);
 				}
 			]]></body>
 		</method>

@@ -23,9 +23,9 @@
 
 	<implementation>
 		<constructor><![CDATA[
-			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-			Components.utils.import("resource://chaika-modules/ChaikaClipboard.js");
-			Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+			Components.utils.import("resource://chaika-modules/ChaikaClipboard.js", this);
+			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
 
 			if(!this.itemType) this.itemType = "page";
 		]]></constructor>
@@ -88,7 +88,7 @@
 							.getService(Components.interfaces.nsIIOService);
 					result = ioService.newURI(aSpec, null, null);
 				}catch(ex){
-					ChaikaCore.logger.error(ex);
+					this.ChaikaCore.logger.error(ex);
 				}
 				return result;
 			}
@@ -96,53 +96,53 @@
 			switch(target.getAttribute("anonid")){
 				case "open":
 					if(isBoard){
-						ChaikaCore.browser.openBoard(getURI(urls[0]), false);
+						this.ChaikaCore.browser.openBoard(getURI(urls[0]), false);
 					}else{
-						ChaikaCore.browser.openThread(getURI(urls[0]), false, true);
+						this.ChaikaCore.browser.openThread(getURI(urls[0]), false, true);
 					}
 					break;
 				case "openTab":
 					if(isBoard){
-						ChaikaCore.browser.openBoard(getURI(urls[0]), true);
+						this.ChaikaCore.browser.openBoard(getURI(urls[0]), true);
 					}else{
-						ChaikaCore.browser.openThread(getURI(urls[0]), true, true);
+						this.ChaikaCore.browser.openThread(getURI(urls[0]), true, true);
 					}
 					break;
 				case "openTabAll":
 					for(var i=0; i<urls.length; i++){
 						if(isBoard){
-							ChaikaCore.browser.openBoard(getURI(urls[i]), true);
+							this.ChaikaCore.browser.openBoard(getURI(urls[i]), true);
 						}else{
-							ChaikaCore.browser.openThread(getURI(urls[i]), true, true);
+							this.ChaikaCore.browser.openThread(getURI(urls[i]), true, true);
 						}
 					}
 					break;
 				case "openBrowser":
 					if(isBoard || isPage){
-						ChaikaCore.browser.openURL(getURI(urls[0]), false);
+						this.ChaikaCore.browser.openURL(getURI(urls[0]), false);
 					}else{
-						ChaikaCore.browser.openThread(getURI(urls[0]), false, true, true);
+						this.ChaikaCore.browser.openThread(getURI(urls[0]), false, true, true);
 					}
 					break;
 				case "openBrowserTab":
 					if(isBoard || isPage){
-						ChaikaCore.browser.openURL(getURI(urls[0]), true);
+						this.ChaikaCore.browser.openURL(getURI(urls[0]), true);
 					}else{
-						ChaikaCore.browser.openThread(getURI(urls[0]), true, true, true);
+						this.ChaikaCore.browser.openThread(getURI(urls[0]), true, true, true);
 					}
 					break;
 				case "copyURL":
-					ChaikaClipboard.setString(getURI(urls[0]).spec);
+					this.ChaikaClipboard.setString(getURI(urls[0]).spec);
 					break;
 				case "openTitleAndURL":
-					ChaikaClipboard.setString(title +"\n"+ getURI(urls[0]).spec);
+					this.ChaikaClipboard.setString(title +"\n"+ getURI(urls[0]).spec);
 					break;
 				case "deleteLog":
 					for(var i=0; i<urls.length; i++){
 						try{
-							(new ChaikaThread(getURI(urls[i]))).deteleThreadData();
+							(new this.ChaikaThread(getURI(urls[i]))).deteleThreadData();
 						}catch(ex){
-							ChaikaCore.logger.error(ex);
+							this.ChaikaCore.logger.error(ex);
 						}
 					}
 					var os = Components.classes["@mozilla.org/observer-service;1"]
@@ -162,7 +162,7 @@
 
 	<implementation>
 		<constructor><![CDATA[
-			Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 		]]></constructor>
 
 
@@ -192,7 +192,7 @@
 		<handler event="popupshowing" phase="target"><![CDATA[
 			var historyMenuPopup = this;
 
-			var storage = ChaikaCore.storage;
+			var storage = this.ChaikaCore.storage;
 			var lastVisitedStatement = storage.createStatement(
 					"SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
 			var visitCountStatement = storage.createStatement(
@@ -234,9 +234,9 @@
 			}
 
 
-			var boardMax = ChaikaCore.pref.getInt("bbsmenu_historymenu_board_max");
+			var boardMax = this.ChaikaCore.pref.getInt("bbsmenu_historymenu_board_max");
 			if(boardMax > 30) boardMax = 30;
-			var threadMax = ChaikaCore.pref.getInt("bbsmenu_historymenu_thread_max");
+			var threadMax = this.ChaikaCore.pref.getInt("bbsmenu_historymenu_thread_max");
 			if(threadMax > 30) threadMax = 30;
 
 			if(boardMax){
@@ -277,7 +277,7 @@
 
 				// 「履歴の消去」メニューアイテム
 			if(target.value == "clearHistory"){
-				ChaikaCore.history.clearHistory();;
+				this.ChaikaCore.history.clearHistory();;
 				return;
 			}
 
@@ -290,9 +290,9 @@
 					// Ctrl を押している場合はタブで開く
 				var addTab = event.ctrlKey;
 				if(itemType == "board"){
-					ChaikaCore.browser.openBoard(url, addTab);
+					this.ChaikaCore.browser.openBoard(url, addTab);
 				}else if(itemType == "thread"){
-					ChaikaCore.browser.openThread(url, addTab, true);
+					this.ChaikaCore.browser.openThread(url, addTab, true);
 				}
 			}
 		]]></handler>
@@ -309,9 +309,9 @@
 				var url = ioService.newURI(target.value, null, null);
 
 				if(itemType == "board"){
-					ChaikaCore.browser.openBoard(url, true);
+					this.ChaikaCore.browser.openBoard(url, true);
 				}else if(itemType == "thread"){
-					ChaikaCore.browser.openThread(url, true, true);
+					this.ChaikaCore.browser.openThread(url, true, true);
 				}
 
 				this.hidePopup();

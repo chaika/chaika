@@ -1,11 +1,14 @@
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-
 var ChaikaBrowserOverlay = {};
+
+
+Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
+
 
 ChaikaBrowserOverlay.contextMenu = {
 
 	start: function contextMenu_start(){
-		var enableContextMenu = ChaikaCore.pref.getBool("enable_browser_contextmenu");
+		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
+				"enable_browser_contextmenu");
 
 		if(enableContextMenu){
 			document.getElementById("contentAreaContextMenu")
@@ -42,8 +45,8 @@ ChaikaBrowserOverlay.contextMenu = {
 	openThread: function contextMenu_openThread(aAddTab){
 		if(!gContextMenu || !gContextMenu.onLink) return;
 
-				// ÉXÉåÉbÉhï\é¶êîÇÃêßå¿
-		var disregardURLOption = ChaikaCore.pref.getBool(
+				// „Çπ„É¨„ÉÉ„ÉâË°®Á§∫Êï∞„ÅÆÂà∂Èôê
+		var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
 				"browser_contextmenu_disregard_url_option");
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
@@ -52,9 +55,10 @@ ChaikaBrowserOverlay.contextMenu = {
 			var threadURLSpec = gContextMenu.link.href;
 			threadURLSpec = threadURLSpec.replace("/test/read.html/", "/test/read.cgi/");
 			var threadURL = ioService.newURI(threadURLSpec, null, null);
-			ChaikaCore.browser.openThread(threadURL, aAddTab, disregardURLOption, false);
+			ChaikaBrowserOverlay.ChaikaCore.browser.openThread(
+					threadURL, aAddTab, disregardURLOption, false);
 		}catch(ex){
-			ChaikaCore.logger.error(ex);
+			ChaikaBrowserOverlay.ChaikaCore.logger.error(ex);
 			return;
 		}
 	}
