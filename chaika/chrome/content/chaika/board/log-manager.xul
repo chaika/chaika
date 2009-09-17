@@ -11,13 +11,13 @@
 
 <popupset>
 
-	<popup id="boardTreeContext" itemType="board"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-		onpopupshowing="return BoardTree.showContext(event)"/>
+	<popup id="boardTreeContext"
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+			onpopupshowing="return BoardTree.showContext(event)"/>
 
-	<popup id="threadTreeContext" itemType="thread"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-		onpopupshowing="return ThreadTree.showContext(event)"/>
+	<popup id="threadTreeContext"
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+			onpopupshowing="return ThreadTree.showContext(event)"/>
 
 </popupset>
 
@@ -76,7 +76,7 @@
 					<treeitem uri="?">
 						<treerow>
 							<treecell label="?title" value="?url"/>
-							<treecell label="?read"/>
+							<treecell label="?read"  value="?type"/>
 							<treecell label="?force"/>
 							<treecell label="?created"/>
 							<treecell label="?boardTitle"/>

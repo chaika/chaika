@@ -8,65 +8,61 @@
 
 <binding id="itemContext" extends="chrome://global/content/bindings/popup.xml#popup">
 	<content>
-		<xul:menuitem label="開く" anonid="open"/>
-		<xul:menuitem label="新しいタブで開く" anonid="openTab"/>
-		<xul:menuitem label="タブですべてを開く" anonid="openTabAll"/>
-		<xul:menuitem label="ブラウザで開く" anonid="openBrowser"/>
+		<xul:menuitem label="開く"                     anonid="open"/>
+		<xul:menuitem label="新しいタブで開く"         anonid="openTab"/>
+		<xul:menuitem label="タブですべてを開く"       anonid="openTabAll"/>
+		<xul:menuitem label="ブラウザで開く"           anonid="openBrowser"/>
 		<xul:menuitem label="新しいブラウザタブで開く" anonid="openBrowserTab"/>
 		<xul:menuseparator/>
-		<xul:menuitem label="URL のコピー" anonid="copyURL"/>
-		<xul:menuitem label="URL とタイトルのコピー" anonid="openTitleAndURL"/>
-		<xul:menuseparator anonid="deleteLogSeparator"/>
-		<xul:menuitem label="ログの削除" anonid="deleteLog"/>
+		<xul:menuitem label="URL のコピー"             anonid="copyURL"/>
+		<xul:menuitem label="URL とタイトルのコピー"   anonid="copyTitleAndURL"/>
+		<xul:menuseparator                             anonid="deleteLogSeparator"/>
+		<xul:menuitem label="ログの削除"               anonid="deleteLog"/>
 	</content>
 
 
 	<implementation>
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
-			Components.utils.import("resource://chaika-modules/ChaikaClipboard.js", this);
 			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
-
-			if(!this.itemType) this.itemType = "page";
+			
+			this.items = [];
 		]]></constructor>
 
-
-		<property name="itemType"
-				onget="return this.getAttribute('itemType');"
-				onset="this.setAttribute('itemType', val); return val;"/>
-		<property name="itemTitle"
-				onget="return this.getAttribute('itemTitle');"
-				onset="this.setAttribute('itemTitle', val); return val;"/>
-		<property name="itemURL"
-				onget="return this.getAttribute('itemURL');"
-				onset="this.setAttribute('itemURL', val); return val;"/>
+		<method name="_getMenuItem">
+			<parameter name="aAnonId"/>
+			<body><![CDATA[
+				return document.getAnonymousElementByAttribute(this, "anonid", aAnonId);
+			]]></body>
+		</method>
 	</implementation>
 
 
 	<handlers>
 		<handler event="popupshowing" phase="target"><![CDATA[
-			var urlSpec = this.itemURL;
-			if(!urlSpec) return false;
 
-				// itemURL が "," 区切りのリストでなければ
+			if(this.items.length == 0) return false;
+
+			var itemType = this.items[0].itemType;
+
+				// items配列の内容がひとつだけなら
 				// 「タブですべてを開く」を隠す
-			document.getAnonymousElementByAttribute(this, "anonid", "openTabAll")
-						.hidden = (urlSpec.indexOf(",") == -1);
-
-			var itemType = this.itemType;
+			this._getMenuItem("openTabAll").hidden = (this.items.length <= 1);
 
 				// itemType  が "thread" 以外なら 「ログの削除」を隠す
-			document.getAnonymousElementByAttribute(this, "anonid", "deleteLogSeparator")
-						.hidden = (itemType != "thread");
-			document.getAnonymousElementByAttribute(this, "anonid", "deleteLog")
-						.hidden = (itemType != "thread");
+			this._getMenuItem("deleteLogSeparator").hidden = (itemType != "thread");
+			this._getMenuItem("deleteLog").hidden = (itemType != "thread");
 
 				// itemType  が "page" なら「開く」「新しいタブで開く」を隠す
-			document.getAnonymousElementByAttribute(this, "anonid", "open")
-						.hidden = (itemType == "page");
-			document.getAnonymousElementByAttribute(this, "anonid", "openTab")
-						.hidden = (itemType == "page");
+			this._getMenuItem("open").hidden = (itemType == "page");
+			this._getMenuItem("openTab").hidden = (itemType == "page");
+
 			return true;
+		]]></handler>
+
+
+		<handler event="popuphidden" phase="target"><![CDATA[
+			this.items = [];
 		]]></handler>
 
 
@@ -75,79 +71,91 @@
 			var target = event.originalTarget;
 			if(target.localName != "menuitem") return;
 
-			var isBoard = (this.itemType == "board");
-			var isPage = (this.itemType == "page");
+			var firstItem = this.items[0];
+			var isBoard = (firstItem.itemType == "board");
+			var isPage = (firstItem.itemType == "page");
 
-			var title = this.itemTitle;
-			var urls = this.itemURL.replace(/\s/g, "").split(",");
+			var osName = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+			const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
 
-			function getURI(aSpec){
-				var result = null;
-				try{
-					var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-							.getService(Components.interfaces.nsIIOService);
-					result = ioService.newURI(aSpec, null, null);
-				}catch(ex){
-					this.ChaikaCore.logger.error(ex);
-				}
-				return result;
-			}
-			
 			switch(target.getAttribute("anonid")){
 				case "open":
 					if(isBoard){
-						this.ChaikaCore.browser.openBoard(getURI(urls[0]), false);
+						this.ChaikaCore.browser.openBoard(firstItem.getURL(), false);
 					}else{
-						this.ChaikaCore.browser.openThread(getURI(urls[0]), false, true);
+						this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true);
 					}
 					break;
+
 				case "openTab":
 					if(isBoard){
-						this.ChaikaCore.browser.openBoard(getURI(urls[0]), true);
+						this.ChaikaCore.browser.openBoard(firstItem.getURL(), true);
 					}else{
-						this.ChaikaCore.browser.openThread(getURI(urls[0]), true, true);
+						this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true);
 					}
 					break;
+
 				case "openTabAll":
-					for(var i=0; i<urls.length; i++){
-						if(isBoard){
-							this.ChaikaCore.browser.openBoard(getURI(urls[i]), true);
+					this.items.forEach(function(aElement, aIndex, aArray){
+						if(aElement.itemType == "board"){
+							this.ChaikaCore.browser.openBoard(aElement.getURL(), true);
 						}else{
-							this.ChaikaCore.browser.openThread(getURI(urls[i]), true, true);
+							this.ChaikaCore.browser.openThread(aElement.getURL(), true, true);
 						}
-					}
+					});
 					break;
+
 				case "openBrowser":
 					if(isBoard || isPage){
-						this.ChaikaCore.browser.openURL(getURI(urls[0]), false);
+						this.ChaikaCore.browser.openURL(firstItem.getURL(), false);
 					}else{
-						this.ChaikaCore.browser.openThread(getURI(urls[0]), false, true, true);
+						this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true, true);
 					}
 					break;
+
 				case "openBrowserTab":
 					if(isBoard || isPage){
-						this.ChaikaCore.browser.openURL(getURI(urls[0]), true);
+						this.ChaikaCore.browser.openURL(firstItem.getURL(), true);
 					}else{
-						this.ChaikaCore.browser.openThread(getURI(urls[0]), true, true, true);
+						this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true, true);
 					}
 					break;
+
 				case "copyURL":
-					this.ChaikaClipboard.setString(getURI(urls[0]).spec);
+					var urls = this.items.map(function(aElement, aIndex, aArray){
+						return aElement.urlSpec;
+					}).join(NEWLINE);
+
+					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+							.getService(Ci.nsIClipboardHelper);
+					clipboardHelper.copyString(urls);
 					break;
-				case "openTitleAndURL":
-					this.ChaikaClipboard.setString(title +"\n"+ getURI(urls[0]).spec);
+
+				case "copyTitleAndURL":
+					var urls = this.items.map(function(aElement, aIndex, aArray){
+						return aElement.title + NEWLINE + aElement.urlSpec;
+					}).join(NEWLINE);
+
+					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+							.getService(Ci.nsIClipboardHelper);
+					clipboardHelper.copyString(urls);
 					break;
+
 				case "deleteLog":
-					for(var i=0; i<urls.length; i++){
+					this.items.forEach(function(aElement, aIndex, aArray){
 						try{
-							(new this.ChaikaThread(getURI(urls[i]))).deteleThreadData();
+							(new this.ChaikaThread(aElement.getURL())).deteleThreadData();
 						}catch(ex){
 							this.ChaikaCore.logger.error(ex);
 						}
-					}
-					var os = Components.classes["@mozilla.org/observer-service;1"]
-								.getService(Components.interfaces.nsIObserverService);
-					os.notifyObservers(null, "itemContext:deleteLog", urls.join(","));
+					}, this);
+
+					var os = Cc["@mozilla.org/observer-service;1"]
+								.getService(Ci.nsIObserverService);
+					var urls = this.items.map(function(aElement, aIndex, aArray){
+						return aElement.urlSpec;
+					}).join(",");
+					os.notifyObservers(null, "itemContext:deleteLog", urls);
 					break;
 			}
 
@@ -163,28 +171,26 @@
 	<implementation>
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+			var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
+					.getService(Components.interfaces.nsIWindowMediator);
+			var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+			if(browserWindow && browserWindow.XULBrowserWindow){
+				this._browserWindow = browserWindow.XULBrowserWindow;
+			}
+
 		]]></constructor>
 
 
 		<method name="_setOverLink">
 			<parameter name="aLink"/>
 			<body><![CDATA[
-				var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-						.getService(Components.interfaces.nsIWindowMediator);
-				var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
-				if(browserWindow && browserWindow.XULBrowserWindow){
-					browserWindow.XULBrowserWindow.setOverLink(aLink, null);
+				if(this._browserWindow){
+					this._browserWindow.setOverLink(aLink, null);
 				}
 			]]></body>
 		</method>
 
-
-		<property name="boardItemContext"
-				onget="return this.getAttribute('boardItemContext');"
-				onset="this.setAttribute('boardItemContext', val); return val;"/>
-		<property name="threadItemContext"
-				onget="return this.getAttribute('threadItemContext');"
-				onset="this.setAttribute('threadItemContext', val); return val;"/>
 	</implementation>
 
 
@@ -335,23 +341,17 @@
 
 		<!-- メニューアイテムの選択解除 -->
 		<handler event="contextmenu"><![CDATA[
+			var itemContext = document.getElementById(this.getAttribute("itemContext"));
+			if(!itemContext) return false;
+
 			var target = event.target;
 			var itemType = target.getAttribute("itemType");
-			if(!itemType) return;
+			if(!itemType) return false;
 
-			var itemContext;
-			if(itemType == "board"){
-				itemContext = document.getElementById(this.boardItemContext);
-				if(!itemContext) return;
-			}else if(itemType == "thread"){
-				itemContext = document.getElementById(this.threadItemContext);
-				if(!itemContext) return;
-			}
+			var urlItem = new ChaikaCore.ChaikaURLItem(target.label, target.value, itemType, 0);
 
-			itemContext.itemTitle = target.label;
-			itemContext.itemURL = target.value;
+			itemContext.items = [urlItem];
 			itemContext.openPopup(target, "after_start", 0, 0, true, false);
-
 		]]></handler>
 	</handlers>
 

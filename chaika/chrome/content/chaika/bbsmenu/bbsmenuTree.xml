@@ -175,15 +175,15 @@
 
 				var item = this._getItem(currentIndex);
 
-				switch(parseInt(item.type)){
+				switch(parseInt(item.boardType)){
 					case ChaikaBoard.BOARD_TYPE_2CH:
 					case ChaikaBoard.BOARD_TYPE_BE2CH:
 					case ChaikaBoard.BOARD_TYPE_JBBS:
 					case ChaikaBoard.BOARD_TYPE_MACHI:
-						ChaikaCore.browser.openBoard(item.url, aAddTab);
+						ChaikaCore.browser.openBoard(item.getURL(), aAddTab);
 						break;
 					default:
-						ChaikaCore.browser.openURL(item.url, aAddTab);
+						ChaikaCore.browser.openURL(item.getURL(), aAddTab);
 						break;
 				}
 
@@ -210,20 +210,7 @@
 				var item = this._getItem(currentIndex);
 
 				var contextMenu = document.getElementById(this.getAttribute("context"));
-				contextMenu.itemURL = item.urlSpec;
-				contextMenu.itemTitle = item.title;
-
-				switch(parseInt(item.type)){
-					case ChaikaBoard.BOARD_TYPE_2CH:
-					case ChaikaBoard.BOARD_TYPE_BE2CH:
-					case ChaikaBoard.BOARD_TYPE_JBBS:
-					case ChaikaBoard.BOARD_TYPE_MACHI:
-						contextMenu.itemType = "board";
-						break;
-					default:
-						contextMenu.itemType = "page";
-						break;
-				}
+				contextMenu.items = [item];
 
 				return true;
 			]]></body>
@@ -236,15 +223,13 @@
 				var view = this.view;
 				var titleColumn = this.columns.getNamedColumn("bbsmenuTreeCol-title");
 				var typeColumn = this.columns.getNamedColumn("bbsmenuTreeCol-type");
-				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-				var item = {};
-				item.title = view.getCellText(aIndex, titleColumn);
-				item.urlSpec = view.getCellValue(aIndex, titleColumn);
-				item.url = ioService.newURI(item.urlSpec, null, null);
-				item.type = parseInt(view.getCellValue(aIndex, typeColumn));
+				var title     = view.getCellText(aIndex, titleColumn);
+				var urlSpec   = view.getCellValue(aIndex, titleColumn);
+				var boardType = parseInt(view.getCellValue(aIndex, typeColumn));
+				var itemType  = (boardType == ChaikaBoard.BOARD_TYPE_PAGE) ? "page" : "board";
 
-				return item;
+				return new ChaikaCore.ChaikaURLItem(title, urlSpec, itemType, boardType);
 			]]></body>
 		</method>
 

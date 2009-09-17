@@ -477,6 +477,36 @@ var ChaikaCore = {
 		    }
 		};
 		return httpChannel;
+	},
+
+};
+
+
+
+
+/**
+ * @constructor
+ * @param {String} aTitle URL のタイトル
+ * @param {String} aURLSpec URL
+ * @param {String} aItemType このアイテムのタイプ "board"、"thread"、"page"
+ * @param {Number} aBoardType ChaikaBoard.BOARD_TYPE_XXX
+ */
+ChaikaCore.ChaikaURLItem = function ChaikaCore_ChaikaURLItem(
+										aTitle, aURLSpec, aItemType, aBoardType){
+	this.title     = aTitle;
+	this.urlSpec   = aURLSpec;
+	this.itemType  = aItemType;
+	this.boardType = aBoardType;
+}
+
+ChaikaCore.ChaikaURLItem.prototype = {
+
+	/**
+	 * @return {nsIURL}
+	 */
+	getURL: function ChaikaURLItem_getURL(){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		return ioService.newURI(this.urlSpec, null, null).QueryInterface(Ci.nsIURL);
 	}
 
 };

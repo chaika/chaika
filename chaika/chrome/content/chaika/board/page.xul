@@ -11,9 +11,9 @@
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 
 <popupset>
-	<popup id="boardTreeContextMenu" itemType="thread"
-		style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-		onpopupshowing="return BoardTree.showContext(event)"/>
+	<popup id="boardTreeContextMenu"
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+			onpopupshowing="return BoardTree.showContext(event)"/>
 </popupset>
 
 

@@ -17,12 +17,10 @@
 	     		oncommand="SearchBox.setSearchMode('boardFilter')"/>
 	</menupopup>
 
-	<popup id="boardItemHistoryContext" itemType="board"
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
-	<popup id="threadItemHistoryContext" itemType="thread"
+	<popup id="HistoryMenuContext"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 
-	<popup id="boardItemBbsmenuTreeContext" itemType="board"
+	<popup id="boardItemBbsmenuTreeContext"
 			onpopupshowing="return document.getElementById('bbsmenuTree').popupshowing(event)"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
@@ -38,8 +36,7 @@
 	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
 		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
 				position="after_end" tooltiptext=""
-				boardItemContext="boardItemHistoryContext"
-				threadItemContext="threadItemHistoryContext"/>
+				itemContext="HistoryMenuContext"/>
 	</menu>
 	<menu id="toolMenu" label="ツール" tooltiptext="ツール" class="menu-iconic">
 		<menupopup position="after_end" tooltiptext="">

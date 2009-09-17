@@ -175,8 +175,11 @@ var BoardTree = {
 	select: function BoardTree_select(aEvent){
 		var currentIndex = this.tree.currentIndex;
 		if(currentIndex == -1) return;
-		var item = this._getItem(currentIndex);
-		ThreadTree.initTree(item.id);
+
+		var titleColumn = this.tree.columns.getNamedColumn("boardTree-title");
+		var id = this.tree.view.getCellValue(currentIndex, titleColumn);
+
+		ThreadTree.initTree(id);
 	},
 
 
@@ -185,12 +188,14 @@ var BoardTree = {
 		if(this.getClickItemIndex(aEvent) == -1) return false;
 
 		var currentIndex = this.tree.currentIndex;
+		if(currentIndex == 0) return false;
 
 		var item = this._getItem(currentIndex);
 
 		var boardTreeContext = document.getElementById("boardTreeContext");
-		boardTreeContext.itemTitle = item.title;
-		boardTreeContext.itemURL = item.urlSpec;
+		boardTreeContext.items = [item];
+
+		return true;
 	},
 
 
@@ -208,16 +213,11 @@ var BoardTree = {
 		var titleColumn = this.tree.columns.getNamedColumn("boardTree-title");
 		var urlColumn   = this.tree.columns.getNamedColumn("boardTree-url");
 
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var title   = view.getCellText(aIndex, titleColumn);
+		var urlSpec = view.getCellText(aIndex, urlColumn);
+		var type    = parseInt(view.getCellValue(aIndex, urlColumn));
 
-		var item = {};
-		item.title   = view.getCellText(aIndex, titleColumn);
-		item.id      = view.getCellValue(aIndex, titleColumn);
-		item.urlSpec = view.getCellText(aIndex, urlColumn);
-		item.url     = (item.urlSpec) ? ioService.newURI(item.urlSpec, null, null) : null;
-		item.type    = parseInt(view.getCellValue(aIndex, urlColumn));
-
-		return item;
+		return new ChaikaCore.ChaikaURLItem(title, urlSpec, "board", type);
 	},
 
 
@@ -334,14 +334,14 @@ var ThreadTree = {
 		});
 		selectionIndices.unshift(currentIndex);
 
-		var urls = selectionIndices.map(function(aElement, aIndex, aArray){
-			return ThreadTree._getItem(aElement).urlSpec;
+		var items = selectionIndices.map(function(aElement, aIndex, aArray){
+			return ThreadTree._getItem(aElement);
 		});
 
-
 		var threadTreeContext = document.getElementById("threadTreeContext");
-		threadTreeContext.itemTitle = this._getItem(currentIndex).title;
-		threadTreeContext.itemURL = urls.join(",");
+		threadTreeContext.items = items;
+
+		return true;
 	},
 
 
@@ -374,15 +374,13 @@ var ThreadTree = {
 	_getItem: function ThreadTree__getItem(aIndex){
 		var view = this.tree.view;
 		var titleColumn = this.tree.columns.getNamedColumn("threadTree-title");
+		var readColumn   = this.tree.columns.getNamedColumn("threadTree-read");
 
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var title   = view.getCellText(aIndex, titleColumn);
+		var urlSpec = view.getCellValue(aIndex, titleColumn);
+		var type    = parseInt(view.getCellValue(aIndex, readColumn));
 
-		var item = {};
-		item.title   = view.getCellText(aIndex, titleColumn);
-		item.urlSpec = view.getCellValue(aIndex, titleColumn);
-		item.url     = (item.urlSpec) ? ioService.newURI(item.urlSpec, null, null) : null;
-
-		return item;
+		return new ChaikaCore.ChaikaURLItem(title, urlSpec, "thread", type);
 	},
 
 

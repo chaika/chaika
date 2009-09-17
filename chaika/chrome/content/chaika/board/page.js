@@ -360,13 +360,14 @@ var BoardTree = {
 		});
 		selectionIndices.unshift(currentIndex);
 
-		var urls = selectionIndices.map(function(aElement, aIndex, aArray){
-			return BoardTree.getItemURL(aElement).spec;
+		var items = selectionIndices.map(function(aElement, aIndex, aArray){
+			var title = BoardTree.getItemTitle(aElement);
+			var urlSpec = BoardTree.getItemURL(aElement).spec;
+			return new ChaikaCore.ChaikaURLItem(title, urlSpec, "thread", gBoard.type);
 		});
 
 		var boardTreeContextMenu = document.getElementById("boardTreeContextMenu");
-		boardTreeContextMenu.itemTitle = this.getItemTitle(currentIndex);
-		boardTreeContextMenu.itemURL = urls.join(",");
+		boardTreeContextMenu.items = items;
 
 		return true;
 	},
