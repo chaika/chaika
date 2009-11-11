@@ -51,7 +51,7 @@ function startup(){
 
 			outsidexmlFile = outsidexmlFile.clone().QueryInterface(Ci.nsILocalFile);
 		}
-		document.getElementById("bbsmenuTree").initTree(gBbsMenuXMLFile, outsidexmlFile);
+		document.getElementById("bookmarks-view").initTree(gBbsMenuXMLFile, outsidexmlFile);
 	}else{	// bbsmenu.html が無いときは自動で取得
 		bbsmenuUpdate();
 	}
@@ -184,7 +184,7 @@ function onBbsmenuUpdated(){
 
 		outsidexmlFile = outsidexmlFile.clone().QueryInterface(Ci.nsILocalFile);
 	}
-	document.getElementById("bbsmenuTree").initTree(gBbsMenuXMLFile, outsidexmlFile);
+	document.getElementById("bookmarks-view").initTree(gBbsMenuXMLFile, outsidexmlFile);
 }
 
 
@@ -263,7 +263,7 @@ function viewFoxAge2ch(){
 
 
 function search(aSearchStr){
-	document.getElementById("bbsmenuTree").search(aSearchStr);
+	document.getElementById("bookmarks-view").search(aSearchStr);
 }
 
 var SearchBox = {
@@ -284,12 +284,12 @@ var SearchBox = {
 	search: function SearchBox_search(aSearchStr){
 		switch(this.getSearchMode()){
 			case "find2ch":
-				document.getElementById("bbsmenuTree").search("");
+				document.getElementById("bookmarks-view").search("");
 				find2ch.search(aSearchStr);
 				break;
 			case "boardFilter":
 				find2ch.search("");
-				document.getElementById("bbsmenuTree").search(aSearchStr);
+				document.getElementById("bookmarks-view").search(aSearchStr);
 				break;
 		}
 	},

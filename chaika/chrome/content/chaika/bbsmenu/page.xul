@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/bbsmenu/page.css" type="text/css"?>
 
-<page id="chaikaBbsmenuPage" title="BBSMENU [chaika]"
+<page id="bookmarksPanel" title="BBSMENU [chaika]"
 		onload="startup()" onunload="shutdown()"
 		onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
@@ -59,7 +60,8 @@
 		style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
 
 <deck id="deck" flex="1" >
-	<tree id="bbsmenuTree" seltype="single" hidecolumnpicker="true" class="plain" flex="2"
+	<tree id="bookmarks-view" seltype="single" hidecolumnpicker="true"
+			class="plain sidebar-placesTree bbsmenuTree" flex="2"
 			context="boardItemBbsmenuTreeContext"
 			persist="openedCategories" statedatasource="rdf:null"
 			datasources="#bbsmenuTree" ref="*" querytype="xml" flags="dont-build-content"
