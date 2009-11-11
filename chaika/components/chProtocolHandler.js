@@ -178,7 +178,10 @@ chContentHandler.prototype = {
 
 	handleContent: function chContentHandler_handleContent(aContentType, aWindowContext, aRequest){
 		var url = aRequest.originalURI;
-		if(url.scheme != "chaika"){
+		if(url.scheme != "chaika") return;
+
+		if(!(url instanceof Ci.nsIURL)){
+			ChaikaCore.logger.error(url.spec);
 			return;
 		}
 
