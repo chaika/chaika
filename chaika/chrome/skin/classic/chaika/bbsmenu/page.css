@@ -31,9 +31,13 @@
 
 
 #searchBox dropmarker {
-  -moz-appearance:none; 
+  list-style-image: url("chrome://chaika/skin/bbsmenu/arrow-dn.gif");
+  -moz-appearance:none;
+  border-style: none;
   background-color: transparent;
-  width: 12px;
+  width: 11px;
+  padding: 0px 2px 0px 0px;
+  cursor: default;
 }
 
 

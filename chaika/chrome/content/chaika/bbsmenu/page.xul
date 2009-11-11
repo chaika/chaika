@@ -28,9 +28,10 @@
 
 <menubar id="mainMenubar" align="stretch">
 
-	<textbox id="searchBox" value="" emptytext="" flex="1" type="autocomplete"
+	<textbox id="searchBox" value="" emptytext="" flex="1" type="search" timeout="2000"
 			searchmode="find2ch" persist="searchmode"
-			ontextentered="SearchBox.search(this.value)">
+			oncommand="if(this.value =='') SearchBox.search('')"
+			onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
 		<box><dropmarker popup="searchModeMenu" class="plain"/></box>
 	</textbox>
 
