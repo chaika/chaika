@@ -37,7 +37,7 @@
 				</tree>
 
 				<hbox pack="center">
-					<html:canvas width="140" height="140" id="aaPanel-thumbnailCanvas" />
+					<html:canvas width="160" height="160" id="aaPanel-thumbnailCanvas" />
 				</hbox>
 			</vbox>
 

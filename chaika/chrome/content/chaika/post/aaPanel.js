@@ -165,7 +165,7 @@ var AAPanel = {
 
 	_drawThumbnail: function AAPanel__drawThumbnail(aContent){
 
-		const THUMBNAIL_SIZE = 140;
+		const THUMBNAIL_SIZE = 160;
 		const FONT_SIZE = ChaikaCore.pref.getInt("thread_aa_font_size");
 		const LINE_HEIGHT = FONT_SIZE + ChaikaCore.pref.getInt("thread_aa_line_space");
 		const FONT_NAME = ChaikaCore.pref.getUniChar("thread_aa_font_name");
@@ -173,7 +173,7 @@ var AAPanel = {
 		var canvas = document.getElementById("aaPanel-thumbnailCanvas");
 		var ctx = canvas.getContext("2d");
 
-		ctx.mozTextStyle = FONT_SIZE + "px \'" + FONT_NAME + "\'";
+		ctx.font = FONT_SIZE + "px \'" + FONT_NAME + "\'";
 
 		var aaLines = aContent.split("\n");
 
@@ -182,11 +182,7 @@ var AAPanel = {
 		for(var i=0; i<aaLines.length; i++){
 			var line = aaLines[i];
 			if(line.length == 0) continue;
-			try{
-				var w = ctx.mozMeasureText(line);
-			}catch(ex){
-				w = 0;
-			}
+			var w = ctx.measureText(line).width;
 			if(w > aaWidth) aaWidth = w;
 		}
 
@@ -196,6 +192,7 @@ var AAPanel = {
 		ctx.fillStyle = "#FFF";
 		ctx.clearRect(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
 		ctx.fillStyle = "#111";
+		ctx.strokeStyle = "#555";
 
 		var scale = 1;
 		var xSpacing = 0;
@@ -219,28 +216,14 @@ var AAPanel = {
 		}
 
 		ctx.save();
-		ctx.translate(xSpacing, (FONT_SIZE * scale) + ySpacing);
 		ctx.scale(scale, scale);
-
 		for(var i=0; i<aaLines.length; i++){
 			line = aaLines[i];
-			ctx.mozDrawText(line);
-			ctx.translate(0, LINE_HEIGHT);
+			var y = (FONT_SIZE * scale) + ySpacing + (i*LINE_HEIGHT);
+			ctx.fillText(line, xSpacing, y);
+			ctx.strokeText(line, xSpacing, y);
 		}
 		ctx.restore();
-
-			// 大きなAAは薄くなるので二回描画する
-		if(aaWidth>300 || aaHeight>300){
-			ctx.save();
-			ctx.translate(xSpacing, (FONT_SIZE * scale) + ySpacing);
-			ctx.scale(scale, scale);
-			for(var i=0; i<aaLines.length; i++){
-				line = aaLines[i];
-				ctx.mozDrawText(line);
-				ctx.translate(0, LINE_HEIGHT);
-			}
-			ctx.restore();
-		}
 	},
 
 
