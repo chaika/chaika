@@ -18,11 +18,11 @@
 	     		oncommand="SearchBox.setSearchMode('boardFilter')"/>
 	</menupopup>
 
-	<popup id="HistoryMenuContext"
+	<menupopup id="HistoryMenuContext"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 
-	<popup id="boardItemBbsmenuTreeContext"
-			onpopupshowing="return document.getElementById('bbsmenuTree').popupshowing(event)"
+	<menupopup id="boardItemBbsmenuTreeContext"
+			onpopupshowing="return document.getElementById('bookmarks-view').popupshowing(event)"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 </popupset>
 
