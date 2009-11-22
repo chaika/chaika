@@ -426,6 +426,7 @@ var BoardTree = {
 
 		// nsDragAndDrop Observer
 	onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
+		if(aEvent.originalTarget.localName != "treechildren") return;
 		var itemIndex = this.getClickItemIndex(aEvent);
 		if(itemIndex == -1) return;
 		if(this.getSelectionIndices().length != 1) return;
