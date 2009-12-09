@@ -507,6 +507,16 @@ ChaikaCore.ChaikaURLItem.prototype = {
 	getURL: function ChaikaURLItem_getURL(){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		return ioService.newURI(this.urlSpec, null, null).QueryInterface(Ci.nsIURL);
+	},
+
+	open: function ChaikaURLItem_open(aAddTab){
+		if(this.itemType == "board"){
+			ChaikaCore.browser.openBoard(this.getURL(), aAddTab);
+		}else if(this.itemType == "thread"){
+			ChaikaCore.browser.openThread(this.getURL(), aAddTab, true);
+		}else{
+			ChaikaCore.browser.openURL(this.getURL(), aAddTab);
+		}
 	}
 
 };
