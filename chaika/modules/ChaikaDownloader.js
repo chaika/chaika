@@ -345,6 +345,12 @@ ChaikaSimpleDownloader.prototype = {
 		this._streamLoader.init(this);
 
 		this._channel = ChaikaCore.getHttpChannel(aURL);
+		this._channel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
+			// LOAD_BYPASS_CACHE : キャッシュを使用しない
+			// LOAD_ANONYMOUS    : cookie を渡さない
+		this._channel.loadFlags |= Ci.nsIRequest.LOAD_BYPASS_CACHE | Ci.nsIRequest.LOAD_ANONYMOUS;
+		this._channel.requestMethod = "GET";
+
 		this.loading = true;
 		this.wrappedJSObject = this;
 		this._channel.asyncOpen(this._streamLoader, this);
@@ -357,7 +363,13 @@ ChaikaSimpleDownloader.prototype = {
 
 		switch(aStatus){
 			case 0:
-				var response = context._readResponse(aResult);
+				try{
+					var response = context._readResponse(aResult);
+				}catch(ex){
+					ChaikaCore.logger.error("failure: " + ex);
+					context._onError(ChaikaSimpleDownloader.ERROR_FAILURE);
+					break;
+				}
 				context._onStop(response, context._channel.responseStatus);
 				break;
 
