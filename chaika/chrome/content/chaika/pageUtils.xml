@@ -242,9 +242,9 @@
 			}
 
 
-			var boardMax = this.ChaikaCore.pref.getInt("bbsmenu_historymenu_board_max");
+			var boardMax = this.ChaikaCore.pref.getInt("historymenu.board_max");
 			if(boardMax > 30) boardMax = 30;
-			var threadMax = this.ChaikaCore.pref.getInt("bbsmenu_historymenu_thread_max");
+			var threadMax = this.ChaikaCore.pref.getInt("historymenu.thread_max");
 			if(threadMax > 30) threadMax = 30;
 
 			if(boardMax){

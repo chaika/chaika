@@ -31,8 +31,8 @@ pref("extensions.chaika.browser.redirector.enabled", false);
 pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
 pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 
-pref("extensions.chaika.bbsmenu_historymenu_board_max", 5);
-pref("extensions.chaika.bbsmenu_historymenu_thread_max", 5);
+pref("extensions.chaika.historymenu.board_max", 6);
+pref("extensions.chaika.historymenu.thread_max", 6);
 
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
