@@ -3,121 +3,70 @@
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/bbsmenu/page.css" type="text/css"?>
 
-<page id="bookmarksPanel" title="BBSMENU [chaika]"
-		onload="startup()" onunload="shutdown()"
-		onmousedown="event.stopPropagation()" onkeypress="event.stopPropagation()"
+
+<page id="bookmarksPanel" title="BBSMENU [chaika]" class="bbsmenuPage"
+		onload="Page.startup()" onunload="Page.shutdown()"
 		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
+<script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
+
 <popupset>
 	<menupopup id="searchModeMenu" onpopupshowing="SearchBox.searchModeMenuShowing(event)">
-	     <menuitem label="find.2ch 検索" value="find2ch"     type="radio" name="searchModeMenuItem"
+	     <menuitem label="find.2ch.net で検索" value="find2ch"     type="radio" name="searchModeMenuItem"
 	     		oncommand="SearchBox.setSearchMode('find2ch')"/>
 	     <menuitem label="板名フィルタ"  value="boardFilter" type="radio" name="searchModeMenuItem"
 	     		oncommand="SearchBox.setSearchMode('boardFilter')"/>
 	</menupopup>
 
-	<menupopup id="HistoryMenuContext"
+	<menupopup id="historyMenuContext"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 
-	<menupopup id="boardItemBbsmenuTreeContext"
-			onpopupshowing="return document.getElementById('bookmarks-view').popupshowing(event)"
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+	<menupopup id="treeContextMenu"
+			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+			onpopupshowing="return Tree.showContext(event)"/>
 </popupset>
 
-<menubar id="mainMenubar" align="stretch">
-
+<hbox align="center">
 	<textbox id="searchBox" value="" emptytext="" flex="1" type="search" timeout="2000"
 			searchmode="find2ch" persist="searchmode"
 			oncommand="if(this.value =='') SearchBox.search('')"
 			onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
 		<box><dropmarker popup="searchModeMenu" class="plain"/></box>
 	</textbox>
+	
+	<menubar id="mainMenubar" class="plain">
+		<menu id="historyMenu" label="履歴" class="plain menu-iconic">
+			<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
+					position="after_end" tooltiptext=""
+					itemContext="historyMenuContext"/>
+		</menu>
 
-	<menu id="historyMenu" label="履歴" tooltiptext="履歴" class="menu-iconic">
-		<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
-				position="after_end" tooltiptext=""
-				itemContext="HistoryMenuContext"/>
-	</menu>
-	<menu id="toolMenu" label="ツール" tooltiptext="ツール" class="menu-iconic">
-		<menupopup position="after_end" tooltiptext="">
-			<menuitem label="bbsmenu 更新" oncommand="bbsmenuUpdate()"/>
-			<menuseparator/>
-			<menuitem label="ログマネージャ" oncommand="openLogManager()"/>
-			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
-			<menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
-					hidden="true" oncommand="viewFoxAge2ch()"/>
-			<menuseparator/>
-			<menuitem label="オプション..." oncommand="openSettings()"/>
-			<menuseparator/>
-			<menuitem label="chaika について" oncommand="openAbout()"/>
-		</menupopup>
-	</menu>
-</menubar>
+		<menu id="toolsMenu" label="ツール" class="plain menu-iconic">
+			<menupopup id="toolsMenuPopup" position="after_end">
+				<menuitem label="bbsmenu 更新" oncommand="BbsmenuUpdater.update()"/>
+				<menuseparator/>
+				<menuitem label="ログマネージャ" oncommand="Page.openLogManager()"/>
+				<menuitem label="データフォルダを開く" oncommand="Page.openDataFolder()"/>
+				<menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
+						 hidden="true" oncommand="Page.viewFoxAge2ch()"/>
+				<menuseparator/>
+				<menuitem label="オプション..." oncommand="Page.openSettings()"/>
+			</menupopup>
+		</menu>
+	</menubar>
+</hbox>
 
-<hbox id="bbsmenuUpdater" collapsed="true"
-		onupdated="onBbsmenuUpdated()" onupddateerror="alert('UPDATE ERROR')"
-		style="-moz-binding:url(chrome://chaika/content/bbsmenu/updater.xml#bbsmenuUpdater)"/>
+<notificationbox id="notification"/>
 
-<deck id="deck" flex="1" >
-	<tree id="bookmarks-view" seltype="single" hidecolumnpicker="true"
-			class="plain sidebar-placesTree bbsmenuTree" flex="2"
-			context="boardItemBbsmenuTreeContext"
-			persist="openedCategories" statedatasource="rdf:null"
-			datasources="#bbsmenuTree" ref="*" querytype="xml" flags="dont-build-content"
-			style="-moz-binding:url(chrome://chaika/content/bbsmenu/bbsmenuTree.xml#bbsmenuTree)">
-		<treecols>
-			<treecol id="bbsmenuTreeCol-title" hideheader="true" flex="10" primary="true"/>
-			<treecol id="bbsmenuTreeCol-type"  hideheader="true" hidden="true"/>
-		</treecols>
-		<template>
-			<query>
-				<assign var="?tagName" expr="name()"/>
-				<assign var="?hasChildNodes" expr="boolean(*)"/>
-			</query>
-
-			<rule>
-				<where subject="?tagName" rel="equals" value="separator"/>
-				<action>
-					<treechildren flex="1">
-						<treeseparator uri="?"/>
-					</treechildren>
-				</action>
-			</rule>
-			<rule>
-				<where subject="?tagName" rel="equals" value="category"/>
-				<where subject="?hasChildNodes" rel="equals" value="true"/>
-				<action>
-					<treechildren flex="1">
-						<treeitem uri="?" open="?open">
-							<treerow>
-								<treecell label="?title" properties="title"/>
-								<treecell label="?type" value="?type"/>
-							</treerow>
-						</treeitem> 
-					</treechildren>
-				</action>
-			</rule>
-			<rule>
-				<where subject="?tagName" rel="equals" value="board"/>
-				<action>
-					<treechildren flex="1">
-						<treeitem uri="?">
-							<treerow>
-								<treecell label="?title" value="?url" properties="title type-?type"/>
-								<treecell label="?type" value="?type"/>
-							</treerow>
-						</treeitem> 
-					</treechildren>
-				</action>
-			</rule>
-		</template>
-	</tree>
-
-	<hbox id="find2ch" flex="1" searchingLabel="検索中..."
-			onclick="find2ch.click(event)" onkeypress="find2ch.keyDown(event)"
-			style="-moz-binding:url(chrome://chaika/content/bbsmenu/find2ch.xml#find2ch)"/>
-</deck>
+<tree id="bookmarks-view" class="sidebar-placesTree bbsmenuTree" hidecolumnpicker="true" flex="1"
+		openedCategories="" persist="openedCategories"
+		context="treeContextMenu"
+		onclick="Tree.click(event)">
+	<treecols>
+		<treecol id="title" flex="1" primary="true" hideheader="true"/>
+	</treecols>
+	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1"/>
+</tree>
 
 </page>

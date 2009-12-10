@@ -6,29 +6,16 @@
 <prefpane id="paneBbsmenu" onpaneload="gBbsmenuPane.startup()">
 
 	<preferences>
-		<preference id="extensions.chaika.bbsmenu_historymenu_show"
-				name="extensions.chaika.bbsmenu_historymenu_show" type="bool"
-				onchange="gBbsmenuPane.startup()"/>
-		<preference id="extensions.chaika.bbsmenu_historymenu_board_max"
-				name="extensions.chaika.bbsmenu_historymenu_board_max" type="int"/>
-		<preference id="extensions.chaika.bbsmenu_historymenu_thread_max"
-				name="extensions.chaika.bbsmenu_historymenu_thread_max" type="int"/>
-		<preference id="extensions.chaika.bbsmenu_toggle_open_container"
-				name="extensions.chaika.bbsmenu_toggle_open_container" type="bool"/>
-		<preference id="extensions.chaika.bbsmenu_load_url"
-				name="extensions.chaika.bbsmenu_load_url" type="string"/>
-		<preference id="extensions.chaika.bbsmenu_click_action"
-				name="extensions.chaika.bbsmenu_click_action" type="int"/>
-		<preference id="extensions.chaika.bbsmenu_double_click_action"
-				name="extensions.chaika.bbsmenu_double_click_action" type="int"/>
-		<preference id="extensions.chaika.bbsmenu_middle_click_action"
-				name="extensions.chaika.bbsmenu_middle_click_action" type="int"/>
+		<preference id="extensions.chaika.bbsmenu.toggle_open_container"
+				name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
+		<preference id="extensions.chaika.bbsmenu.bbsmenu_html_url"
+				name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
 	</preferences>
 
 	<script type="application/x-javascript; version=1.7"
 			src="chrome://chaika/content/settings/bbsmenu-pane.js"/>
 
-	<grid  flex="1">
+	<grid flex="1">
 		<columns>
 			<column flex="1"/>
 			<column flex="6"/>
@@ -36,83 +23,23 @@
 		<rows>
 
 			<row class="setting-row">
-				<description class="setting-description">メニュー :</description>
-				<vbox>
-					<checkbox label="履歴メニューを表示する"
-							preference="extensions.chaika.bbsmenu_historymenu_show"/>
-					<hbox class="indent" align="center" id="historyMenuMaxBox">
-						<label value="板の表示数 :"/>
-						<textbox id="fontSize" value="16" type="number" min="0" max="20" style="width:3.5em;"
-								preference="extensions.chaika.bbsmenu_historymenu_board_max"/>
-						<label value="スレッドの表示数 :"/>
-						<textbox id="fontSize" value="16" type="number" min="0" max="20" style="width:3.5em;"
-								preference="extensions.chaika.bbsmenu_historymenu_thread_max"/>
-					</hbox>
-				</vbox>
-			</row>
-
-			<row class="setting-row">
 				<description class="setting-description">ツリー :</description>
 				<vbox>
 					<checkbox label="一度に開けるカテゴリをひとつに制限する"
-							preference="extensions.chaika.bbsmenu_toggle_open_container"/>
+							preference="extensions.chaika.bbsmenu.toggle_open_container"/>
 				</vbox>
-			</row>
-
-			<row class="setting-row">
-				<description class="setting-description">板を開く動作 :</description>
-				<hbox>
-					<grid>
-						<columns>
-							<column/>
-							<column flex="1"/>
-						</columns>
-						<rows>
-							<row align="center">
-								<label value="クリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.bbsmenu_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-							<row align="center">
-								<label value="ダブルクリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.bbsmenu_double_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-							<row align="center">
-								<label value="ミドルクリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.bbsmenu_middle_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-						</rows>
-					</grid>
-				</hbox>
 			</row>
 
 			<row class="setting-row">
 				<description class="setting-description">板一覧取得 URL :</description>
 				<hbox align="center">
-					<textbox preference="extensions.chaika.bbsmenu_load_url" flex="1"/>
+					<textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
 					<button label="規定値" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
 				</hbox>
 			</row>
 		</rows>
 	</grid>
-
+	<spacer height="50"/>
 </prefpane>
 
 

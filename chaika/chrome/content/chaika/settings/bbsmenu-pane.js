@@ -37,13 +37,12 @@
 
 
 var gBbsmenuPane = {
+
 	startup: function(){
-		setCcontainerDisabled("extensions.chaika.bbsmenu_historymenu_show",
-					"historyMenuMaxBox", true);
 	},
 
 	resetBbsmenuURL: function(){
-		var pref = document.getElementById("extensions.chaika.bbsmenu_load_url");
+		var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
 		pref.value = pref.defaultValue;
 	}
 
