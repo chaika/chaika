@@ -40,7 +40,7 @@
 					<checkbox label="コンテキストメニューに chaika の項目を追加する *"
 							preference="extensions.chaika.enable_browser_contextmenu"/>
 					<hbox id="boxDisregardURLOption" class="indent">
-						<checkbox label="URL の表示制限を無視して開く"
+						<checkbox label="URL の表示制限を書き換えて開く"
 								preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
 					</hbox>
 				</vbox>
