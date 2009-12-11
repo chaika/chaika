@@ -8,6 +8,8 @@
 	<preferences>
 		<preference id="extensions.chaika.board.auto_update"
 				name="extensions.chaika.board.auto_update" type="bool"/>
+		<preference id="extensions.chaika.board.tree_size"
+				name="extensions.chaika.board.tree_size" type="string"/>
 		<preference id="extensions.chaika.board.thread_view_limit"
 				name="extensions.chaika.board.thread_view_limit" type="int"/>
 	</preferences>
@@ -25,6 +27,20 @@
 					<checkbox label="スレッド一覧を開いたときに自動的に一覧を更新する"
 							preference="extensions.chaika.board.auto_update"/>
 				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description"> リスト :</description>
+				<hbox align="center" pack="start">
+					<label value="リストのテキスト"/>
+					<menulist preference="extensions.chaika.board.tree_size">
+						<menupopup>
+							<menuitem label="小" value="small"/>
+							<menuitem label="中" value="medium"/>
+							<menuitem label="大" value="big"/>
+						</menupopup>
+					</menulist>
+				</hbox>
 			</row>
 
 			<row class="setting-row">

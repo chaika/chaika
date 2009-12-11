@@ -42,6 +42,29 @@
 }
 
 
+tree.bbsmenuTree treechildren::-moz-tree-cell-text,
+tree.bbsmenuTree[treesize="small"] treechildren::-moz-tree-cell-text {
+  font-size: 12px !important;
+}
+tree.bbsmenuTree treechildren::-moz-tree-row,
+tree.bbsmenuTree[treesize="small"] treechildren::-moz-tree-row {
+  height: 18px !important;
+}
+
+tree.bbsmenuTree[treesize="medium"] treechildren::-moz-tree-cell-text {
+  font-size: 14px !important;
+}
+tree.bbsmenuTree[treesize="medium"] treechildren::-moz-tree-row {
+  height: 20px !important;
+}
+
+tree.bbsmenuTree[treesize="big"] treechildren::-moz-tree-cell-text {
+  font-size: 16px !important;
+}
+tree.bbsmenuTree[treesize="big"] treechildren::-moz-tree-row {
+  height: 22px !important;
+}
+
 
 /* 2ch */
 tree.bbsmenuTree treechildren::-moz-tree-image(title, type-0) {

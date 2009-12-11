@@ -17,6 +17,30 @@
 }
 
 
+#boardTree treechildren::-moz-tree-cell-text,
+#boardTree[treesize="small"] treechildren::-moz-tree-cell-text {
+  font-size: 12px !important;
+}
+#boardTree treechildren::-moz-tree-row,
+#boardTree[treesize="small"] treechildren::-moz-tree-row {
+  height: 18px !important;
+}
+
+#boardTree[treesize="medium"] treechildren::-moz-tree-cell-text {
+  font-size: 14px !important;
+}
+#boardTree[treesize="medium"] treechildren::-moz-tree-row {
+  height: 20px !important;
+}
+
+#boardTree[treesize="big"] treechildren::-moz-tree-cell-text {
+  font-size: 16px !important;
+}
+#boardTree[treesize="big"] treechildren::-moz-tree-row {
+  height: 22px !important;
+}
+
+
 #boardTree treechildren::-moz-tree-image(status){
   margin-left: 2px;
   list-style-image: url("chrome://chaika/skin/board/status-icon.png") !important;

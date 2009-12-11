@@ -52,6 +52,11 @@ const MODE_FIND2CH = 2;
 var Page = {
 
 	startup: function Page_startup(){
+		PrefObserver.start();
+		var tree = document.getElementById("bookmarks-view");
+		tree.collapsed = true;
+		tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+
 		this.showViewFoxAge2chMenu();
 		SearchBox.init();
 
@@ -59,6 +64,9 @@ var Page = {
 	},
 
 	delayStartup: function Page_delayStartup(){
+		var tree = document.getElementById("bookmarks-view");
+		tree.collapsed = false;
+
 		if(Bbsmenu.getItemCount() == 0){
 			BbsmenuUpdater.update();
 		}else{
@@ -67,6 +75,7 @@ var Page = {
 	},
 
 	shutdown: function Page_shutdown(){
+		PrefObserver.stop();
 		Tree.saveOpenedCategories();
 	},
 
@@ -125,6 +134,38 @@ var Page = {
 		if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
 			browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
 		}
+	}
+
+};
+
+
+
+
+var PrefObserver = {
+
+	PREF_BRANCH: "extensions.chaika.bbsmenu.",
+
+	start: function PrefObserver_start(){
+		var prefService = Cc["@mozilla.org/preferences-service;1"]
+				.getService(Ci.nsIPrefService);
+		this._branch = prefService.getBranch(this.PREF_BRANCH)
+				.QueryInterface(Ci.nsIPrefBranch2);
+		this._branch.addObserver("", this, false);
+	},
+
+
+	stop: function PrefObserver_stop(){
+		this._branch.removeObserver("", this);
+	},
+
+
+	observe: function PrefObserver_observe(aSubject, aTopic, aData){
+		if(aTopic != "nsPref:changed") return;
+
+		if(aData == "tree_size"){
+			Tree.changeTreeSize();
+		}
+
 	}
 
 };
@@ -666,6 +707,13 @@ var Tree = {
 		}else{
 			this._tree.setAttribute("openedCategories", "");
 		}
+	},
+
+
+	changeTreeSize: function Tree_changeTreeSize(){
+		this._tree.collapsed = true;
+		this._tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+		setTimeout(function(){ Tree._tree.collapsed = false }, 0);
 	},
 
 

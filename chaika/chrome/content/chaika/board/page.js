@@ -57,7 +57,8 @@ var gNewURL;
  * 開始時の処理
  */
 function startup(){
-
+	PrefObserver.start();
+	
 	document.title = location.href;
 	document.getElementById("lblTitle").setAttribute("value", location.href);
 
@@ -105,6 +106,7 @@ function startup(){
  * 終了時の処理
  */
 function shutdown(){
+	PrefObserver.stop();
 
 	if(!BoardTree.firstInitBoardTree){
 		savePersist();
@@ -192,6 +194,38 @@ function setPageTitle(){
 
 
 
+var PrefObserver = {
+
+	PREF_BRANCH: "extensions.chaika.board.",
+
+	start: function PrefObserver_start(){
+		var prefService = Cc["@mozilla.org/preferences-service;1"]
+				.getService(Ci.nsIPrefService);
+		this._branch = prefService.getBranch(this.PREF_BRANCH)
+				.QueryInterface(Ci.nsIPrefBranch2);
+		this._branch.addObserver("", this, false);
+	},
+
+
+	stop: function PrefObserver_stop(){
+		this._branch.removeObserver("", this);
+	},
+
+
+	observe: function PrefObserver_observe(aSubject, aTopic, aData){
+		if(aTopic != "nsPref:changed") return;
+
+		if(aData == "tree_size"){
+			BoardTree.changeTreeSize();
+		}
+
+	}
+
+};
+
+
+
+
 var BoardTree = {
 
 	tree: null,
@@ -200,6 +234,7 @@ var BoardTree = {
 
 	initTree: function BoardTree_initTree(aNoFocus){
 		this.tree = document.getElementById("boardTree");
+		this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
 
 		setPageTitle();
 		if(this.firstInitBoardTree){
@@ -253,6 +288,13 @@ var BoardTree = {
 			this.tree.treeBoxObject.view.selection.select(0);
 		}
 
+	},
+
+
+	changeTreeSize: function BoardTree_changeTreeSize(){
+		this.tree.collapsed = true;
+		this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
+		setTimeout(function(){ BoardTree.tree.collapsed = false }, 0);
 	},
 
 

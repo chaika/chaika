@@ -8,6 +8,8 @@
 	<preferences>
 		<preference id="extensions.chaika.bbsmenu.toggle_open_container"
 				name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
+		<preference id="extensions.chaika.bbsmenu.tree_size"
+				name="extensions.chaika.bbsmenu.tree_size" type="string"/>
 		<preference id="extensions.chaika.bbsmenu.bbsmenu_html_url"
 				name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
 	</preferences>
@@ -27,6 +29,16 @@
 				<vbox>
 					<checkbox label="一度に開けるカテゴリをひとつに制限する"
 							preference="extensions.chaika.bbsmenu.toggle_open_container"/>
+					<hbox align="center" pack="start">
+						<label value="ツリーのテキスト"/>
+						<menulist preference="extensions.chaika.bbsmenu.tree_size">
+							<menupopup>
+								<menuitem label="小" value="small"/>
+								<menuitem label="中" value="medium"/>
+								<menuitem label="大" value="big"/>
+							</menupopup>
+						</menulist>
+					</hbox>
 				</vbox>
 			</row>
 
