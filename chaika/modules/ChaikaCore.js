@@ -755,7 +755,7 @@ ChaikaBrowser.prototype = {
 
 				// スレッド表示数の制限
 			if(aReplaceViewLimit){
-				var threadViewLimit = ChaikaCore.pref.getInt("board_thread_view_limit");
+				var threadViewLimit = ChaikaCore.pref.getInt("board.thread_view_limit");
 				if(threadViewLimit == 0){
 					threadURL = ioService.newURI("./", null, threadURL);
 				}else{

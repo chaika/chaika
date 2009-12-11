@@ -85,7 +85,7 @@ function startup(){
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
-	if(ChaikaCore.pref.getBool("board_auto_update")){
+	if(ChaikaCore.pref.getBool("board.auto_update")){
 		subjectUpdate();
 	}else if(!subjectFile.exists() || subjectFile.fileSize==0){
 		subjectUpdate();
@@ -421,7 +421,7 @@ function subjectUpdate(aEvent){
 	var settingFile = gBoard.settingFile.clone();
 	if(subjectFile.exists()){
 		var interval = new Date().getTime() - subjectFile.lastModifiedTime;
-		var updateIntervalLimit =  ChaikaCore.pref.getInt("board_update_interval_limit");
+		var updateIntervalLimit =  ChaikaCore.pref.getInt("board.update_interval_limit");
 			// 不正な値や、10 秒以下なら 10 秒にする
 		if(isNaN(parseInt(updateIntervalLimit)) || updateIntervalLimit < 10)
 			updateIntervalLimit = 10;

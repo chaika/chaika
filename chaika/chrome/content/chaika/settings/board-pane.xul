@@ -6,10 +6,10 @@
 <prefpane id="paneBoard">
 
 	<preferences>
-		<preference id="extensions.chaika.board_auto_update"
-				name="extensions.chaika.board_auto_update" type="bool"/>
-		<preference id="extensions.chaika.board_thread_view_limit"
-				name="extensions.chaika.board_thread_view_limit" type="int"/>
+		<preference id="extensions.chaika.board.auto_update"
+				name="extensions.chaika.board.auto_update" type="bool"/>
+		<preference id="extensions.chaika.board.thread_view_limit"
+				name="extensions.chaika.board.thread_view_limit" type="int"/>
 	</preferences>
 
 	<grid flex="1">
@@ -23,14 +23,14 @@
 				<description class="setting-description">自動更新 :</description>
 				<vbox>
 					<checkbox label="スレッド一覧を開いたときに自動的に一覧を更新する"
-							preference="extensions.chaika.board_auto_update"/>
+							preference="extensions.chaika.board.auto_update"/>
 				</vbox>
 			</row>
 
 			<row class="setting-row">
 				<description class="setting-description">スレッド表示の制限 :</description>
 				<vbox align="start">
-					<menulist preference="extensions.chaika.board_thread_view_limit">
+					<menulist preference="extensions.chaika.board.thread_view_limit">
 						<menupopup>
 							<menuitem label="全件表示" value="0"/>
 							<menuitem label="最新  25件" value="25"/>
