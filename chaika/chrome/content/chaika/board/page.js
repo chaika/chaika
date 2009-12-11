@@ -264,50 +264,12 @@ var BoardTree = {
 
 		if(aEvent.ctrlKey || aEvent.shiftKey) return;
 
-		var clickAction = ChaikaCore.pref.getInt("board_click_action");
-		var doubleClickAction = ChaikaCore.pref.getInt("board_double_click_action");
-
-		if(aEvent.button==1 || doubleClickAction == 0 || clickAction==doubleClickAction){
-				// ダブルクリックの動作が指定されていない場合や
-				// クリックと同じ動作ならダブルクリック判定を行わない
-			BoardTree.clickDelay(aEvent);
-		}else{
-			if(this._clickTimer){
-				clearTimeout(this._clickTimer);
-			}
-			this._clickTimer = setTimeout(function(aEvent){
-				BoardTree.clickDelay(aEvent);
-			}, 350, aEvent);
-		}
-	},
-
-
-	clickDelay: function BoardTree_clickDelay(aEvent){
-		this._clickTimer = null;
-
-		var button = aEvent.button;
-		var detail = aEvent.detail;
-
-		var openActionPref;
-		if(button==0 && detail==1){
-				// クリック
-			openActionPref = "board_click_action";
-		}else if(button==0 && detail==2){
-				// ダブルクリック
-			openActionPref = "board_double_click_action";
-		}else if(button==1 && detail==1){
-				// ミドルクリック
-			openActionPref = "board_middle_click_action";
-		}else{
-			return;
-		}
-
-		var openAction = ChaikaCore.pref.getInt(openActionPref);
-		if(openAction==1){
+		if(aEvent.button==0){
 			this.openThread(false);
-		}else if(openAction==2){
+		}else if(aEvent.button==1){
 			this.openThread(true);
 		}
+
 	},
 
 

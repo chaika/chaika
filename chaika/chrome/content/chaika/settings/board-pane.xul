@@ -8,17 +8,11 @@
 	<preferences>
 		<preference id="extensions.chaika.board_auto_update"
 				name="extensions.chaika.board_auto_update" type="bool"/>
-		<preference id="extensions.chaika.board_click_action"
-				name="extensions.chaika.board_click_action" type="int"/>
-		<preference id="extensions.chaika.board_double_click_action"
-				name="extensions.chaika.board_double_click_action" type="int"/>
-		<preference id="extensions.chaika.board_middle_click_action"
-				name="extensions.chaika.board_middle_click_action" type="int"/>
 		<preference id="extensions.chaika.board_thread_view_limit"
 				name="extensions.chaika.board_thread_view_limit" type="int"/>
 	</preferences>
 
-	<grid  flex="1">
+	<grid flex="1">
 		<columns>
 			<column flex="1"/>
 			<column flex="5"/>
@@ -31,50 +25,6 @@
 					<checkbox label="スレッド一覧を開いたときに自動的に一覧を更新する"
 							preference="extensions.chaika.board_auto_update"/>
 				</vbox>
-			</row>
-
-			<row class="setting-row">
-				<description class="setting-description">スレッドを開く動作 :</description>
-				<hbox>
-					<grid>
-						<columns>
-							<column/>
-							<column flex="1"/>
-						</columns>
-						<rows>
-							<row align="center">
-								<label value="クリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.board_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-							<row align="center">
-								<label value="ダブルクリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.board_double_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-							<row align="center">
-								<label value="ミドルクリック :" style="text-align:right;"/>
-								<menulist preference="extensions.chaika.board_middle_click_action">
-									<menupopup>
-										<menuitem label="なにもしない" value="0"/>
-										<menuitem label="現在のタブで開く" value="1"/>
-										<menuitem label="新しいタブで開く" value="2"/>
-									</menupopup>
-								</menulist>
-							</row>
-						</rows>
-					</grid>
-				</hbox>
 			</row>
 
 			<row class="setting-row">

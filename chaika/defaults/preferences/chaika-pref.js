@@ -39,9 +39,6 @@ pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 
 pref("extensions.chaika.board_auto_update", false);
-pref("extensions.chaika.board_click_action", 1);
-pref("extensions.chaika.board_double_click_action", 0);
-pref("extensions.chaika.board_middle_click_action", 2);
 pref("extensions.chaika.board_update_interval_limit", 45);
 pref("extensions.chaika.board_thread_view_limit", 50);
 

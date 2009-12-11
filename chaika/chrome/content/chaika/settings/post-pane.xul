@@ -26,7 +26,6 @@
 							preference="extensions.chaika.post.thread_reload"/>
 					<checkbox label="ウィザードを自動的に閉じる"
 							preference="extensions.chaika.post.auto_finish"/>
-					<spacer height="50"/>
 				</vbox>
 			</row>
 

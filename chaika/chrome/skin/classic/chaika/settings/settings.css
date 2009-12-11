@@ -16,7 +16,9 @@ radio[pane]{
 }
 
 
-
+grid {
+  min-height: 120px;
+}
 
 row.setting-row {
   margin-bottom: 1em;
