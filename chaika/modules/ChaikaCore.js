@@ -821,11 +821,9 @@ ChaikaBrowser.prototype = {
 			try{
 				var contentBrowser = browserWindow.getBrowser();
 				if(aAddTab){
-					ChaikaCore.logger.debug("addTab: " + aURI.spec);
-					var newTab = contentBrowser.addTab(aURI.spec);
-					if(ChaikaCore.pref.getBool("tab_load_in_foreground")){
-						contentBrowser.selectedTab = newTab;
-					}
+					var loadInForeground = ChaikaCore.pref.getBool("tab_load_in_foreground");
+					ChaikaCore.logger.debug("loadOneTab: " + aURI.spec + " : " + loadInForeground);
+					contentBrowser.loadOneTab(aURI.spec, null, null, null, !loadInForeground, false);
 				}else{
 					ChaikaCore.logger.debug("loadURI: " + aURI.spec);
 					contentBrowser.loadURI(aURI.spec);
