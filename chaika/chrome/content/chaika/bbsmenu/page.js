@@ -348,7 +348,7 @@ var Bbsmenu = {
 		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-		var bbsmenuDoc = domParser.parseFromString("<root/>", "text/xml");
+		var bbsmenuDoc = domParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
 		var fragment = unescapeHTML.parseFragment(aHtmlSource, false, null,
 							bbsmenuDoc.documentElement);
 		bbsmenuDoc.documentElement.appendChild(fragment);
@@ -370,8 +370,12 @@ var Bbsmenu = {
 			storage.executeSimpleSQL("INSERT INTO bbsmenu(title, title_n, path, is_category) " +
 					"VALUES('2ch', '', '/2ch/', 1);");
 
-			var xpath = "root/font/b/text() | root/font/a[@href]";
-			var xpathResult = bbsmenuDoc.evaluate(xpath, bbsmenuDoc, null,
+			var xpath = "root/html:font/html:b/text() | root/html:font/html:a[@href]" +
+							" | root/font/b/text() | root/font/a[@href]";
+			function resolver(){
+				return "http://www.w3.org/1999/xhtml";
+			}
+			var xpathResult = bbsmenuDoc.evaluate(xpath, bbsmenuDoc, resolver,
 					Ci.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 			while(node = xpathResult.iterateNext()){
 				if(node.nodeType == Ci.nsIDOMNode.TEXT_NODE){
