@@ -61,12 +61,11 @@
 
 <tree id="bookmarks-view" class="sidebar-placesTree bbsmenuTree" hidecolumnpicker="true" flex="1"
 		openedCategories="" persist="openedCategories"
-		context="treeContextMenu"
-		onclick="Tree.click(event)">
+		context="treeContextMenu">
 	<treecols>
 		<treecol id="title" flex="1" primary="true" hideheader="true"/>
 	</treecols>
-	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1"/>
+	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1" onclick="Tree.click(event)"/>
 </tree>
 
 </page>

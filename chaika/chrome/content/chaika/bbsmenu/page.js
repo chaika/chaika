@@ -728,14 +728,14 @@ var Tree = {
 		var subElement = {};
 		this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
 		if(row.value == -1) return;	// ツリーのアイテム以外をクリック
+		if(subElement.value=="twisty") return;
 
-		var isContainer = this.isContainer(row.value);
-		if(aEvent.button == 0 && subElement.value!="twisty" && isContainer){
-			this.toggleOpenState(row.value);
+		if(this.isContainer(row.value)){
+			if(aEvent.button == 0){
+				this.toggleOpenState(row.value);
+			}
 			return;
 		}
-
-		if(isContainer) return;
 
 		if(aEvent.button == 0){
 			var item = this.getURLItem(row.value);
