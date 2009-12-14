@@ -11,7 +11,7 @@
 			em:optionsURL="chrome://chaika/content/settings/settings.xul"
 			em:iconURL="chrome://chaika/content/icon.png"
 			em:creator="chaika.xrea.jp"
-			em:updateURL="https://ss2.xrea.com/chaika.xrea.jp/update/chaika-release.rdf">
+			em:updateURL="https://ss2.xrea.com/chaika.xrea.jp/update/chaika-beta.rdf">
 
 		<em:targetApplication>
 			<!-- Firefox -->
