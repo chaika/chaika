@@ -1174,6 +1174,10 @@ ChaikaHistory.prototype = {
 
 
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
+		var privateBrowsingService = Cc["@mozilla.org/privatebrowsing;1"]
+				.getService(Ci.nsIPrivateBrowsingService);
+		if(privateBrowsingService.privateBrowsingEnabled) return;
+
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
 		var title = aTitle;
