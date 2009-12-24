@@ -561,6 +561,12 @@ ChaikaBoard.prototype = {
 			var cont;
 			do{
 				cont = fileStream.readLine(line);
+
+					// JBBS の subject は、最終行に1行目と同じ情報が入っているので無視する
+				if(!cont && this.type==ChaikaBoard.BOARD_TYPE_JBBS){
+					break;
+				}
+
 				if(!regLine.test(line.value)) continue;
 				var datID = RegExp.$1;
 				var threadID = boardID + datID;
