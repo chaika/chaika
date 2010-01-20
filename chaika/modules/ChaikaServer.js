@@ -201,10 +201,12 @@ ChaikaServerHandler.prototype = {
 
 		this._transport = aTransport;
 
-		var inputStream = aTransport.openInputStream(0, 1024*8, 1024)
-								.QueryInterface(Ci.nsIAsyncInputStream);
-		var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
-		inputStream.asyncWait(this, 0, 0, mainThread);
+		//var inputStream = aTransport.openInputStream(0, 1024*8, 1024)
+		//						.QueryInterface(Ci.nsIAsyncInputStream);
+		//var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
+		//inputStream.asyncWait(this, 0, 0, mainThread);
+		var inputStream = aTransport.openInputStream(0, 1024*8, 1024);
+		this.onInputStreamReady(inputStream);
 	},
 
 
@@ -217,6 +219,10 @@ ChaikaServerHandler.prototype = {
 
 		this.response = new ChaikaServerResponse(outputStream);
 		this.isAlive = true;
+
+		while(aInputStream.available() == 0){
+			sleep(50);
+		}
 
 		try{
 			this.request = new ChaikaServerRequest(aInputStream);
