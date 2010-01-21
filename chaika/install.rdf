@@ -4,14 +4,14 @@
 
 	<Description about="urn:mozilla:install-manifest"
 			em:name="chaika"
-			em:version="1.1.0b2"
+			em:version="1.1.0"
 			em:description="2ch.net(Japanese Web Forums) Browser"
 			em:id="chaika@chaika.xrea.jp"
 			em:homepageURL="http://chaika.xrea.jp/"
 			em:optionsURL="chrome://chaika/content/settings/settings.xul"
 			em:iconURL="chrome://chaika/content/icon.png"
 			em:creator="chaika.xrea.jp"
-			em:updateURL="https://ss2.xrea.com/chaika.xrea.jp/update/chaika-beta.rdf">
+			em:updateURL="https://ss2.xrea.com/chaika.xrea.jp/update/chaika-release.rdf">
 
 		<em:targetApplication>
 			<!-- Firefox -->
