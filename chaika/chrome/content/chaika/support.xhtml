@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+  <head>
+    <title>トラブルシューティング情報 [chaika]</title>
+
+<style type="text/css"><![CDATA[
+
+	html {
+	  background-color: #FFF;
+	  color: #222;
+	  font: message-box;
+	}
+	body {
+	  text-align: justify;
+	  width: 90%;
+	  margin-left: 5%;
+	  margin-right: 5%;
+	}
+
+	h1 {
+	  margin-bottom: 2em;
+	}
+
+	table {
+	  background-color: #F0F0F0;
+	  color: #111;
+	  font: message-box;
+	  text-align: start;
+	  width: 100%;
+	  border: 1px solid #333;
+	  border-collapse: collapse;
+	  margin-bottom: 2em;
+	}
+
+	th, td {
+	  border-right: 1px solid #999;
+	  border-bottom: 1px dotted #999;
+	  padding: 3px 5px;
+	}
+
+	th {
+	  border-right: 1px solid #666;
+	  border-bottom: 1px solid #333;
+	  text-align: center;
+	  background-color: #778DA8;
+	  color: #FFF;
+	}
+
+	th.column {
+	  border-right: 1px solid #333;
+	  border-bottom: 1px dotted #333;
+	  text-align: start;
+	  white-space: nowrap;
+	  width: 10em; 
+	}
+
+	tr.userValue td{
+	  color: #B11;
+	  font-weight: bold;
+	}
+
+]]></style>
+
+
+<script type="application/javascript"><![CDATA[
+	Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
+	const Ci = Components.interfaces;
+	const Cc = Components.classes;
+	const Cr = Components.results;
+
+	const EXTENSION_ID = "chaika@chaika.xrea.jp";
+
+
+	function startup(){
+		printBasic();
+		printDetails();
+		printPrefs();
+	}
+
+
+	function shutdown(){
+	}
+
+
+	function printBasic(){
+		var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
+				.getService(Ci.nsIExtensionManager);
+		var item = extensionManager.getItemForID(EXTENSION_ID);
+	
+		var basicInfoTable = <table id="basicInfoTable">
+			<tr>
+				<th class="column">名前</th>
+				<td>{item.name}</td>
+			</tr>
+			<tr>
+				<th class="column">バージョン</th>
+				<td>{item.version}</td>
+			</tr>
+			<tr>
+				<th class="column">UserAgent</th>
+				<td>{ChaikaCore.getUserAgent()}</td>
+			</tr>
+		</table>;
+		document.getElementById("basicInfoBox").innerHTML = basicInfoTable.toXMLString();
+	}
+
+
+	function printDetails(){
+		var skinName = ChaikaCore.pref.getUniChar("thread_skin") || "(Default)";
+	
+		var detailsInfoTable = <table id="detailsInfoTable">
+			<tr>
+				<th class="column">データフォルダ</th>
+				<td>{ChaikaCore.getDataDir().path}</td>
+			</tr>
+			<tr>
+				<th class="column">ログフォルダ</th>
+				<td>{ChaikaCore.getLogDir().path}</td>
+			</tr>
+			<tr>
+				<th class="column">ストレージファイル</th>
+				<td>{ChaikaCore.storage.databaseFile.path}</td>
+			</tr>
+	
+			<tr>
+				<th class="column">デフォルトフォルダ</th>
+				<td>{ChaikaCore.getDefaultsDir().path}</td>
+			</tr>
+			<tr>
+				<th class="column">ServerURL</th>
+				<td>{ChaikaCore.getServerURL().spec}</td>
+			</tr>
+	
+			<tr>
+				<th class="column">スレッド表示スキン</th>
+				<td>{skinName}</td>
+			</tr>
+	
+		</table>;
+		document.getElementById("detailsInfoBox").innerHTML = detailsInfoTable.toXMLString();
+	}
+	
+	
+	function printPrefs(){
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+		var branch = prefService.getBranch("extensions.chaika.");
+	
+		function getPrefValue(aPrefName){
+			var prefType = branch.getPrefType(aPrefName);
+			var value = "";
+	
+			switch(prefType){
+				case Ci.nsIPrefBranch.PREF_STRING:
+					value = ChaikaCore.pref.getUniChar(aPrefName);
+					if(aPrefName.indexOf("pass") != -1){
+						value = value.replace(/./g, "•");
+					}
+					break;
+				case Ci.nsIPrefBranch.PREF_INT:
+					value = ChaikaCore.pref.getInt(aPrefName);
+					break;
+				case Ci.nsIPrefBranch.PREF_BOOL:
+					value = ChaikaCore.pref.getBool(aPrefName);
+					break;
+				default:
+					value = "(INVALID)";
+					break;
+			}
+			return value;
+		}
+	
+		var prefNames = branch.getChildList("", {});
+		prefNames.sort();
+	
+		var prefsInfoTable = <table id="prefsInfoTable">
+			<tr>
+				<th>名前</th>
+				<th>値</th>
+			</tr>
+		</table>;
+	
+		prefNames.forEach(function(aElement, aIndex, aArray){
+			prefsInfoTable.tr[aIndex+1] = "";
+			prefsInfoTable.tr[aIndex+1].td[0] = aElement;
+			prefsInfoTable.tr[aIndex+1].td[1] = getPrefValue(aElement);
+	
+			if(branch.prefHasUserValue(aElement)){
+				prefsInfoTable.tr[aIndex+1].@class = "userValue";
+			}
+		});
+		document.getElementById("prefsInfoBox").innerHTML = prefsInfoTable.toXMLString();
+	}
+
+]]></script>
+
+</head>
+
+<body onload="startup()" onunload="shutdown()">
+
+	<h1>chaika トラブルシューティング情報</h1>
+
+	<h2>基本情報</h2>
+	<div id="basicInfoBox"></div>
+
+	<h2>詳細情報</h2>
+	<div id="detailsInfoBox"></div>
+
+	<h2>設定</h2>
+	<div id="prefsInfoBox"></div>
+
+</body>
+</html>

@@ -105,6 +105,14 @@ var Page = {
 	},
 
 
+	openSupport: function Page_openSupport(){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var supportURL = ioService.newURI("chaika://support/", null, null);
+
+		ChaikaCore.browser.openURL(supportURL, true);
+	},
+
+
 	openSettings: function Page_openSettings(){
 		var winMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
 			.getService(Ci.nsIWindowMediator);

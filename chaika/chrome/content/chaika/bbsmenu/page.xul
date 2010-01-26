@@ -50,6 +50,11 @@
 				<menuitem label="データフォルダを開く" oncommand="Page.openDataFolder()"/>
 				<menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
 						 hidden="true" oncommand="Page.viewFoxAge2ch()"/>
+				<menu label="ヘルプ">
+					<menupopup>
+						<menuitem label="トラブルシーティング情報" oncommand="Page.openSupport()"/>
+					</menupopup>
+				</menu>
 				<menuseparator/>
 				<menuitem label="オプション..." oncommand="Page.openSettings()"/>
 			</menupopup>
