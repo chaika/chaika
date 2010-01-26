@@ -376,10 +376,16 @@ var ChaikaCore = {
 			try{
 				var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
 						.getService(Ci.nsIExtensionManager);
-				var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
 				var item = extensionManager.getItemForID(EXTENSION_ID);
-				this._userAgent = [ "Monazilla/1.00 (", item.name, "/", item.version, "; ",
-						appInfo.name, "/", appInfo.version, ")" ].join("");
+				var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
+				var httpProtocolHandler = Cc["@mozilla.org/network/protocol;1?name=http"]
+						.getService(Ci.nsIHttpProtocolHandler);
+
+				var extName = item.name + "/" + item.version;
+				var oscpu = httpProtocolHandler.oscpu;
+				var appName = appInfo.name + "/" + appInfo.version;
+
+				this._userAgent = "Monazilla/1.00 (" + extName + "; " + oscpu + "; " + appName + ")";
 			}catch(ex){
 				this.logger.error(ex);
 				this._userAgent = this.pref.getChar("exception_useragent");
