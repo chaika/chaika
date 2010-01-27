@@ -300,18 +300,22 @@ var BoardTree = {
 
 	click: function BoardTree_click(aEvent){
 		if(aEvent.originalTarget.localName != "treechildren") return;
-		
-			// ツリーのアイテム以外をクリック
 		if(this.getClickItemIndex(aEvent) == -1) return;
-
 		if(aEvent.ctrlKey || aEvent.shiftKey) return;
+		if(aEvent.button > 1) return;
 
-		if(aEvent.button==0){
-			this.openThread(false);
-		}else if(aEvent.button==1){
-			this.openThread(true);
+
+		var singleClicked = aEvent.type == "click";
+		var openSingleClick = ChaikaCore.pref.getBool("board.open_single_click");
+		var openNewTab = ChaikaCore.pref.getBool("board.open_new_tab");
+
+		if(aEvent.button==1 && singleClicked){
+			this.openThread(!openNewTab);
+		}else if(openSingleClick && singleClicked){
+			this.openThread(openNewTab);
+		}else if(!openSingleClick && !singleClicked){
+			this.openThread(openNewTab);
 		}
-
 	},
 
 

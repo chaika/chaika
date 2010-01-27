@@ -58,7 +58,8 @@
 
 
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
-		onclick="BoardTree.click(event)" onkeypress="BoardTree.keyDown(event)"
+		onclick="BoardTree.click(event)" ondblclick="BoardTree.click(event)"
+		onkeypress="BoardTree.keyDown(event)"
 		ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
  		onmousemove="BoardTree.mouseMove(event)"
  		onmouseout="BoardTree.mouseOut(event)"

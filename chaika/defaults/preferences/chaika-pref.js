@@ -38,11 +38,15 @@ pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 pref("extensions.chaika.bbsmenu.tree_size", "small");
+pref("extensions.chaika.bbsmenu.open_single_click", true);
+pref("extensions.chaika.bbsmenu.open_new_tab", false);
 
 pref("extensions.chaika.board.auto_update", false);
 pref("extensions.chaika.board.update_interval_limit", 45);
 pref("extensions.chaika.board.thread_view_limit", 50);
 pref("extensions.chaika.board.tree_size", "small");
+pref("extensions.chaika.board.open_single_click", true);
+pref("extensions.chaika.board.open_new_tab", false);
 
 pref("extensions.chaika.thread_skin", "");
 pref("extensions.chaika.thread_font_name", "sans-serif");

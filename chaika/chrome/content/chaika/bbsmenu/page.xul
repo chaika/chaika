@@ -70,7 +70,8 @@
 	<treecols>
 		<treecol id="title" flex="1" primary="true" hideheader="true"/>
 	</treecols>
-	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1" onclick="Tree.click(event)"/>
+	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1"
+			onclick="Tree.click(event)" ondblclick="Tree.click(event)"/>
 </tree>
 
 </page>

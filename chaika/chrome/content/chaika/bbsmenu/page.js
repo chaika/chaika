@@ -738,19 +738,25 @@ var Tree = {
 		if(row.value == -1) return;	// ツリーのアイテム以外をクリック
 		if(subElement.value=="twisty") return;
 
+		var singleClicked = aEvent.type == "click";
+
 		if(this.isContainer(row.value)){
-			if(aEvent.button == 0){
+			if(singleClicked && aEvent.button == 0){
 				this.toggleOpenState(row.value);
 			}
 			return;
 		}
 
-		if(aEvent.button == 0){
-			var item = this.getURLItem(row.value);
-			item.open(false);
-		}else if(aEvent.button == 1){
-			var item = this.getURLItem(row.value);
-			item.open(true);
+		var openSingleClick = ChaikaCore.pref.getBool("bbsmenu.open_single_click");
+		var openNewTab = ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
+		var item = this.getURLItem(row.value);
+
+		if(aEvent.button==1 && singleClicked){
+			item.open(!openNewTab);
+		}else if(openSingleClick && singleClicked){
+			item.open(openNewTab);
+		}else if(!openSingleClick && !singleClicked){
+			item.open(openNewTab);
 		}
 	},
 

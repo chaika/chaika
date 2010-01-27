@@ -10,6 +10,10 @@
 				name="extensions.chaika.board.auto_update" type="bool"/>
 		<preference id="extensions.chaika.board.tree_size"
 				name="extensions.chaika.board.tree_size" type="string"/>
+		<preference id="extensions.chaika.board.open_single_click"
+				name="extensions.chaika.board.open_single_click" type="bool"/>
+		<preference id="extensions.chaika.board.open_new_tab"
+				name="extensions.chaika.board.open_new_tab" type="bool"/>
 		<preference id="extensions.chaika.board.thread_view_limit"
 				name="extensions.chaika.board.thread_view_limit" type="int"/>
 	</preferences>
@@ -31,16 +35,22 @@
 
 			<row class="setting-row">
 				<description class="setting-description"> リスト :</description>
-				<hbox align="center" pack="start">
-					<label value="リストのテキスト"/>
-					<menulist preference="extensions.chaika.board.tree_size">
-						<menupopup>
-							<menuitem label="小" value="small"/>
-							<menuitem label="中" value="medium"/>
-							<menuitem label="大" value="big"/>
-						</menupopup>
-					</menulist>
-				</hbox>
+				<vbox>
+					<hbox align="center" pack="start">
+						<label value="リストのテキスト"/>
+						<menulist preference="extensions.chaika.board.tree_size">
+							<menupopup>
+								<menuitem label="小" value="small"/>
+								<menuitem label="中" value="medium"/>
+								<menuitem label="大" value="big"/>
+							</menupopup>
+						</menulist>
+					</hbox>
+					<checkbox label="シングルクリックで開く"
+							preference="extensions.chaika.board.open_single_click"/>
+					<checkbox label="新しいタブで開く"
+							preference="extensions.chaika.board.open_new_tab"/>
+				</vbox>
 			</row>
 
 			<row class="setting-row">
