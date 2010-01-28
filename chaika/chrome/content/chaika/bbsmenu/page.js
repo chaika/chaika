@@ -737,6 +737,7 @@ var Tree = {
 		this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
 		if(row.value == -1) return;	// ツリーのアイテム以外をクリック
 		if(subElement.value=="twisty") return;
+		if(aEvent.button > 1) return;
 
 		var singleClicked = aEvent.type == "click";
 
