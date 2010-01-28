@@ -6,6 +6,10 @@
 <prefpane id="paneBbsmenu" onpaneload="gBbsmenuPane.startup()">
 
 	<preferences>
+		<preference id="extensions.chaika.historymenu.board_max"
+				name="extensions.chaika.historymenu.board_max" type="int"/>
+		<preference id="extensions.chaika.historymenu.thread_max"
+				name="extensions.chaika.historymenu.thread_max" type="int"/>
 		<preference id="extensions.chaika.bbsmenu.toggle_open_container"
 				name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
 		<preference id="extensions.chaika.bbsmenu.tree_size"
@@ -27,6 +31,18 @@
 			<column flex="6"/>
 		</columns>
 		<rows>
+
+			<row class="setting-row">
+				<description class="setting-description">履歴メニュー :</description>
+				<hbox align="center">
+					<label value="板表示数"/>
+					<textbox type="number" min="0" max="20" style="width:6ch;"
+							 preference="extensions.chaika.historymenu.board_max"/>
+					<label value="スレ表示数"/>
+					<textbox type="number" min="0" max="20" style="width:6ch;"
+							 preference="extensions.chaika.historymenu.thread_max"/>
+				</hbox>
+			</row>
 
 			<row class="setting-row">
 				<description class="setting-description">ツリー :</description>
