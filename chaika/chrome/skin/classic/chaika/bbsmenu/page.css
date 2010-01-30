@@ -48,21 +48,24 @@ tree.bbsmenuTree[treesize="small"] treechildren::-moz-tree-cell-text {
 }
 tree.bbsmenuTree treechildren::-moz-tree-row,
 tree.bbsmenuTree[treesize="small"] treechildren::-moz-tree-row {
-  height: 18px !important;
+  font-size: 12px !important;
+  height: 1.4em !important;
 }
 
 tree.bbsmenuTree[treesize="medium"] treechildren::-moz-tree-cell-text {
   font-size: 14px !important;
 }
 tree.bbsmenuTree[treesize="medium"] treechildren::-moz-tree-row {
-  height: 20px !important;
+  font-size: 14px !important;
+  height: 1.4em !important;
 }
 
 tree.bbsmenuTree[treesize="big"] treechildren::-moz-tree-cell-text {
   font-size: 16px !important;
 }
 tree.bbsmenuTree[treesize="big"] treechildren::-moz-tree-row {
-  height: 22px !important;
+  font-size: 16px !important;
+  height: 1.4em !important;
 }
 
 

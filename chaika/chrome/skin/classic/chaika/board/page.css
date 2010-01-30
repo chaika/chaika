@@ -23,21 +23,24 @@
 }
 #boardTree treechildren::-moz-tree-row,
 #boardTree[treesize="small"] treechildren::-moz-tree-row {
-  height: 18px !important;
+  font-size: 12px !important;
+  height: 1.5em !important;
 }
 
 #boardTree[treesize="medium"] treechildren::-moz-tree-cell-text {
   font-size: 14px !important;
 }
 #boardTree[treesize="medium"] treechildren::-moz-tree-row {
-  height: 20px !important;
+  font-size: 14px !important;
+  height: 1.5em !important;
 }
 
 #boardTree[treesize="big"] treechildren::-moz-tree-cell-text {
   font-size: 16px !important;
 }
 #boardTree[treesize="big"] treechildren::-moz-tree-row {
-  height: 22px !important;
+  font-size: 16px !important;
+  height: 1.5em !important;
 }
 
 
