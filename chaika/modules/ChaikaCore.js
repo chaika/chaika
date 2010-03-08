@@ -822,7 +822,7 @@ ChaikaBrowser.prototype = {
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
-		var browserWindow = this._getBrowserWindow();
+		var browserWindow = this.getBrowserWindow();
 		if(browserWindow && browserWindow.getBrowser){
 			try{
 				var contentBrowser = browserWindow.getBrowser();
@@ -880,8 +880,11 @@ ChaikaBrowser.prototype = {
 	},
 
 
-	/** @private */
-	_getBrowserWindow: function ChaikaBrowser__getBrowserWindow(){
+	/**
+	 * ブラウザウィンドウを返す。
+	 * @return {ChromeWindow} ブラウザウィンドウ
+	 */
+	getBrowserWindow: function ChaikaBrowser_getBrowserWindow(){
 		var windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
 				.getService(Ci.nsIWindowMediator);
 		return windowMediator.getMostRecentWindow("navigator:browser");

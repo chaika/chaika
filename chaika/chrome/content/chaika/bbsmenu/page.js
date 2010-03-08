@@ -81,10 +81,7 @@ var Page = {
 
 
 	showViewFoxAge2chMenu: function Page_showViewFoxAge2chMenu(){
-		var browser = Cc["@mozilla.org/appshell/window-mediator;1"]
-				.getService(Ci.nsIWindowMediator)
-				.getMostRecentWindow("navigator:browser");
-
+		var browser = ChaikaCore.browser.getBrowserWindow();
 		if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
 			document.getElementById("viewFoxAge2chMenu").hidden = false;
 		}
@@ -136,9 +133,7 @@ var Page = {
 
 
 	viewFoxAge2ch: function Page_viewFoxAge2ch(){
-		var browser = Cc["@mozilla.org/appshell/window-mediator;1"]
-				.getService(Ci.nsIWindowMediator)
-				.getMostRecentWindow("navigator:browser");
+		var browser = ChaikaCore.browser.getBrowserWindow();
 		if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
 			browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
 		}

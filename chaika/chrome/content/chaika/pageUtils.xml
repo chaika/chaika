@@ -174,9 +174,7 @@
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 
-			var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-					.getService(Components.interfaces.nsIWindowMediator);
-			var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+			var browserWindow = ChaikaCore.browser.getBrowserWindow();
 			if(browserWindow && browserWindow.XULBrowserWindow){
 				this._browserWindow = browserWindow.XULBrowserWindow;
 			}

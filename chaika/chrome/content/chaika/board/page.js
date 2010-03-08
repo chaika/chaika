@@ -243,9 +243,7 @@ var BoardTree = {
 			this.firstInitBoardTree = false;
 		}
 
-		var windowMediator = Components.classes["@mozilla.org/appshell/window-mediator;1"]
-				.getService(Components.interfaces.nsIWindowMediator);
-		var browserWindow = windowMediator.getMostRecentWindow("navigator:browser");
+		var browserWindow = ChaikaCore.browser.getBrowserWindow();
 		if(browserWindow && browserWindow.XULBrowserWindow){
 			this._XULBrowserWindow = browserWindow.XULBrowserWindow;
 		}
@@ -574,7 +572,9 @@ function openLogsDir(){
 
 function postNewThread(){
 	var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-	window.openDialog(postWizardURLSpec, "_blank",
+
+	var browserWindow = ChaikaCore.browser.getBrowserWindow();
+	browserWindow.openDialog(postWizardURLSpec, "_blank",
 		"chrome, resizable, dialog", gBoard.url.spec, true);
 }
 
@@ -590,7 +590,8 @@ function openSettings(){
 	}catch(ex){
 		features = "chrome,titlebar,toolbar,centerscreen,modal";
 	}
-	window.openDialog(settingDialogURL, "", features);
+	var browserWindow = ChaikaCore.browser.getBrowserWindow();
+	browserWindow.openDialog(settingDialogURL, "", features);
 }
 
 function showBanner(aEvent){
