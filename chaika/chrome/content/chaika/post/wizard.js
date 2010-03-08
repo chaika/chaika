@@ -627,7 +627,8 @@ var SubmitPage = {
 
 		var serverURL = ChaikaCore.getServerURL();
 
-		var browserWindows = ChaikaCore.browser.getBrowserWindow();
+		var browserWindows = Cc["@mozilla.org/appshell/window-mediator;1"]
+				.getService(Ci.nsIWindowMediator).getEnumerator("navigator:browser");
 		while(browserWindows.hasMoreElements()){
 			var browserWindow = browserWindows.getNext();
 			if(!browserWindow.getBrowser) continue;
