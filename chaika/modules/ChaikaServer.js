@@ -47,7 +47,6 @@ const Cr = Components.results;
 
 
 var gServerScriptList = [];
-var gWindow = null;
 
 
 /** @ignore */
@@ -59,22 +58,20 @@ function makeException(aResult, aMessage){
 
 /** @ignore */
 function sleep(aWait) {
-	var timer = { timeup: false };
-
-	if(!gWindow){
-		gWindow = Cc["@mozilla.org/appshell/appShellService;1"]
-			.getService(Ci.nsIAppShellService).hiddenDOMWindow;
+	var timerCallback = {
+		notify: function(aTimer){
+			this.timeup = true;
+		},
+		timeup: false
 	}
 
-	var interval = gWindow.setInterval(function(){
-		timer.timeup = true;
-	}, aWait);
+	var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+	timer.initWithCallback(timerCallback, aWait, Ci.nsITimer.TYPE_ONE_SHOT);
 
-	var thread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
-	while(!timer.timeup){
-		thread.processNextEvent(true);
+	var mainThread = Cc["@mozilla.org/thread-manager;1"].getService().mainThread;
+	while(!timerCallback.timeup){
+		mainThread.processNextEvent(true);
 	}
-	gWindow.clearInterval(interval);
 }
 
 
@@ -221,7 +218,7 @@ ChaikaServerHandler.prototype = {
 		this.isAlive = true;
 
 		while(aInputStream.available() == 0){
-			sleep(50);
+			sleep(20);
 		}
 
 		try{
@@ -309,15 +306,13 @@ ChaikaServerHandler.prototype = {
 
 		var status = StatusCode.getStatusCode(aStatusCode);
 
-		var html = <html>
-			<head><title>{status} [ChaikaServer]</title></head>
-			<body>
-				<h1>{status}</h1>
-				<pre>{message}</pre>
-			</body>
-		</html>;
+		var html = 
+			"<html>" +
+			"<head><title>" + status + "[ChaikaServer]</title></head>" +
+			"<body><h1>" + status + "</h1><pre>" + message + "</pre></body>" +
+			"</html>";
 
-		this.response.write(html.toXMLString());
+		this.response.write(html);
 		this.close();
 	},
 
