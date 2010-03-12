@@ -307,6 +307,10 @@ ChaikaBoard.prototype = {
 		var boardID = this.id;
 		var database = ChaikaCore.storage;
 
+		var today = Date.parse((new Date()).toLocaleFormat("%b %d %Y")) / 1000
+		var yesterday = today - 86400;
+		var tomorrow = today + 86400;
+
 		var sql;
 		var statement;
 		switch(aFilterLimit){
@@ -322,17 +326,17 @@ ChaikaBoard.prototype = {
 					"    td.line_count AS read,",
 					"    0 AS unread,",
 					"    0 AS force,",
-					"    STRFTIME(?1, td.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', td.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', td.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM thread_data AS td",
-					"WHERE board_id=?2 AND dat_id IN (",
-					"    SELECT dat_id FROM thread_data WHERE board_id=?2",
+					"WHERE board_id=:board_id AND dat_id IN (",
+					"    SELECT dat_id FROM thread_data WHERE board_id=:board_id",
 					"    EXCEPT",
-					"    SELECT dat_id FROM board_subject WHERE board_id=?2",
+					"    SELECT dat_id FROM board_subject WHERE board_id=:board_id",
 					");"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
-				statement.bindStringParameter(1, boardID);
+				statement.params.board_id = boardID;
 				break;
 			case this.FILTER_LIMIT_SUBSCRIBE:
 				sql = [
@@ -346,14 +350,14 @@ ChaikaBoard.prototype = {
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
-					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', bs.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', bs.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id",
-					"WHERE bs.board_id=?2;"
+					"WHERE bs.board_id=:board_id;"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
-				statement.bindStringParameter(1, boardID);
+				statement.params.board_id = boardID;
 				break;
 			case this.FILTER_LIMIT_NEW:
 				sql = [
@@ -367,14 +371,14 @@ ChaikaBoard.prototype = {
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
-					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', bs.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', bs.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM board_subject AS bs INNER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id AND bs.line_count > td.line_count",
-					"WHERE bs.board_id=?2;"
+					"WHERE bs.board_id=:board_id;"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y-%m-%d %H:%M");
-				statement.bindStringParameter(1, boardID);
+				statement.params.board_id = boardID;
 				break;
 			case this.FILTER_LIMIT_SEARCH:
 				sql = [
@@ -388,10 +392,11 @@ ChaikaBoard.prototype = {
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
-					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', bs.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', bs.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id",
-					"WHERE bs.board_id=?2 AND x_normalize(bs.title) LIKE x_normalize(?3)",
+					"WHERE bs.board_id=:board_id AND x_normalize(bs.title) LIKE x_normalize(:search_str)",
 					"UNION ALL",
 					"SELECT",
 					"    4 AS status,",
@@ -403,18 +408,18 @@ ChaikaBoard.prototype = {
 					"    td.line_count AS read,",
 					"    0 AS unread,",
 					"    0 AS force,",
-					"    STRFTIME(?1, td.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', td.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', td.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM thread_data AS td",
-					"WHERE board_id=?2 AND dat_id IN (",
-					"    SELECT dat_id FROM thread_data WHERE board_id=?2",
+					"WHERE board_id=:board_id AND dat_id IN (",
+					"    SELECT dat_id FROM thread_data WHERE board_id=:board_id",
 					"    EXCEPT",
-					"    SELECT dat_id FROM board_subject WHERE board_id=?2",
-					") AND x_normalize(td.title) LIKE x_normalize(?3);"
+					"    SELECT dat_id FROM board_subject WHERE board_id=:board_id",
+					") AND x_normalize(td.title) LIKE x_normalize(:search_str);"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y/%m/%d %H:%M");
-				statement.bindStringParameter(1, boardID);
-				statement.bindStringParameter(2, aSearchStr);
+				statement.params.board_id = boardID;
+				statement.params.search_str = aSearchStr;
 				break;
 			default:
 				sql = [
@@ -428,17 +433,17 @@ ChaikaBoard.prototype = {
 					"    IFNULL(td.line_count, 0) AS read,",
 					"    IFNULL(MAX(bs.line_count - td.line_count, 0), 0) AS unread,",
 					"    bs.line_count * 86400 / (strftime('%s','now') - bs.dat_id) AS force,",
-					"    STRFTIME(?1, bs.dat_id, 'unixepoch', 'localtime') AS make_date",
+					"    STRFTIME('%Y/%m/%d', bs.dat_id, 'unixepoch', 'localtime') AS created_date,",
+					"    STRFTIME('%H:%M', bs.dat_id, 'unixepoch', 'localtime') AS created_time",
 					"FROM board_subject AS bs LEFT OUTER JOIN thread_data AS td",
 					"ON bs.thread_id=td.thread_id",
-					"WHERE bs.board_id=?2",
+					"WHERE bs.board_id=:board_id",
 					"ORDER BY status DESC, number",
-					"LIMIT ?3;"
+					"LIMIT :filter_limit;"
 				].join("\n");
 				statement = database.createStatement(sql);
-				statement.bindStringParameter(0, "%Y/%m/%d %H:%M");
-				statement.bindStringParameter(1, boardID);
-				statement.bindInt32Parameter(2, (aFilterLimit > 0) ? aFilterLimit : 10000);
+				statement.params.board_id = boardID;
+				statement.params.filter_limit = (aFilterLimit > 0) ? aFilterLimit : 10000;
 				break;
 		}
 
@@ -454,7 +459,8 @@ ChaikaBoard.prototype = {
 				var read     = statement.getInt32(6);
 				var unread   = statement.getInt32(7);
 				var force    = statement.getInt32(8);
-				var created  = statement.getString(9);
+				var createdDate  = statement.getString(9);
+				var createdTime  = statement.getString(10);
 				var url      = threadUrlSpec + datID + "/";
 
 				var sortPlace = 20000;
@@ -492,10 +498,21 @@ ChaikaBoard.prototype = {
 				}else{
 					itemNode.setAttribute("force",  force + "/d");
 				}
+
 				itemNode.setAttribute("forceSort",   forceSort);
-				itemNode.setAttribute("created",     created);
 				itemNode.setAttribute("createdSort", createdSort);
 				itemNode.setAttribute("url",         url);
+
+				var datIDInt = parseInt(datID);
+				if(datIDInt >= tomorrow){
+					itemNode.setAttribute("created", "");
+				}else if(datIDInt >= today){
+					itemNode.setAttribute("created", "\u4eca\u65e5, " + createdTime);
+				}else if(datIDInt >= yesterday){
+					itemNode.setAttribute("created", "\u6628\u65e5, " + createdTime);
+				}else{
+					itemNode.setAttribute("created", createdDate);
+				}
 
 				this.itemsDoc.documentElement.appendChild(itemNode);
 			}

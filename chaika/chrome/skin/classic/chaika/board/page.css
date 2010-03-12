@@ -88,5 +88,10 @@
 }
 
 #boardTree treechildren::-moz-tree-cell {
-  margin-right: 2px;
+  margin-right: 4px;
+  margin-left: 2px;
+}
+
+#boardTree treechildren::-moz-tree-cell(created) {
+  margin-left: 6px;
 }
