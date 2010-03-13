@@ -200,6 +200,37 @@ Post.prototype = {
 	},
 
 
+	writeKakikomi: function Post_writeKakikomi(aNewThread){
+		var url;
+		if(aNewThread){
+			url = this._board.url.spec;
+		}else{
+			url = this._thread.plainURL.spec;
+		}
+
+		var nowDate = new Date();
+		var week = "日月火水木金土";
+		var date = nowDate.toLocaleFormat("%Y/%m/%d($WEEK$) %H:%M:%S")
+				.replace("$WEEK$", week[nowDate.getDay()]);
+
+		var kakikomi = [];
+		kakikomi.push("--------------------------------------------");
+		kakikomi.push("Date   : " + date);
+		kakikomi.push("Subject: " + this.getThreadTitle());
+		kakikomi.push("URL    : " + url);
+		kakikomi.push("FROM   : " + this.name);
+		kakikomi.push("MAIL   : " + this.mail);
+		kakikomi.push("");
+		kakikomi = kakikomi.concat(this.message.split("\n"));
+
+		kakikomi = kakikomi.join("\r\n") + "\r\n\r\n\r\n";
+			
+		var kakikomiFile = ChaikaCore.getDataDir();
+		kakikomiFile.appendRelativePath("kakikomi.txt");
+		ChaikaCore.io.writeString(kakikomiFile, "Shift_JIS", true, kakikomi);
+	},
+
+
 	submit: function Post_submit(aListener, additionalData){
 		this._listener = aListener;
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);

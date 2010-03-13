@@ -10,6 +10,10 @@
 				name="extensions.chaika.post.thread_reload" type="bool"/>
 		<preference id="extensions.chaika.post.auto_finish"
 				name="extensions.chaika.post.auto_finish" type="bool"/>
+		<preference id="extensions.chaika.post.write_log.succeeded"
+				name="extensions.chaika.post.write_log.succeeded" type="bool"/>
+		<preference id="extensions.chaika.post.write_log.failed"
+				name="extensions.chaika.post.write_log.failed" type="bool"/>
 	</preferences>
 
 	<grid  flex="1">
@@ -18,7 +22,6 @@
 			<column flex="6"/>
 		</columns>
 		<rows>
-
 			<row class="setting-row">
 				<description class="setting-description">成功時の動作 :</description>
 				<vbox>
@@ -29,6 +32,15 @@
 				</vbox>
 			</row>
 
+			<row class="setting-row">
+				<description class="setting-description">書き込みログ :</description>
+				<vbox>
+					<checkbox label="成功時に kakikomi.txt に保存する"
+							preference="extensions.chaika.post.write_log.succeeded"/>
+					<checkbox label="失敗時に kakikomi.txt に保存する"
+							preference="extensions.chaika.post.write_log.failed"/>
+				</vbox>
+			</row>
 		</rows>
 	</grid>
 

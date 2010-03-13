@@ -63,3 +63,5 @@ pref("extensions.chaika.thread_alert_got_log", true);
 pref("extensions.chaika.post.thread_reload", true);
 pref("extensions.chaika.post.auto_finish", false);
 pref("extensions.chaika.post.auto_finish_delay", 750);
+pref("extensions.chaika.post.write_log.succeeded", false);
+pref("extensions.chaika.post.write_log.failed", false);

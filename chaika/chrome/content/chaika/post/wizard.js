@@ -590,6 +590,11 @@ var SubmitPage = {
 		document.getElementById("response").value += response + "\n***** ***** *****\n\n"
 
 		Notification.info("書き込みに成功しました");
+
+		if(ChaikaCore.pref.getBool("post.write_log.succeeded")){
+			gPost.writeKakikomi(gWizType == WIZ_TYPE_NEW_THREAD);
+		}
+
 		gWizard.canRewind = false;
 		gWizard.canAdvance = true;
 		gWizard.getButton("finish").disabled = false;
@@ -614,6 +619,11 @@ var SubmitPage = {
 
 
 		Notification.critical("書き込みに失敗しました");
+
+		if(ChaikaCore.pref.getBool("post.write_log.failed")){
+			gPost.writeKakikomi(gWizType == WIZ_TYPE_NEW_THREAD);
+		}
+
 		gWizard.canRewind = true;
 		gWizard.canAdvance = false;
 		gWizard.getButton("finish").disabled = true;
