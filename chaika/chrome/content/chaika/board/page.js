@@ -98,7 +98,7 @@ function startup(){
 		BoardTree.initTree();
 	}
 
-	ThreadUpdateObserver.startup();
+	UpdateObserver.startup();
 }
 
 
@@ -120,7 +120,7 @@ function shutdown(){
 	if(gBoardMoveChecker && gBoardMoveChecker.checking)
 		gBoardMoveChecker.abort();
 
-	ThreadUpdateObserver.shutdown();
+	UpdateObserver.shutdown();
 }
 
 
@@ -457,13 +457,13 @@ function setStatus(aString){
 /**
  * subject.txt をダウンロードする
  */
-function subjectUpdate(aEvent){
+function subjectUpdate(aEvent, aForce){
 	if(aEvent && aEvent.type=="click" && aEvent.button!=0) return;
 
 		// ダウンロード間隔の制限
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
-	if(subjectFile.exists()){
+	if(subjectFile.exists() && !aForce){
 		var interval = new Date().getTime() - subjectFile.lastModifiedTime;
 		var updateIntervalLimit =  ChaikaCore.pref.getInt("board.update_interval_limit");
 			// 不正な値や、10 秒以下なら 10 秒にする
@@ -706,7 +706,7 @@ b2rBoardMoveChecker.prototype = {
 
 		var responseText = this._httpReq.responseText;
 		if(responseText.match(/Change your bookmark/m)){
-			if(responseText.match(/<a href="([^"]+)">/m)){
+			if(responseText.match(/<a href=\"([^\"]+)\">/m)){
 				this.onChecked(true, RegExp.$1);
 			}
 		}else{
@@ -720,23 +720,23 @@ b2rBoardMoveChecker.prototype = {
 }
 
 
+var UpdateObserver = {
 
-
-var ThreadUpdateObserver = {
-
-	startup: function ThreadUpdateObserver_startup(){
+	startup: function UpdateObserver_startup(){
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.addObserver(this, "itemContext:deleteLog", false);
+		os.addObserver(this, "findNewThread:update", false);
 	},
 
 
-	shutdown: function ThreadUpdateObserver_shutdown(){
+	shutdown: function UpdateObserver_shutdown(){
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.removeObserver(this, "itemContext:deleteLog");
+		os.removeObserver(this, "findNewThread:update");
 	},
 
 
-	deleteLogsTreeUpdate: function ThreadUpdateObserver_deleteLogsTreeUpdate(aURLs){
+	deleteLogsTreeUpdate: function UpdateObserver_deleteLogsTreeUpdate(aURLs){
 		if(!BoardTree.tree.boxObject.beginUpdateBatch) return;
 
 		var xpathResult = gBoard.itemsDoc.evaluate("descendant::boarditem[@read>0]",
@@ -756,9 +756,19 @@ var ThreadUpdateObserver = {
 	},
 
 
-	observe: function ThreadUpdateObserver_observe(aSubject, aTopic, aData){
+	observe: function UpdateObserver_observe(aSubject, aTopic, aData){
 		if(aTopic == "itemContext:deleteLog"){
 			this.deleteLogsTreeUpdate(aData.split(","));
+			return;
+		}
+
+		if(aTopic == "findNewThread:update"){
+			var newThreadInfo = JSON.parse(aData);
+			if(newThreadInfo.boardURL == gBoard.url.spec){
+				document.getElementById("searchTextBox").value = newThreadInfo.threadTitle;
+				subjectUpdate(null, true);
+			}
+			return;
 		}
 	},
 

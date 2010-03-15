@@ -595,6 +595,17 @@ var SubmitPage = {
 			gPost.writeKakikomi(gWizType == WIZ_TYPE_NEW_THREAD);
 		}
 
+		if(gWizType == WIZ_TYPE_NEW_THREAD){
+			var newThreadInfo = {
+				boardURL: gBoard.url.spec,
+				threadTitle: FormPage._titleForm.value
+			};
+			alert(JSON.stringify(newThreadInfo));
+			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+			os.notifyObservers(null, "findNewThread:update", JSON.stringify(newThreadInfo));
+		}
+
+
 		gWizard.canRewind = false;
 		gWizard.canAdvance = true;
 		gWizard.getButton("finish").disabled = false;
