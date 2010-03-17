@@ -600,7 +600,7 @@ var SubmitPage = {
 				boardURL: gBoard.url.spec,
 				threadTitle: FormPage._titleForm.value
 			};
-			alert(JSON.stringify(newThreadInfo));
+
 			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 			os.notifyObservers(null, "findNewThread:update", JSON.stringify(newThreadInfo));
 		}
