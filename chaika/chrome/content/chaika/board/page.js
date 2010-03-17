@@ -765,7 +765,6 @@ var UpdateObserver = {
 		if(aTopic == "findNewThread:update"){
 			var newThreadInfo = JSON.parse(aData);
 			if(newThreadInfo.boardURL == gBoard.url.spec){
-				document.getElementById("searchTextBox").value = newThreadInfo.threadTitle;
 				subjectUpdate(null, true);
 			}
 			return;
