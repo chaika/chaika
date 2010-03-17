@@ -4,7 +4,7 @@
 
 	<Description about="urn:mozilla:install-manifest"
 			em:name="chaika"
-			em:version="1.2.0"
+			em:version="1.3.0b1"
 			em:description="2ch.net(Japanese Web Forums) Browser"
 			em:id="chaika@chaika.xrea.jp"
 			em:homepageURL="http://chaika.xrea.jp/"
@@ -16,7 +16,7 @@
 		<em:targetApplication>
 			<!-- Firefox -->
 			<Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-					em:minVersion="3.5" em:maxVersion="3.6.*"/>
+					em:minVersion="3.6" em:maxVersion="3.6.*"/>
 		</em:targetApplication>
 	</Description>
 </RDF>
