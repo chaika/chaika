@@ -52,6 +52,19 @@ function ChaikaService(){
 ChaikaService.prototype = {
 
 	_startup: function ChaikaService__startup(){
+		var self = this;
+
+		var scope = {};
+		Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);
+		Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
+		scope.AddonManager.getAddonByID("chaika@chaika.xrea.jp", function(aAddon){
+			scope.ChaikaAddonInfo._init(aAddon);
+			self._startup2();
+		});
+	},
+
+
+	_startup2: function ChaikaService__startup2(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		ChaikaCore._startup();
 
@@ -67,6 +80,9 @@ ChaikaService.prototype = {
 
 		Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+		
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.notifyObservers(null, "ChaikaService:startup", "startup");
 	},
 
 
@@ -157,24 +173,13 @@ ChaikaService.prototype = {
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 
 		switch(aTopic){
-			case "app-startup":
-				os.addObserver(this, "profile-after-change", false);
-				os.addObserver(this, "quit-application", false);
-				os.addObserver(this, "xpcom-shutdown", false);
-				break;
 			case "profile-after-change":
 				this._startup();
-				os.removeObserver(this, "profile-after-change");
-				os.notifyObservers(null, "ChaikaService:startup", "startup");
+				os.addObserver(this, "quit-application", false);
 				break;
 			case "quit-application":
-				os.removeObserver(this, "quit-application");
 				os.notifyObservers(null, "ChaikaService:quit", "quit");
 				this._quitApp();
-				break;
-			case "xpcom-shutdown":
-				os.removeObserver(this, "xpcom-shutdown");
-				this._shutdown();
 				break;
 		}
 	},
@@ -203,6 +208,4 @@ ChaikaService.prototype = {
 };
 
 
-function NSGetModule(aCompMgr, aFileSpec){
-	return XPCOMUtils.generateModule([ChaikaService]);
-}
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([ChaikaService]);

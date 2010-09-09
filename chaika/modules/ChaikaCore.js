@@ -355,15 +355,10 @@ var ChaikaCore = {
 	 * @return {nsILocalFile}
 	 */
 	getDefaultsDir: function ChaikaCore_getDefaultsDir(){
-		var extensionID = "chaika@chaika.xrea.jp";
-		var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
-				.getService(Ci.nsIExtensionManager);
+		var scope = {};
+		Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
 
-		var installLocation = extensionManager.getInstallLocation(extensionID);
-
-		var defaultsDir = installLocation.getItemFile(extensionID, "defaults")
-				.clone().QueryInterface(Ci.nsILocalFile);
-		return defaultsDir;
+		return scope.ChaikaAddonInfo.defaultsDir.clone().QueryInterface(Ci.nsILocalFile);
 	},
 
 
@@ -374,14 +369,15 @@ var ChaikaCore = {
 	getUserAgent: function ChaikaCore_getUserAgent(){
 		if(!this._userAgent){
 			try{
-				var extensionManager = Cc["@mozilla.org/extensions/manager;1"]
-						.getService(Ci.nsIExtensionManager);
-				var item = extensionManager.getItemForID(EXTENSION_ID);
+
+				var scope = {};
+				Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
+
 				var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
 				var httpProtocolHandler = Cc["@mozilla.org/network/protocol;1?name=http"]
 						.getService(Ci.nsIHttpProtocolHandler);
 
-				var extName = item.name + "/" + item.version;
+				var extName = scope.ChaikaAddonInfo.name + "/" + scope.ChaikaAddonInfo.version;
 				var oscpu = httpProtocolHandler.oscpu;
 				var appName = appInfo.name + "/" + appInfo.version;
 

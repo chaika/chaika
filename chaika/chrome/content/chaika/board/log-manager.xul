@@ -11,11 +11,11 @@
 
 <popupset>
 
-	<popup id="boardTreeContext"
+	<menupopup id="boardTreeContext"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
 			onpopupshowing="return BoardTree.showContext(event)"/>
 
-	<popup id="threadTreeContext"
+	<menupopup id="threadTreeContext"
 			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
 			onpopupshowing="return ThreadTree.showContext(event)"/>
 

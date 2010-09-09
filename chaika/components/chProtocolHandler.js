@@ -250,7 +250,4 @@ chContentHandler.prototype = {
 };
 
 
-
-function NSGetModule(aCompMgr, aFileSpec){
-	return XPCOMUtils.generateModule([chProtocolHandler, b2rProtocolHandler, chContentHandler]);
-}
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([chProtocolHandler, b2rProtocolHandler, chContentHandler]);

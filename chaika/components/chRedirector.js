@@ -61,7 +61,7 @@ chRedirector.prototype = {
 			var categoryManager = Cc["@mozilla.org/categorymanager;1"]
 					.getService(Ci.nsICategoryManager);
 			categoryManager.addCategoryEntry("content-policy", this.classDescription,
-					this.contractID, true, true);
+					this.contractID, false, true);
 		}
 
 		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
@@ -125,7 +125,7 @@ chRedirector.prototype = {
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 
 		switch(aTopic){
-			case "app-startup":
+			case "profile-after-change":
 				os.addObserver(this, "ChaikaService:startup", false);
 				os.addObserver(this, "ChaikaService:quit", false);
 				break;
@@ -169,6 +169,4 @@ chRedirector.prototype = {
 };
 
 
-function NSGetModule(aCompMgr, aFileSpec){
-	return XPCOMUtils.generateModule([chRedirector]);
-}
+var NSGetFactory = XPCOMUtils.generateNSGetFactory([chRedirector]);
