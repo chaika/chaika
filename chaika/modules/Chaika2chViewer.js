@@ -198,10 +198,11 @@ var Chaika2chViewer = {
 		ChaikaCore.logger.info("Auth: NG");
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.notifyObservers(null, "Chaika2chViewer:Auth", "NG");
-
-		var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
-		alertsService.showAlertNotification("", "Chaika",
-					"Login failed on 2ch Viewer", false, "", null);
+		try{
+			var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+			alertsService.showAlertNotification("", "Chaika",
+						"Login failed on 2ch Viewer", false, "", null);
+		}catch(ex){}
 	}
 
 };

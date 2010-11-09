@@ -488,17 +488,10 @@ Thread2ch.prototype = {
 				var mimizunURLSpec  = [
 					"http://mimizun.com/log/2ch",
 					this.thread.boardURL.filePath,
-					this.thread.boardURL.host,
-					this.thread.boardURL.filePath,
-					"kako/",
-					this.thread.datID.substring(0, 4),
-					"/",
-					this.thread.datID.substring(0, 5),
-					"/",
 					this.thread.datID,
 					".dat"
 				].join("");
-
+		
 				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 				var mimizunURL = ioService.newURI(mimizunURLSpec, null, null).QueryInterface(Ci.nsIURL);
 				this.httpChannel = ChaikaCore.getHttpChannel(mimizunURL);
@@ -709,8 +702,10 @@ Thread2ch.prototype = {
 		}
 
 		var alertStr = statusBundle.formatStringFromName(alertStrID, [this.thread.title], 1);
-		var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
-		alertsService.showAlertNotification("", "Chaika", alertStr, false, "", null);
+		try{
+			var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+			alertsService.showAlertNotification("", "Chaika", alertStr, false, "", null);
+		}catch(ex){}
 	}
 
 };
