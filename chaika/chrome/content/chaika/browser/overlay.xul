@@ -52,11 +52,10 @@
 		</menu>
 	</popup>
 
-	<!-- Statusbar -->
-	<statusbar id="status-bar">
-		<statusbarpanel id="statusbar-chaika"
-			insertafter="statusbar-progresspanel" hidden="true"
-			style="-moz-binding:url(chrome://chaika/content/browser/statusbar.xml#threadStatusbar)"/>
-	</statusbar>
+	<!-- NavigationBar -->
+    <hbox id="nav-bar">
+		<toolbaritem id="chaika-thread-toolbaritem" insertbefore="window-controls" hidden="true"
+			style="-moz-binding:url('chrome://chaika/content/browser/thread-toolbarbutton.xml#threadToolbarButton')"/>
+	</hbox>
 
 </overlay>

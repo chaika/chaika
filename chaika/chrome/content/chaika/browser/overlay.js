@@ -68,24 +68,24 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 
-ChaikaBrowserOverlay.statusbar = {
+ChaikaBrowserOverlay.threadToolbar = {
 
 	start: function statusbar_start(){
-		getBrowser().addProgressListener(ChaikaBrowserOverlay.statusbar.webProgress,
+		getBrowser().addProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
 						Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
 	stop: function statusbar_stop(){
-		getBrowser().removeProgressListener(ChaikaBrowserOverlay.statusbar.webProgress,
+		getBrowser().removeProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
 						Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
 	webProgress: {
 		onLocationChange: function(aWebProgress, aRequest, aLocation){
-			var b2rstatusbar = document.getElementById("statusbar-chaika");
-			b2rstatusbar.showCheck();
+			var threadToolbarItem = document.getElementById("chaika-thread-toolbaritem");
+			threadToolbarItem.showCheck();
 		},
 		onStateChange: function(){},
 		onProgressChange: function(){},
@@ -142,7 +142,7 @@ ChaikaBrowserOverlay.aboneEvent = {
 
 window.addEventListener("load",   ChaikaBrowserOverlay.contextMenu.start, false);
 window.addEventListener("unload", ChaikaBrowserOverlay.contextMenu.stop, false);
-window.addEventListener("load",   ChaikaBrowserOverlay.statusbar.start, false);
-window.addEventListener("unload", ChaikaBrowserOverlay.statusbar.stop, false);
+window.addEventListener("load",   ChaikaBrowserOverlay.threadToolbar.start, false);
+window.addEventListener("unload", ChaikaBrowserOverlay.threadToolbar.stop, false);
 window.addEventListener("load",   ChaikaBrowserOverlay.aboneEvent.start, false);
 window.addEventListener("unload", ChaikaBrowserOverlay.aboneEvent.stop, false);

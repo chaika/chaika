@@ -1,0 +1,11 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+
+.thread-toolbarbutton {
+ -moz-box-orient: horizontal !important;
+
+  list-style-image: url("chrome://chaika/skin/browser/toolbarbutton.png") !important;
+  -moz-image-region: rect(0px, 24px, 24px, 0px);
+}
+
+
