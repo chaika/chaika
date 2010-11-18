@@ -1,4 +1,19 @@
-var ChaikaBrowserOverlay = {};
+var ChaikaBrowserOverlay = {
+
+	start: function ChaikaBrowserOverlay_start(){
+		ChaikaBrowserOverlay.contextMenu.start();
+		ChaikaBrowserOverlay.threadToolbar.start();
+		ChaikaBrowserOverlay.aboneEvent.start();
+	},
+
+
+	stop: function ChaikaBrowserOverlay_stop(){
+		ChaikaBrowserOverlay.contextMenu.stop();
+		ChaikaBrowserOverlay.threadToolbar.stop();
+		ChaikaBrowserOverlay.aboneEvent.stop();
+	}
+
+};
 
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
@@ -140,9 +155,5 @@ ChaikaBrowserOverlay.aboneEvent = {
 }
 
 
-window.addEventListener("load",   ChaikaBrowserOverlay.contextMenu.start, false);
-window.addEventListener("unload", ChaikaBrowserOverlay.contextMenu.stop, false);
-window.addEventListener("load",   ChaikaBrowserOverlay.threadToolbar.start, false);
-window.addEventListener("unload", ChaikaBrowserOverlay.threadToolbar.stop, false);
-window.addEventListener("load",   ChaikaBrowserOverlay.aboneEvent.start, false);
-window.addEventListener("unload", ChaikaBrowserOverlay.aboneEvent.stop, false);
+window.addEventListener("load",   ChaikaBrowserOverlay.start, false);
+window.addEventListener("unload", ChaikaBrowserOverlay.stop, false);
