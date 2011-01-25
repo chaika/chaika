@@ -99,8 +99,10 @@ ChaikaBrowserOverlay.threadToolbar = {
 
 	webProgress: {
 		onLocationChange: function(aWebProgress, aRequest, aLocation){
-			var threadToolbarItem = document.getElementById("chaika-thread-toolbaritem");
-			threadToolbarItem.showCheck();
+			setTimeout(function(){
+				var threadToolbarItem = document.getElementById("chaika-thread-toolbaritem");
+				threadToolbarItem.showCheck();
+			}, 0);
 		},
 		onStateChange: function(){},
 		onProgressChange: function(){},
