@@ -100,7 +100,7 @@ marblebuttongroup > marblebutton:last-child .marblebutton-box {
 marbletextbox {
   padding: 2px 2px 2px 5px;
   border: 2px solid #222;
-  -moz-background-clip: padding;
+  background-clip: padding-box;
   -moz-border-top-colors: transparent #222;
   -moz-border-right-colors: transparent #222;
   -moz-border-bottom-colors: #666 #222;
