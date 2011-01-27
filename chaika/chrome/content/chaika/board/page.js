@@ -320,15 +320,19 @@ var BoardTree = {
 	keyDown: function BoardTree_keyDown(aEvent){
 		if(this.tree.currentIndex == -1) return;
 
-			// エンターキー以外なら終了
-		if(!(aEvent.keyCode==aEvent.DOM_VK_ENTER || aEvent.keyCode==aEvent.DOM_VK_RETURN)){
-			return;
-		}
+		if(aEvent.keyCode == aEvent.DOM_VK_ENTER || aEvent.keyCode == aEvent.DOM_VK_RETURN){
+			if(aEvent.ctrlKey || aEvent.altKey){
+				this.openThread(true);
+			}else{
+				this.openThread(false);
+			}
 
-		if(aEvent.ctrlKey || aEvent.altKey){
-			this.openThread(true);
-		}else{
-			this.openThread(false);
+		}else if(aEvent.charCode == aEvent.DOM_VK_SPACE){
+			if(aEvent.shiftKey){
+				this.tree._moveByPage(-1, 0, aEvent);
+			}else{
+				this.tree._moveByPage(1, this.tree.view.rowCount - 1, aEvent);
+			}
 		}
 	},
 
