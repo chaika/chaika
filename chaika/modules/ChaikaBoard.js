@@ -463,11 +463,11 @@ ChaikaBoard.prototype = {
 				var createdTime  = statement.getString(10);
 				var url      = threadUrlSpec + datID + "/";
 
-				var sortPlace = 20000;
-				var sortPlaceR = 10000;
+				var sortPlace = 2000000;
+				var sortPlaceR = 1000000;
 				if(status == 4){ // DAT落ち
-					sortPlace = 10000;
-					sortPlaceR = 20000;
+					sortPlace = 1000000;
+					sortPlaceR = 2000000;
 				}
 				var statusSort = status + sortPlace;
 				var numberSort = number + sortPlaceR;
