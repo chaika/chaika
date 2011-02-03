@@ -138,6 +138,8 @@ function makeException(aResult){
  */
 var ChaikaCore = {
 
+	initialized: false,
+
 	/**
 	 * ログをとるための {@link ChaikaLogger} オブジェクト
 	 * @type ChaikaLogger
@@ -202,6 +204,8 @@ var ChaikaCore = {
 		this.logger.info("UserAgent:   " + this.getUserAgent());
 		this.logger.info("ServerURL:   " + this.getServerURL().spec);
 		this.logger.info("Storage:     " + this.storage.databaseFile.path);
+		
+		this.initialized = true;
 	},
 
 

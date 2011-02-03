@@ -174,11 +174,17 @@
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 
-			var browserWindow = ChaikaCore.browser.getBrowserWindow();
-			if(browserWindow && browserWindow.XULBrowserWindow){
-				this._browserWindow = browserWindow.XULBrowserWindow;
-			}
+			var tmp = {};
+			Components.utils.import("resource://gre/modules/XPCOMUtils.jsm", tmp);
 
+			var self = this;
+			tmp.XPCOMUtils.defineLazyGetter(this, "_browserWindow", function(){
+				var browserWindow = self.ChaikaCore.browser.getBrowserWindow();
+				if(browserWindow && browserWindow.XULBrowserWindow){
+					return browserWindow.XULBrowserWindow;
+				}
+				return null;
+			});
 		]]></constructor>
 
 

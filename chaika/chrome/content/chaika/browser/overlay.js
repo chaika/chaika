@@ -1,9 +1,17 @@
 var ChaikaBrowserOverlay = {
 
-	start: function ChaikaBrowserOverlay_start(){
-		ChaikaBrowserOverlay.contextMenu.start();
-		ChaikaBrowserOverlay.threadToolbar.start();
-		ChaikaBrowserOverlay.aboneEvent.start();
+	start: function ChaikaBrowserOverlay_start(){				
+		if(ChaikaBrowserOverlay.ChaikaCore.initialized){
+			ChaikaBrowserOverlay.contextMenu.start();
+			ChaikaBrowserOverlay.threadToolbar.start();
+			ChaikaBrowserOverlay.aboneEvent.start();
+		}else{
+			setTimeout(function(){
+				ChaikaBrowserOverlay.contextMenu.start();
+				ChaikaBrowserOverlay.threadToolbar.start();
+				ChaikaBrowserOverlay.aboneEvent.start();
+			}, 100);
+		}
 	},
 
 
