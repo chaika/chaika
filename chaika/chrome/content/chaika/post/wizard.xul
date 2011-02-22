@@ -92,7 +92,7 @@
 
 		<vbox flex="1">
 			<textbox id="response" multiline="true" readonly="true" flex="1"/>
-			<hbox align="center">
+			<hbox align="center" style="padding:2px;">
 				<hbox flex="1">
 					<progressmeter id="submitProgress" mode="undetermined" flex="1"/>
 				</hbox>
