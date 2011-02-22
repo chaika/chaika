@@ -264,6 +264,7 @@ Post.prototype = {
 	COOKIE:      1,
 	SERVER_HIGH: 2,
 	SAMBA:       3,
+	NINJA:       4,
 	ERROR:       0xFE,
 	UNKNOWN:     0xFF,
 
@@ -275,6 +276,7 @@ Post.prototype = {
 		                              "書き込み終了",
 		                              "書きこみが終わりました"];
 		statuses[this.COOKIE     ] = ["クッキー確認"];
+		statuses[this.NINJA      ] = ["貴方の冒険の書を作成します"];
 		statuses[this.SERVER_HIGH] = ["お茶でも飲みましょう"];
 		statuses[this.SAMBA      ] = ["Samba", "SAMBA", "samba"];
 		statuses[this.STRANGE    ] = ["ブラウザ"];
@@ -309,6 +311,10 @@ Post.prototype = {
 
 		if(postStatus == this.SUCCESS){
 			this._listener.onSucceeded(this, responseData, postStatus);
+		}else if(postStatus == this.NINJA && this._cookieReSubmit){
+			this._cookieReSubmit = false;
+			this._listener.onError(this, responseData, postStatus);
+			return;
 		}else if(postStatus == this.COOKIE && !this._cookieReSubmit){
 			this._cookieReSubmit = true;
 
@@ -327,6 +333,7 @@ Post.prototype = {
 					if(ignoreInputs.indexOf(input.name) != -1) continue;
 					additionalData.push(input.name +"="+ input.value);
 				}
+				this._listener.onCookieCheck(this, responseData, postStatus);
 				this.submit(this._listener, additionalData);
 				ChaikaCore.logger.debug("AdditionalData: " + additionalData);
 				return;
