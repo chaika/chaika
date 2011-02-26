@@ -8,4 +8,8 @@
   -moz-image-region: rect(0px, 24px, 24px, 0px);
 }
 
+.thread-toolbarbutton > .toolbarbutton-icon {
+  width: 16px;
+  height: 16px;
+}
 
