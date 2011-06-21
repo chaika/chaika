@@ -205,7 +205,7 @@ chContentHandler.prototype = {
 			return;
 		}
 
-		if(ChaikaCore.getServerURL().hostPort != contextHost){
+		if(contextHost != "" && ChaikaCore.getServerURL().hostPort != contextHost){
 			// 内部サーバ外から呼ばれたなら終了
 			ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
 			return;
