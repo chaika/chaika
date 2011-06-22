@@ -52,19 +52,6 @@ function ChaikaService(){
 ChaikaService.prototype = {
 
 	_startup: function ChaikaService__startup(){
-		var self = this;
-
-		var scope = {};
-		Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);
-		Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
-		scope.AddonManager.getAddonByID("chaika@chaika.xrea.jp", function(aAddon){
-			scope.ChaikaAddonInfo._init(aAddon);
-			self._startup2();
-		});
-	},
-
-
-	_startup2: function ChaikaService__startup2(){
 		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 		ChaikaCore._startup();
 
@@ -83,6 +70,14 @@ ChaikaService.prototype = {
 		
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.notifyObservers(null, "ChaikaService:startup", "startup");
+
+
+		var scope = {};
+		Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);
+		Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
+		scope.AddonManager.getAddonByID("chaika@chaika.xrea.jp", function(aAddon){
+			scope.ChaikaAddonInfo._init(aAddon);
+		});
 	},
 
 

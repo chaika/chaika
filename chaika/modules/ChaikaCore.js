@@ -197,14 +197,6 @@ var ChaikaCore = {
 		this.storage = this._openStorage();
 		this.history._startup();
 
-		this.logger.info("***** ***** ChaikaCore Startup ***** *****");
-		this.logger.info("DataDir:     " + this.getDataDir().path);
-		this.logger.info("LogDir:      " + this.getLogDir().path);
-		this.logger.info("DefaultsDir: " + this.getDefaultsDir().path);
-		this.logger.info("UserAgent:   " + this.getUserAgent());
-		this.logger.info("ServerURL:   " + this.getServerURL().spec);
-		this.logger.info("Storage:     " + this.storage.databaseFile.path);
-		
 		this.initialized = true;
 	},
 
@@ -359,10 +351,9 @@ var ChaikaCore = {
 	 * @return {nsILocalFile}
 	 */
 	getDefaultsDir: function ChaikaCore_getDefaultsDir(){
-		var scope = {};
-		Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
-
-		return scope.ChaikaAddonInfo.defaultsDir.clone().QueryInterface(Ci.nsILocalFile);
+		var defaultsDir = __LOCATION__.parent.parent.clone().QueryInterface(Ci.nsILocalFile);
+		defaultsDir.append("defaults");
+		return defaultsDir;
 	},
 
 
