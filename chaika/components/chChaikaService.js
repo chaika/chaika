@@ -67,9 +67,6 @@ ChaikaService.prototype = {
 
 		Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 		Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
-		
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.notifyObservers(null, "ChaikaService:startup", "startup");
 
 
 		var scope = {};
@@ -173,7 +170,6 @@ ChaikaService.prototype = {
 				os.addObserver(this, "quit-application", false);
 				break;
 			case "quit-application":
-				os.notifyObservers(null, "ChaikaService:quit", "quit");
 				this._quitApp();
 				break;
 		}

@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -53,9 +53,7 @@ function chRedirector(){
 chRedirector.prototype = {
 
 	_startup: function chRedirector__startup(){
-		Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-
-		this.enabled = ChaikaCore.pref.getBool("browser.redirector.enabled");
+		this.enabled = Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled");
 
 		if(this.enabled){
 			var categoryManager = Cc["@mozilla.org/categorymanager;1"]
@@ -64,14 +62,12 @@ chRedirector.prototype = {
 					this.contractID, false, true);
 		}
 
-		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
-		pref.addObserver("extensions.chaika.browser.redirector.enabled", this, false);
+		Services.prefs.addObserver("extensions.chaika.browser.redirector.enabled", this, false);
 	},
 
 
 	_quitApp: function chRedirector__quitApp(){
-		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
-		pref.removeObserver("extensions.chaika.browser.redirector.enabled", this, false);
+		Services.prefs.removeObserver("extensions.chaika.browser.redirector.enabled", this, false);
 	},
 
 
@@ -126,15 +122,11 @@ chRedirector.prototype = {
 
 		switch(aTopic){
 			case "profile-after-change":
-				os.addObserver(this, "ChaikaService:startup", false);
-				os.addObserver(this, "ChaikaService:quit", false);
-				break;
-			case "ChaikaService:startup":
+				os.addObserver(this, "quit-application", false);
 				this._startup();
-				os.removeObserver(this, "ChaikaService:startup");
 				break;
-			case "ChaikaService:quit":
-				os.removeObserver(this, "ChaikaService:quit");
+			case "quit-application":
+				os.removeObserver(this, "quit-application");
 				this._quitApp();
 				break;
 			case "nsPref:changed":
@@ -167,6 +159,13 @@ chRedirector.prototype = {
 		Ci.nsISupports
 	])
 };
+
+
+XPCOMUtils.defineLazyGetter(this, "ChaikaCore", function () {
+	var scope = {};
+	Components.utils.import("resource://chaika-modules/ChaikaCore.js", scope);
+	return scope.ChaikaCore;
+});
 
 
 var NSGetFactory = XPCOMUtils.generateNSGetFactory([chRedirector]);
