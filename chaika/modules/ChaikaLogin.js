@@ -84,10 +84,20 @@ var ChaikaBeLogin = {
 		httpReq.onload = function(aEvent){
 			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 			this.channel.contentCharset = "euc-jp";
+
+			var id = null;
+			var sessionID = null;
+			if((/DMDM=([^;]+)/m).test(this.responseText)){
+				id = RegExp.$1;
+			}
 			if((/MDMD=([^;]+)/m).test(this.responseText)){
-				var sessionID = RegExp.$1;
-				var id = ChaikaCore.pref.getChar("login.be.id");
-				ChaikaBeLogin._setCookie(id, sessionID, new Date(2030, 0, 1));
+				sessionID = RegExp.$1;
+			}
+
+			if(id && sessionID){
+				var exp = new Date();
+				exp.setTime(exp.getTime() + 5 * 365 * 86400 * 1000);		
+				ChaikaBeLogin._setCookie(id, sessionID, exp);
 				ChaikaBeLogin._loggedIn = true;
 
 				os.notifyObservers(null, "ChaikaBeLogin:Login", "OK");
@@ -126,9 +136,9 @@ var ChaikaBeLogin = {
 		var cookieService = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
 
 		var idCookie = "DMDM=" + aID
-				+ "; domain=2ch.net; path=/; expires=" + aExpires.toUTCString();
+				+ "; domain=.2ch.net; path=/; expires=" + aExpires.toUTCString();
 		var sessionIDCookie = "MDMD=" + aSessionID
-				+ "; domain=2ch.net; path=/; expires=" + aExpires.toUTCString();
+				+ "; domain=.2ch.net; path=/; expires=" + aExpires.toUTCString();
 
 		cookieService.setCookieString(this._getLoginURI(), null, idCookie, null);
 		cookieService.setCookieString(this._getLoginURI(), null, sessionIDCookie, null);
