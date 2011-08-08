@@ -139,10 +139,9 @@ function loadPersist(){
 	jsonFile.appendRelativePath("boardPersist.json");
 	if(!jsonFile.exists()) return;
 
-	var json = Cc["@mozilla.org/dom/json;1"].createInstance(Ci.nsIJSON);
 	var content = ChaikaCore.io.readString(jsonFile, "UTF-8");
 	try{
-		var persistData = json.decode(content);
+		var persistData = JSON.parse(content);
 		for(var i in persistData){
 			var element = document.getElementById(i);
 			if(!element) continue;
@@ -180,8 +179,7 @@ function savePersist(){
 
 	var jsonFile = ChaikaCore.getDataDir();
 	jsonFile.appendRelativePath("boardPersist.json");
-	var json = Cc["@mozilla.org/dom/json;1"].createInstance(Ci.nsIJSON);
-	ChaikaCore.io.writeString(jsonFile, "UTF-8", false, json.encode(persistData));
+	ChaikaCore.io.writeString(jsonFile, "UTF-8", false, JSON.stringify(persistData, null, "  "));
 }
 
 
