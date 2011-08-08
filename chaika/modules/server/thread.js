@@ -1122,8 +1122,8 @@ b2rThreadConverter.prototype = {
 	},
 
 	toFunction: function(aRes){
-		return eval(
-			"function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage){return \""+aRes
+		return new Function("aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage",
+				"return \"" + aRes
 				.replace(/\\/g,"\\\\").replace(/\"/g,"\\\"")
 				.replace(/(\r|\n|\t)/g,"").replace(/<!--.*?-->/g,"")
 				.replace(/<PLAINNUMBER\/>/g, "\"+aNumber+\"")
@@ -1136,8 +1136,7 @@ b2rThreadConverter.prototype = {
 				.replace(/<IDCOLOR\/>/g, "\"+resIDColor+\"")
 				.replace(/<IDBACKGROUNDCOLOR\/>/g, "\"+resIDBgColor+\"")
 				.replace(/<BEID\/>/g, "\"+aBeID+\"")
-				.replace(/<MESSAGE\/>/g, "\"+aMessage+\"")+"\";}"
-		);
+				.replace(/<MESSAGE\/>/g, "\"+aMessage+\"") + "\"");
 	},
 
 	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone){
