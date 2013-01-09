@@ -391,8 +391,9 @@ Thread2ch.prototype = {
 			resDate = RegExp.$1;
 			resBeID = RegExp.$2;
 		}
+		
 			// resDate を DATE と ID に分割
-		if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:(.+)/)){
+		if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:([^ ]+)/)){
 			resDate = RegExp.$1;
 			resID = RegExp.$2;
 		}
