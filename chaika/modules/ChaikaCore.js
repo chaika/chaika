@@ -39,6 +39,10 @@
 EXPORTED_SYMBOLS = ["ChaikaCore"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
+try{
+	XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils", "resource://gre/modules/PrivateBrowsingUtils.jsm");
+}catch(ex){}
+
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -1174,9 +1178,16 @@ ChaikaHistory.prototype = {
 
 
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
-		var privateBrowsingService = Cc["@mozilla.org/privatebrowsing;1"]
-				.getService(Ci.nsIPrivateBrowsingService);
-		if(privateBrowsingService.privateBrowsingEnabled) return;
+
+		if(PrivateBrowsingUtils){
+			//Firefox 20+
+			var win = ChaikaCore.browser.getBrowserWindow();
+			if(PrivateBrowsingUtils.isWindowPrivate(win)) return;
+		}else{
+			var privateBrowsingService = Cc["@mozilla.org/privatebrowsing;1"]
+					.getService(Ci.nsIPrivateBrowsingService);
+			if(privateBrowsingService.privateBrowsingEnabled) return;
+		}
 
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
