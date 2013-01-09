@@ -745,6 +745,7 @@ ThreadJbbs.prototype = {
 		var line = UniConverter.fromEUC(aLine);
 		line = UniConverter.toSJIS(line);
 		var resArray = line.split("<>");
+		aNumber = parseInt(resArray[0]);
 		var resNumber = aNumber;
 		var resName = "BROKEN";
 		var resMail = "";
@@ -852,7 +853,20 @@ ThreadJbbs.prototype = {
 		this.write(this.converter.getFooter("ok"));
 		this.close();
 		this._data = null;
-	}
+	},
+
+ 	datSave: function(aDatContent){
+		if(aDatContent){
+				// サーバ側透明あぼーんにより DAT 行数と最終レスナンバーが
+				// 一致しないことがあるため、行数を最終レスのナンバーから取得
+			var lines = aDatContent.split("\n");
+			var lastLine = lines.pop(); // 多分空行
+			if(!lastLine) lastLine = lines.pop();
+			this.thread.lineCount = parseInt(lastLine.match(/^\d+/));
+		}
+		var superClass = Thread2ch.prototype.datSave;
+		return superClass.apply(this, arguments);
+ 	}
 };
 
 ThreadJbbs.prototype.__proto__ = Thread2ch.prototype;
@@ -884,6 +898,7 @@ ThreadMachi.prototype = {
 	},
 
 	datLineParse: function(aLine, aNumber, aNew){
+		if(!aLine) return "";
 		var resArray = aLine.split("<>");
 		var trueNumber = parseInt(resArray.shift());
 		var superClass = Thread2ch.prototype.datLineParse;
