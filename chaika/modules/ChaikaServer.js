@@ -460,8 +460,9 @@ ChaikaServerResponse.prototype = {
 
 
 	write: function ChaikaServerResponse_write(aString){
+		sleep(0);
+		
 		if(this.stream){
-			sleep(0);
 			this.stream.write(aString, aString.length);
 		}else{
 			ChaikaCore.logger.warning("Stream Closed");
