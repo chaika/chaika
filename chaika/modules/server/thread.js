@@ -391,7 +391,7 @@ Thread2ch.prototype = {
 			resDate = RegExp.$1;
 			resBeID = RegExp.$2;
 		}
-		
+
 			// resDate を DATE と ID に分割
 		if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:([^ ]+)/)){
 			resDate = RegExp.$1;
@@ -423,13 +423,41 @@ Thread2ch.prototype = {
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
 			// レス番リンク処理 & 連鎖あぼーん
-		var regResPointer = /(?:<a .*?>)?(&gt;&gt;|&gt;)([0-9]{1,4})(\-[0-9]{1,4})?(?:<\/a>)?/g;
+			// \x81\x84 = ＞
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
 
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var chainAbone = false;
-		resMes = resMes.replace(regResPointer, function(aStr, aP1, aP2, aP3, aOffset, aS){
-			chainAbone = chainAbone || (chainAboneNumbers.indexOf(parseInt(aP2)) != -1);
-			return '<a href="#res' + aP2 + '" class="resPointer">' + aP1 + aP2 + aP3 + '</a>';
+		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
+			//レス番号解析
+			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
+			var resNums = [];
+
+			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
+				if(!isNaN(resNumRange)){
+					//「-」で範囲指定がないとき
+					resNums.push(parseInt(resNumRange));
+				}else{
+					//範囲指定があるとき
+					let [resStart, resEnd] = resNumRange.split('-');
+					resStart = parseInt(resStart);
+					resEnd = parseInt(resEnd);
+
+					for(let i = resStart; i <= resEnd; i++){
+						resNums.push(i);
+					}
+				}
+			});
+
+			//連鎖あぼーんの判定
+			chainAbone = resNums.some(function(resNum){
+				return chainAboneNumbers.indexOf(resNum) !== -1;
+			});
+
+			//リンク処理
+			//  現状スキンが対応していないので、リンクを貼っても正しくポップアップしない状態のまま
+			//  chaika側で正常なアンカーに書き換えるか、それとも書き込みのオリジナル形式を尊重するべきか？
+			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
 		});
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
@@ -780,13 +808,39 @@ ThreadJbbs.prototype = {
 
 
 			// レス番リンク処理 & 連鎖あぼーん
-		var regResPointer = /(?:<a .*?>)?(&gt;&gt;|&gt;)([0-9]{1,4})(\-[0-9]{1,4})?(?:<\/a>)?/g;
+			// \x81\x84 = ＞
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
 
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var chainAbone = false;
-		resMes = resMes.replace(regResPointer, function(aStr, aP1, aP2, aP3, aOffset, aS){
-			chainAbone = chainAbone || (chainAboneNumbers.indexOf(parseInt(aP2)) != -1);
-			return '<a href="#res' + aP2 + '" class="resPointer">' + aP1 + aP2 + aP3 + '</a>';
+		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
+			//レス番号解析
+			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
+			var resNums = [];
+
+			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
+				if(!isNaN(resNumRange)){
+					//「-」で範囲指定がないとき
+					resNums.push(parseInt(resNumRange));
+				}else{
+					//範囲指定があるとき
+					let [resStart, resEnd] = resNumRange.split('-');
+					resStart = parseInt(resStart);
+					resEnd = parseInt(resEnd);
+
+					for(let i = resStart; i <= resEnd; i++){
+						resNums.push(i);
+					}
+				}
+			});
+
+			//連鎖あぼーんの判定
+			chainAbone = resNums.some(function(resNum){
+				return chainAboneNumbers.indexOf(resNum) !== -1;
+			});
+
+			//リンク処理
+			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
 		});
 		if(this._enableChainAbone && chainAbone){
 			this._chainAboneNumbers.push(aNumber);
