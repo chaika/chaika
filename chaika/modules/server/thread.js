@@ -410,7 +410,7 @@ Thread2ch.prototype = {
 		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
-			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
+			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -426,8 +426,7 @@ Thread2ch.prototype = {
 			// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
 
-		var chainAboneNumbers = this._chainAboneNumbers;
-		var chainAbone = false;
+		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//レス番号解析
 			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
@@ -435,7 +434,7 @@ Thread2ch.prototype = {
 
 			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
 				if(!isNaN(resNumRange)){
-					//「-」で範囲指定がないとき
+					//範囲指定がないとき
 					resNums.push(parseInt(resNumRange));
 				}else{
 					//範囲指定があるとき
@@ -450,19 +449,23 @@ Thread2ch.prototype = {
 			});
 
 			//連鎖あぼーんの判定
-			chainAbone = resNums.some(function(resNum){
-				return chainAboneNumbers.indexOf(resNum) !== -1;
-			});
+			if(this._enableChainAbone){
+				shouldChainAbone = resNums.some(function(resNum){
+					return this._chainAboneNumbers.indexOf(resNum) !== -1;
+				}, this);
+			}
 
 			//リンク処理
 			//  現状スキンが対応していないので、リンクを貼っても正しくポップアップしない状態のまま
 			//  chaika側で正常なアンカーに書き換えるか、それとも書き込みのオリジナル形式を尊重するべきか？
 			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
 		});
-		if(this._enableChainAbone && chainAbone){
+
+		if(shouldChainAbone){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
-			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
+
+			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -794,7 +797,7 @@ ThreadJbbs.prototype = {
 		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
-			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
+			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
@@ -811,8 +814,7 @@ ThreadJbbs.prototype = {
 			// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
 
-		var chainAboneNumbers = this._chainAboneNumbers;
-		var chainAbone = false;
+		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//レス番号解析
 			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
@@ -820,7 +822,7 @@ ThreadJbbs.prototype = {
 
 			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
 				if(!isNaN(resNumRange)){
-					//「-」で範囲指定がないとき
+					//範囲指定がないとき
 					resNums.push(parseInt(resNumRange));
 				}else{
 					//範囲指定があるとき
@@ -835,17 +837,20 @@ ThreadJbbs.prototype = {
 			});
 
 			//連鎖あぼーんの判定
-			chainAbone = resNums.some(function(resNum){
-				return chainAboneNumbers.indexOf(resNum) !== -1;
-			});
+			if(this._enableChainAbone){
+				shouldChainAbone = resNums.some(function(resNum){
+					return this._chainAboneNumbers.indexOf(resNum) !== -1;
+				}, this);
+			}
 
 			//リンク処理
 			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
 		});
-		if(this._enableChainAbone && chainAbone){
+
+		if(shouldChainAbone){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
-			if(aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
+			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
 				return "";
 			}
 		}
