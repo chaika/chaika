@@ -705,7 +705,7 @@ Thread2ch.prototype = {
 		var alertStr = statusBundle.formatStringFromName(alertStrID, [this.thread.title], 1);
 		try{
 			var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
-			alertsService.showAlertNotification("", "Chaika", alertStr, false, "", null);
+			alertsService.showAlertNotification("chrome://chaika/content/icon.png", "Chaika", alertStr, false, "", null);
 		}catch(ex){}
 	}
 
