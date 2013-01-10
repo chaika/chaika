@@ -1,16 +1,21 @@
 var ChaikaBrowserOverlay = {
 
-	start: function ChaikaBrowserOverlay_start(){				
+	_initCount: 0,
+
+	start: function ChaikaBrowserOverlay_start(){
+		//10s待ってもChaikaCoreが初期化されていなかったら
+		//初期化は失敗したものとみなす
+		if(this._initCount > 100){
+			return;
+		}
+
 		if(ChaikaBrowserOverlay.ChaikaCore.initialized){
 			ChaikaBrowserOverlay.contextMenu.start();
 			ChaikaBrowserOverlay.threadToolbar.start();
 			ChaikaBrowserOverlay.aboneEvent.start();
 		}else{
-			setTimeout(function(){
-				ChaikaBrowserOverlay.contextMenu.start();
-				ChaikaBrowserOverlay.threadToolbar.start();
-				ChaikaBrowserOverlay.aboneEvent.start();
-			}, 100);
+			this._initCount++;
+			setTimeout(this.start, 100);
 		}
 	},
 
@@ -94,12 +99,14 @@ ChaikaBrowserOverlay.contextMenu = {
 ChaikaBrowserOverlay.threadToolbar = {
 
 	start: function statusbar_start(){
-		getBrowser().addProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress);
+		getBrowser().addProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
+		                                 Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
 	stop: function statusbar_stop(){
-		getBrowser().removeProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress);
+		getBrowser().removeProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
+		                                    Ci.nsIWebProgress.NOTIFY_LOCATION);
 	},
 
 
