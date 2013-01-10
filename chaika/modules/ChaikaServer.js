@@ -583,10 +583,23 @@ ChaikaRefController.prototype = {
 	/** @private */
 	_enabled: true,
 
+	HTTP_REQUEST_TOPIC: '',
+
 	/** @private */
 	startup: function(){
+		//Firefox 18以降は http-on-opening-request を,
+		//それ以前は　http-on-modify-request を使用する
+		var geckoVersion = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo).platformVersion;
+
+		if(parseInt(geckoVersion.indexOf) >= 18){
+			this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
+		}else{
+			this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
+		}
+
+
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.addObserver(this, "http-on-modify-request", true);
+		os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
 
 		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
 		this._enabled = pref.getBoolPref("extensions.chaika.refController.enabled");
@@ -599,7 +612,7 @@ ChaikaRefController.prototype = {
 	/** @private */
 	quit: function(){
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.removeObserver(this, "http-on-modify-request");
+		os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
 
 		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
 		pref.removeObserver("extensions.chaika.refController.enabled", this);
@@ -620,7 +633,7 @@ ChaikaRefController.prototype = {
 
 	/** @private */
 	observe: function ChaikaRefController_observe(aSubject, aTopic, aData){
-		if(aTopic == "http-on-modify-request" && this._enabled){
+		if(aTopic == this.HTTP_REQUEST_TOPIC && this._enabled){
 			var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 				// リファラがなければ終了
 			if(!httpChannel.referrer) return;
