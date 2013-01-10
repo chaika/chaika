@@ -120,6 +120,7 @@ function startup(){
 
 		switch(gBoard.type){
 			case ChaikaBoard.BOARD_TYPE_2CH:
+			case ChaikaBoard.BOARD_TYPE_JBBS:
 				break;
 			default:
 				Notification.critical("chaika での新規スレッド作成に対応していない掲示板です");
@@ -327,7 +328,16 @@ var FormPage = {
 			}
 
 		}else if(gWizType == WIZ_TYPE_NEW_THREAD){
-			gPost = new Post2chNewThread(gBoard);
+			switch(gBoard.type){
+				case ChaikaBoard.BOARD_TYPE_2CH:
+					gPost = new Post2chNewThread(gBoard);
+					break;
+				case ChaikaBoard.BOARD_TYPE_JBBS:
+					gPost = new PostJBBSNewThread(gBoard);
+					break;
+				default:
+					gPost = null;
+			}
 
 				// タイトルフォームの表示
 			document.getElementById("titleFormContainer").hidden = false;

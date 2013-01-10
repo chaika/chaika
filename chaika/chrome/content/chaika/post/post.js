@@ -224,7 +224,7 @@ Post.prototype = {
 		kakikomi = kakikomi.concat(this.message.split("\n"));
 
 		kakikomi = kakikomi.join("\r\n") + "\r\n\r\n\r\n";
-			
+
 		var kakikomiFile = ChaikaCore.getDataDir();
 		kakikomiFile.appendRelativePath("kakikomi.txt");
 		ChaikaCore.io.writeString(kakikomiFile, "Shift_JIS", true, kakikomi);
@@ -550,6 +550,45 @@ Post2chNewThread.prototype = {
 };
 
 Post2chNewThread.prototype.__proto__ = Post.prototype;
+
+
+
+function PostJBBSNewThread(aBoard){
+	this._thread = null;
+	this._board = aBoard;
+}
+
+PostJBBSNewThread.prototype = {
+	charset: "euc-jp",
+
+	submit: function PostJBBSNewThread_submit(aListener, additionalData){
+		this._listener = aListener;
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+		var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
+		var postURI = ioService.newURI('http://jbbs.livedoor.jp/bbs/write.cgi/'+dir+'/'+bbs+'/new/', null, null);
+
+		this._httpRequest = new HttpRequest(postURI, null, this);
+
+		var postData = [];
+		postData.push("BBS="    + bbs);
+		postData.push("DIR="    + dir);
+		postData.push("TIME="   + (Math.ceil(Date.now() / 1000) - 300));
+		postData.push("SUBJECT=" + this._convert(this.title, this.charset, false, true));
+		postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+		postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+		postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+		postData.push("submit=" + this._convert("新規書き込み", this.charset, false, true));
+
+		if(additionalData){
+			postData = postData.concat(additionalData);
+		}
+
+		ChaikaCore.logger.debug(postData);
+		this._httpRequest.post(postData.join("&"));
+	}
+};
+PostJBBSNewThread.prototype.__proto__ = Post2chNewThread.prototype;
 
 
 
