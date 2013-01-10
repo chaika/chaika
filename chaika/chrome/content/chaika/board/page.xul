@@ -43,7 +43,7 @@
 			<menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
 				onclick="if(event.button==1)showBrowser(true)"/>
 			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
-			<menuitem label="新規スレッド作成" oncommand="postNewThread()"/>			
+			<menuitem label="新規スレッド作成" oncommand="postNewThread()"/>
 			<menuseparator/>
 			<menuitem label="オプション..." oncommand="openSettings()"/>
 		</menupopup>
