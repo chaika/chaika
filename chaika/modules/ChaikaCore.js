@@ -445,7 +445,7 @@ var ChaikaCore = {
                     .getService(Ci.nsIProtocolProxyService);
 			if(proxyMode == 1){
 				var proxyInfo = pps.newProxyInfo("direct", "", -1, 0, 0, null);
-				httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo)
+				httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo, 0, null)
 						.QueryInterface(Ci.nsIHttpChannel);
 			}else if(proxyMode == 2){
 					var httpProxyValue = this.pref.getUniChar("http_proxy_value");
@@ -456,7 +456,7 @@ var ChaikaCore = {
 						try{
 							var proxyInfo = pps.newProxyInfo("http", host, port, 0, 10,
 									pps.newProxyInfo("direct", "", -1, 0, 0, null));
-							httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo)
+							httpChannel = httpProtocolHandler.newProxiedChannel(aURL, proxyInfo, 0, null)
 								.QueryInterface(Ci.nsIHttpChannel);
 						}catch(ex){
 							this.logger.error(ex);
