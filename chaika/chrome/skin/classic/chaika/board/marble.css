@@ -5,6 +5,7 @@
 
 marbletoolbar {
   background: -moz-linear-gradient(top, #848484 0%, #4F4F4F 50%, #3C3C3C 50%, #444444 100%);
+  backgorund: linear-gradient(to top, #848484 0%, #4F4F4F 50%, #3C3C3C 50%, #444444 100%);
 }
 
 

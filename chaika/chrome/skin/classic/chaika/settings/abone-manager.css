@@ -21,7 +21,7 @@ tabs {
 tab {
   -moz-appearance: none !important;
   border-style: none !important;
-  -moz-border-radius: 0px !important;
+  border-radius: 0px !important;
   margin: 0px !important;
   padding: 5px 10px !important;
   background-color: #FFF !important;
