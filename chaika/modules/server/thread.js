@@ -425,7 +425,8 @@ Thread2ch.prototype = {
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
-
+		var enableChainAbone = this._enableChainAbone;
+		var chainAboneNumbers = this._chainAboneNumbers;
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//レス番号解析
@@ -449,9 +450,9 @@ Thread2ch.prototype = {
 			});
 
 			//連鎖あぼーんの判定
-			if(this._enableChainAbone){
+			if(enableChainAbone){
 				shouldChainAbone = resNums.some(function(resNum){
-					return this._chainAboneNumbers.indexOf(resNum) !== -1;
+					return chainAboneNumbers.indexOf(resNum) !== -1;
 				}, this);
 			}
 
@@ -813,7 +814,8 @@ ThreadJbbs.prototype = {
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
-
+		var enableChainAbone = this._enableChainAbone;
+		var chainAboneNumbers = this._chainAboneNumbers;
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//レス番号解析
@@ -837,9 +839,9 @@ ThreadJbbs.prototype = {
 			});
 
 			//連鎖あぼーんの判定
-			if(this._enableChainAbone){
+			if(enableChainAbone){
 				shouldChainAbone = resNums.some(function(resNum){
-					return this._chainAboneNumbers.indexOf(resNum) !== -1;
+					return chainAboneNumbers.indexOf(resNum) !== -1;
 				}, this);
 			}
 
