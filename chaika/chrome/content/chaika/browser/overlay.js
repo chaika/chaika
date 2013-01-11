@@ -99,14 +99,12 @@ ChaikaBrowserOverlay.contextMenu = {
 ChaikaBrowserOverlay.threadToolbar = {
 
 	start: function statusbar_start(){
-		getBrowser().addProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
-		                                 Ci.nsIWebProgress.NOTIFY_LOCATION);
+		getBrowser().addProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress);
 	},
 
 
 	stop: function statusbar_stop(){
-		getBrowser().removeProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress,
-		                                    Ci.nsIWebProgress.NOTIFY_LOCATION);
+		getBrowser().removeProgressListener(ChaikaBrowserOverlay.threadToolbar.webProgress);
 	},
 
 
