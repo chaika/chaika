@@ -40,7 +40,7 @@ EXPORTED_SYMBOLS = ["ChaikaCore"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 try{
-	XPCOMUtils.defineLazyModuleGetter(this, "PrivateBrowsingUtils", "resource://gre/modules/PrivateBrowsingUtils.jsm");
+	Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 }catch(ex){}
 
 
@@ -1179,7 +1179,7 @@ ChaikaHistory.prototype = {
 
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
 
-		if(PrivateBrowsingUtils){
+		if(typeof PrivateBrowsingUtils !== 'undefined'){
 			//Firefox 20+
 			var win = ChaikaCore.browser.getBrowserWindow();
 			if(PrivateBrowsingUtils.isWindowPrivate(win)) return;
