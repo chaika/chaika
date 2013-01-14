@@ -572,20 +572,21 @@ var Find2ch = {
 	_downloader: null,
 	_infoNode: null,
 
-	search: function Find2ch_search(aSearchStr){
-		const QUERY_URL = "http://find.2ch.net/?COUNT=50&STR=";
+	get isHTMLMode(){
+		return !ChaikaCore.pref.getBool('bbsmenu.find2ch.use_rss');
+	},
 
-		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
-		try{
-			converter.charset = 'EUC-JP';
-			aSearchStr = converter.ConvertFromUnicode(aSearchStr);
-		}catch(e){}
+	search: function Find2ch_search(aSearchStr){
+		const isHTML = this.isHTMLMode;
+		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&STR=" : 'http://find.2ch.net/rss.php/';
+		const ENCODE = isHTML ? 'EUC-JP' : 'UTF-8';
+		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) : encodeURIComponent(aSearchStr);
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var find2chURL = ioService.newURI(QUERY_URL + escape(aSearchStr), null, null);
+		var find2chURL = ioService.newURI(QUERY_URL + QUERY, null, null);
 
 		this._downloader = new ChaikaSimpleDownloader();
-		this._downloader.download(find2chURL, "EUC-JP", this);
+		this._downloader.download(find2chURL, ENCODE, this);
 
 		Notification.removeAll();
 		this._infoNode = Notification.info("検索中");
@@ -593,9 +594,13 @@ var Find2ch = {
 
 
 	onStop: function Find2ch_onStop(aDownloader, aResponse, aHttpStatus){
-		if(aResponse && aResponse.indexOf("<html") != -1){
-			this.initTree(aResponse);
+		if(aResponse){
+			if( (this.isHTMLMode && aResponse.indexOf('<html') !== -1) ||
+			   aResponse.indexOf('<rdf:RDF') !== -1){
+				this.initTree(aResponse);
+			}
 		}
+
 		Notification.remove(this._infoNode);
 		this._downloader = null;
 		this._infoNode = null;
@@ -611,9 +616,31 @@ var Find2ch = {
 
 
 	initTree: function Find2ch_initTree(aResponse){
+		var resultDoc = this.isHTMLMode ? this._convertDocFromHTML(aResponse) :
+										  this._convertDocFromRSS(aResponse);
+		Tree.initTree(resultDoc, MODE_FIND2CH);
+	},
+
+	_convertDocFromRSS: function(aResponseStr){
+		var httpReq = new XMLHttpRequest();
+		httpReq.open("GET", "chrome://chaika/content/bbsmenu/find2ch.xsl", false);
+		httpReq.send(null);
+
 		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Ci.nsIDOMParser);
-		var findDoc = domParser.parseFromString(aResponse, "text/html");
+		var xsltDoc = domParser.parseFromString(httpReq.responseText, "text/xml");
+		var findDoc = domParser.parseFromString(aResponseStr, "text/xml");
+
+		var xslt = new XSLTProcessor();
+		xslt.importStylesheet(xsltDoc);
+
+		return xslt.transformToDocument(findDoc);
+	},
+
+	_convertDocFromHTML: function(aResponseStr){
+		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
+				.createInstance(Ci.nsIDOMParser);
+		var findDoc = domParser.parseFromString(aResponseStr, "text/html");
 
 		var resultDoc = document.implementation.createDocument(null, '', null);
 		var root = document.createElement('category');
@@ -657,7 +684,18 @@ var Find2ch = {
 
 		resultDoc.appendChild(root);
 
-		Tree.initTree(resultDoc, MODE_FIND2CH);
+		return resultDoc;
+	},
+
+	_convertEncode: function(aStr, aEncode){
+		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
+
+		try{
+			converter.charset = aEncode;
+			return converter.ConvertFromUnicode(aStr);
+		}catch(e){
+			return aStr;
+		}
 	}
 
 };
