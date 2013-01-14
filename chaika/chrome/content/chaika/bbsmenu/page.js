@@ -573,13 +573,19 @@ var Find2ch = {
 	_infoNode: null,
 
 	search: function Find2ch_search(aSearchStr){
-		const QUERY_URL = "http://find.2ch.net/rss.php/";
+		const QUERY_URL = "http://find.2ch.net/?COUNT=50&STR=";
+
+		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
+		try{
+			converter.charset = 'EUC-JP';
+			aSearchStr = converter.ConvertFromUnicode(aSearchStr);
+		}catch(e){}
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var find2chURL = ioService.newURI(QUERY_URL + encodeURIComponent(aSearchStr), null, null);
+		var find2chURL = ioService.newURI(QUERY_URL + escape(aSearchStr), null, null);
 
 		this._downloader = new ChaikaSimpleDownloader();
-		this._downloader.download(find2chURL, "UTF-8", this);
+		this._downloader.download(find2chURL, "EUC-JP", this);
 
 		Notification.removeAll();
 		this._infoNode = Notification.info("検索中");
@@ -587,7 +593,7 @@ var Find2ch = {
 
 
 	onStop: function Find2ch_onStop(aDownloader, aResponse, aHttpStatus){
-		if(aResponse && aResponse.indexOf("<rdf:RDF") != -1){
+		if(aResponse && aResponse.indexOf("<html") != -1){
 			this.initTree(aResponse);
 		}
 		Notification.remove(this._infoNode);
@@ -605,21 +611,52 @@ var Find2ch = {
 
 
 	initTree: function Find2ch_initTree(aResponse){
-		var httpReq = new XMLHttpRequest();
-		httpReq.open("GET", "chrome://chaika/content/bbsmenu/find2ch.xsl", false);
-		httpReq.send(null);
-
 		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
 				.createInstance(Ci.nsIDOMParser);
-		var xsltDoc = domParser.parseFromString(httpReq.responseText, "text/xml");
-		var findDoc = domParser.parseFromString(aResponse, "text/xml");
+		var findDoc = domParser.parseFromString(aResponse, "text/html");
 
-		var xslt = new XSLTProcessor();
-		xslt.importStylesheet(xsltDoc);
-		var resultDoc = xslt.transformToDocument(findDoc);
+		var resultDoc = document.implementation.createDocument(null, '', null);
+		var root = document.createElement('category');
 
-		var serializer = new XMLSerializer();
-		var xml = serializer.serializeToString(resultDoc);
+		var resultObj = {};  //key: board name, value: an array of threads
+
+		//最後のdtは広告
+		Array.slice(findDoc.querySelectorAll('.content_pane dt:not(:last-child)')).forEach(function(item){
+			var links = item.getElementsByTagName('a');
+
+			var thread = links[0];
+			var threadURI = thread.getAttribute('href').replace(/\d+-\d+$/, '');
+			var threadTitle = thread.textContent;
+
+			var post = thread.nextSibling.nodeValue.replace(/\D/g, '') || '0';
+			var boardTitle = links[1].textContent;
+
+			var threadItem = document.createElement('thread');
+			threadItem.setAttribute('url', threadURI);
+			threadItem.setAttribute('title', threadTitle + ' [' + post + ']');
+			threadItem.setAttribute('boardName', boardTitle);
+
+			if(!resultObj[boardTitle]){
+				resultObj[boardTitle] = [];
+			}
+			resultObj[boardTitle].push(threadItem);
+		});
+
+		for(let boardTitle in resultObj){
+			var boardItem = document.createElement('board');
+			boardItem.setAttribute('title', boardTitle);
+			boardItem.setAttribute('isContainer', 'true');
+			boardItem.setAttribute('isOpen', 'true');
+
+			resultObj[boardTitle].forEach(function(threadItem){
+				boardItem.appendChild(threadItem);
+			});
+
+			root.appendChild(boardItem);
+		}
+
+		resultDoc.appendChild(root);
+
 		Tree.initTree(resultDoc, MODE_FIND2CH);
 	}
 
