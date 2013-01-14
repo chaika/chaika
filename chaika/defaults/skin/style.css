@@ -90,7 +90,7 @@ h1 {
   padding: 6px 24px;
   font-size: 0.7em;
   border: 1px solid #BBB;
-  -moz-border-radius: 6px;
+  border-radius: 6px;
   color: #888;
 }
 
@@ -165,8 +165,8 @@ dl[isAbone="true"] span.resHeaderAboneContent:after {
 div.popup {
   font-size: 0.8em;
   padding: 8px;
-  -moz-border-radius: 8px;
-  -moz-box-shadow: #333 0px 0px 12px;
+  border-radius: 8px;
+  box-shadow: #333 0px 0px 12px;
   background-color: rgba(60, 60, 60, 0.85);
   position: absolute;
 }
