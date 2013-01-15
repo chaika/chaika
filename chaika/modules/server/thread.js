@@ -424,42 +424,61 @@ Thread2ch.prototype = {
 
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(:?<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
+		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
-			//レス番号解析
-			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
-			var resNums = [];
+			//アンカー番号解析
+			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
+			var ancNums = [];
 
-			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
-				if(!isNaN(resNumRange)){
+			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
+				if(!isNaN(ancNumRange)){
 					//範囲指定がないとき
-					resNums.push(parseInt(resNumRange));
+					ancNums.push(parseInt(ancNumRange));
 				}else{
 					//範囲指定があるとき
-					let [resStart, resEnd] = resNumRange.split('-');
-					resStart = parseInt(resStart);
-					resEnd = parseInt(resEnd);
+					let [ancStart, ancEnd] = ancNumRange.split('-');
+					ancStart = parseInt(ancStart);
+					ancEnd = parseInt(ancEnd);
 
-					for(let i = resStart; i <= resEnd; i++){
-						resNums.push(i);
+					let rangeArray = [];
+					for(let i = ancStart; i <= ancEnd; i++){
+						rangeArray.push(i);
 					}
+
+					ancNums.push(rangeArray);
 				}
 			});
 
 			//連鎖あぼーんの判定
 			if(enableChainAbone){
-				shouldChainAbone = resNums.some(function(resNum){
-					return chainAboneNumbers.indexOf(resNum) !== -1;
-				}, this);
+				let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
+
+				shouldChainAbone = ancNumsFlattened.some(function(ancNum){
+					return chainAboneNumbers.indexOf(ancNum) !== -1;
+				});
 			}
 
 			//リンク処理
-			//  現状スキンが対応していないので、リンクを貼っても正しくポップアップしない状態のまま
-			//  chaika側で正常なアンカーに書き換えるか、それとも書き込みのオリジナル形式を尊重するべきか？
-			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
+			if(!fixInvalidAnchor){
+				return '<a href="#res' + ancNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
+			}else{
+				let links = [];
+
+				ancNums.forEach(function(ancNum){
+					if(ancNum instanceof Array){
+						links.push('<a href="#res' + ancNum[0] + '" class="resPointer">&gt;&gt;' +
+									ancNum[0] + '-' + ancNum[ancNum.length-1] + '</a>');
+					}else{
+						links.push('<a href="#res' + ancNum + '" class="resPointer">&gt;&gt;' + ancNum + '</a>');
+					}
+				});
+
+				return links.join(' ');
+			}
 		});
 
 		if(shouldChainAbone){
@@ -813,40 +832,61 @@ ThreadJbbs.prototype = {
 
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]?\s*)+)(?:<\/a>)?/g;
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(:?<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
+		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
-			//レス番号解析
-			//レス番号の配列に落としこむ: >>1-3,5 -> [1,2,3,5]
-			var resNums = [];
+			//アンカー番号解析
+			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
+			var ancNums = [];
 
-			ancStr.replace(/\s*/g, '').split(',').forEach(function(resNumRange){
-				if(!isNaN(resNumRange)){
+			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
+				if(!isNaN(ancNumRange)){
 					//範囲指定がないとき
-					resNums.push(parseInt(resNumRange));
+					ancNums.push(parseInt(ancNumRange));
 				}else{
 					//範囲指定があるとき
-					let [resStart, resEnd] = resNumRange.split('-');
-					resStart = parseInt(resStart);
-					resEnd = parseInt(resEnd);
+					let [ancStart, ancEnd] = ancNumRange.split('-');
+					ancStart = parseInt(ancStart);
+					ancEnd = parseInt(ancEnd);
 
-					for(let i = resStart; i <= resEnd; i++){
-						resNums.push(i);
+					let rangeArray = [];
+					for(let i = ancStart; i <= ancEnd; i++){
+						rangeArray.push(i);
 					}
+
+					ancNums.push(rangeArray);
 				}
 			});
 
 			//連鎖あぼーんの判定
 			if(enableChainAbone){
-				shouldChainAbone = resNums.some(function(resNum){
-					return chainAboneNumbers.indexOf(resNum) !== -1;
-				}, this);
+				let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
+
+				shouldChainAbone = ancNumsFlattened.some(function(ancNum){
+					return chainAboneNumbers.indexOf(ancNum) !== -1;
+				});
 			}
 
 			//リンク処理
-			return '<a href="#res' + resNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
+			if(!fixInvalidAnchor){
+				return '<a href="#res' + ancNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
+			}else{
+				let links = [];
+
+				ancNums.forEach(function(ancNum){
+					if(ancNum instanceof Array){
+						links.push('<a href="#res' + ancNum[0] + '" class="resPointer">&gt;&gt;' +
+									ancNum[0] + '-' + ancNum[ancNum.length-1] + '</a>');
+					}else{
+						links.push('<a href="#res' + ancNum + '" class="resPointer">&gt;&gt;' + ancNum + '</a>');
+					}
+				});
+
+				return links.join(' ');
+			}
 		});
 
 		if(shouldChainAbone){
