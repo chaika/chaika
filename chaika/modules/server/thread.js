@@ -435,7 +435,7 @@ Thread2ch.prototype = {
 			var ancNums = [];
 
 			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
-				if(!isNaN(ancNumRange)){
+				if(ancNumRange && !isNaN(ancNumRange)){
 					//範囲指定がないとき
 					ancNums.push(parseInt(ancNumRange));
 				}else{
@@ -444,12 +444,14 @@ Thread2ch.prototype = {
 					ancStart = parseInt(ancStart);
 					ancEnd = parseInt(ancEnd);
 
-					let rangeArray = [];
-					for(let i = ancStart; i <= ancEnd; i++){
-						rangeArray.push(i);
-					}
+					if(ancStart > 0 && ancEnd > 0){
+						let rangeArray = [];
+						for(let i = ancStart; i <= ancEnd; i++){
+							rangeArray.push(i);
+						}
 
-					ancNums.push(rangeArray);
+						ancNums.push(rangeArray);
+					}
 				}
 			});
 
@@ -843,7 +845,7 @@ ThreadJbbs.prototype = {
 			var ancNums = [];
 
 			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
-				if(!isNaN(ancNumRange)){
+				if(ancNumRange && !isNaN(ancNumRange)){
 					//範囲指定がないとき
 					ancNums.push(parseInt(ancNumRange));
 				}else{
@@ -852,12 +854,14 @@ ThreadJbbs.prototype = {
 					ancStart = parseInt(ancStart);
 					ancEnd = parseInt(ancEnd);
 
-					let rangeArray = [];
-					for(let i = ancStart; i <= ancEnd; i++){
-						rangeArray.push(i);
-					}
+					if(ancStart > 0 && ancEnd > 0){
+						let rangeArray = [];
+						for(let i = ancStart; i <= ancEnd; i++){
+							rangeArray.push(i);
+						}
 
-					ancNums.push(rangeArray);
+						ancNums.push(rangeArray);
+					}
 				}
 			});
 
