@@ -424,7 +424,7 @@ Thread2ch.prototype = {
 
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(:?<\/a>|,|\-)*\s*)+)/g;
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
@@ -832,7 +832,7 @@ ThreadJbbs.prototype = {
 
 			// レス番リンク処理 & 連鎖あぼーん
 			// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(:?<\/a>|,|\-)*\s*)+)/g;
+		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
