@@ -589,7 +589,7 @@ ChaikaRefController.prototype = {
 		//それ以前は　http-on-modify-request を使用する
 		var geckoVersion = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo).platformVersion;
 
-		if(parseInt(geckoVersion.indexOf) >= 18){
+		if(parseInt(geckoVersion) >= 18){
 			this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
 		}else{
 			this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
