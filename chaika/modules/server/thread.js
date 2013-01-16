@@ -239,6 +239,7 @@ Thread2ch.prototype = {
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
 			datLines.pop();
 
+			this._waitLineCount =
 			this._logLineCount = datLines.length;
 
 			if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
@@ -252,7 +253,7 @@ Thread2ch.prototype = {
 				this.close();
 				return;
 
-			}else if(this.optionsEnd){
+			}else if(this.optionsEnd  && this.optionsEnd <= this._logLineCount){
 				this._headerResponded = true;
 				var title = UniConverter.toSJIS(this.thread.title);
 				var header = this.converter.getHeader(title);
@@ -545,7 +546,7 @@ Thread2ch.prototype = {
 					this.thread.datID,
 					".dat"
 				].join("");
-		
+
 				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 				var mimizunURL = ioService.newURI(mimizunURLSpec, null, null).QueryInterface(Ci.nsIURL);
 				this.httpChannel = ChaikaCore.getHttpChannel(mimizunURL);
@@ -632,16 +633,19 @@ Thread2ch.prototype = {
 			return;
 		}
 
-			// 取得した DAT を行ごとに配列にし、最後の行をバッファに追加
-		var datLines = availableData.split("\n");
-		this._datBuffer = (datLines.length>1) ? datLines.pop() : "";
+		if(this._waitLineCount && httpStatus != 200)
+			this._waitLineCount = 0;
 
-			// DAT を 変換して書き出す
-		for(var i=0; i<datLines.length; i++){
-			this.thread.lineCount++;
-			datLines[i] = this.datLineParse(datLines[i], this.thread.lineCount, true);
-		}
-		this.write(datLines.join("\n"));
+		var that = this;
+		this._datBuffer = availableData.replace(/.*?\n/g, function (line, idx, old) {
+			if(that._waitLineCount){
+				that._waitLineCount--;
+				return "";
+			}
+
+			that.write(that.datLineParse(line.substring(0, line.length-1), ++that.thread.lineCount, true) + "\n");
+			return "";
+		});
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
