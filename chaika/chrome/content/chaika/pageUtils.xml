@@ -299,12 +299,14 @@
 							.getService(Components.interfaces.nsIIOService);
 				var url = ioService.newURI(target.value, null, null);
 
-					// Ctrl を押している場合はタブで開く
-				var addTab = event.ctrlKey;
+					// Ctrl を押している場合は設定にかかわらずタブで開く
+				var boardAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
+				var threadAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("board.open_new_tab");
+
 				if(itemType == "board"){
-					this.ChaikaCore.browser.openBoard(url, addTab);
+					this.ChaikaCore.browser.openBoard(url, boardAddTab);
 				}else if(itemType == "thread"){
-					this.ChaikaCore.browser.openThread(url, addTab, true);
+					this.ChaikaCore.browser.openThread(url, threadAddTab, true);
 				}
 			}
 		]]></handler>
