@@ -239,8 +239,8 @@ Thread2ch.prototype = {
 			// 取得済みログの送信
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
-			var lastLine = datLines.pop();  //空行？
-			if(!lastLine) lastLine = datLines.pop();
+			var lastLine = datLines.pop();
+			if(!lastLine) lastLine = datLines[datLines.length-1];  //最終行が空行だった時
 
 			this._logLineCount = parseInt(lastLine.match(/^(\d+)<>/)) || datLines.length;
 
@@ -637,12 +637,10 @@ Thread2ch.prototype = {
 		}
 
 		var that = this;
-
 		this._datBuffer = availableData.replace(/.*?\n/g, function (line, idx, old) {
-			var resNum = that.thread.lineCount++;
-			if(resNum < that._logLineCount) return "";
+			if(that.thread.lineCount < that._logLineCount) return "";
 
-			that.write(that.datLineParse(line.substring(0, line.length-1), resNum, true) + "\n");
+			that.write(that.datLineParse(line.substring(0, line.length-1), ++that.thread.lineCount, true) + "\n");
 			return "";
 		});
 	},
