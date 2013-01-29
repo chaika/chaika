@@ -233,14 +233,16 @@ Thread2ch.prototype = {
 		this.write("-->\n\n");
 		*/
 
+		//取得済みログの件数
 		this._logLineCount = 0;
+
 			// 取得済みログの送信
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
-			datLines.pop();
+			var lastLine = datLines.pop();  //空行？
+			if(!lastLine) lastLine = datLines.pop();
 
-			this._waitLineCount =
-			this._logLineCount = datLines.length;
+			this._logLineCount = parseInt(lastLine.match(/^(\d+)<>/)) || datLines.length;
 
 			if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
 				this._headerResponded = true;
@@ -626,24 +628,21 @@ Thread2ch.prototype = {
 			// 変換前の DAT を保存しておく
 		this._data.push(availableData);
 
-		var availableData = this._datBuffer + availableData;
+		availableData = this._datBuffer + availableData;
+
 			// 改行を含まないならバッファに追加して終了
 		if(!availableData.match(/\n/)){
 			this._datBuffer = availableData;
 			return;
 		}
 
-		if(this._waitLineCount && httpStatus != 200)
-			this._waitLineCount = 0;
-
 		var that = this;
-		this._datBuffer = availableData.replace(/.*?\n/g, function (line, idx, old) {
-			if(that._waitLineCount){
-				that._waitLineCount--;
-				return "";
-			}
 
-			that.write(that.datLineParse(line.substring(0, line.length-1), ++that.thread.lineCount, true) + "\n");
+		this._datBuffer = availableData.replace(/.*?\n/g, function (line, idx, old) {
+			var resNum = that.thread.lineCount++;
+			if(resNum < that._logLineCount) return "";
+
+			that.write(that.datLineParse(line.substring(0, line.length-1), resNum, true) + "\n");
 			return "";
 		});
 	},
