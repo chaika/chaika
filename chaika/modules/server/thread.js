@@ -438,7 +438,7 @@ Thread2ch.prototype = {
 			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
 			var ancNums = [];
 
-			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
+			ancStr.replace(/(?:\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
 				if(ancNumRange && !isNaN(ancNumRange)){
 					//範囲指定がないとき
 					ancNums.push(parseInt(ancNumRange));
