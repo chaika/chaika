@@ -791,133 +791,42 @@ ThreadJbbs.prototype = {
 	},
 
 	datLineParse: function(aLine, aNumber, aNew){
-		if(!aLine) return "";
+        if(!aLine) return "";
 
-			// EUC-JP から SJIS へ変換
-		var line = UniConverter.fromEUC(aLine);
-		line = UniConverter.toSJIS(line);
-		var resArray = line.split("<>");
-		var resNumber = aNumber;
-		var resName = "BROKEN";
-		var resMail = "";
-		var resDate = "BROKEN";
-		var resID = "";
-		var resBeID = "";
-		var resMes	= "";
-		var isAbone = false;
+        // EUC-JP から SJIS へ変換
+        var line = UniConverter.fromEUC(aLine);
+        line = UniConverter.toSJIS(line);
 
-		if(resArray.length > 5){
-			resName = resArray[1].replace(/<\/?b>|/g, "");
-			resMail = resArray[2];
-			resDate = resArray[3];
-			resMes = resArray[4];
-			resID = resArray[6];
-		}
+        //2ch互換へと変換
+        var resArray = line.split("<>");
+        var resName = "";
+        var resMail = "";
+        var resDate = "";
+        var resID = "";
+        var resMes  = "";
+        var threadTitle = '';
 
-		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
-			this._chainAboneNumbers.push(aNumber);
-			isAbone = true;
-			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
-				return "";
-			}
-		}
+        if(resArray.length > 5){
+            resName = resArray[1].replace(/<\/?b>|/g, "");
+            resMail = resArray[2];
+            resDate = resArray[3];
+            resMes = resArray[4];
+            threadTitle = resArray[5];
+            resID = resArray[6];
+        }
 
-			// JSでは "\" が特殊な意味を持つため、数値文字参照に変換
-		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
-		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
+        //2ch互換へと書き換える
+        aLine = [
+            resName,
+            resMail,
+            resDate + ' ID:' + resID,
+            resMes,
+            threadTitle
+        ].join('<>');
 
-		var resMailName = resName;
-		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
-
-
-			// レス番リンク処理 & 連鎖あぼーん
-			// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
-		var enableChainAbone = this._enableChainAbone;
-		var chainAboneNumbers = this._chainAboneNumbers;
-		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
-		var shouldChainAbone = false;
-		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
-			//アンカー番号解析
-			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
-			var ancNums = [];
-
-			ancStr.replace(/(:?\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
-				if(ancNumRange && !isNaN(ancNumRange)){
-					//範囲指定がないとき
-					ancNums.push(parseInt(ancNumRange));
-				}else{
-					//範囲指定があるとき
-					let [ancStart, ancEnd] = ancNumRange.split('-');
-					ancStart = parseInt(ancStart);
-					ancEnd = parseInt(ancEnd);
-
-					if(ancStart > 0 && ancEnd > 0){
-						let rangeArray = [];
-						for(let i = ancStart; i <= ancEnd; i++){
-							rangeArray.push(i);
-						}
-
-						ancNums.push(rangeArray);
-					}
-				}
-			});
-
-			//連鎖あぼーんの判定
-			if(enableChainAbone){
-				let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
-
-				shouldChainAbone = ancNumsFlattened.some(function(ancNum){
-					return chainAboneNumbers.indexOf(ancNum) !== -1;
-				});
-			}
-
-			//リンク処理
-			if(!fixInvalidAnchor){
-				return '<a href="#res' + ancNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
-			}else{
-				let links = [];
-
-				ancNums.forEach(function(ancNum){
-					if(ancNum instanceof Array){
-						links.push('<a href="#res' + ancNum[0] + '" class="resPointer">&gt;&gt;' +
-									ancNum[0] + '-' + ancNum[ancNum.length-1] + '</a>');
-					}else{
-						links.push('<a href="#res' + ancNum + '" class="resPointer">&gt;&gt;' + ancNum + '</a>');
-					}
-				});
-
-				return links.join(' ');
-			}
-		});
-
-		if(shouldChainAbone){
-			this._chainAboneNumbers.push(aNumber);
-			isAbone = true;
-			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
-				return "";
-			}
-		}
-
-			// 通常リンク処理
-		if(resMes.indexOf("ttp")!=-1){
-			var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
-			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
-		}
-
-			// スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
-		if(!this._headerResponded && resArray[5]!= ""){
-			this._headerResponded = true;
-			var title = resArray[5];
-			this.thread.title = UniConverter.fromSJIS(title);
-			var header = this.converter.getHeader(title);
-			this.write(header);
-			this._handler.response.flush();
-		}
-		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
-								resMailName, resDate, resID, resBeID, resMes, isAbone);
-		return response;
-	},
+        var superClass = Thread2ch.prototype.datLineParse;
+		return superClass.apply(this, [aLine, aNumber, aNew]);
+    },
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
 		if(!this._opened) return;
