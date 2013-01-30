@@ -149,7 +149,7 @@ ChaikaBoard.prototype = {
 	 * @return {String}
 	 */
 	getTitle: function ChaikaBoard_getTitle(){
-		return this.getSetting("BBS_TITLE")  || this.getMachiTitle() || this.getPageTitle() || this.url.spec;
+		return this.getSetting("BBS_TITLE") || this.getMachiTitle() || this.getPageTitle() || this.url.spec;
 	},
 
 
@@ -169,14 +169,29 @@ ChaikaBoard.prototype = {
 		return null;
 	},
 
-	getPageTitle: function(){
+
+	/**
+	 * 板のページタイトルをAjaxで取得する
+	 * @param {String} [encoding=UTF-8] ページのエンコーディング
+	 * @return {String} ページタイトル 取得できない場合はnullが返る
+	 */
+	getPageTitle: function(encoding){
 		try{
 			var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
 			req.open('GET', this.url.spec, false);
+			req.channel.contentCharset = encoding || 'UTF-8';
 			req.send(null);
 
 			if(req.status === 200 && req.responseText){
-				return req.responseText.match(/<title>(.*)<\/title>/i)[1];
+				let text = req.responseText;
+
+				//エンコーディングが違っていたらやり直す
+				let trueEncoding = text.match(/charset="?(.*?)"?\s*\/?\s*>/i);
+				if(!encoding && trueEncoding && trueEncoding[1].toUpperCase() != 'UTF-8'){
+					return this.getPageTitle(trueEncoding[1]);
+				}
+
+				return text.match(/<title>(.*)<\/title>/i)[1];
 			}
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
