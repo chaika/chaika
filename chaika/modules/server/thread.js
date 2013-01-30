@@ -815,7 +815,6 @@ ThreadJbbs.prototype = {
             resID = resArray[6];
         }
 
-        //2ch互換へと書き換える
         aLine = [
             resName,
             resMail,

@@ -67,7 +67,7 @@ const EX_HOSTS = [
 		"headline.2ch.net",
 		"newsnavi.2ch.net",
 		"headline.bbspink.com"
-	];
+];
 
 
 /**
@@ -145,11 +145,11 @@ ChaikaBoard.prototype = {
 
 	/**
 	 * 板のタイトルを SETTING.TXT から取得して返す。
-	 * 取得できない場合は、板の URL を返す。
+	 * 取得できない場合は、ページタイトル、板の URL の順で試行して返す。
 	 * @return {String}
 	 */
 	getTitle: function ChaikaBoard_getTitle(){
-		return this.getSetting("BBS_TITLE") || this.getMachiTitle() || this.url.spec;
+		return this.getSetting("BBS_TITLE")  || this.getMachiTitle() || this.getPageTitle() || this.url.spec;
 	},
 
 
@@ -162,6 +162,22 @@ ChaikaBoard.prototype = {
 				"resource://chaika-modules/machiBoardTitle.properties");
 		try{
 			return statusBundle.GetStringFromName(this.id);
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+
+		return null;
+	},
+
+	getPageTitle: function(){
+		try{
+			var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+			req.open('GET', this.url.spec, false);
+			req.send(null);
+
+			if(req.status === 200 && req.responseText){
+				return req.responseText.match(/<title>(.*)<\/title>/i)[1];
+			}
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 		}
