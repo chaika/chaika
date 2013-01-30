@@ -185,7 +185,7 @@ Thread2ch.prototype = {
 
 			// HTML ヘッダを送信したら true になる
 		this._headerResponded = false;
-		this._opend = true;
+		this._opened = true;
 		this.httpChannel = null;
 
 		try{
@@ -239,11 +239,11 @@ Thread2ch.prototype = {
 			// 取得済みログの送信
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
-			var lastLine = datLines.pop();
-			if(!lastLine) lastLine = datLines[datLines.length-1];  //最終行が空行だった時
+			datLines.pop();
 
-			this._logLineCount = parseInt(lastLine.match(/^(\d+)<>/)) || datLines.length;
+			this._logLineCount = datLines.length;
 
+			//単レス指定
 			if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
 				this._headerResponded = true;
 				var title = UniConverter.toSJIS(this.thread.title);
@@ -255,6 +255,7 @@ Thread2ch.prototype = {
 				this.close();
 				return;
 
+			//レス範囲指定
 			}else if(this.optionsEnd  && this.optionsEnd <= this._logLineCount){
 				this._headerResponded = true;
 				var title = UniConverter.toSJIS(this.thread.title);
@@ -332,7 +333,7 @@ Thread2ch.prototype = {
 			ChaikaCore.history.visitPage(this.thread.plainURL,
 					this.thread.threadID, this.thread.title, 1);
 		}
-		this._opend = false;
+		this._opened = false;
 		this._httpChannel = null;
 		this._handler.close();
 		this._handler = null;
@@ -587,14 +588,15 @@ Thread2ch.prototype = {
 		this._bInputStream = Cc["@mozilla.org/binaryinputstream;1"]
 					.createInstance(Ci.nsIBinaryInputStream);
 		this._data = new Array();
-		this._datBuffer = "";
+		this._dataBuffer = '';
 	},
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
-		if(!this._opend) return;
+		if(!this._opened) return;
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		var httpStatus = aRequest.responseStatus;
+
 			// 必要な情報がないなら終了
 		if(!(httpStatus==200 || httpStatus==206)) return;
 		if(aCount == 0) return;
@@ -623,30 +625,33 @@ Thread2ch.prototype = {
 			}
 		}
 
-			// NULL 文字
+		// NULL 文字を変換
 		availableData = availableData.replace(/\x00/g, "*");
-			// 変換前の DAT を保存しておく
+
+		// 送られてきたデータを追加
 		this._data.push(availableData);
 
-		availableData = this._datBuffer + availableData;
+		//前回のバッファと結合
+		availableData = this._dataBuffer + availableData;
 
-			// 改行を含まないならバッファに追加して終了
-		if(!availableData.match(/\n/)){
-			this._datBuffer = availableData;
-			return;
-		}
+        //データの最後にあるレスの断片をバッファに追加する
+        this._dataBuffer = availableData.replace(/.*\n/g, '');
 
-		var that = this;
-		this._datBuffer = availableData.replace(/.*?\n/g, function (line, idx, old) {
-			if(that.thread.lineCount < that._logLineCount) return "";
+        //受信したデータを書き出す
+		var lines = availableData.split(/\n/);
 
-			that.write(that.datLineParse(line.substring(0, line.length-1), ++that.thread.lineCount, true) + "\n");
-			return "";
-		});
+		//最後の空要素、または\nのないレス断片をカットする
+		lines.pop();
+
+		lines.forEach(function(line){
+			if(this.thread.lineCount < this._logLineCount) return;
+
+			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
+		}, this);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
-		if(!this._opend) return;
+		if(!this._opened) return;
 
 		this._bInputStream = null;
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
@@ -700,13 +705,6 @@ Thread2ch.prototype = {
 			this.write(this.converter.getFooter("not_modified"));
 			this.close();
 			return;
-		}
-
-		if(this._datBuffer){
-			this.thread.lineCount++;
-			this._datBuffer = this.thread.lineCount +"\t: "+ this._datBuffer;
-			this.write(this._datBuffer);
-			this._datBuffer = "";
 		}
 
 		if(httpStatus == 200 || httpStatus == 206){
@@ -799,7 +797,6 @@ ThreadJbbs.prototype = {
 		var line = UniConverter.fromEUC(aLine);
 		line = UniConverter.toSJIS(line);
 		var resArray = line.split("<>");
-		aNumber = parseInt(resArray[0]);
 		var resNumber = aNumber;
 		var resName = "BROKEN";
 		var resMail = "";
@@ -922,8 +919,81 @@ ThreadJbbs.prototype = {
 		return response;
 	},
 
+	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
+		if(!this._opened) return;
+
+		aRequest.QueryInterface(Ci.nsIHttpChannel);
+		var httpStatus = aRequest.responseStatus;
+
+			// 必要な情報がないなら終了
+		if(!(httpStatus==200 || httpStatus==206)) return;
+		if(aCount == 0) return;
+
+		this._bInputStream.setInputStream(aInputStream);
+
+		var availableData = "";
+		if(!this._aboneChecked){
+			var firstChar = this._bInputStream.readBytes(1)
+			availableData = this._bInputStream.readBytes(aCount - 1);
+			if(firstChar.charCodeAt(0) != 10){
+				this._threadAbone = true;
+			}
+
+		}else{
+			availableData = this._bInputStream.readBytes(aCount);
+		}
+		this._aboneChecked = true;
+
+		// NULL 文字を変換
+		availableData = availableData.replace(/\x00/g, "*");
+
+		//受信したデータをレスごとに分割
+		//最後にレス断片が付いている場合にはそれをバッファに追加する
+		var _lines = availableData.split("\n");
+		this._dataBuffer = _lines.pop();
+
+		//レス断片のみの場合にはバッファに入れるだけで終了する
+		if(!_lines.length) return;
+
+		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
+		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
+		let lines = [];  //空白挿入後のdatLines
+
+		_lines.forEach(function(line){
+			var resNum = parseInt(line.match(/^(\d+)<>/));
+			if(!resNum) return;
+
+			//透明あぼーんの分だけ空行を挿入
+			while(lineCount < resNum){
+				lineCount++;
+				lines.push('');
+			}
+
+			lineCount++;
+			lines.push(line);
+		});
+
+		availableData = lines.join('\n') + '\n';
+
+		// 送られてきたデータを追加
+		this._data.push(availableData);
+
+		//前回のバッファと結合
+		availableData = this._dataBuffer + availableData;
+
+        //受信したデータを書き出す
+		var lines = availableData.split(/\n/);
+		lines.pop();
+
+		lines.forEach(function(line){
+			if(this.thread.lineCount < this._logLineCount) return;
+
+			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
+		}, this);
+	},
+
 	onStopRequest: function(aRequest, aContext, aStatus){
-		if(!this._opend) return;
+		if(!this._opened) return;
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
 		var httpStatus = aRequest.responseStatus;
@@ -946,33 +1016,13 @@ ThreadJbbs.prototype = {
 				return;
 		}
 
-		if(this._datBuffer){
-			this.thread.lineCount++;
-			this._datBuffer = this.thread.lineCount +"\t: "+ this._datBuffer;
-			this.write(this._datBuffer);
-			this._datBuffer = "";
-		}
-
 		if(httpStatus == 200 || httpStatus == 206){
 			this.datSave(this._data.join(""));
 		}
 		this.write(this.converter.getFooter("ok"));
 		this.close();
 		this._data = null;
-	},
-
- 	datSave: function(aDatContent){
-		if(aDatContent){
-				// サーバ側透明あぼーんにより DAT 行数と最終レスナンバーが
-				// 一致しないことがあるため、行数を最終レスのナンバーから取得
-			var lines = aDatContent.split("\n");
-			var lastLine = lines.pop(); // 多分空行
-			if(!lastLine) lastLine = lines.pop();
-			this.thread.lineCount = parseInt(lastLine.match(/^\d+/));
-		}
-		var superClass = Thread2ch.prototype.datSave;
-		return superClass.apply(this, arguments);
- 	}
+	}
 };
 
 ThreadJbbs.prototype.__proto__ = Thread2ch.prototype;
@@ -1011,20 +1061,78 @@ ThreadMachi.prototype = {
 		return superClass.apply(this, [resArray.join("<>"), trueNumber, aNew]);
  	},
 
+	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
+		if(!this._opened) return;
 
- 	datSave: function(aDatContent){
-		if(aDatContent){
-				// サーバ側透明あぼーんにより DAT 行数と最終レスナンバーが
-				// 一致しないことがあるため、行数を最終レスのナンバーから取得
-			var lines = aDatContent.split("\n");
-			var lastLine = lines.pop(); // 多分空行
-			if(!lastLine) lastLine = lines.pop();
-			this.thread.lineCount = parseInt(lastLine.match(/^\d+/));
+		aRequest.QueryInterface(Ci.nsIHttpChannel);
+		var httpStatus = aRequest.responseStatus;
+
+			// 必要な情報がないなら終了
+		if(!(httpStatus==200 || httpStatus==206)) return;
+		if(aCount == 0) return;
+
+		this._bInputStream.setInputStream(aInputStream);
+
+		var availableData = "";
+		if(!this._aboneChecked){
+			var firstChar = this._bInputStream.readBytes(1)
+			availableData = this._bInputStream.readBytes(aCount - 1);
+			if(firstChar.charCodeAt(0) != 10){
+				this._threadAbone = true;
+			}
+
+		}else{
+			availableData = this._bInputStream.readBytes(aCount);
 		}
-		var superClass = Thread2ch.prototype.datSave;
-		return superClass.apply(this, arguments);
-	}
+		this._aboneChecked = true;
 
+		// NULL 文字を変換
+		availableData = availableData.replace(/\x00/g, "*");
+
+		//受信したデータをレスごとに分割
+		//最後にレス断片が付いている場合にはそれをバッファに追加する
+		var _lines = availableData.split("\n");
+		this._dataBuffer = _lines.pop();
+
+		//レス断片のみの場合にはバッファに入れるだけで終了する
+		if(!_lines.length) return;
+
+		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
+		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
+		let lines = [];  //空白挿入後のdatLines
+
+		_lines.forEach(function(line){
+			var resNum = parseInt(line.match(/^(\d+)<>/));
+			if(!resNum) return;
+
+			//透明あぼーんの分だけ空行を挿入
+			while(lineCount < resNum){
+				lineCount++;
+				lines.push('');
+			}
+
+			lineCount++;
+			lines.push(line);
+		});
+
+		availableData = lines.join('\n') + '\n';
+
+		// 送られてきたデータを追加
+		this._data.push(availableData);
+
+		//前回のバッファと結合
+		availableData = this._dataBuffer + availableData;
+
+        //受信したデータを書き出す
+		var lines = availableData.split(/\n/);
+		lines.pop();
+
+		lines.forEach(function(line){
+			if(this.thread.lineCount < this._logLineCount) return;
+
+			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
+		}, this);
+	}
 };
 
 ThreadMachi.prototype.__proto__ = Thread2ch.prototype;
