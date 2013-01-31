@@ -664,8 +664,6 @@ Thread2ch.prototype = {
 
 			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
 		}, this);
-
-		ChaikaCore.logger.debug('lineCount: ' + this.thread.lineCount);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
@@ -849,10 +847,11 @@ ThreadJbbs.prototype = {
 		if(!this._opened) return;
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
+
 		var httpStatus = aRequest.responseStatus;
 
-			// 必要な情報がないなら終了
-		if(!(httpStatus==200 || httpStatus==206)) return;
+		// 通信失敗の場合は終了
+		if(!(httpStatus == 200 || httpStatus == 206)) return;
 		if(aCount == 0) return;
 
 		this._bInputStream.setInputStream(aInputStream);
@@ -1004,10 +1003,11 @@ ThreadMachi.prototype = {
 		if(!this._opened) return;
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
+
 		var httpStatus = aRequest.responseStatus;
 
-			// 必要な情報がないなら終了
-		if(!(httpStatus==200 || httpStatus==206)) return;
+		// 通信失敗の場合は終了
+		if(!(httpStatus == 200 || httpStatus == 206)) return;
 		if(aCount == 0) return;
 
 		this._bInputStream.setInputStream(aInputStream);
