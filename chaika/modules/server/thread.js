@@ -204,7 +204,7 @@ Thread2ch.prototype = {
 			if(ex == Components.results.NS_ERROR_FILE_NOT_FOUND){
 				var skinName = ChaikaCore.pref.getUniChar("thread_skin");
 
-			    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+				var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
 						.getService(Ci.nsIStringBundleService);
 				var statusBundle = strBundleService.createBundle(
 						"resource://chaika-modules/server/thread-status.properties");
@@ -236,7 +236,7 @@ Thread2ch.prototype = {
 		//取得済みログの件数
 		this._logLineCount = 0;
 
-		//新たにダウンロードしたログの内、すでに取得済みのログの件数
+		//ダウンロードしたログの範囲で、すでに取得済みのログの件数
 		this._readLogCount = 0;
 
 		// 取得済みログの送信
@@ -386,7 +386,7 @@ Thread2ch.prototype = {
 
 		if(resName.indexOf("<") != -1){
 			resName =  resName.replace("</b>", "<span class=\"resSystem\">", "g")
-							.replace("<b>", "</span>", "g");;
+							.replace("<b>", "</span>", "g");
 		}
 
 
@@ -639,11 +639,11 @@ Thread2ch.prototype = {
 		//前回のバッファと結合
 		availableData = this._dataBuffer + availableData;
 
-        //データの最後にあるレスの断片をバッファに追加する
-        this._dataBuffer = availableData.replace(/.*\n/g, '');
+		//データの最後にあるレスの断片をバッファに追加する
+		this._dataBuffer = availableData.replace(/.*\n/g, '');
 
 
-        //受信したデータを書き出す
+		//受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 
 		//最後の空要素、または\nのないレス断片をカットする
@@ -756,7 +756,7 @@ Thread2ch.prototype = {
 	_alertGotLog: function(){
 		if(!ChaikaCore.pref.getBool("thread_alert_got_log")) return;
 
-	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+		var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
 				.getService(Ci.nsIStringBundleService);
 		var statusBundle = strBundleService.createBundle(
 				"resource://chaika-modules/server/thread-status.properties");
@@ -807,41 +807,41 @@ ThreadJbbs.prototype = {
 	},
 
 	datLineParse: function(aLine, aNumber, aNew){
-        if(!aLine) return "";
+		if(!aLine) return "";
 
-        // EUC-JP から SJIS へ変換
-        var line = UniConverter.fromEUC(aLine);
-        line = UniConverter.toSJIS(line);
+		// EUC-JP から SJIS へ変換
+		var line = UniConverter.fromEUC(aLine);
+		line = UniConverter.toSJIS(line);
 
-        //2ch互換へと変換
-        var resArray = line.split("<>");
-        var resName = "";
-        var resMail = "";
-        var resDate = "";
-        var resID = "";
-        var resMes  = "";
-        var threadTitle = '';
+		//2ch互換へと変換
+		var resArray = line.split("<>");
+		var resName = "";
+		var resMail = "";
+		var resDate = "";
+		var resID = "";
+		var resMes  = "";
+		var threadTitle = '';
 
-        if(resArray.length > 5){
-            resName = resArray[1].replace(/<\/?b>|/g, "");
-            resMail = resArray[2];
-            resDate = resArray[3];
-            resMes = resArray[4];
-            threadTitle = resArray[5];
-            resID = resArray[6];
-        }
+		if(resArray.length > 5){
+			resName = resArray[1].replace(/<\/?b>|/g, "");
+			resMail = resArray[2];
+			resDate = resArray[3];
+			resMes = resArray[4];
+			threadTitle = resArray[5];
+			resID = resArray[6];
+		}
 
-        aLine = [
-            resName,
-            resMail,
-            resDate + ' ID:' + resID,
-            resMes,
-            threadTitle
-        ].join('<>');
+		aLine = [
+			resName,
+			resMail,
+			resDate + ' ID:' + resID,
+			resMes,
+			threadTitle
+		].join('<>');
 
-        var superClass = Thread2ch.prototype.datLineParse;
+		var superClass = Thread2ch.prototype.datLineParse;
 		return superClass.apply(this, [aLine, aNumber, aNew]);
-    },
+	},
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
 		if(!this._opened) return;
@@ -909,7 +909,7 @@ ThreadJbbs.prototype = {
 		availableData = this._dataBuffer + availableData;
 
 
-        //受信したデータを書き出す
+		//受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 		lines.pop();
 
@@ -997,7 +997,7 @@ ThreadMachi.prototype = {
 		var trueNumber = parseInt(resArray.shift());
 		var superClass = Thread2ch.prototype.datLineParse;
 		return superClass.apply(this, [resArray.join("<>"), trueNumber, aNew]);
- 	},
+	},
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
 		if(!this._opened) return;
@@ -1065,7 +1065,7 @@ ThreadMachi.prototype = {
 		availableData = this._dataBuffer + availableData;
 
 
-        //受信したデータを書き出す
+		//受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 		lines.pop();
 
@@ -1282,7 +1282,7 @@ b2rThreadConverter.prototype = {
 	},
 
 	getStatusText: function(aStatus){
-	    var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+		var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
 					.getService(Ci.nsIStringBundleService);
 		var statusBundle = strBundleService.createBundle(
 					"resource://chaika-modules/server/thread-status.properties");
