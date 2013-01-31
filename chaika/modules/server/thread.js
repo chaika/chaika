@@ -236,12 +236,16 @@ Thread2ch.prototype = {
 		//取得済みログの件数
 		this._logLineCount = 0;
 
-			// 取得済みログの送信
+		//新たにダウンロードしたログの内、すでに取得済みのログの件数
+		this._readLogCount = 0;
+
+		// 取得済みログの送信
 		if(this.thread.datFile.exists()){
 			var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
 			datLines.pop();
 
 			this._logLineCount = datLines.length;
+			this._readLogCount = this._logLineCount;
 
 			//単レス指定
 			if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
@@ -595,10 +599,11 @@ Thread2ch.prototype = {
 		if(!this._opened) return;
 
 		aRequest.QueryInterface(Ci.nsIHttpChannel);
+
 		var httpStatus = aRequest.responseStatus;
 
-			// 必要な情報がないなら終了
-		if(!(httpStatus==200 || httpStatus==206)) return;
+		// 通信失敗の場合は終了
+		if(!(httpStatus == 200 || httpStatus == 206)) return;
 		if(aCount == 0) return;
 
 		this._bInputStream.setInputStream(aInputStream);
@@ -617,7 +622,7 @@ Thread2ch.prototype = {
 		this._aboneChecked = true;
 
 
-		if(this._maruMode && !this._mimizunMode &&  this._data.length == 0){
+		if(this._maruMode && !this._mimizunMode && this._data.length == 0){
 			if(availableData.match(/\n/)){
 				availableData = RegExp.rightContext;
 			}else{
@@ -628,7 +633,7 @@ Thread2ch.prototype = {
 		// NULL 文字を変換
 		availableData = availableData.replace(/\x00/g, "*");
 
-		// 送られてきたデータを追加
+		// 送られてきたデータを保存用配列に追加
 		this._data.push(availableData);
 
 		//前回のバッファと結合
@@ -637,17 +642,30 @@ Thread2ch.prototype = {
         //データの最後にあるレスの断片をバッファに追加する
         this._dataBuffer = availableData.replace(/.*\n/g, '');
 
+
         //受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 
 		//最後の空要素、または\nのないレス断片をカットする
 		lines.pop();
 
+		//ステータスが206 Partial Contentの場合、
+		//受信したデータの中に既読レスは含まれない
+		if(this._readLogCount && httpStatus == 206){
+			this._readLogCount = 0;
+		}
+
 		lines.forEach(function(line){
-			if(this.thread.lineCount < this._logLineCount) return;
+			//既読レスは書き出さない
+			if(this._readLogCount > 0){
+				this._readLogCount--;
+				return;
+			}
 
 			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
 		}, this);
+
+		ChaikaCore.logger.debug('lineCount: ' + this.thread.lineCount);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
@@ -863,6 +881,7 @@ ThreadJbbs.prototype = {
 		//レス断片のみの場合にはバッファに入れるだけで終了する
 		if(!_lines.length) return;
 
+
 		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
 		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
 		let lines = [];  //空白挿入後のdatLines
@@ -883,18 +902,30 @@ ThreadJbbs.prototype = {
 
 		availableData = lines.join('\n') + '\n';
 
+
 		// 送られてきたデータを追加
 		this._data.push(availableData);
 
 		//前回のバッファと結合
 		availableData = this._dataBuffer + availableData;
 
+
         //受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 		lines.pop();
 
+		//ステータスが206 Partial Contentの場合、
+		//受信したデータの中に既読レスは含まれない
+		if(this._readLogCount && httpStatus == 206){
+			this._readLogCount = 0;
+		}
+
 		lines.forEach(function(line){
-			if(this.thread.lineCount < this._logLineCount) return;
+			//既読レスは書き出さない
+			if(this._readLogCount > 0){
+				this._readLogCount--;
+				return;
+			}
 
 			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
 		}, this);
@@ -1005,6 +1036,7 @@ ThreadMachi.prototype = {
 		//レス断片のみの場合にはバッファに入れるだけで終了する
 		if(!_lines.length) return;
 
+
 		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
 		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
 		let lines = [];  //空白挿入後のdatLines
@@ -1025,18 +1057,30 @@ ThreadMachi.prototype = {
 
 		availableData = lines.join('\n') + '\n';
 
+
 		// 送られてきたデータを追加
 		this._data.push(availableData);
 
 		//前回のバッファと結合
 		availableData = this._dataBuffer + availableData;
 
+
         //受信したデータを書き出す
 		var lines = availableData.split(/\n/);
 		lines.pop();
 
+		//ステータスが206 Partial Contentの場合、
+		//受信したデータの中に既読レスは含まれない
+		if(this._readLogCount && httpStatus == 206){
+			this._readLogCount = 0;
+		}
+
 		lines.forEach(function(line){
-			if(this.thread.lineCount < this._logLineCount) return;
+			//既読レスは書き出さない
+			if(this._readLogCount > 0){
+				this._readLogCount--;
+				return;
+			}
 
 			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
 		}, this);
