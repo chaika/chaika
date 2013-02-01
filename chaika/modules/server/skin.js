@@ -76,6 +76,7 @@ SkinServerScript.prototype = {
 			var lastModified = parseInt(new Date(skinFile.lastModifiedTime).getTime() / 1000);
 			var ifLastModified = parseInt(new Date(
 					aServerHandler.request.headers["If-Modified-Since"]).getTime() / 1000);
+
 			if(lastModified == ifLastModified){
 				aServerHandler.response.writeHeaders(304);
 				aServerHandler.close();
@@ -83,15 +84,23 @@ SkinServerScript.prototype = {
 			}
 		}
 
-		var mimeService = Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
-				.getService(Ci.nsIMIMEService);
-		var contentType = mimeService.getTypeFromFile(skinFile);
+		//Content-Typeの設定
+		var contentType = 'text/plain';
+		try{
+			let mimeService = Cc["@mozilla.org/uriloader/external-helper-app-service;1"]
+					.getService(Ci.nsIMIMEService);
+			contentType = mimeService.getTypeFromFile(skinFile);
+		}catch(ex){}
 		aServerHandler.response.setHeader("Content-Type", contentType);
+
 		aServerHandler.response.writeHeaders(200);
+
+		//ファイル送信
 		var fileStream = Cc["@mozilla.org/network/file-input-stream;1"]
 				.createInstance(Ci.nsIFileInputStream);
 		fileStream.init(skinFile, 0x01, 0444, fileStream.CLOSE_ON_EOF);
 		aServerHandler.response.stream.writeFrom(fileStream, skinFile.fileSize);
+
 		fileStream.close();
 		aServerHandler.close();
 	},
