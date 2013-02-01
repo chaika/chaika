@@ -789,9 +789,11 @@ ThreadJbbs.prototype = {
 		var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "rawmode.cgi");
 		this._aboneChecked = true;
 		this._threadAbone = false;
+		this._deltaMode = false;
 
-			// 差分GET
+		// 差分GET
 		if(this.thread.datFile.exists() && this.thread.lineCount){
+			this._deltaMode = true;
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
 
@@ -906,9 +908,8 @@ ThreadJbbs.prototype = {
 		});
 
 
-		//ステータスが206 Partial Contentの場合、
-		//受信したデータの中に既読レスは含まれない
-		if(this._readLogCount && httpStatus == 206){
+		//差分取得の場合は受信したデータの中に既読レスは含まれない
+		if(this._readLogCount && (httpStatus == 206 || this._deltaMode)){
 			this._readLogCount = 0;
 		}
 
@@ -973,9 +974,11 @@ ThreadMachi.prototype = {
 		var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi");
 		this._aboneChecked = true;
 		this._threadAbone = false;
+		this._deltaMode = false;
 
-				// 差分GET
+		// 差分GET
 		if(this.thread.datFile.exists() && this.thread.lineCount){
+			this._deltaMode = true;
 			datURLSpec += (this.thread.lineCount + 1) + "-";
 		}
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
