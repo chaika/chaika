@@ -831,7 +831,7 @@ ThreadJbbs.prototype = {
 			resID = resArray[6];
 		}
 
-		aLine = [
+		line = [
 			resName,
 			resMail,
 			resDate + ' ID:' + resID,
@@ -840,7 +840,7 @@ ThreadJbbs.prototype = {
 		].join('<>');
 
 		var superClass = Thread2ch.prototype.datLineParse;
-		return superClass.apply(this, [aLine, aNumber, aNew]);
+		return superClass.apply(this, [line, aNumber, aNew]);
 	},
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
@@ -872,22 +872,28 @@ ThreadJbbs.prototype = {
 		// NULL 文字を変換
 		availableData = availableData.replace(/\x00/g, "*");
 
+
+		//前回のバッファと結合し、受信データ先頭のレス断片を解消する
+		availableData = this._dataBuffer + availableData;
+
 		//受信したデータをレスごとに分割
 		//最後にレス断片が付いている場合にはそれをバッファに追加する
 		var _lines = availableData.split("\n");
 		this._dataBuffer = _lines.pop();
 
-		//レス断片のみの場合にはバッファに入れるだけで終了する
-		if(!_lines.length) return;
+		//もしレス断片しかない場合にはここで終了
+		if(!_lines.length){
+			return;
+		}
 
 
-		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
+		//datを2ch互換に変換する
 		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
 		let lines = [];  //空白挿入後のdatLines
 
+		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
 		_lines.forEach(function(line){
 			var resNum = parseInt(line.match(/^(\d+)<>/));
-			if(!resNum) return;
 
 			//透明あぼーんの分だけ空行を挿入
 			while(lineCount < resNum){
@@ -899,19 +905,6 @@ ThreadJbbs.prototype = {
 			lines.push(line);
 		});
 
-		availableData = lines.join('\n') + '\n';
-
-
-		// 送られてきたデータを追加
-		this._data.push(availableData);
-
-		//前回のバッファと結合
-		availableData = this._dataBuffer + availableData;
-
-
-		//受信したデータを書き出す
-		var lines = availableData.split(/\n/);
-		lines.pop();
 
 		//ステータスが206 Partial Contentの場合、
 		//受信したデータの中に既読レスは含まれない
@@ -919,6 +912,7 @@ ThreadJbbs.prototype = {
 			this._readLogCount = 0;
 		}
 
+		//データをブラウザに書き出す
 		lines.forEach(function(line){
 			//既読レスは書き出さない
 			if(this._readLogCount > 0){
@@ -928,6 +922,10 @@ ThreadJbbs.prototype = {
 
 			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
 		}, this);
+
+
+		//変換後の受信データを保存用配列に追加
+		this._data.push(lines.join('\n') + '\n');
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
@@ -1000,90 +998,7 @@ ThreadMachi.prototype = {
 	},
 
 	onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
-		if(!this._opened) return;
-
-		aRequest.QueryInterface(Ci.nsIHttpChannel);
-
-		var httpStatus = aRequest.responseStatus;
-
-		// 通信失敗の場合は終了
-		if(!(httpStatus == 200 || httpStatus == 206)) return;
-		if(aCount == 0) return;
-
-		this._bInputStream.setInputStream(aInputStream);
-
-		var availableData = "";
-		if(!this._aboneChecked){
-			var firstChar = this._bInputStream.readBytes(1)
-			availableData = this._bInputStream.readBytes(aCount - 1);
-			if(firstChar.charCodeAt(0) != 10){
-				this._threadAbone = true;
-			}
-
-		}else{
-			availableData = this._bInputStream.readBytes(aCount);
-		}
-		this._aboneChecked = true;
-
-		// NULL 文字を変換
-		availableData = availableData.replace(/\x00/g, "*");
-
-		//受信したデータをレスごとに分割
-		//最後にレス断片が付いている場合にはそれをバッファに追加する
-		var _lines = availableData.split("\n");
-		this._dataBuffer = _lines.pop();
-
-		//レス断片のみの場合にはバッファに入れるだけで終了する
-		if(!_lines.length) return;
-
-
-		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
-		let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
-		let lines = [];  //空白挿入後のdatLines
-
-		_lines.forEach(function(line){
-			var resNum = parseInt(line.match(/^(\d+)<>/));
-			if(!resNum) return;
-
-			//透明あぼーんの分だけ空行を挿入
-			while(lineCount < resNum){
-				lineCount++;
-				lines.push('');
-			}
-
-			lineCount++;
-			lines.push(line);
-		});
-
-		availableData = lines.join('\n') + '\n';
-
-
-		// 送られてきたデータを追加
-		this._data.push(availableData);
-
-		//前回のバッファと結合
-		availableData = this._dataBuffer + availableData;
-
-
-		//受信したデータを書き出す
-		var lines = availableData.split(/\n/);
-		lines.pop();
-
-		//ステータスが206 Partial Contentの場合、
-		//受信したデータの中に既読レスは含まれない
-		if(this._readLogCount && httpStatus == 206){
-			this._readLogCount = 0;
-		}
-
-		lines.forEach(function(line){
-			//既読レスは書き出さない
-			if(this._readLogCount > 0){
-				this._readLogCount--;
-				return;
-			}
-
-			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
-		}, this);
+		return ThreadJbbs.prototype.onDataAvailable.apply(this, arguments);
 	}
 };
 
