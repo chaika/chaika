@@ -4,7 +4,7 @@
 
 	<Description about="urn:mozilla:install-manifest"
 			em:name="chaika"
-			em:version="1.5.7"
+			em:version="1.5.8"
 			em:description="2ch.net(Japanese Web Forums) Browser"
 			em:id="chaika@chaika.xrea.jp"
 			em:unpack="true"
