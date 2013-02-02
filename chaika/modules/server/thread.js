@@ -467,7 +467,7 @@ Thread2ch.prototype = {
 			if(enableChainAbone){
 				let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
 
-				shouldChainAbone = ancNumsFlattened.some(function(ancNum){
+				shouldChainAbone = shouldChainAbone || ancNumsFlattened.some(function(ancNum){
 					return chainAboneNumbers.indexOf(ancNum) !== -1;
 				});
 			}
