@@ -440,19 +440,28 @@ Thread2ch.prototype = {
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//アンカー番号解析
 			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
+			//最大500個に制限する
 			var ancNums = [];
 
 			ancStr.replace(/(?:\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
 				if(ancNumRange && !isNaN(ancNumRange)){
 					//範囲指定がないとき
-					ancNums.push(parseInt(ancNumRange));
+					if(ancNums.length < 500){
+						ancNums.push(parseInt(ancNumRange));
+					}
 				}else{
 					//範囲指定があるとき
 					let [ancStart, ancEnd] = ancNumRange.split('-');
 					ancStart = parseInt(ancStart);
 					ancEnd = parseInt(ancEnd);
 
-					if(ancStart > 0 && ancEnd > 0){
+					if(0 < ancStart && 0 < ancEnd && ancNums.length < 500){
+						//最大の範囲を500に制限する
+						if((ancEnd - ancStart + 1) > 500){
+							ancEnd = ancStart + 499;
+						}
+
+						//配列に落としこむ
 						let rangeArray = [];
 						for(let i = ancStart; i <= ancEnd; i++){
 							rangeArray.push(i);
