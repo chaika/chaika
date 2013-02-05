@@ -307,7 +307,7 @@ var FormPage = {
 		}
 		this.sageCheck();
 		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
-		this._p2Check.checked = ChaikaP2Login.isLoggedIn() && this._p2Check.checked;
+		this._p2Check.checked = ChaikaP2Login.isLoggedIn() && ChaikaP2Login.enabled;
 
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
@@ -332,7 +332,38 @@ var FormPage = {
 		this._firstShow = false;
 	},
 
-	_setPost: function(){
+
+	pageAdvanced: function FormPage_pageAdvanced(aEvent){
+		var title   = this._titleForm.value;
+		var name    = this._nameForm.value;
+		var mail    = this._mailForm.value;
+		var message = this._messeageForm.value;
+
+		if(FormPage._sageCheck.checked){
+			if(mail == ""){
+				mail = "sage";
+			}else if(mail.toLowerCase().indexOf("sage") == -1){
+				mail += " sage";
+			}
+		}
+
+		gPost.setPostData(title, name, mail, message);
+
+		var errorMessages = gPost.getErrorMessages();
+		if(errorMessages.length > 0){
+			gWizard.canAdvance = false;
+			Notification.removeAll(true);
+			Notification.warning(errorMessages[0]);
+			setTimeout("gWizard.canAdvance = true;", 750);
+		}else{
+			Notification.removeAll(false);
+			return true;
+		}
+		return false;
+	},
+
+
+	_setPost: function FormPage__setPost(){
 		gPost = null;
 
 		if(gWizType == WIZ_TYPE_RES){
@@ -365,36 +396,6 @@ var FormPage = {
 				}
 			}
 		}
-	},
-
-
-	pageAdvanced: function FormPage_pageAdvanced(aEvent){
-		var title   = this._titleForm.value;
-		var name    = this._nameForm.value;
-		var mail    = this._mailForm.value;
-		var message = this._messeageForm.value;
-
-		if(FormPage._sageCheck.checked){
-			if(mail == ""){
-				mail = "sage";
-			}else if(mail.toLowerCase().indexOf("sage") == -1){
-				mail += " sage";
-			}
-		}
-
-		gPost.setPostData(title, name, mail, message);
-
-		var errorMessages = gPost.getErrorMessages();
-		if(errorMessages.length > 0){
-			gWizard.canAdvance = false;
-			Notification.removeAll(true);
-			Notification.warning(errorMessages[0]);
-			setTimeout("gWizard.canAdvance = true;", 750);
-		}else{
-			Notification.removeAll(false);
-			return true;
-		}
-		return false;
 	},
 
 
@@ -461,15 +462,18 @@ var FormPage = {
 
 	toggleP2Login: function FormPage_toggleP2Login(){
 		if(FormPage._p2Check.checked){
+			ChaikaP2Login.enabled = false;
 			FormPage._p2Check.checked = false;
 
 			if(ChaikaP2Login.isLoggedIn()){
+				ChaikaP2Login.enabled = true;
 				FormPage._p2Check.checked = true;
 				FormPage._setPost();
 			}else{
 				ChaikaP2Login.login();
 			}
 		}else{
+			ChaikaP2Login.enabled = false;
 			FormPage._p2Check.checked = false;
 			FormPage._setPost();
 		}
@@ -479,6 +483,7 @@ var FormPage = {
 		observe: function(aSubject, aTopic, aData){
 			//ログイン成功時
 			if(aTopic == "ChaikaP2Login:Login" && aData == "OK"){
+				ChaikaP2Login.enabled = true;
 				FormPage._p2Check.checked = true;
 				FormPage._setPost();
 			}
@@ -487,12 +492,14 @@ var FormPage = {
 			if(aTopic == "ChaikaP2Login:Login" && aData == "NG"){
 				alert("p2へのログインに失敗しました。\n" +
 						"IDとパスワードを確認してください。");
+				ChaikaP2Login.enabled = false;
 				FormPage._p2Check.checked = false;
 				FormPage._setPost();
 			}
 
 			//ログアウト
 			if(aTopic == "ChaikaP2Login:Logout" && aData == "OK"){
+				ChaikaP2Login.enabled = false;
 				FormPage._p2Check.checked = false;
 				FormPage._setPost();
 			}

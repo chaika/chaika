@@ -156,6 +156,9 @@ var ChaikaP2Login = {
 	//p2にログインしているかどうか
 	_loggedIn: false,
 
+	//p2での書き込みを有効にするかどうか
+	enabled: false,
+
 	get cookieManager(){
 		if(!this._cookieManager)
 			this._cookieManager = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2);
