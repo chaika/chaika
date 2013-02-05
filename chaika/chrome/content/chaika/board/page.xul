@@ -32,7 +32,7 @@
 	<marblebuttongroup id="filterGroup" value="0" persist2="value">
 		<marblebutton label="すべて"  value="0"   oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
 		<marblebutton label="TOP200"  value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="購読中"  value="-2"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+		<marblebutton label="既読"  value="-2"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
 		<marblebutton label="DAT落ち" value="-1"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
 	</marblebuttongroup>
 
