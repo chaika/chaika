@@ -16,6 +16,10 @@
 				onchange="setCcontainerDisabled(this.name, 'boxDataDir', true)"/>
 		<preference id="extensions.chaika.data_dir"
 				name="extensions.chaika.data_dir" type="unichar"/>
+		<preference id="extensions.chaika.login.p2.id" type="string"
+				name="extensions.chaika.login.p2.id"/>
+		<preference id="extensions.chaika.login.p2.password" type="string"
+				name="extensions.chaika.login.p2.password"/>
 	</preferences>
 
 	<script type="application/x-javascript; version=1.7"
@@ -50,6 +54,29 @@
 					<button id="btnDataDirSelect" label="設定..."
 								oncommand="gGeneralPane.openMaruDialog()"/>
 				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description">p2.2ch.net :</description>
+				<hbox align="start">
+					<grid style="min-height: auto;">
+						<columns>
+							<column />
+							<column width="200"/>
+						</columns>
+						<rows>
+							<row>
+								<label value="ID " style="text-align:right;"/>
+								<textbox preference="extensions.chaika.login.p2.id"/>
+							</row>
+							<row>
+								<label value="Pass " style="text-align:right;"/>
+								<textbox type="password"
+									preference="extensions.chaika.login.p2.password"/>
+							</row>
+						</rows>
+					</grid>
+				</hbox>
 			</row>
 
 			<row class="setting-row">

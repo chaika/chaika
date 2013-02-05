@@ -139,6 +139,8 @@ function startup(){
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login", false);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout", false);
+	os.addObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Login", false);
+	os.addObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Logout", false);
 
 	if(gBoard.type == ChaikaBoard.BOARD_TYPE_2CH && !gBoard.settingFile.exists()){
 		gWizard.goTo("boardSettingPage");
@@ -161,6 +163,8 @@ function shutdown(){
 	try{
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
+		os.removeObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Login");
+		os.removeObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Logout");
 	}catch(ex){
 	}
 	FormPage.addFormHistory();
@@ -291,6 +295,7 @@ var FormPage = {
 		this._sageCheck = document.getElementById("sageCheck");
 		this._messeageForm = document.getElementById("messeageForm");
 		this._beCheck = document.getElementById("beCheck");
+		this._p2Check = document.getElementById("p2Check");
 
 		this.setUseAAFont();
 		this._setDefaultMailName();
@@ -302,53 +307,62 @@ var FormPage = {
 		}
 		this.sageCheck();
 		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
+		this._p2Check.checked = ChaikaP2Login.isLoggedIn() && this._p2Check.checked;
 
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
+		//このレスにレス
+		if(gWizType == WIZ_TYPE_RES && gThread.url.fileName){
+			var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+			this._messeageForm.value = res;
+		}
 
-		if(gWizType == WIZ_TYPE_RES){
-			switch(gBoard.type){
-				case ChaikaBoard.BOARD_TYPE_2CH:
-					gPost = new Post(gThread, gBoard);
-					break;
-				case ChaikaBoard.BOARD_TYPE_JBBS:
-					gPost = new PostJBBS(gThread, gBoard);
-					break;
-				case ChaikaBoard.BOARD_TYPE_MACHI:
-					gPost = new PostMachi(gThread, gBoard);
-					break;
-				default:
-					gPost = null;
-			}
-
-				// このレスにレス
-			if(gThread.url.fileName){
-				var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
-				this._messeageForm.value = res ;
-			}
-
-		}else if(gWizType == WIZ_TYPE_NEW_THREAD){
-			switch(gBoard.type){
-				case ChaikaBoard.BOARD_TYPE_2CH:
-					gPost = new Post2chNewThread(gBoard);
-					break;
-				case ChaikaBoard.BOARD_TYPE_JBBS:
-					gPost = new PostJBBSNewThread(gBoard);
-					break;
-				default:
-					gPost = null;
-			}
-
-				// タイトルフォームの表示
+		//スレッド作成の時はタイトルフォームを表示する
+		if(gWizType == WIZ_TYPE_NEW_THREAD){
 			document.getElementById("titleFormContainer").hidden = false;
 		}
 
-
+		//cookieチェック
 		if(gBoard.url.host.indexOf(".2ch.net")!=-1  && !this._cookieEnabled()){
 			Notification.warning(gBoard.url.host +" への Cookie アクセスを許可してください");
 		}
 
 		this._firstShow = false;
+	},
+
+	_setPost: function(){
+		gPost = null;
+
+		if(gWizType == WIZ_TYPE_RES){
+			if(this._p2Check.checked){
+				gPost = new PostP2(gThread, gBoard);
+			}else{
+				switch(gBoard.type){
+					case ChaikaBoard.BOARD_TYPE_2CH:
+						gPost = new Post(gThread, gBoard);
+						break;
+					case ChaikaBoard.BOARD_TYPE_JBBS:
+						gPost = new PostJBBS(gThread, gBoard);
+						break;
+					case ChaikaBoard.BOARD_TYPE_MACHI:
+						gPost = new PostMachi(gThread, gBoard);
+						break;
+				}
+			}
+		}else if(gWizType == WIZ_TYPE_NEW_THREAD){
+			if(this._p2Check.checked){
+				gPost = new PostNewThreadP2(gBoard);
+			}else{
+				switch(gBoard.type){
+					case ChaikaBoard.BOARD_TYPE_2CH:
+						gPost = new Post2chNewThread(gBoard);
+						break;
+					case ChaikaBoard.BOARD_TYPE_JBBS:
+						gPost = new PostJBBSNewThread(gBoard);
+						break;
+				}
+			}
+		}
 	},
 
 
@@ -421,7 +435,7 @@ var FormPage = {
 		}else{
 			ChaikaBeLogin.logout();
 		}
-	}, 
+	},
 
 	beLoginObserver: {
 		observe: function(aSubject, aTopic, aData){
@@ -433,7 +447,47 @@ var FormPage = {
 			}
 		}
 	},
-	
+
+	toggleP2Login: function FormPage_toggleP2Login(){
+		if(FormPage._p2Check.checked){
+			FormPage._p2Check.checked = false;
+
+			if(ChaikaP2Login.isLoggedIn()){
+				FormPage._p2Check.checked = true;
+				FormPage._setPost();
+			}else{
+				ChaikaP2Login.login();
+			}
+		}else{
+			FormPage._p2Check.checked = false;
+			FormPage._setPost();
+		}
+	},
+
+	p2LoginObserver: {
+		observe: function(aSubject, aTopic, aData){
+			//ログイン成功時
+			if(aTopic == "ChaikaP2Login:Login" && aData == "OK"){
+				FormPage._p2Check.checked = true;
+				FormPage._setPost();
+			}
+
+			//ログイン失敗
+			if(aTopic == "ChaikaP2Login:Login" && aData == "NG"){
+				alert("p2へのログインに失敗しました。\n" +
+						"IDとパスワードを確認してください。");
+				FormPage._p2Check.checked = false;
+				FormPage._setPost();
+			}
+
+			//ログアウト
+			if(aTopic == "ChaikaP2Login:Logout" && aData == "OK"){
+				FormPage._p2Check.checked = false;
+				FormPage._setPost();
+			}
+		}
+	},
+
 	sageCheck: function FormPage_sageCheck(){
 		var sageChecked = FormPage._sageCheck.checked;
 		this._mailForm.emptyText = sageChecked ? "sage" : " ";
@@ -538,7 +592,7 @@ var PreviewPage = {
 		}
 		previewDoc.body.style.font = fontStyle;
 
-		
+
 		previewDoc.getElementById("title").innerHTML = previewData["title"];
 		previewDoc.getElementById("name").innerHTML = previewData["name"];
 		previewDoc.getElementById("mail").innerHTML = previewData["mail"];

@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-EXPORTED_SYMBOLS = ["ChaikaBeLogin"];
+EXPORTED_SYMBOLS = ["ChaikaBeLogin", "ChaikaP2Login"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
@@ -144,4 +144,116 @@ var ChaikaBeLogin = {
 		cookieService.setCookieString(this._getLoginURI(), null, sessionIDCookie, null);
 	}
 
+};
+
+
+/**
+ * p2.2ch.net ログインオブジェクト
+ * @class
+ */
+var ChaikaP2Login = {
+
+	//p2にログインしているかどうか
+	_loggedIn: false,
+
+	get cookieManager(){
+		if(!this._cookieManager)
+			this._cookieManager = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2);
+
+		return this._cookieManager;
+	},
+
+	get os(){
+		if(!this._os)
+			this._os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+
+		return this._os;
+	},
+
+
+	isLoggedIn: function ChaikaP2Login_isLoggedIn(){
+		var psExists = this.cookieManager.cookieExists({
+			host: ChaikaCore.pref.getChar("login.p2.cookie_domain"),
+			path: '/',
+			name: 'PS'
+		});
+
+		var cidExists = this.cookieManager.cookieExists({
+			host: ChaikaCore.pref.getChar("login.p2.cookie_domain"),
+			path: '/',
+			name: 'cid'
+		});
+
+		ChaikaCore.logger.debug('ps exists:' + psExists + '; cid exists:' + cidExists);
+
+		//クッキーがあればログイン済みである
+		this._loggedIn = psExists && cidExists;
+
+		return this._loggedIn;
+	},
+
+	login: function ChaikaP2Login_login(){
+		this._loggedIn = false;
+
+		var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+		req.addEventListener('load', this, false);
+		req.addEventListener('error', this, false);
+
+		var formStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+		var mail = "form_login_id=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.id"));
+		var pass = "form_login_pass=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.password"));
+		var extra = "ctl_register_cookie=1&register_cookie=1&submit_userlogin=%83%86%81%5B%83U%83%8D%83O%83C%83%93";
+		formStr.data = [mail, pass, extra].join("&");
+		ChaikaCore.logger.debug(formStr);
+
+		req.open("POST", ChaikaCore.pref.getChar("login.p2.login_url"), true);
+		req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		req.send(formStr);
+	},
+
+	logout: function ChaikaP2Login_logout(){
+		//クッキーを削除する
+		this.cookieManager.remove(ChaikaCore.pref.getChar("login.p2.cookie_domain"), 'PS', '/', false);
+		this.cookieManager.remove(ChaikaCore.pref.getChar("login.p2.cookie_domain"), 'cid', '/', false);
+		this._loggedIn = false;
+
+		//ログアウトを通知
+		this.os.notifyObservers(null, "ChaikaP2Login:Logout", "OK");
+	},
+
+	handleEvent: function(event){
+		if(this.isLoggedIn()){
+			this.os.notifyObservers(null, "ChaikaP2Login:Login", "OK");
+		}else{
+			this.logout();
+			this.os.notifyObservers(null, "ChaikaP2Login:Login", "NG");
+		}
+	},
+
+	/**
+     * 書き込みページからcsrfidを得る
+     * @param {String} host 書き込み先のホスト
+     * @param {String} bbs 書き込み先の板名
+     * @param {Number} datID 書き込み先のdat ID
+     * @return {String} csrfid 取得できなかった場合は null を返す
+	 */
+	getCsrfid: function(host, bbs, datID){
+		if(!this.isLoggedIn()) return null;
+
+		var csrfid_url = ChaikaCore.pref.getChar('login.p2.csrfid_url');
+		var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+
+		req.open('GET', csrfid_url + '?host=' + host + '&bbs=' + bbs + '&key=' + datID, false);
+		req.send(null);
+
+		if(req.status !== 200) return null;
+
+		var csrfid = req.responseText.match(/csrfid" value="([a-zA-Z0-9]+)"/);
+
+		if(csrfid){
+			return csrfid[1];
+		}else{
+			return null;
+		}
+	}
 };

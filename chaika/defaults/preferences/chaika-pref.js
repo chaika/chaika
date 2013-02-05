@@ -27,6 +27,13 @@ pref("extensions.chaika.login.be.login_url", "http://be.2ch.net/test/login.php")
 pref("extensions.chaika.login.be.id", "");
 pref("extensions.chaika.login.be.password", "");
 
+pref("extensions.chaika.login.p2.login_url", "http://p2.2ch.net/p2/?b=pc");
+pref("extensions.chaika.login.p2.post_url", "http://p2.2ch.net/p2/post.php?grid=ON");
+pref("extensions.chaika.login.p2.csrfid_url", "http://p2.2ch.net/p2/post_form.php");
+pref("extensions.chaika.login.p2.cookie_domain", ".p2.2ch.net");
+pref("extensions.chaika.login.p2.id", "");
+pref("extensions.chaika.login.p2.password", "");
+
 pref("extensions.chaika.browser.redirector.enabled", false);
 pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
 pref("extensions.chaika.browser.redirector.replace_view_limit", true);
