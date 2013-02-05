@@ -428,10 +428,14 @@ var FormPage = {
 	},
 
 	toggleBeLogin: function FormPage_toggleBeLogin(){
-		var beChecked = FormPage._beCheck.checked;
-		if(beChecked){
+		if(FormPage._beCheck.checked){
 			FormPage._beCheck.checked = false;
-			openDialog("chrome://chaika/content/post/belogin.xul", "", "chrome, modal,centerscreen");
+
+			if(ChaikaBeLogin.isLoggedIn()){
+				FormPage._beCheck.checked = true;
+			}else{
+				ChaikaBeLogin.login();
+			}
 		}else{
 			ChaikaBeLogin.logout();
 		}
@@ -441,6 +445,11 @@ var FormPage = {
 		observe: function(aSubject, aTopic, aData){
 			if(aTopic == "ChaikaBeLogin:Login" && aData == "OK"){
 				FormPage._beCheck.checked = true;
+			}
+			if(aTopic == 'ChaikaBeLogin:Login' && aData == 'NG'){
+				alert("Be@2chへのログインに失敗しました。\n" +
+						"IDとパスワードを確認してください。");
+				FormPage._beCheck.checked = false;
 			}
 			if(aTopic == "ChaikaBeLogin:Logout" && aData == "OK"){
 				FormPage._beCheck.checked = false;

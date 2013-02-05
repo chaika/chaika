@@ -96,7 +96,7 @@ var ChaikaBeLogin = {
 
 			if(id && sessionID){
 				var exp = new Date();
-				exp.setTime(exp.getTime() + 5 * 365 * 86400 * 1000);		
+				exp.setTime(exp.getTime() + 5 * 365 * 86400 * 1000);
 				ChaikaBeLogin._setCookie(id, sessionID, exp);
 				ChaikaBeLogin._loggedIn = true;
 
