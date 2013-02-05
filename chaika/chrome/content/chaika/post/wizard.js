@@ -311,6 +311,8 @@ var FormPage = {
 
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
+		this._setPost();
+
 		//このレスにレス
 		if(gWizType == WIZ_TYPE_RES && gThread.url.fileName){
 			var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
