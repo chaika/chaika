@@ -61,7 +61,7 @@ var ChaikaBeLogin = {
 	_loggedIn: false,
 
 
-	isLoggdIn: function ChaikaBeLogin_isLoggdIn(){
+	isLoggedIn: function ChaikaBeLogin_isLoggedIn(){
 		if(!this._loggedIn){
 			var cookieService = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
 
@@ -76,7 +76,7 @@ var ChaikaBeLogin = {
 
 	login: function ChaikaBeLogin_login(){
 		this._loggedIn = false;
-		
+
 		var httpReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
 				.createInstance(Ci.nsIXMLHttpRequest);
 

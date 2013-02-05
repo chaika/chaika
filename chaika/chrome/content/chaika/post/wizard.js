@@ -301,7 +301,7 @@ var FormPage = {
 			this._nameForm.emptyText = noName;
 		}
 		this.sageCheck();
-		this._beCheck.checked = ChaikaBeLogin.isLoggdIn();
+		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
 
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
