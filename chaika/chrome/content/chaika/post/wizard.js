@@ -133,9 +133,6 @@ function startup(){
 		return;
 	}
 
-
-
-
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login", false);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout", false);
@@ -155,19 +152,30 @@ function shutdown(){
 		// checked の値を完全に覚えさせる
 	var sageCheck = document.getElementById("sageCheck");
 	if(!sageCheck.checked) sageCheck.setAttribute("checked", "false");
+
 	var useAAFontCheck = document.getElementById("useAAFontCheck");
 	if(!useAAFontCheck.hasAttribute("checked")){
 		useAAFontCheck.setAttribute("checked", "false");
 	}
+
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	try{
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
 		os.removeObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Login");
 		os.removeObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Logout");
-	}catch(ex){
-	}
+	}catch(ex){}
+
 	FormPage.addFormHistory();
+
+	//自動ログアウト
+	if(ChaikaCore.pref.getBool('post.auto_be_disable')){
+		ChaikaBeLogin.logout();
+	}
+
+	if(ChaikaCore.pref.getBool('post.auto_p2_disable')){
+		ChaikaP2Login.logout();
+	}
 }
 
 
@@ -297,20 +305,34 @@ var FormPage = {
 		this._beCheck = document.getElementById("beCheck");
 		this._p2Check = document.getElementById("p2Check");
 
+		//aa, defaultmail/name.txt, タイトル設定
 		this.setUseAAFont();
 		this._setDefaultMailName();
 		setTitle();
 
+		//名無し設定
 		var noName = gBoard.getSetting("BBS_NONAME_NAME");
 		if(noName){
 			this._nameForm.emptyText = noName;
 		}
+
+		//sage
 		this.sageCheck();
+
+		//Be, p2
 		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
 		this._p2Check.checked = ChaikaP2Login.isLoggedIn() && ChaikaP2Login.enabled;
 
+		//Be自動ログイン
+		if(ChaikaCore.pref.getBool('post.auto_be_enable') && !this._beCheck.checked &&
+		   /\.2ch\.net\/(?:be|nandemo|argue)\//.test(gBoard.url.spec)){
+			ChaikaBeLogin.login();
+		}
+
+		//AAメニュー有効化
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
+		//gPostの設定
 		this._setPost();
 
 		//このレスにレス
