@@ -154,7 +154,7 @@
 
 				try{
 					var thread = new this.ChaikaThread(threadURL);
-					thread.deteleThreadData();
+					thread.deleteThreadData();
 				}catch(ex){
 					this.ChaikaCore.logger.error(ex);
 				}

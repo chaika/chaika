@@ -146,7 +146,7 @@
 				case "deleteLog":
 					this.items.forEach(function(aElement, aIndex, aArray){
 						try{
-							(new this.ChaikaThread(aElement.getURL())).deteleThreadData();
+							(new this.ChaikaThread(aElement.getURL())).deleteThreadData();
 						}catch(ex){
 							this.ChaikaCore.logger.error(ex);
 						}

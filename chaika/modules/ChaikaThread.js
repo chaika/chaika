@@ -210,7 +210,7 @@ ChaikaThread.prototype = {
 
 		// DAT が無く ThreadData のみ存在する場合は、ライン数がずれてしまうので ThreadData を消す
 		if(!this.datFile.exists() && this.lineCount>0){
-			this.deteleThreadData();
+			this.deleteThreadData();
 		}
 	},
 
@@ -306,7 +306,7 @@ ChaikaThread.prototype = {
 	/**
 	 * スレッド情報をデータベースから消去し、DAT ファイルを削除する。
 	 */
-	deteleThreadData: function ChaikaThread_deteleThreadData(){
+	deleteThreadData: function ChaikaThread_deleteThreadData(){
 		var storage = ChaikaCore.storage;
 		var statement = storage.createStatement("DELETE FROM thread_data WHERE thread_id=?1");
 		statement.bindStringParameter(0, this.threadID);
