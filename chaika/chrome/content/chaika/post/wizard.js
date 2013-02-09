@@ -181,7 +181,7 @@ function finish(){
 
 
 function cancelCheck(aEvent){
-	if(FormPage._messeageForm && FormPage._messeageForm.value){
+	if(FormPage._messeageForm && FormPage._messeageForm.value && ChaikaCore.pref.getBool('post.warn_when_close')){
 		var promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
 				.getService(Ci.nsIPromptService);
 		var comformMsg = "書きかけのメッセージがありますがそのまま閉じますか?";
@@ -357,8 +357,17 @@ var FormPage = {
 			setTimeout("gWizard.canAdvance = true;", 750);
 		}else{
 			Notification.removeAll(false);
+
+			//プレビューを表示しない設定の時は
+			//次のページを送信ページにする
+			if(!ChaikaCore.pref.getBool('post.show_preview')){
+				gWizard.goTo('submitPage');
+				return false;
+			}
+
 			return true;
 		}
+
 		return false;
 	},
 
@@ -461,7 +470,7 @@ var FormPage = {
 	},
 
 	toggleP2Login: function FormPage_toggleP2Login(){
-		if(FormPage._p2Check.checked){
+		if(this._p2Check.checked){
 			ChaikaP2Login.enabled = false;
 			FormPage._p2Check.checked = false;
 
@@ -574,7 +583,10 @@ var PreviewPage = {
 		var warningMessages = gPost.getWarningMessages();
 		if(warningMessages.length > 0){
 			Notification.removeAll(true);
-			Notification.warning(warningMessages[0]);
+
+			warningMessages.forEach(function(warning){
+				Notification.warning(warning);
+			});
 		}
 
 		setTimeout("PreviewPage._createPreview()", 0);

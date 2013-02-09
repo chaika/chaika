@@ -116,16 +116,28 @@ Post.prototype = {
 		var result = [];
 		var convertedMessage = this._convert(this.message, this.charset, true, false);
 
-			// fusianasan 警告
-		var name = this.name || this._board.getSetting("BBS_NONAME_NAME") || "";		
-		if(name){
-			name = name.replace("&r", "", "g");
-			if(name.indexOf("fusianasan") != -1){
-				result.push("fusianasan トラップ (リモートホストが表示されます)");
+		// fusianasan 警告
+		if(ChaikaCore.pref.getBool('post.warn_fusianasan')){
+			var name = this.name || this._board.getSetting("BBS_NONAME_NAME") || "";
+			if(name){
+				name = name.replace("&r", "", "g");
+				if(name.indexOf("fusianasan") != -1){
+					result.push("fusianasan トラップ (リモートホストが表示されます)");
+				}
 			}
 		}
-		
-			// 文字化けチェック
+
+		//be警告
+		if(ChaikaCore.pref.getBool('post.warn_be') && ChaikaBeLogin.isLoggedIn()){
+			result.push('Beが有効になっています');
+		}
+
+		//p2警告
+		if(ChaikaCore.pref.getBool('post.warn_p2') && ChaikaP2Login.enabled){
+			result.push('p2経由で書き込みを行います');
+		}
+
+		// 文字化けチェック
 		var bbsUnicode = this._board.getSetting("BBS_UNICODE");
 		if(bbsUnicode && bbsUnicode!="pass"){
 			if(convertedMessage != this.message){

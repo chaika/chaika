@@ -24,6 +24,8 @@
 				name="extensions.chaika.login.p2.id"/>
 		<preference id="extensions.chaika.login.p2.password" type="string"
 				name="extensions.chaika.login.p2.password"/>
+		<preference id="extensions.chaika.warn_when_delete_log" type="bool"
+				name="extensions.chaika.warn_when_delete_log"/>
 	</preferences>
 
 	<script type="application/x-javascript; version=1.7"
@@ -37,8 +39,10 @@
 		<rows>
 
 			<row class="setting-row">
-				<description class="setting-description">ログファイル :</description>
+				<description class="setting-description">ログ :</description>
 				<vbox>
+					<checkbox label="ログを削除するときに警告する"
+							preference="extensions.chaika.warn_when_delete_log" />
 					<checkbox label="ログファイルの位置を指定する *"
 							preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
 					<hbox id="boxDataDir" class="indent" flex="1" align="start">

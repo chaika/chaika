@@ -56,11 +56,11 @@
 				var threadURL = null;
 				try{
 					 threadURL = Services.io.newURI(currentURI.path.substring(8), null, null)
-							 .QueryInterface(Ci.nsIURL);					
+							 .QueryInterface(Ci.nsIURL);
 				}catch(ex){
 					this.ChaikaCore.logger.error(ex);
 				}
-				
+
 				return threadURL;
 			]]></body>
 		</method>
@@ -69,7 +69,7 @@
 		<method name ="_doCommand">
 			<parameter name="aEvent"/>
 			<parameter name="aMiddleClicked"/>
-			
+
 			<body><![CDATA[
 				var menupopup = document.getAnonymousElementByAttribute(this, "anonid", "menupopup");
 				function hidePopupMenu(){
@@ -80,7 +80,7 @@
 
 				var targetElement = aEvent.originalTarget;
 				var anonymousID = targetElement.getAttribute("anonid");
-				
+
 				switch(anonymousID){
 					case "goToBoard-menu":
 						this._goToBoard(aMiddleClicked);
@@ -148,9 +148,11 @@
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
 
-				var result = Services.prompt.confirm(null, "ログの削除 [chaika]",
-								"このスレッドのログを削除しますか?");
-				if(!result) return;
+				if(this.ChaikaCore.pref.getBool('warn_when_delete_log')){
+					var result = Services.prompt.confirm(null, "ログの削除 [chaika]",
+									"このスレッドのログを削除しますか?");
+					if(!result) return;
+				}
 
 				try{
 					var thread = new this.ChaikaThread(threadURL);

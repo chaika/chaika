@@ -74,3 +74,10 @@ pref("extensions.chaika.post.auto_finish", false);
 pref("extensions.chaika.post.auto_finish_delay", 750);
 pref("extensions.chaika.post.write_log.succeeded", false);
 pref("extensions.chaika.post.write_log.failed", false);
+pref('extensions.chaika.post.show_preview', true);
+pref('extensions.chaika.post.warn_when_close', true);
+pref('extensions.chaika.post.warn_fusianasan', true);
+pref('extensions.chaika.post.warn_be', true);
+pref('extensions.chaika.post.warn_p2', false);
+
+pref("extensions.chaika.warn_when_delete_log", true);

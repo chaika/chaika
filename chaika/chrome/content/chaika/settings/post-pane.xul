@@ -14,6 +14,17 @@
 				name="extensions.chaika.post.write_log.succeeded" type="bool"/>
 		<preference id="extensions.chaika.post.write_log.failed"
 				name="extensions.chaika.post.write_log.failed" type="bool"/>
+		<preference id="extensions.chaika.post.warn_when_close"
+				name="extensions.chaika.post.warn_when_close" type="bool" />
+		<preference id="extensions.chaika.post.show_preview"
+				name="extensions.chaika.post.show_preview" type="bool"
+				onchange="setCcontainerDisabled(this.name, 'previewWarnings', true)" />
+		<preference id="extensions.chaika.post.warn_fusianasan"
+				name="extensions.chaika.post.warn_fusianasan" type="bool" />
+		<preference id="extensions.chaika.post.warn_be"
+				name="extensions.chaika.post.warn_be" type="bool" />
+		<preference id="extensions.chaika.post.warn_p2"
+				name="extensions.chaika.post.warn_p2" type="bool" />
 	</preferences>
 
 	<grid  flex="1">
@@ -39,6 +50,25 @@
 							preference="extensions.chaika.post.write_log.succeeded"/>
 					<checkbox label="失敗時に kakikomi.txt に保存する"
 							preference="extensions.chaika.post.write_log.failed"/>
+				</vbox>
+			</row>
+
+			<row class="setting-row">
+				<description class="setting-description">警告 :</description>
+				<vbox>
+					<checkbox label="ウィザードを閉じるときに警告する"
+						preference="extensions.chaika.post.warn_when_close" />
+					<checkbox label="書き込む前にプレビューを表示する(推奨)"
+						preference="extensions.chaika.post.show_preview" control="previewWarnings" />
+
+					<vbox id="previewWarnings" class="indent">
+						<checkbox label="fusianasanを警告する"
+							preference="extensions.chaika.post.warn_fusianasan" />
+						<checkbox label="Beが有効なときに警告する"
+							preference="extensions.chaika.post.warn_be" />
+						<checkbox label="p2経由で書き込むときに警告する"
+							preference="extensions.chaika.post.warn_p2" />
+					</vbox>
 				</vbox>
 			</row>
 		</rows>
