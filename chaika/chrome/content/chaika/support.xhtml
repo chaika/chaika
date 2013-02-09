@@ -63,7 +63,6 @@
 
 ]]></style>
 
-
 <script type="application/javascript"><![CDATA[
 	Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 	Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
@@ -72,81 +71,76 @@
 	const Cc = Components.classes;
 	const Cr = Components.results;
 
-
 	function startup(){
 		printBasic();
 		printDetails();
 		printPrefs();
 	}
 
-
 	function shutdown(){
 	}
 
-
 	function printBasic(){
-		var basicInfoTable = <table id="basicInfoTable">
-			<tr>
-				<th class="column">名前</th>
-				<td>{ChaikaAddonInfo.name}</td>
-			</tr>
-			<tr>
-				<th class="column">バージョン</th>
-				<td>{ChaikaAddonInfo.version}</td>
-			</tr>
-			<tr>
-				<th class="column">UserAgent</th>
-				<td>{ChaikaCore.getUserAgent()}</td>
-			</tr>
-		</table>;
-		document.getElementById("basicInfoBox").innerHTML = basicInfoTable.toXMLString();
+		var basicInfoTable = '<table id="basicInfoTable">\
+			<tr>\
+				<th class="column">名前</th>\
+				<td>' + ChaikaAddonInfo.name + '</td>\
+			</tr>\
+			<tr>\
+				<th class="column">バージョン</th>\
+				<td>' + ChaikaAddonInfo.version + '</td>\
+			</tr>\
+			<tr>\
+				<th class="column">UserAgent</th>\
+				<td>' + ChaikaCore.getUserAgent() + '</td>\
+			</tr>\
+		</table>';
+		document.getElementById("basicInfoBox").innerHTML = basicInfoTable;
 	}
-
 
 	function printDetails(){
 		var skinName = ChaikaCore.pref.getUniChar("thread_skin") || "(Default)";
-	
-		var detailsInfoTable = <table id="detailsInfoTable">
-			<tr>
-				<th class="column">データフォルダ</th>
-				<td>{ChaikaCore.getDataDir().path}</td>
-			</tr>
-			<tr>
-				<th class="column">ログフォルダ</th>
-				<td>{ChaikaCore.getLogDir().path}</td>
-			</tr>
-			<tr>
-				<th class="column">ストレージファイル</th>
-				<td>{ChaikaCore.storage.databaseFile.path}</td>
-			</tr>
-	
-			<tr>
-				<th class="column">デフォルトフォルダ</th>
-				<td>{ChaikaCore.getDefaultsDir().path}</td>
-			</tr>
-			<tr>
-				<th class="column">ServerURL</th>
-				<td>{ChaikaCore.getServerURL().spec}</td>
-			</tr>
-	
-			<tr>
-				<th class="column">スレッド表示スキン</th>
-				<td>{skinName}</td>
-			</tr>
-	
-		</table>;
-		document.getElementById("detailsInfoBox").innerHTML = detailsInfoTable.toXMLString();
+
+		var detailsInfoTable = '<table id="detailsInfoTable">\
+			<tr>\
+				<th class="column">データフォルダ</th>\
+				<td>' + ChaikaCore.getDataDir().path + '</td>\
+			</tr>\
+			<tr>\
+				<th class="column">ログフォルダ</th>\
+				<td>' + ChaikaCore.getLogDir().path + '</td>\
+			</tr>\
+			<tr>\
+				<th class="column">ストレージファイル</th>\
+				<td>' + ChaikaCore.storage.databaseFile.path + '</td>\
+			</tr>\
+\
+			<tr>\
+				<th class="column">デフォルトフォルダ</th>\
+				<td>' + ChaikaCore.getDefaultsDir().path + '</td>\
+			</tr>\
+			<tr>\
+				<th class="column">ServerURL</th>\
+				<td>' + ChaikaCore.getServerURL().spec + '</td>\
+			</tr>\
+\
+			<tr>\
+				<th class="column">スレッド表示スキン</th>\
+				<td>' + skinName + '</td>\
+			</tr>\
+\
+		</table>';
+		document.getElementById("detailsInfoBox").innerHTML = detailsInfoTable;
 	}
-	
-	
+
 	function printPrefs(){
 		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
 		var branch = prefService.getBranch("extensions.chaika.");
-	
+
 		function getPrefValue(aPrefName){
 			var prefType = branch.getPrefType(aPrefName);
 			var value = "";
-	
+
 			switch(prefType){
 				case Ci.nsIPrefBranch.PREF_STRING:
 					value = ChaikaCore.pref.getUniChar(aPrefName);
@@ -166,27 +160,45 @@
 			}
 			return value;
 		}
-	
+
 		var prefNames = branch.getChildList("", {});
 		prefNames.sort();
-	
-		var prefsInfoTable = <table id="prefsInfoTable">
-			<tr>
-				<th>名前</th>
-				<th>値</th>
-			</tr>
-		</table>;
-	
+
+		var prefsInfoTable = document.createElement('table');
+		prefsInfoTable.setAttribute('id', 'prefsInfoTable');
+
+		//ヘッダー
+		var header = document.createElement('tr');
+
+		var name = document.createElement('th');
+		name.textContent = '名前';
+		header.appendChild(name);
+
+		var value = document.createElement('th');
+		value.textContent = '値';
+		header.appendChild(value);
+
+		prefsInfoTable.appendChild(header);
+
+		//設定値
 		prefNames.forEach(function(aElement, aIndex, aArray){
-			prefsInfoTable.tr[aIndex+1] = "";
-			prefsInfoTable.tr[aIndex+1].td[0] = aElement;
-			prefsInfoTable.tr[aIndex+1].td[1] = getPrefValue(aElement);
-	
+			var tr = document.createElement('tr');
 			if(branch.prefHasUserValue(aElement)){
-				prefsInfoTable.tr[aIndex+1].@class = "userValue";
+				tr.classList.add('userValue');
 			}
+
+			var name = document.createElement('td');
+			name.textContent = aElement;
+			tr.appendChild(name);
+
+			var value = document.createElement('td');
+			value.textContent = getPrefValue(aElement);
+			tr.appendChild(value);
+
+			prefsInfoTable.appendChild(tr);
 		});
-		document.getElementById("prefsInfoBox").innerHTML = prefsInfoTable.toXMLString();
+
+		document.getElementById("prefsInfoBox").appendChild(prefsInfoTable);
 	}
 
 ]]></script>
