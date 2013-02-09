@@ -224,6 +224,9 @@ var ChaikaP2Login = {
 	},
 
 	handleEvent: function(event){
+		//XMLHttpRequestでない場合は終了
+		if(!this._req) return;
+
 		//w2鯖の場合は自動で修正してやり直す
 		if(this._req.channel.URI.spec.indexOf('w2.p2.2ch.net') !== -1 &&
 		   ChaikaCore.pref.getChar('login.p2.login_url').indexOf('w2.p2.2ch.net') === -1){
@@ -234,8 +237,19 @@ var ChaikaP2Login = {
 			return this.login();
 		}
 
+		//w2ではないのにw2に設定されていた場合も自動で修正する
+		if(this._req.channel.URI.spec.indexOf('w2.p2.2ch.net') === -1 &&
+			ChaikaCore.pref.getChar('login.p2.login_url').indexOf('w2.p2.2ch.net') !== -1){
+			ChaikaCore.pref.setChar('login.p2.login_url', "http://p2.2ch.net/p2/?b=pc");
+			ChaikaCore.pref.setChar('login.p2.post_url', 'http://p2.2ch.net/p2/post.php?grid=ON');
+			ChaikaCore.pref.setChar('login.p2.csrfid_url', 'http://p2.2ch.net/p2/post_form.php');
+
+			return this.login();
+		}
+
 		this._req = null;
 
+		//ログインの成功の可否を通知する
 		if(this.isLoggedIn()){
 			this.os.notifyObservers(null, "ChaikaP2Login:Login", "OK");
 		}else{
