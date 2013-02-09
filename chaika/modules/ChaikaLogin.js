@@ -198,20 +198,19 @@ var ChaikaP2Login = {
 	login: function ChaikaP2Login_login(){
 		this._loggedIn = false;
 
-		var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-		req.addEventListener('load', this, false);
-		req.addEventListener('error', this, false);
+		this._req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
+		this._req.addEventListener('load', this, false);
+		this._req.addEventListener('error', this, false);
 
 		var formStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
 		var mail = "form_login_id=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.id"));
 		var pass = "form_login_pass=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.password"));
 		var extra = "ctl_register_cookie=1&register_cookie=1&submit_userlogin=%83%86%81%5B%83U%83%8D%83O%83C%83%93";
 		formStr.data = [mail, pass, extra].join("&");
-		ChaikaCore.logger.debug(formStr);
 
-		req.open("POST", ChaikaCore.pref.getChar("login.p2.login_url"), true);
-		req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		req.send(formStr);
+		this._req.open("POST", ChaikaCore.pref.getChar("login.p2.login_url"), true);
+		this._req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		this._req.send(formStr);
 	},
 
 	logout: function ChaikaP2Login_logout(){
@@ -225,6 +224,18 @@ var ChaikaP2Login = {
 	},
 
 	handleEvent: function(event){
+		//w2鯖の場合は自動で修正してやり直す
+		if(this._req.channel.URI.spec.indexOf('w2.p2.2ch.net') !== -1 &&
+		   ChaikaCore.pref.getChar('login.p2.login_url').indexOf('w2.p2.2ch.net') === -1){
+			ChaikaCore.pref.setChar('login.p2.login_url', "http://w2.p2.2ch.net/p2/?b=pc");
+			ChaikaCore.pref.setChar('login.p2.post_url', 'http://w2.p2.2ch.net/p2/post.php?grid=ON');
+			ChaikaCore.pref.setChar('login.p2.csrfid_url', 'http://w2.p2.2ch.net/p2/post_form.php');
+
+			return this.login();
+		}
+
+		this._req = null;
+
 		if(this.isLoggedIn()){
 			this.os.notifyObservers(null, "ChaikaP2Login:Login", "OK");
 		}else{
