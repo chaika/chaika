@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="chrome://chaika/content/icon.png" />
+    <title>リリースノート [chaika]</title>
+    <style>
+        body{
+            background-color: #eee;
+            color: black;
+            font-size: 13.5px;
+        }
+
+        article{
+            margin: 1em 3em;
+        }
+
+        h1{
+            text-shadow: -1px 1px 0 rgba(255, 255, 255, 1);
+        }
+
+        ul{
+            list-style-type: none;
+        }
+
+
+        header > h1{
+            margin-left: 10px;
+        }
+
+        section > h1{
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 0 #fff;
+        }
+
+        section > p{
+            margin-left: 40px;
+        }
+
+        article ul{
+            width: 80%;
+            margin-bottom: 50px;
+        }
+
+        article li{
+            margin: 0;
+            padding: 0.5em 0 0.5em 25px;
+            border-bottom: 1px rgba(0, 0, 0, 0.25) dotted;
+            background-repeat: no-repeat;
+            background-position: left center;
+            background-size: 14px;
+        }
+
+
+        footer{
+            margin-top: 80px;
+            border-top: 1.5px solid rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+            font-size: 80%;
+        }
+
+        footer > ul{
+            list-style-type: square;
+        }
+
+
+        .new{
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYMAPEqCYbHAeiPeTq9kAiP9DsQI5BsxHMqCfVM0OQPweyYD3UDGc/vxPJgbpBfvvPRmaQXoEkJ1MqgEG6F4pIEFzAjEhjwvPR9bAhGbAQSJiaCM+A/yJMACnGgEcIf0eixjOjPMfLfUJQHE/mlwANgPWQyX340j7BlA5jICEOf8+LpPRQAAsBYIAQIABAGFTZWF4e3sHAAAAAElFTkSuQmCC);
+        }
+
+        .fixed{
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHBJREFUeNpi/P//PwMlgImBUkCGCwRQ9JJoAEjzeSCeT44BMM3/oXg+SC8TLudhEd8PxAb4wgDFeXhs/o/NCxjOI6SZkAEwhTg1YwtEbIbg1IwrFnAZMh9nGsISjbjCg2gD8MUIhgGMA56ZKDYAIMAADEBwpEggEUwAAAAASUVORK5CYII=);
+        }
+
+        .modified{
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALNJREFUeNpiYMAPBIBYAZfk////sYo7APF6kDwaXg+Vw2tAPxaN6LgflwHImu8DcQLURgco+z66IcgGOCBJzof6HVt4zEdS54BswHokmwUIBCrMJeuRDYCZasFAGCTA1IMMYEKLprdEGPAAmQMy4AMDBQDdAGEi9GBNWLBA9IbSJAeiJlpiQdYgQEw02mExoAGJD2Ib4EtI6MlVAIsYLLX2E8pMDHgMICo3MuDwAlYDAAIMAFQCdq6IkR49AAAAAElFTkSuQmCC);
+        }
+
+        .removed{
+            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC9JREFUeNpi/P//PwMlgImBQjBqAAMDC4hgZGQkKyqAMcg4DMKAcTQlDgIDAAIMAFXeChvgRcFcAAAAAElFTkSuQmCC);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>chaika リリースノート</h1>
+</header>
+
+<article>
+    <section>
+        <h1>1.5.8</h1>
+        <ul>
+            <li class="new">「最近アクセスしたスレッド」等が新しいタブで開くかどうかについて設定を反映するようにした</li>
+            <li class="new">SETTING.TXTに板名が書かれていない板ではページタイトルを板名に設定するようにした</li>
+            <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした<br />（Web Fontなどがスキンで使えるようになりました）</li>
+            <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
+            <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正</li>
+            <li class="fixed">ログピックアップモードの時新着を取得しない問題を修正</li>
+            <li class="fixed">連鎖あぼーんが正しく動かないことがある問題を修正</li>
+            <li class="fixed">アンカー修正機能が有効なときにアンカーが誤って表示されることがある問題を修正</li>
+            <li class="fixed">正規表現ミスの修正、その他コード整理</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.7</h1>
+        <ul>
+            <li class="new">したらばでの新規スレッド作成機能を実装</li>
+            <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
+            <li class="new">HTML版の2ch検索を実装（extensions.chaika.bbsmenu.find2ch.use_rssで切り替え）</li>
+            <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装<br />
+            （extensions.chaika.thread_fix_invalid_anchorで切り替え）</li>
+            <li class="modified">maxVersionをFirefox 18に変更</li>
+            <li class="modified">minVersionをFirefox 10に変更</li>
+            <li class="fixed">Be IDがあるときにIDの末尾に余計なスペースが付加される問題を修正</li>
+            <li class="fixed">したらばで透明あぼーんが発生した場合にレス番がずれる問題を修正</li>
+            <li class="fixed">ID: の前に文字があるとIDのリンクを貼らない問題を修正</li>
+            <li class="fixed">特定環境下でスレッドの読み込みに時間がかかることがある問題を修正</li>
+            <li class="fixed">ツールバーアイコンが消えることがある問題を修正</li>
+            <li class="fixed">大きいアイコンにするとWindowsでツールバーボタンに画像が表示されなくなる問題を修正</li>
+            <li class="fixed">範囲指定のあるアンカー等で正しく連鎖あぼーんが働かない問題を修正</li>
+            <li class="fixed">Firefox 18以降でプロキシを「ブラウザの設定に従う」以外にするとスレッドが開けなくなる問題を修正</li>
+            <li class="fixed">Firefox 18以降で「直接接続する」が動作しない問題を修正</li>
+            <li class="fixed">Firefox 20以降でスレッド一覧が開けない問題を修正</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.6</h1>
+        <ul>
+            <li class="modified">maxVersionをFirefox 10に変更</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.5</h1>
+        <ul>
+            <li class="modified">maxVersionをFirefox 8に変更</li>
+            <li class="modified">minVersionをFirefox 7に変更</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.4</h1>
+        <ul>
+            <li class="modified">maxVersionをFirefox 7に変更</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.3</h1>
+        <ul>
+            <li class="modified">maxVersionをFirefox 6に変更</li>
+            <li class="modified">minVersionをFirefox 5に変更</li>
+            <li class="modified">marbletoolbarの背景グラデーションをSVGからCSSに変更</li>
+            <li class="fixed">Firefox 7でスレッド一覧が表示されない問題を修正</li>
+            <li class="fixed">Beの仕様変更に対応</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>1.5.2</h1>
+        <ul>
+            <li class="modified">起動初期化時にアドオン情報の取得を待たないようにした</li>
+        </ul>
+    </section>
+
+    <section>
+        <h1>〜1.5.1</h1>
+        <p>
+            1.5.1以前のリリースノートについては、<a href="http://chaika.xrea.jp/index.php/blog/">公式サイト</a>をご覧ください。
+        </p>
+    </section>
+</article>
+
+<footer>
+    <ul>
+        <li><a href="http://chaika.xrea.jp/">chaika 公式サイト</a></li>
+        <li>chaikaは<a href="http://code.google.com/p/chaika/">Google Code</a>でホスティングされています。
+            より詳細な更新履歴については<a href="http://code.google.com/p/chaika/source/list">コミットログ</a>をご覧ください。
+        </li>
+    </ul>
+</footer>
+
+</body>
+</html>

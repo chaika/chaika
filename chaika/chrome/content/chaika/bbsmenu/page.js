@@ -110,6 +110,14 @@ var Page = {
 	},
 
 
+	openChangelog: function Page_openChangelog(){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var changelogURL = ioService.newURI("chaika://changelog/", null, null);
+
+		ChaikaCore.browser.openURL(changelogURL, true);
+	},
+
+
 	openSettings: function Page_openSettings(){
 		var winMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
 			.getService(Ci.nsIWindowMediator);

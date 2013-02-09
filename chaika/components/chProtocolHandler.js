@@ -108,6 +108,9 @@ chProtocolHandler.prototype = {
 			case "support":
 				channel = this._getRedirectChannel("chrome://chaika/content/support.xhtml");
 				break;
+			case "changelog":
+				channel = this._getRedirectChannel("chrome://chaika/content/changelog.html");
+				break;
 			default:
 				channel = this._getCommandChannel(aURI);
 				break;
