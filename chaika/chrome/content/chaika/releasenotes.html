@@ -76,6 +76,16 @@
             background-size: 14px;
         }
 
+        .info{
+            font-size: 90%;
+            width: 80%;
+            margin: 0 0 0 2em;
+            padding: 12px 0 5px 40px;
+            opacity: 0.75;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPtJREFUeNrslYEJxCAMRWu5AW4UR3CDOkJHcLWb4EbwNnEETw9jQ7AWNEU4DHwKtmmeUb/Ce7+MjHUZHBNgAkyACTABJkAzgBAiC42ZIBvkieKYoXm/3Hgdt4iEDnJB/kIufXtEKwCC2EmRd1CcrUoyaQx/s0PtXgBNZqcqoIp0SXMAOFRc4o5CIbJcEud0AaTWwmwUXdITAOgE5JkeAIvWvLqnCgF7wvb4gEzPV0Mu5MgHg5d8qD/EWcfzD0O1nL+wYtmTszK0fmvI3fI/uI9hdrjj3T3H8MyILgBYjahoxZW281oxijGXEcd1zAZANqYtFLbp3ZOSfwUYAEd3xzL8/6eQAAAAAElFTkSuQmCC) no-repeat left top;
+            background-size: 30px;
+        }
+
 
         footer{
             margin-top: 80px;
@@ -130,9 +140,17 @@
         <ul>
             <li class="new">「最近アクセスしたスレッド」等が新しいタブで開くかどうかについて設定を反映するようにした</li>
             <li class="new">SETTING.TXTに板名が書かれていない板ではページタイトルを板名に設定するようにした</li>
-            <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした<br />（Web Fontなどがスキンで使えるようになりました）</li>
+            <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした
+                <aside class="info">
+                    Web Fontなど、従来Internal Server Errorとなっていたファイルがスキンで使えるようになりました。
+                </aside>
+            </li>
             <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
-            <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正</li>
+            <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正
+                <aside class="info">
+                    本修正に伴い、透明削除があるスレッドのdatに互換性がなくなりました。表示がおかしい場合にはdatを再取得して下さい。
+                </aside>
+            </li>
             <li class="fixed">ログピックアップモードの時に新着を取得しない問題を修正</li>
             <li class="fixed">連鎖あぼーんが正しく動かないことがある問題を修正</li>
             <li class="fixed">アンカー修正機能が有効な時にアンカーが誤って表示されることがある問題を修正</li>
@@ -145,9 +163,17 @@
         <ul>
             <li class="new">したらばでの新規スレッド作成機能を実装</li>
             <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
-            <li class="new">HTML版の2ch検索を実装（extensions.chaika.bbsmenu.find2ch.use_rssで切り替え）</li>
-            <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装<br />
-            （extensions.chaika.thread_fix_invalid_anchorで切り替え）</li>
+            <li class="new">HTML版の2ch検索を実装
+                <aside class="info">
+                    about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで切り替えることができます(デフォルトOFF)。
+                </aside>
+            </li>
+            <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装
+                <aside class="info">
+                    本機能は実験的機能となっています。<br />
+                    about:configよりextensions.chaika.thread_fix_invalid_anchorで切り替えることができます(デフォルトOFF)。
+                </aside>
+            </li>
             <li class="changed">maxVersionをFirefox 18に変更</li>
             <li class="changed">minVersionをFirefox 10に変更</li>
             <li class="fixed">Be IDがあるときにIDの末尾に余計なスペースが付加される問題を修正</li>
