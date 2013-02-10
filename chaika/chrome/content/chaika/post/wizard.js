@@ -204,14 +204,25 @@ function cancelCheck(aEvent){
 
 function setTitle(){
 	if(gWizType == WIZ_TYPE_RES){
-		gWizard.title = "書き込み: " + gThread.title + " [chaika]";
-		document.getElementById("titleHeader").value = gThread.title;
+		var title = unescapeHTML(gThread.title);
+
+		gWizard.title = "書き込み: " + title + " [chaika]";
+		document.getElementById("titleHeader").value = title;
 	}else if(gWizType == WIZ_TYPE_NEW_THREAD){
-		gWizard.title = gBoard.getTitle() + " への新規スレッド作成"  + " [chaika]";
-		document.getElementById("titleHeader").value = gBoard.getTitle() + " への新規スレッド作成";
+		var title = unescapeHTML(gBoard.getTitle());
+
+		gWizard.title = title + " への新規スレッド作成"  + " [chaika]";
+		document.getElementById("titleHeader").value = title + " への新規スレッド作成";
 	}
 }
 
+
+function unescapeHTML(aStr){
+	var div = document.createElementNS('http://www.w3.org/1999/xhtml', 'div');
+	div.insertAdjacentHTML('afterbegin', aStr);
+
+	return div.textContent;
+}
 
 
 
