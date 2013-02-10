@@ -5,7 +5,7 @@ var ChaikaBrowserOverlay = {
 	start: function ChaikaBrowserOverlay_start(){
 		//10s待ってもChaikaCoreが初期化されていなかったら
 		//初期化は失敗したものとみなす
-		if(this._initCount > 100){
+		if(ChaikaBrowserOverlay._initCount > 100){
 			return;
 		}
 
@@ -13,9 +13,12 @@ var ChaikaBrowserOverlay = {
 			ChaikaBrowserOverlay.contextMenu.start();
 			ChaikaBrowserOverlay.threadToolbar.start();
 			ChaikaBrowserOverlay.aboneEvent.start();
+
+			//リリースノートの表示
+			setTimeout(function(){ ChaikaBrowserOverlay._showReleaseNotes(); }, 0);
 		}else{
-			this._initCount++;
-			setTimeout(this.start, 100);
+			ChaikaBrowserOverlay._initCount++;
+			setTimeout(ChaikaBrowserOverlay.start, 100);
 		}
 	},
 
@@ -24,12 +27,34 @@ var ChaikaBrowserOverlay = {
 		ChaikaBrowserOverlay.contextMenu.stop();
 		ChaikaBrowserOverlay.threadToolbar.stop();
 		ChaikaBrowserOverlay.aboneEvent.stop();
-	}
+	},
+
+
+	/**
+	 * ブラウザ起動時のウィンドウロード後に一度だけ実行される
+	 * バージョン更新時にのみ自動的にリリースノートを表示する
+	 */
+	_showReleaseNotes: function ChaikaBrowserOverlay__showReleaseNotes(){
+		//現在のバージョン
+		var currentVersion = ChaikaBrowserOverlay.ChaikaAddonInfo.version.split('.');
+
+		//前回リリースノートを表示した時のバージョン
+		var showedVersion = ChaikaBrowserOverlay.ChaikaCore.pref.getChar('releasenotes_showed').split('.');
+
+		for(let i=0; i<currentVersion.length; i++){
+			if(currentVersion[i] > ( showedVersion[i] || 0 )){
+				gBrowser.selectedTab = gBrowser.addTab('chaika://releasenotes/?updated=1');
+				ChaikaBrowserOverlay.ChaikaCore.pref.setChar('releasenotes_showed', currentVersion.join('.'));
+				break;
+			}
+		}
+	},
 
 };
 
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
+Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBrowserOverlay);
 
 
 ChaikaBrowserOverlay.contextMenu = {

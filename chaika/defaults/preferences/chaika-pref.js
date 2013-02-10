@@ -1,3 +1,5 @@
+pref('extensions.chaika.releasenotes_showed', '1.5.7');
+
 pref("extensions.chaika.enable_browser_contextmenu", true);
 pref("extensions.chaika.browser_contextmenu_disregard_url_option", true);
 pref("extensions.chaika.http_proxy_mode", 0);

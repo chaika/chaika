@@ -4,6 +4,15 @@
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="chrome://chaika/content/icon.png" />
     <title>リリースノート [chaika]</title>
+    <script>
+        window.addEventListener('DOMContentLoaded', function(){
+            if(location.search.indexOf('updated=1') > -1){
+                document.body.classList.add('updated');
+            }
+
+            window.removeEventListener('DOMContentLoaded', arguments.callee, false);
+        }, false);
+    </script>
     <style>
         body{
             background-color: #eee;
@@ -25,8 +34,29 @@
 
 
         header > h1{
+            font-size: 200%;
             margin-left: 10px;
         }
+
+
+        #updated{
+            display: none;
+            padding: 10px 0;
+        }
+
+        #updated > h1{
+            font-size: 180%;
+            margin: 8px 0;
+        }
+
+        .updated #updated{
+            display: block;
+        }
+
+        .updated #updated + section > h1{
+            color: red;
+        }
+
 
         section > p{
             margin-left: 40px;
@@ -90,6 +120,11 @@
 </header>
 
 <article>
+    <section id="updated">
+        <h1>chaika が新しいバージョンへと更新されました。</h1>
+        <p>ご利用ありがとうございます。<br />公式サイト等へのリンクはページ下部をご覧ください。</p>
+    </section>
+
     <section>
         <h1>1.5.8 - 2013/02/02</h1>
         <ul>
