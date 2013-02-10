@@ -157,7 +157,15 @@ var ChaikaP2Login = {
 	_loggedIn: false,
 
 	//p2での書き込みを有効にするかどうか
-	enabled: false,
+	_enabled: false,
+
+	get enabled(){
+		return this._enabled && this.isLoggedIn();
+	},
+
+	set enabled(bool){
+		this._enabled = bool;
+	},
 
 	get cookieManager(){
 		if(!this._cookieManager)
