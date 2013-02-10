@@ -60,18 +60,24 @@
         }
 
 
+        /* *** アイコン *** */
+
+        /* 新機能: 星 */
         .new{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYMAPEqCYbHAeiPeTq9kAiP9DsQI5BsxHMqCfVM0OQPweyYD3UDGc/vxPJgbpBfvvPRmaQXoEkJ1MqgEG6F4pIEFzAjEhjwvPR9bAhGbAQSJiaCM+A/yJMACnGgEcIf0eixjOjPMfLfUJQHE/mlwANgPWQyX340j7BlA5jICEOf8+LpPRQAAsBYIAQIABAGFTZWF4e3sHAAAAAElFTkSuQmCC);
         }
 
+        /* バグ修正: チェック */
         .fixed{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHBJREFUeNpi/P//PwMlgImBUkCGCwRQ9JJoAEjzeSCeT44BMM3/oXg+SC8TLudhEd8PxAb4wgDFeXhs/o/NCxjOI6SZkAEwhTg1YwtEbIbg1IwrFnAZMh9nGsISjbjCg2gD8MUIhgGMA56ZKDYAIMAADEBwpEggEUwAAAAASUVORK5CYII=);
         }
 
-        .modified{
+        /* 変更: 更新 */
+        .changed{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALNJREFUeNpiYMAPBIBYAZfk////sYo7APF6kDwaXg+Vw2tAPxaN6LgflwHImu8DcQLURgco+z66IcgGOCBJzof6HVt4zEdS54BswHokmwUIBCrMJeuRDYCZasFAGCTA1IMMYEKLprdEGPAAmQMy4AMDBQDdAGEi9GBNWLBA9IbSJAeiJlpiQdYgQEw02mExoAGJD2Ib4EtI6MlVAIsYLLX2E8pMDHgMICo3MuDwAlYDAAIMAFQCdq6IkR49AAAAAElFTkSuQmCC);
         }
 
+        /* 削除: マイナス */
         .removed{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC9JREFUeNpi/P//PwMlgImBQjBqAAMDC4hgZGQkKyqAMcg4DMKAcTQlDgIDAAIMAFXeChvgRcFcAAAAAElFTkSuQmCC);
         }
@@ -107,8 +113,8 @@
             <li class="new">HTML版の2ch検索を実装（extensions.chaika.bbsmenu.find2ch.use_rssで切り替え）</li>
             <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装<br />
             （extensions.chaika.thread_fix_invalid_anchorで切り替え）</li>
-            <li class="modified">maxVersionをFirefox 18に変更</li>
-            <li class="modified">minVersionをFirefox 10に変更</li>
+            <li class="changed">maxVersionをFirefox 18に変更</li>
+            <li class="changed">minVersionをFirefox 10に変更</li>
             <li class="fixed">Be IDがあるときにIDの末尾に余計なスペースが付加される問題を修正</li>
             <li class="fixed">したらばやまちBBSの透明削除があるスレッドを開くとレス番がずれる問題を修正</li>
             <li class="fixed">ID: の前に文字があるとIDのリンクが貼られない問題を修正</li>
@@ -125,31 +131,31 @@
     <section>
         <h1>1.5.6 - 2011/12/21</h1>
         <ul>
-            <li class="modified">maxVersionをFirefox 10に変更</li>
+            <li class="changed">maxVersionをFirefox 10に変更</li>
         </ul>
     </section>
 
     <section>
         <h1>1.5.5 - 2011/11/07</h1>
         <ul>
-            <li class="modified">maxVersionをFirefox 8に変更</li>
-            <li class="modified">minVersionをFirefox 7に変更</li>
+            <li class="changed">maxVersionをFirefox 8に変更</li>
+            <li class="changed">minVersionをFirefox 7に変更</li>
         </ul>
     </section>
 
     <section>
         <h1>1.5.4 - 2011/10/03</h1>
         <ul>
-            <li class="modified">maxVersionをFirefox 7に変更</li>
+            <li class="changed">maxVersionをFirefox 7に変更</li>
         </ul>
     </section>
 
     <section>
         <h1>1.5.3 - 2011/08/13</h1>
         <ul>
-            <li class="modified">maxVersionをFirefox 6に変更</li>
-            <li class="modified">minVersionをFirefox 5に変更</li>
-            <li class="modified">marbletoolbarの背景グラデーションをSVGからCSSに変更</li>
+            <li class="changed">maxVersionをFirefox 6に変更</li>
+            <li class="changed">minVersionをFirefox 5に変更</li>
+            <li class="changed">marbletoolbarの背景グラデーションをSVGからCSSに変更</li>
             <li class="fixed">Firefox 7でスレッド一覧が表示されない問題を修正</li>
             <li class="fixed">Beの仕様変更に対応</li>
         </ul>
@@ -158,7 +164,7 @@
     <section>
         <h1>1.5.2 - 2011/07/08</h1>
         <ul>
-            <li class="modified">起動初期化時にアドオン情報の取得を待たないようにした</li>
+            <li class="changed">起動初期化時にアドオン情報の取得を待たないようにした</li>
         </ul>
     </section>
 
