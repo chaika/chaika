@@ -80,7 +80,9 @@
 							<row>
 								<label value="Pass " style="text-align:right;"/>
 								<textbox type="password"
-									preference="extensions.chaika.login.be.password"/>
+									preference="extensions.chaika.login.be.password"
+									onsyncfrompreference="return gGeneralPane.setPasswordBox('Be')"
+									onsynctopreference="return gGeneralPane.setPasswordPref('Be', this.value)"/>
 							</row>
 						</rows>
 					</grid>
@@ -103,7 +105,9 @@
 							<row>
 								<label value="Pass " style="text-align:right;"/>
 								<textbox type="password"
-									preference="extensions.chaika.login.p2.password"/>
+									preference="extensions.chaika.login.p2.password"
+									onsyncfrompreference="return gGeneralPane.setPasswordBox('p2')"
+									onsynctopreference="return gGeneralPane.setPasswordPref('p2', this.value)"/>
 							</row>
 						</rows>
 					</grid>

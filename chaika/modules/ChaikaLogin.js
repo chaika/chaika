@@ -61,6 +61,69 @@ var ChaikaBeLogin = {
 	_loggedIn: false,
 
 
+	/**
+	 * ユーザーIDとパスワードを返す関数
+	 * @return {Object}  {String} .id ID
+	 *                   {String} .password Password
+	 */
+	getLoginInfo: function ChaikaBeLogin_getLoginInfo(){
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+
+		var account = {
+			id: '',
+			password: ''
+		};
+
+		account.id = ChaikaCore.pref.getChar('login.be.id');
+
+		var logins = lm.findLogins({}, 'http://be.2ch.net', 'http://be.2ch.net', null);
+
+		logins.some(function(login){
+			if(login.username === account.id){
+				account.password = login.password;
+				return true;
+			}
+
+			return false;
+		});
+
+		return account;
+	},
+
+
+	/**
+	 * ユーザーIDとパスワードをセットする関数
+	 * @param {String} id
+	 * @param {String} password
+	 */
+	setLoginInfo: function ChaikaBeLogin_setLoginInfo(id, password){
+		if(!id || !password) return;
+
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+		var loginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+														Ci.nsILoginInfo, "init");
+
+		var login = new loginInfo('http://be.2ch.net', 'http://be.2ch.net', null,
+						id, password, 'm', 'p');
+
+		try{
+			var oldLogin = this.getLoginInfo();
+
+			if(oldLogin.id == id && oldLogin.password == password) return;
+
+			if(oldLogin.id == id){
+				var oldLoginInfo = new loginInfo('http://be.2ch.net', 'http://be.2ch.net', null,
+										oldLogin.id, oldLogin.password, 'm', 'p');
+				lm.modifyLogin(oldLoginInfo, login);
+			}else{
+				lm.addLogin(login);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+	},
+
+
 	isLoggedIn: function ChaikaBeLogin_isLoggedIn(){
 		if(!this._loggedIn){
 			var cookieService = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
@@ -106,9 +169,11 @@ var ChaikaBeLogin = {
 				os.notifyObservers(null, "ChaikaBeLogin:Login", "NG");
 			}
 		}
+
+		var account = this.getLoginInfo();
 		var fromStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-		var mail = "m=" + encodeURIComponent(ChaikaCore.pref.getChar("login.be.id"));
-		var pass = "p=" + encodeURIComponent(ChaikaCore.pref.getChar("login.be.password"));
+		var mail = "m=" + encodeURIComponent(account.id);
+		var pass = "p=" + encodeURIComponent(account.password);
 		var submit = "submit=%C5%D0%CF%BF";
 		fromStr.data = [mail, pass, submit].join("&");
 
@@ -181,6 +246,72 @@ var ChaikaP2Login = {
 		return this._os;
 	},
 
+	/**
+	 * ユーザーIDとパスワードを返す関数
+	 * @return {Object}  {String} .id ID
+	 *                   {String} .password Password
+	 */
+	getLoginInfo: function ChaikaP2Login_getLoginInfo(){
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+
+		var account = {
+			id: '',
+			password: ''
+		};
+
+		account.id = ChaikaCore.pref.getChar('login.p2.id');
+
+		var url = ChaikaCore.pref.getChar('login.p2.login_url');
+		url = url.match(/^(https?:\/\/[^\/]+)\//)[1];
+
+		var logins = lm.findLogins({}, url, url, null);
+
+		logins.some(function(login){
+			if(login.username === account.id){
+				account.password = login.password;
+				return true;
+			}
+
+			return false;
+		});
+
+		return account;
+	},
+
+
+	/**
+	 * ユーザーIDとパスワードをセットする関数
+	 * @param {String} id
+	 * @param {String} password
+	 */
+	setLoginInfo: function ChaikaP2Login_setLoginInfo(id, password){
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+		var loginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+														Ci.nsILoginInfo, "init");
+
+		var url = ChaikaCore.pref.getChar('login.p2.login_url');
+		url = url.match(/^(https?:\/\/[^\/]+)\//)[1];
+
+		var login = new loginInfo(url, url, null,
+						id, password, 'form_login_id', 'form_login_pass');
+
+		try{
+			var oldLogin = this.getLoginInfo();
+
+			if(oldLogin.id == id && oldLogin.password == password) return;
+
+			if(oldLogin.id == id){
+				var oldLoginInfo = new loginInfo(url, url, null,
+										oldLogin.id, oldLogin.password, 'form_login_id', 'form_login_pass');
+				lm.modifyLogin(oldLoginInfo, login);
+			}else{
+				lm.addLogin(login);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+	},
+
 
 	isLoggedIn: function ChaikaP2Login_isLoggedIn(){
 		var psExists = this.cookieManager.cookieExists({
@@ -210,9 +341,10 @@ var ChaikaP2Login = {
 		this._req.addEventListener('load', this, false);
 		this._req.addEventListener('error', this, false);
 
+		var account = this.getLoginInfo();
 		var formStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-		var mail = "form_login_id=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.id"));
-		var pass = "form_login_pass=" + encodeURIComponent(ChaikaCore.pref.getChar("login.p2.password"));
+		var mail = "form_login_id=" + encodeURIComponent(account.id);
+		var pass = "form_login_pass=" + encodeURIComponent(account.password);
 		var extra = "ctl_register_cookie=1&register_cookie=1&submit_userlogin=%83%86%81%5B%83U%83%8D%83O%83C%83%93";
 		formStr.data = [mail, pass, extra].join("&");
 

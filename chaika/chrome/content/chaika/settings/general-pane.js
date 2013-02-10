@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 
 var gGeneralPane = {
 
@@ -81,5 +82,32 @@ var gGeneralPane = {
 	openMaruDialog: function(){
 		document.documentElement.openSubDialog(
 			"chrome://chaika/content/settings/maru.xul", "", null);
+	},
+
+	/**
+	 * ログインマネージャからパスワードを取得してセットする
+	 */
+	setPasswordBox: function(mode){
+		var account = mode == 'Be' ?
+							ChaikaBeLogin.getLoginInfo() :
+							ChaikaP2Login.getLoginInfo();
+
+		return account.password;
+	},
+
+	/**
+	 * パスワードをログインマネージャに登録し、設定値には空文字列を登録するようにする
+	 * 変更の反映処理等を効率的に行うためにダミーの設定項目(login.p2.idなど)を使用する
+	 */
+	setPasswordPref: function(mode, pass){
+		if(mode == 'Be'){
+			var id = document.getElementById('extensions.chaika.login.be.id').value;
+			ChaikaBeLogin.setLoginInfo(id, pass);
+		}else{
+			var id = document.getElementById('extensions.chaika.login.p2.id').value;
+			ChaikaP2Login.setLoginInfo(id, pass);
+		}
+
+		return '';
 	}
 };
