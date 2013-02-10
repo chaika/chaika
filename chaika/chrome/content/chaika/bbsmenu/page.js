@@ -110,11 +110,11 @@ var Page = {
 	},
 
 
-	openChangelog: function Page_openChangelog(){
+	openReleaseNotes: function Page_openReleaseNotes(){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var changelogURL = ioService.newURI("chaika://changelog/", null, null);
+		var releasenotesURL = ioService.newURI("chaika://releasenotes/", null, null);
 
-		ChaikaCore.browser.openURL(changelogURL, true);
+		ChaikaCore.browser.openURL(releasenotesURL, true);
 	},
 
 

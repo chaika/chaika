@@ -52,7 +52,7 @@
 						 hidden="true" oncommand="Page.viewFoxAge2ch()"/>
 				<menu label="ヘルプ">
 					<menupopup>
-						<menuitem label="リリースノート" oncommand="Page.openChangelog()"/>
+						<menuitem label="リリースノート" oncommand="Page.openReleaseNotes()"/>
 						<menuitem label="トラブルシューティング情報" oncommand="Page.openSupport()"/>
 					</menupopup>
 				</menu>
