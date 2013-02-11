@@ -76,6 +76,17 @@ var ChaikaBeLogin = {
 
 		account.id = ChaikaCore.pref.getChar('login.be.id');
 
+
+		//保存されているパスワードをログインマネージャへ移行
+		if(ChaikaCore.pref.getChar('login.be.password')){
+			account.password = ChaikaCore.pref.getChar('login.be.password');
+			ChaikaCore.pref.setChar('login.be.password', '');
+			this.setLoginInfo(account.id, account.password);
+
+			return account;
+		}
+
+
 		var logins = lm.findLogins({}, 'http://be.2ch.net', 'http://be.2ch.net', null);
 
 		logins.some(function(login){
@@ -260,6 +271,17 @@ var ChaikaP2Login = {
 		};
 
 		account.id = ChaikaCore.pref.getChar('login.p2.id');
+
+
+		//保存されているパスワードをログインマネージャへ移行
+		if(ChaikaCore.pref.getChar('login.p2.password')){
+			account.password = ChaikaCore.pref.getChar('login.p2.password');
+			ChaikaCore.pref.setChar('login.p2.password', '');
+			this.setLoginInfo(account.id, account.password);
+
+			return account;
+		}
+
 
 		var url = ChaikaCore.pref.getChar('login.p2.login_url');
 		url = url.match(/^(https?:\/\/[^\/]+)\//)[1];
