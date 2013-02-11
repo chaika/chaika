@@ -149,9 +149,17 @@ function startup(){
 
 
 function shutdown(){
-		// checked の値を完全に覚えさせる
+	// checked の値を完全に覚えさせる
+	// ただし、defaultmail.txtの内容は覚えない
 	var sageCheck = document.getElementById("sageCheck");
-	if(!sageCheck.checked) sageCheck.setAttribute("checked", "false");
+
+	if(sageCheck.hasAttribute('previousValue')){
+		sageCheck.setAttribute('checked', sageCheck.getAttribute('previousValue').toString());
+	}else{
+		sageCheck.setAttribute('checked', sageCheck.checked.toString());
+	}
+
+	ChaikaCore.logger.debug(sageCheck.getAttribute('checked').toString());
 
 	var useAAFontCheck = document.getElementById("useAAFontCheck");
 	if(!useAAFontCheck.hasAttribute("checked")){
@@ -328,7 +336,7 @@ var FormPage = {
 		}
 
 		//sage
-		this.sageCheck();
+		this.sageCheck(true);
 
 		//Be, p2
 		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
@@ -548,11 +556,25 @@ var FormPage = {
 		}
 	},
 
-	sageCheck: function FormPage_sageCheck(){
-		var sageChecked = FormPage._sageCheck.checked;
-		this._mailForm.emptyText = sageChecked ? "sage" : " ";
+	/**
+	 * sageチェックボックスを管理する
+	 * @param {Boolean} init 初期化する場合はtrue
+	 */
+	sageCheck: function FormPage_sageCheck(init){
+		//defaultmail.txtで指定されている場合は、
+		//sageチェックボックスをそれに合わせる
+		if(init && this._mailForm.value){
+			//defaultmail.txtではない時の値を覚えておく
+			this._sageCheck.setAttribute('previousValue', this._sageCheck.checked.toString());
 
-		return sageChecked;
+			this._sageCheck.checked = this._mailForm.value.indexOf('sage') > -1;
+		}
+
+		//emptyTextの設定
+		this._mailForm.emptyText = this._sageCheck.checked ? "sage" : " ";
+
+ChaikaCore.logger.debug(init + '/' + this._sageCheck.getAttribute('previousValue') + '/' + this._sageCheck.checked.toString());
+		return this._sageCheck.checked;
 	},
 
 	setUseAAFont: function FormPage_setUseAAFont(){
