@@ -164,11 +164,9 @@ Post.prototype = {
 		}
 
 		function convertEntity(aStr){
-			return aStr.replace("\"", "&quot;", "g")
-							.replace("\"", "&quot;", "g")
-							.replace("&", "&amp;", "g")
-							.replace("<", "&lt;", "g")
-							.replace(">", "&gt;", "g");
+			return aStr.replace("&", "&amp;", "g")
+						.replace("<", "&lt;", "g")
+						.replace(">", "&gt;", "g");
 		}
 
 		preview["title"]   = convertEntity(this.getThreadTitle());
