@@ -84,6 +84,82 @@ var Chaika2chViewer = {
 	},
 
 
+	/**
+	 * ユーザーIDとパスワードを返す関数
+	 * @return {Object}  {String} .id ID
+	 *                   {String} .password Password
+	 */
+	getLoginInfo: function Chaika2chViewer_getLoginInfo(){
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+
+		var account = {
+			id: '',
+			password: ''
+		};
+
+		account.id = ChaikaCore.pref.getChar('maru_id');
+
+
+		//保存されているパスワードをログインマネージャへ移行
+		if(ChaikaCore.pref.getChar('maru_password')){
+			account.password = ChaikaCore.pref.getChar('maru_password');
+			ChaikaCore.pref.setChar('maru_password', '');
+			this.setLoginInfo(account.id, account.password);
+
+			return account;
+		}
+
+
+		var logins = lm.findLogins({}, 'chrome://chaika', null, '2ch Viewer Registration');
+
+		logins.some(function(login){
+			if(login.username === account.id){
+				account.password = login.password;
+				return true;
+			}
+
+			return false;
+		});
+
+		//パスワードがない時はそのアカウントは無効
+		if(!account.password) account.id = '';
+
+		return account;
+	},
+
+
+	/**
+	 * ユーザーIDとパスワードをセットする関数
+	 * @param {String} id
+	 * @param {String} password
+	 */
+	setLoginInfo: function Chaika2chViewer_setLoginInfo(id, password){
+		if(!id || !password) return;
+
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+		var loginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+														Ci.nsILoginInfo, "init");
+
+		var login = new loginInfo('chrome://chaika', null, '2ch Viewer Registration', id, password, '', '');
+
+		try{
+			var oldLogin = this.getLoginInfo();
+
+			if(oldLogin.id == id && oldLogin.password == password) return;
+
+			if(oldLogin.id && oldLogin.id == id){
+				var oldLoginInfo = new loginInfo('chrome://chaika', null, '2ch Viewer Registration',
+										oldLogin.id, oldLogin.password, '', '');
+				lm.modifyLogin(oldLoginInfo, login);
+			}else{
+				lm.addLogin(login);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+	},
+
+
 	auth: function(){
 		this.maruLogined = false;
 		this.maruSessionID = "";
@@ -127,8 +203,9 @@ var Chaika2chViewer = {
 
 	_authStart: function Chaika2chViewer__authStart(){
 		var maruAuthURLSpec = ChaikaCore.pref.getChar("maru_auth_url");
-		var maruID = ChaikaCore.pref.getChar("maru_id");
-		var maruPass = ChaikaCore.pref.getChar("maru_password");
+		var account = this.getLoginInfo();
+		var maruID = account.id;
+		var maruPass = account.password;
 
 		if(!(maruID && maruPass)){
 			ChaikaCore.logger.warning("Auth: STOP");

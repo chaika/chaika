@@ -23,6 +23,27 @@ var gMaruPane = {
 		Chaika2chViewer.auth();
 	},
 
+	/**
+	 * ログインマネージャからパスワードを取得してセットする
+	 */
+	setPasswordBox: function(){
+		var account = Chaika2chViewer.getLoginInfo();
+		return account.password;
+	},
+
+	/**
+	 * パスワードをログインマネージャに登録し、設定値には空文字列を登録するようにする
+	 * 変更の反映処理等を効率的に行うためにダミーの設定項目を使用する
+	 */
+	setPasswordPref: function(){
+		var id = document.getElementById('txtMaruID').value;
+		var pass = document.getElementById('txtMaruPass').value;
+
+		Chaika2chViewer.setLoginInfo(id, pass);
+
+		return '';
+	},
+
 
   	// ********** ********* implements nsIObserver ********** **********
 

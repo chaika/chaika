@@ -41,7 +41,9 @@
 					<row align="center">
 						<label value="Pass :" style="text-align:right;"/>
 						<textbox id="txtMaruPass" type="password"
-							preference="extensions.chaika.maru_password"/>
+							preference="extensions.chaika.maru_password"
+							onsyncfrompreference="return gMaruPane.setPasswordBox()"
+							onsynctopreference="return gMaruPane.setPasswordPref()"/>
 					</row>
 				</rows>
 			</grid>
