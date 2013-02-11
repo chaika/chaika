@@ -159,8 +159,6 @@ function shutdown(){
 		sageCheck.setAttribute('checked', sageCheck.checked.toString());
 	}
 
-	ChaikaCore.logger.debug(sageCheck.getAttribute('checked').toString());
-
 	var useAAFontCheck = document.getElementById("useAAFontCheck");
 	if(!useAAFontCheck.hasAttribute("checked")){
 		useAAFontCheck.setAttribute("checked", "false");
@@ -573,7 +571,6 @@ var FormPage = {
 		//emptyTextの設定
 		this._mailForm.emptyText = this._sageCheck.checked ? "sage" : " ";
 
-ChaikaCore.logger.debug(init + '/' + this._sageCheck.getAttribute('previousValue') + '/' + this._sageCheck.checked.toString());
 		return this._sageCheck.checked;
 	},
 
