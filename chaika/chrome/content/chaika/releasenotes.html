@@ -31,6 +31,13 @@
         ul{
             list-style-type: none;
         }
+        ul.list{
+            list-style-type: square;
+        }
+
+        p:first-child{
+            margin-top: 0;
+        }
 
 
         header > h1{
@@ -62,17 +69,24 @@
             margin-left: 40px;
         }
 
-        article ul{
-            width: 80%;
+        section > ul{
+            width: 90%;
             margin-bottom: 50px;
         }
 
-        article li{
+        section > ul > li{
             margin: 0;
-            padding: 0.5em 0 0.5em 25px;
+            padding: 0.5em 0 0.5em 5px;
             border-bottom: 1px rgba(0, 0, 0, 0.25) dotted;
+        }
+        section > ul > li:before{
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            margin: 5px 8px 0 0;
             background-repeat: no-repeat;
-            background-position: left center;
+            background-position: left top;
             background-size: 14px;
         }
 
@@ -95,30 +109,26 @@
             color: #555;
         }
 
-        footer > ul{
-            list-style-type: square;
-        }
-
 
         /* *** アイコン *** */
 
         /* 新機能: 星 */
-        .new{
+        .new:before{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYMAPEqCYbHAeiPeTq9kAiP9DsQI5BsxHMqCfVM0OQPweyYD3UDGc/vxPJgbpBfvvPRmaQXoEkJ1MqgEG6F4pIEFzAjEhjwvPR9bAhGbAQSJiaCM+A/yJMACnGgEcIf0eixjOjPMfLfUJQHE/mlwANgPWQyX340j7BlA5jICEOf8+LpPRQAAsBYIAQIABAGFTZWF4e3sHAAAAAElFTkSuQmCC);
         }
 
         /* バグ修正: チェック */
-        .fixed{
+        .fixed:before{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHBJREFUeNpi/P//PwMlgImBUkCGCwRQ9JJoAEjzeSCeT44BMM3/oXg+SC8TLudhEd8PxAb4wgDFeXhs/o/NCxjOI6SZkAEwhTg1YwtEbIbg1IwrFnAZMh9nGsISjbjCg2gD8MUIhgGMA56ZKDYAIMAADEBwpEggEUwAAAAASUVORK5CYII=);
         }
 
         /* 変更: 鉛筆 */
-        .changed{
+        .changed:before{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIdJREFUeNpi+P//PwMIEwl4gbgdiBvgIiQYANK8HKQFiueTYgC6ZrghTETYLADEs4A4AqssARfgspkoLxDWjMcA4jTjMIB4zVgMIE0zFgNI0wwExETjAiBOxCmL5IL50DjfRYzN2Az4j2bIfKJyB5oB/4nWCAUsSGxGBjIAsgH/SdAHtwwgwACYfIPu05/AsQAAAABJRU5ErkJggg==);
         }
 
         /* 削除: マイナス */
-        .removed{
+        .removed:before{
             background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC9JREFUeNpi/P//PwMlgImBQjBqAAMDC4hgZGQkKyqAMcg4DMKAcTQlDgIDAAIMAFXeChvgRcFcAAAAAElFTkSuQmCC);
         }
     </style>
@@ -132,7 +142,11 @@
 <article>
     <section id="updated">
         <h1>chaika が新しいバージョンへと更新されました。</h1>
-        <p>ご利用ありがとうございます。<br />公式サイト等へのリンクはページ下部をご覧ください。</p>
+        <p>
+            ご利用ありがとうございます。<br />
+            公式サイト等へのリンクはページ下部をご覧ください。<br />
+            <strong>chaika 1.5.7 以降と Chaika Write Helper は併用出来ませんのでご注意下さい。</strong>
+        </p>
     </section>
 
     <section>
@@ -148,7 +162,7 @@
             <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
             <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正
                 <aside class="info">
-                    本修正に伴い、透明削除があるスレッドのdatに互換性がなくなりました。表示がおかしい場合にはdatを再取得して下さい。
+                    本修正に伴い、透明削除があるスレッドのdatが過去のchaikaと非互換になりました。表示がおかしい場合にはdatを再取得して下さい。
                 </aside>
             </li>
             <li class="fixed">ログピックアップモードの時に新着を取得しない問題を修正</li>
@@ -165,7 +179,7 @@
             <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
             <li class="new">HTML版の2ch検索を実装
                 <aside class="info">
-                    about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで切り替えることができます(デフォルトOFF)。
+                    about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで従来のRSSを用いた検索と切り替えることができます(デフォルトはRSS検索)。
                 </aside>
             </li>
             <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装
@@ -238,7 +252,7 @@
 </article>
 
 <footer>
-    <ul>
+    <ul class="list">
         <li><a href="http://chaika.xrea.jp/">chaika 公式サイト</a></li>
         <li>chaikaは<a href="http://code.google.com/p/chaika/">Google Code</a>でホスティングされています。
             より詳細な更新履歴については<a href="http://code.google.com/p/chaika/source/list">コミットログ</a>をご覧ください。
