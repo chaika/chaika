@@ -98,6 +98,9 @@ var ChaikaBeLogin = {
 			return false;
 		});
 
+		//パスワードがない時はそのアカウントは無効
+		if(!account.password) account.id = '';
+
 		return account;
 	},
 
@@ -122,7 +125,7 @@ var ChaikaBeLogin = {
 
 			if(oldLogin.id == id && oldLogin.password == password) return;
 
-			if(oldLogin.id == id){
+			if(oldLogin.id && oldLogin.id == id){
 				var oldLoginInfo = new loginInfo('http://be.2ch.net', 'http://be.2ch.net', null,
 										oldLogin.id, oldLogin.password, 'm', 'p');
 				lm.modifyLogin(oldLoginInfo, login);
@@ -297,6 +300,9 @@ var ChaikaP2Login = {
 			return false;
 		});
 
+		//パスワードがない時はそのアカウントは無効
+		if(!account.password) account.id = '';
+
 		return account;
 	},
 
@@ -322,7 +328,7 @@ var ChaikaP2Login = {
 
 			if(oldLogin.id == id && oldLogin.password == password) return;
 
-			if(oldLogin.id == id){
+			if(oldLogin.id && oldLogin.id == id){
 				var oldLoginInfo = new loginInfo(url, url, null,
 										oldLogin.id, oldLogin.password, 'form_login_id', 'form_login_pass');
 				lm.modifyLogin(oldLoginInfo, login);
