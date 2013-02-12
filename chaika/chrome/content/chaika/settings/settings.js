@@ -49,10 +49,14 @@ function startup(){
 			document.documentElement.showPane(paneElement);
 		}
 	}
+
+	window.addEventListener('paneload', sizeToContent, false);
 }
 
 function shutdown(){
+	window.removeEventListener('paneload', sizeToContent, false);
 }
+
 
 function setCcontainerDisabled(aPref, aCcontainerID, aEnabledValue){
 	var prefValue = document.getElementById(aPref).value;
