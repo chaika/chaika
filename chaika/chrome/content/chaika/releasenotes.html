@@ -31,12 +31,17 @@
         ul{
             list-style-type: none;
         }
+
         ul.list{
             list-style-type: square;
         }
 
         p:first-child{
             margin-top: 0;
+        }
+
+        p:last-child{
+            margin-bottom: 0;
         }
 
 
@@ -78,17 +83,19 @@
             margin: 0;
             padding: 0.5em 0 0.5em 5px;
             border-bottom: 1px rgba(0, 0, 0, 0.25) dotted;
+            clear: both;
         }
 
         section > ul > li:before{
             content: '';
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            margin: 5px 8px 0 0;
+            display: block;
+            width: 1em;
+            height: 2em;
+            float: left;
+            margin: 0.1em 8px 0 0;
             background-repeat: no-repeat;
             background-position: left top;
-            background-size: 14px;
+            background-size: 1em;
         }
 
         .info{
@@ -147,6 +154,50 @@
             ご利用ありがとうございます。<br />
             公式サイト等へのリンクはページ下部をご覧ください。
         </p>
+    </section>
+
+    <section>
+        <h1>1.6.0 - 2013/02/11</h1>
+        <ul>
+            <li class="new">p2経由での書き込みに対応
+                <aside class="info">
+                    <p>初めてp2経由でBeを有効にして書き込む場合、<a href="http://info.2ch.net/wiki/index.php?p2.2ch.net#content_1_9">p2.2ch.net
+                    にて設定する必要があります</a>。</p>
+                </aside>
+            </li>
+            <li class="new">リリースノートページの追加</li>
+            <li class="new">更新後初回起動時にリリースノートを自動で表示するようにした</li>
+            <li class="new">書き込みプレビューを表示するかどうかの設定を追加</li>
+            <li class="new">以下の場合に警告するかどうかの設定を追加
+                <ul class="list">
+                    <li>ログを削除する時</li>
+                    <li>書き込みウィザードを閉じる時</li>
+                    <li>fusianasan</li>
+                    <li>Beが有効な時 (Be関連板を除く)</li>
+                    <li>p2が有効な時</li>
+                </ul>
+            </li>
+            <li class="new">Be関連板で書き込む際に自動的にBeを有効にする機能を追加</li>
+            <li class="new">書き込みが終わるごとにBe, p2を無効にする機能を追加</li>
+            <li class="new">ログマネージャ、スレッド一覧、トラブルシューティング情報にfaviconを追加</li>
+            <li class="changed">Be、 p2、●のパスワードをログインマネージャで保管するように変更
+                <aside class="info">
+                    <p>これまでパスワードは平文で保存されていましたが、ログインマネージャを使うことにより暗号化された状態で保存されるようになり、
+                        セキュリティが大幅に向上しました。
+                    </p>
+                    <p>なお、従来の保存先である extensions.chaika.maru_password / extensions.chaika.login.be.password / extensions.chaika.login.p2.password は空文字のまま残りますが、これは内部処理で使用しているためであり不具合ではありません。</p>
+                </aside>
+            </li>
+            <li class="changed">スレッド一覧の「購読中」ボタンを「既読」ボタンへと名称を変更</li>
+            <li class="changed">Beのアカウントの設定を設定画面から行うように変更</li>
+            <li class="changed">defaultmail.txtで空白以外が指定されている板のスレッドへ書き込む際は、ウィザードのsageチェックボックスの値を記憶しないよう変更</li>
+            <li class="changed">設定ウィンドウのサイズを内容に応じて変化するように変更</li>
+            <li class="fixed">範囲が非常に大きいアンカーを含むレスがあるとメモリ不足になってスレッドが読み込めなくなる問題を修正</li>
+            <li class="fixed">Firefox 18以降でトラブルシューティング情報が動かない問題を修正</li>
+            <li class="fixed">書き込みウィザードでタイトルの実体参照が解除されていない問題を修正</li>
+            <li class="fixed">書き込みウィザードのプレビュー画面で「&quot;」が不要に実体参照へ変換されていた問題を修正</li>
+            <li class="fixed">defaultmail.txtで設定されたメールアドレスと書き込みウィザードのsageチェックボックスの値が矛盾することがある問題を修正</li>
+        </ul>
     </section>
 
     <section>
