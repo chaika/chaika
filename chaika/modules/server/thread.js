@@ -430,47 +430,51 @@ Thread2ch.prototype = {
 		var resMailName = resName;
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
-			// レス番リンク処理 & 連鎖あぼーん
-			// \x81\x84 = ＞
+		// レス番リンク処理 & 連鎖あぼーん
+		// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
-			//アンカー番号解析
-			//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
-			//最大500個に制限する
-			var ancNums = [];
+			//必要なときにのみアンカーの詳細解析を行う
+			if(enableChainAbone || fixInvalidAnchor){
+				//アンカー番号解析
+				//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
+				//最大500個に制限する
+				var ancNums = [];
 
-			ancStr.replace(/(?:\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
-				if(ancNumRange && !isNaN(ancNumRange)){
-					//範囲指定がないとき
-					if(ancNums.length < 500){
-						ancNums.push(parseInt(ancNumRange));
-					}
-				}else{
-					//範囲指定があるとき
-					let [ancStart, ancEnd] = ancNumRange.split('-');
-					ancStart = parseInt(ancStart);
-					ancEnd = parseInt(ancEnd);
-
-					if(0 < ancStart && 0 < ancEnd && ancNums.length < 500){
-						//最大の範囲を500に制限する
-						if((ancEnd - ancStart + 1) > 500){
-							ancEnd = ancStart + 499;
+				ancStr.replace(/(?:\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
+					if(ancNumRange && !isNaN(ancNumRange)){
+						//範囲指定がないとき
+						if(ancNums.length < 500){
+							ancNums.push(parseInt(ancNumRange));
 						}
+					}else{
+						//範囲指定があるとき
+						let [ancStart, ancEnd] = ancNumRange.split('-');
+						ancStart = parseInt(ancStart);
+						ancEnd = parseInt(ancEnd);
 
-						//配列に落としこむ
-						let rangeArray = [];
-						for(let i = ancStart; i <= ancEnd; i++){
-							rangeArray.push(i);
+						if(0 < ancStart && 0 < ancEnd && ancNums.length < 500){
+							//最大の範囲を500に制限する
+							if((ancEnd - ancStart + 1) > 500){
+								ancEnd = ancStart + 499;
+							}
+
+							//配列に落としこむ
+							let rangeArray = [];
+							for(let i = ancStart; i <= ancEnd; i++){
+								rangeArray.push(i);
+							}
+
+							ancNums.push(rangeArray);
 						}
-
-						ancNums.push(rangeArray);
 					}
-				}
-			});
+				});
+			}
+
 
 			//連鎖あぼーんの判定
 			if(enableChainAbone){
@@ -480,6 +484,7 @@ Thread2ch.prototype = {
 					return chainAboneNumbers.indexOf(ancNum) !== -1;
 				});
 			}
+
 
 			//リンク処理
 			if(!fixInvalidAnchor){
