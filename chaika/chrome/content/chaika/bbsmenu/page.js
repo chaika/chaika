@@ -588,7 +588,8 @@ var Find2ch = {
 		const isHTML = this.isHTMLMode;
 		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&STR=" : 'http://find.2ch.net/rss.php/';
 		const ENCODE = isHTML ? 'EUC-JP' : 'UTF-8';
-		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) : encodeURIComponent(aSearchStr);
+		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) :
+								encodeURIComponent(ChaikaCore.io.escapeHTML(aSearchStr));
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		var find2chURL = ioService.newURI(QUERY_URL + QUERY, null, null);
@@ -661,7 +662,7 @@ var Find2ch = {
 
 			var thread = links[0];
 			var threadURI = thread.getAttribute('href').replace(/\d+-\d+$/, '');
-			var threadTitle = thread.textContent;
+			var threadTitle = ChaikaCore.io.unescapeHTML(thread.textContent);
 
 			var post = thread.nextSibling.nodeValue.replace(/\D/g, '') || '0';
 			var boardTitle = links[1].textContent;

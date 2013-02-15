@@ -49,7 +49,7 @@
 							<treecell label="?title" value="?id"/>
 							<treecell label="?url"   value="?type"/>
 						</treerow>
-					</treeitem> 
+					</treeitem>
 				</treechildren>
 			</action>
 		</template>
@@ -84,7 +84,7 @@
 							<treecell label="?created"/>
 							<treecell label="?boardTitle"/>
 						</treerow>
-					</treeitem> 
+					</treeitem>
 				</treechildren>
 			</action>
 		</template>

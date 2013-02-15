@@ -516,7 +516,7 @@ ChaikaBoard.prototype = {
 				itemNode.setAttribute("numberSort", numberSort);
 				itemNode.setAttribute("datID",      datID);
 				itemNode.setAttribute("threadID",   threadID);
-				itemNode.setAttribute("title",      title);
+				itemNode.setAttribute("title",      ChaikaCore.io.unescapeHTML(title));
 				itemNode.setAttribute("count",      count);
 				itemNode.setAttribute("countSort",  countSort +":"+ numberReverse);
 				itemNode.setAttribute("read",       read);

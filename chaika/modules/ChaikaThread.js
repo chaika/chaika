@@ -227,7 +227,7 @@ ChaikaThread.prototype = {
 						"    FROM thread_data WHERE thread_id=?1;");
 			statement.bindStringParameter(0, this.threadID);
 			if(statement.executeStep()){
-				this.title        = statement.getString(0);
+				this.title        = ChaikaCore.io.unescapeHTML(statement.getString(0));
 				this.lineCount    = statement.getInt32(1);
 				this.lastModified = statement.getString(2);
 				this.maruGetted   = (statement.getInt32(3)==1);

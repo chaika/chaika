@@ -287,7 +287,7 @@ var ThreadTree = {
 		try{
 			while(statement.executeStep()){
 				var threadItem = itemsDoc.createElement("threadItem");
-				threadItem.setAttribute("title",      statement.getString(0));
+				threadItem.setAttribute("title",      ChaikaCore.io.unescapeHTML(statement.getString(0)));
 				threadItem.setAttribute("read",       statement.getInt32(1));
 				threadItem.setAttribute("readSort",   statement.getInt32(1) + 10000);
 				threadItem.setAttribute("datID",      statement.getString(2));

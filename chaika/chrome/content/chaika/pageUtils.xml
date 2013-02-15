@@ -225,7 +225,7 @@
 					aStatement.bindInt32Parameter(1, aLimit);
 					while(aStatement.executeStep()){
 						var menuitem = document.createElement("menuitem");
-						menuitem.setAttribute("label", aStatement.getString(0));
+						menuitem.setAttribute("label", this.ChaikaCore.io.unescapeHTML(aStatement.getString(0)));
 						menuitem.setAttribute("value",  aStatement.getString(1));
 						menuitem.setAttribute("itemType",  aItemType);
 						menupopup.appendChild(menuitem);

@@ -910,7 +910,7 @@ ChaikaBrowser.prototype = {
  * @constructor
  */
 function ChaikaIO(){
-
+	this._doc = Cc["@mozilla.org/xul/xul-document;1"].createInstance(Ci.nsIDOMDocument);
 }
 
 ChaikaIO.prototype = {
@@ -1125,7 +1125,7 @@ ChaikaIO.prototype = {
 			aDir.reveal();
 			return true;
 		}catch(ex){}
-		
+
 		try{ // file: プロトコルで開く
 			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);	
 			var dirURI = ioService.newFileURI(aDir);
@@ -1138,6 +1138,32 @@ ChaikaIO.prototype = {
 		}
 
 		return false;
+	},
+
+
+	/**
+	 * HTML実体参照にエンコードする
+	 * @param {String} aStr エンコードする文字列
+	 * @return {String}　エンコード後の文字列
+	 */
+	escapeHTML: function ChaikaCore_escapeHTML(aStr){
+		return aStr.split('&').join('&amp;')
+					.split('<').join('&lt;')
+					.split('>').join('&gt;')
+					.split('"').join('&quot;');
+	},
+
+
+	/**
+	 * HTML実体参照をデコードする
+	 * @param {String} aStr デコードする文字列
+	 * @return {String}　デコード後の文字列
+	 */
+	unescapeHTML: function ChaikaCore_unescapeHTML(aStr){
+		return aStr.split('&lt;').join('<')
+					.split('&gt;').join('>')
+					.split('&quot;').join('"')
+					.split('&amp;').join('&');
 	}
 };
 
