@@ -40,11 +40,9 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
-
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
-
 
 var gBoard;
 var gSubjectDownloader;
@@ -52,13 +50,12 @@ var gSettingDownloader;
 var gBoardMoveChecker;
 var gNewURL;
 
-
 /**
  * 開始時の処理
  */
 function startup(){
 	PrefObserver.start();
-	
+
 	document.title = location.href;
 	document.getElementById("lblTitle").setAttribute("value", location.href);
 
@@ -81,8 +78,9 @@ function startup(){
 		return;
 	}
 
-
 	loadPersist();
+
+	settingUpdate();
 
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
@@ -100,7 +98,6 @@ function startup(){
 
 	UpdateObserver.startup();
 }
-
 
 /**
  * 終了時の処理
@@ -123,7 +120,6 @@ function shutdown(){
 	UpdateObserver.shutdown();
 }
 
-
 /**
  * ブラウザへのイベントフロー抑制
  */
@@ -132,7 +128,6 @@ function eventBubbleCheck(aEvent){
 	if(!(aEvent.ctrlKey || aEvent.shiftKey || aEvent.altKey || aEvent.metaKey))
 		aEvent.stopPropagation();
 }
-
 
 function loadPersist(){
 	var jsonFile = ChaikaCore.getDataDir();
@@ -155,7 +150,6 @@ function loadPersist(){
 		ChaikaCore.logger.error(ex + " : " + content);
 	}
 }
-
 
 function savePersist(){
 	var persistData = {};
@@ -182,15 +176,11 @@ function savePersist(){
 	ChaikaCore.io.writeString(jsonFile, "UTF-8", false, JSON.stringify(persistData, null, "  "));
 }
 
-
 function setPageTitle(){
 	var boardTitle = gBoard.getTitle();
 	document.title = boardTitle + " [chaika]";
 	document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/[@＠].+$/, ""));
 }
-
-
-
 
 var PrefObserver = {
 
@@ -204,11 +194,9 @@ var PrefObserver = {
 		this._branch.addObserver("", this, false);
 	},
 
-
 	stop: function PrefObserver_stop(){
 		this._branch.removeObserver("", this);
 	},
-
 
 	observe: function PrefObserver_observe(aSubject, aTopic, aData){
 		if(aTopic != "nsPref:changed") return;
@@ -221,14 +209,10 @@ var PrefObserver = {
 
 };
 
-
-
-
 var BoardTree = {
 
 	tree: null,
 	firstInitBoardTree: true,
-
 
 	initTree: function BoardTree_initTree(aNoFocus){
 		this.tree = document.getElementById("boardTree");
@@ -286,20 +270,17 @@ var BoardTree = {
 
 	},
 
-
 	changeTreeSize: function BoardTree_changeTreeSize(){
 		this.tree.collapsed = true;
 		this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
 		setTimeout(function(){ BoardTree.tree.collapsed = false }, 0);
 	},
 
-
 	click: function BoardTree_click(aEvent){
 		if(aEvent.originalTarget.localName != "treechildren") return;
 		if(this.getClickItemIndex(aEvent) == -1) return;
 		if(aEvent.ctrlKey || aEvent.shiftKey) return;
 		if(aEvent.button > 1) return;
-
 
 		var singleClicked = aEvent.type == "click";
 		var openSingleClick = ChaikaCore.pref.getBool("board.open_single_click");
@@ -313,7 +294,6 @@ var BoardTree = {
 			this.openThread(openNewTab);
 		}
 	},
-
 
 	keyDown: function BoardTree_keyDown(aEvent){
 		if(this.tree.currentIndex == -1) return;
@@ -334,7 +314,6 @@ var BoardTree = {
 		}
 	},
 
-
 	mouseMove: function BoardTree_mouseMove(aEvent){
 		if(!this._XULBrowserWindow) return;
 		if(aEvent.originalTarget.localName != "treechildren") return;
@@ -348,13 +327,11 @@ var BoardTree = {
 		this._lastMouseOverIndex = index;
 	},
 
-
 	mouseOut: function BoardTree_mouseOut(aEvent){
 		if(!this._XULBrowserWindow) return;
 
 		this._XULBrowserWindow.setOverLink("", null);
 	},
-
 
 	showContext: function BoardTree_showContext(aEvent){
 			// ツリーのアイテム以外をクリック
@@ -380,7 +357,6 @@ var BoardTree = {
 		return true;
 	},
 
-
 	getClickItemIndex: function BoardTree_getClickItemIndex(aEvent){
 		var row = {}
 		var obj = {}
@@ -388,7 +364,6 @@ var BoardTree = {
 		if(!obj.value) return -1;
 		return row.value;
 	},
-
 
 	getItemURL: function BoardTree_getItemURL(aIndex){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
@@ -399,14 +374,12 @@ var BoardTree = {
 		return ioService.newURI(spec, null, null);
 	},
 
-
 	getItemTitle: function BoardTree_getItemTitle(aIndex){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 		var titleColumn = this.tree.columns.getNamedColumn("boardTreeCol-title");
 		return this.tree.builder.getCellText(aIndex, titleColumn);
 	},
-
 
 	getSelectionIndices: function BoardTree_getSelectionIndices(){
 		var resultArray = new Array();
@@ -424,13 +397,11 @@ var BoardTree = {
 		return resultArray;
 	},
 
-
 	openThread: function BoardTree_openThread(aAddTab){
 		var index = this.tree.currentIndex;
 		if(index == -1) return null;
 		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true);
 	},
-
 
 		// nsDragAndDrop Observer
 	onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
@@ -447,9 +418,6 @@ var BoardTree = {
 	}
 
 };
-
-
-
 
 function setStatus(aString){
 	document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0; 
@@ -526,11 +494,9 @@ function subjectUpdate(aEvent, aForce){
 		setStatus("ネットワークの問題により、スレッド一覧を取得できませんでした。");
 	};
 
-
 	gSubjectDownloader.download();
 	setStatus("request: " + gSubjectDownloader.url.spec);
 }
-
 
 /**
  * SETTING.TXT をダウンロードする
@@ -554,7 +520,6 @@ function settingUpdate(){
 		}
 	};
 
-
 	gSettingDownloader.download();
 	setStatus("request: " + gSettingDownloader.url.spec);
 }
@@ -571,7 +536,6 @@ function openLogsDir(){
 	ChaikaCore.io.revealDir(logDir);
 }
 
-
 function postNewThread(){
 	var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
 
@@ -579,7 +543,6 @@ function postNewThread(){
 	browserWindow.openDialog(postWizardURLSpec, "_blank",
 		"chrome, resizable, dialog", gBoard.url.spec, true);
 }
-
 
 function openSettings(){
 	var settingDialogURL = "chrome://chaika/content/settings/settings.xul#paneBoard";
@@ -617,7 +580,6 @@ function bannerLoaded(){
 function bannerLoadError(aEvent){
 	alert("バナーの読み込みに失敗しました");
 }
-
 
 function boardMoveCheck(aEvent){
 	if(aEvent.type=="click" && aEvent.button!=0) return;
@@ -663,9 +625,6 @@ function moveNewURL(aEvent){
 		document.getElementById("dckUpdate").selectedIndex = 0;
 	}
 }
-
-
-
 
 function b2rBoardMoveChecker(){
 }
@@ -721,7 +680,6 @@ b2rBoardMoveChecker.prototype = {
 	onChecked: function(aSuccess, aNewURL){}
 }
 
-
 var UpdateObserver = {
 
 	startup: function UpdateObserver_startup(){
@@ -730,13 +688,11 @@ var UpdateObserver = {
 		os.addObserver(this, "findNewThread:update", false);
 	},
 
-
 	shutdown: function UpdateObserver_shutdown(){
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.removeObserver(this, "itemContext:deleteLog");
 		os.removeObserver(this, "findNewThread:update");
 	},
-
 
 	deleteLogsTreeUpdate: function UpdateObserver_deleteLogsTreeUpdate(aURLs){
 		if(!BoardTree.tree.boxObject.beginUpdateBatch) return;
@@ -757,7 +713,6 @@ var UpdateObserver = {
 		BoardTree.tree.boxObject.endUpdateBatch();
 	},
 
-
 	observe: function UpdateObserver_observe(aSubject, aTopic, aData){
 		if(aTopic == "itemContext:deleteLog"){
 			this.deleteLogsTreeUpdate(aData.split(","));
@@ -772,7 +727,6 @@ var UpdateObserver = {
 			return;
 		}
 	},
-
 
 	QueryInterface: XPCOMUtils.generateQI([
 		Ci.nsISupportsWeakReference,
