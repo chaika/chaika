@@ -193,8 +193,9 @@
 	<handlers>
 		<handler event="popupshowing" phase="target"><![CDATA[
 			var historyMenuPopup = this;
-
 			var storage = this.ChaikaCore.storage;
+			var io = this.ChaikaCore.io;
+
 			var lastVisitedStatement = storage.createStatement(
 					"SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
 			var visitCountStatement = storage.createStatement(
@@ -214,7 +215,7 @@
 					aStatement.bindInt32Parameter(1, aLimit);
 					while(aStatement.executeStep()){
 						var menuitem = document.createElement("menuitem");
-						menuitem.setAttribute("label", this.ChaikaCore.io.unescapeHTML(aStatement.getString(0)));
+						menuitem.setAttribute("label", io.unescapeHTML(aStatement.getString(0)));
 						menuitem.setAttribute("value",  aStatement.getString(1));
 						menuitem.setAttribute("itemType",  aItemType);
 						menupopup.appendChild(menuitem);
