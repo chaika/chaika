@@ -910,7 +910,6 @@ ChaikaBrowser.prototype = {
  * @constructor
  */
 function ChaikaIO(){
-	this._doc = Cc["@mozilla.org/xul/xul-document;1"].createInstance(Ci.nsIDOMDocument);
 }
 
 ChaikaIO.prototype = {

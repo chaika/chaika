@@ -5,7 +5,6 @@
 		xmlns:xbl="http://www.mozilla.org/xbl"
 		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-
 <binding id="itemContext" extends="chrome://global/content/bindings/popup.xml#popup">
 	<content>
 		<xul:arrowscrollbox class="popup-internal-box" flex="1" orient="vertical">
@@ -22,12 +21,11 @@
 		</xul:arrowscrollbox>
 	</content>
 
-
 	<implementation>
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
-			
+
 			this.items = [];
 		]]></constructor>
 
@@ -38,7 +36,6 @@
 			]]></body>
 		</method>
 	</implementation>
-
 
 	<handlers>
 		<handler event="popupshowing" phase="target"><![CDATA[
@@ -62,11 +59,9 @@
 			return true;
 		]]></handler>
 
-
 		<handler event="popuphidden" phase="target"><![CDATA[
 			this.items = [];
 		]]></handler>
-
 
 		<!-- メニューアイテムの実行 -->
 		<handler event="command" phase="bubbling"><![CDATA[
@@ -165,9 +160,6 @@
 	</handlers>	
 </binding>
 
-
-
-
 <binding id="historyMenuPopup" extends="chrome://global/content/bindings/popup.xml#popup">
 
 	<implementation>
@@ -187,7 +179,6 @@
 			});
 		]]></constructor>
 
-
 		<method name="_setOverLink">
 			<parameter name="aLink"/>
 			<body><![CDATA[
@@ -199,7 +190,6 @@
 
 	</implementation>
 
-
 	<handlers>
 		<handler event="popupshowing" phase="target"><![CDATA[
 			var historyMenuPopup = this;
@@ -209,7 +199,6 @@
 					"SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
 			var visitCountStatement = storage.createStatement(
 					"SELECT title, url FROM history WHERE type=?1 ORDER BY visit_count DESC LIMIT ?2");
-
 
 			function createCategory(aCategoryTitle, aStatement, aItemType, aLimit){
 				var menu = document.createElement("menu");
@@ -245,7 +234,6 @@
 				return menu;
 			}
 
-
 			var boardMax = this.ChaikaCore.pref.getInt("historymenu.board_max");
 			if(boardMax > 30) boardMax = 30;
 			var threadMax = this.ChaikaCore.pref.getInt("historymenu.thread_max");
@@ -273,14 +261,12 @@
 			historyMenuitem.setAttribute("value", "clearHistory");
 			historyMenuPopup.appendChild(historyMenuitem);
 		]]></handler>
-	
 
 		<handler event="popuphidden" phase="target"><![CDATA[
 			while(this.hasChildNodes()){
 				this.removeChild(this.firstChild);
 			}
 		]]></handler>
-
 
 		<!-- メニューアイテムの実行 -->
 		<handler event="command"><![CDATA[
@@ -311,7 +297,6 @@
 			}
 		]]></handler>
 
-
 		<!-- メニューアイテムのミドルクリック -->
 		<handler event="click" button="1"><![CDATA[
 			var target = event.target;
@@ -332,7 +317,6 @@
 			}
 		]]></handler>
 
-
 		<!-- メニューアイテムの選択 -->
 		<handler event="DOMMenuItemActive"><![CDATA[
 			var target = event.target;
@@ -340,12 +324,10 @@
 			this._setOverLink(target.value);
 		]]></handler>
 
-
 		<!-- メニューアイテムの選択解除 -->
 		<handler event="DOMMenuItemInactive"><![CDATA[
 			this._setOverLink("");
 		]]></handler>
-
 
 		<!-- メニューアイテムの選択解除 -->
 		<handler event="contextmenu"><![CDATA[
@@ -364,7 +346,6 @@
 	</handlers>
 
 </binding>
-
 
 <binding id="toolbar-group">
 	<content>
