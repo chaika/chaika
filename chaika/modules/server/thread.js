@@ -483,7 +483,7 @@ Thread2ch.prototype = {
 
 			//リンク処理
 			if(!fixInvalidAnchor){
-				return '<a href="#res' + ancNums[0] + '" class="resPointer">' + ancMark + ancStr + '</a>';
+				return '<a href="#res' + parseInt(ancStr) + '" class="resPointer">' + ancMark + ancStr + '</a>';
 			}else{
 				let links = [];
 
