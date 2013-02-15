@@ -430,7 +430,7 @@ var ChaikaP2Login = {
      * 書き込みページからcsrfidを得る
      * @param {String} host 書き込み先のホスト
      * @param {String} bbs 書き込み先の板名
-     * @param {Number} datID 書き込み先のdat ID
+     * @param {Number} [datID] 書き込み先のdat ID 省略した場合はスレ立てになる
      * @return {String} csrfid 取得できなかった場合は null を返す
 	 */
 	getCsrfid: function(host, bbs, datID){
@@ -439,7 +439,8 @@ var ChaikaP2Login = {
 		var csrfid_url = ChaikaCore.pref.getChar('login.p2.csrfid_url');
 		var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
 
-		req.open('GET', csrfid_url + '?host=' + host + '&bbs=' + bbs + '&key=' + datID, false);
+		req.open('GET', csrfid_url + '?host=' + host + '&bbs=' + bbs +
+		         (datID ? '&key=' + datID : '&newthread=1'), false);
 		req.send(null);
 
 		if(req.status !== 200) return null;

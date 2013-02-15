@@ -531,7 +531,7 @@ PostP2.prototype = {
 		//csrfidを書き込みページから取得する
 		var csrfid = ChaikaP2Login.getCsrfid(host, bbs, this._thread.datID);
 		if(!csrfid){
-			return this._listener.onError(this, "P2 LOGIN ERROR", this.UNKNOWN);
+			return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
 		}
 
 		var postData = [];
@@ -685,9 +685,9 @@ PostNewThreadP2.prototype = {
 		}
 
 		//csrfidを書き込みページから取得する
-		var csrfid = ChaikaP2Login.getCsrfid(host, bbs, this._thread.datID);
+		var csrfid = ChaikaP2Login.getCsrfid(host, bbs);
 		if(!csrfid){
-			return this._listener.onError(this, "P2 LOGIN ERROR", this.UNKNOWN);
+			return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
 		}
 
 		var postData = [];
