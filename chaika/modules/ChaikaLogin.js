@@ -364,7 +364,7 @@ var ChaikaP2Login = {
 
 	login: function ChaikaP2Login_login(){
 		//確実にログアウトする
-
+		this.logout();
 		this._loggedIn = false;
 
 		this._req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
