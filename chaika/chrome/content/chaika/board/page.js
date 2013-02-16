@@ -80,10 +80,19 @@ function startup(){
 
 	loadPersist();
 
-	settingUpdate();
-
 	var subjectFile = gBoard.subjectFile.clone();
 	var settingFile = gBoard.settingFile.clone();
+
+	//前回SETTING.TXTをチェックしてから3ヶ月以上経っていたら更新する
+	if(settingFile.exists()){
+		let lastModified = settingFile.lastModifiedTime || 0;
+		let expire = lastModified + 3 * 30 * 24 * 60 * 60 * 1000;
+
+		if(expire < (new Date()).getTime()){
+			settingUpdate();
+		}
+	}
+
 	if(ChaikaCore.pref.getBool("board.auto_update")){
 		subjectUpdate();
 	}else if(!subjectFile.exists() || subjectFile.fileSize==0){
