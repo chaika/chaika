@@ -1,6 +1,8 @@
 pref('extensions.chaika.releasenotes_showed', '1.5.7');
 
 pref("extensions.chaika.enable_browser_contextmenu", true);
+pref('extensions.chaika.browser_contextmenu_only_bbs', true);
+pref('extensions.chaika.browser_contextmenu_add_tab_by_click', false);
 pref("extensions.chaika.browser_contextmenu_disregard_url_option", true);
 pref("extensions.chaika.http_proxy_mode", 0);
 pref("extensions.chaika.http_proxy_value", "localhost:8080");

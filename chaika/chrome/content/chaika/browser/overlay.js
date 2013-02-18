@@ -108,23 +108,27 @@ ChaikaBrowserOverlay.contextMenu = {
 
 		//その他のスキン
 		var skinDir = this._getSkinDir();
-		var entries = skinDir.directoryEntries
-				.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
-		while(entry = entries.nextFile){
-			if(entry.isDirectory()){
-				let item = skinMenu.insertItemAt(skinMenu.itemCount - 2, entry.leafName, entry.leafName);
-				item.setAttribute('class', 'context-chaika-skin-item');
-				item.setAttribute('name', 'context-chaika-skin-item');
-				item.setAttribute('type', 'radio');
-				item.addEventListener('command', this._setSkin, false);
+		if(skinDir.exists()){
+			let entries = skinDir.directoryEntries
+					.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
+			while(entry = entries.nextFile){
+				if(entry.isDirectory()){
+					let item = skinMenu.insertItemAt(skinMenu.itemCount - 2, entry.leafName, entry.leafName);
+					item.setAttribute('class', 'context-chaika-skin-item');
+					item.setAttribute('name', 'context-chaika-skin-item');
+					item.setAttribute('type', 'radio');
+					item.addEventListener('command', this._setSkin, false);
+				}
 			}
+			entries.close();
 		}
-		entries.close();
 
 		//現在設定されているスキンを選択状態にする
 		var currentSkinName = ChaikaBrowserOverlay.ChaikaCore.pref.getUniChar('thread_skin');
-		skinMenu.querySelector('menuitem[value="' + currentSkinName + '"]')
-				.setAttribute('checked', 'true');
+		var currentSkinItem = skinMenu.querySelector('menuitem[value="' + currentSkinName + '"]');
+		if(currentSkinItem){
+			currentSkinItem.setAttribute('checked', 'true');
+		}
 	},
 
 
@@ -148,8 +152,14 @@ ChaikaBrowserOverlay.contextMenu = {
 		var contextMenu = document.getElementById('context-chaika');
 		var url = gBrowser.currentURI.spec;
 
+		//掲示板上でのみ表示する設定の場合
+		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs') && !that._isBBS(url)){
+			contextMenu.hidden = true;
+			return;
+		}
 
 		//すべての非表示・無効化を解除
+		contextMenu.hidden = false;
 		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
 			item.hidden = false;
 			item.disabled = false;
@@ -232,6 +242,15 @@ ChaikaBrowserOverlay.contextMenu = {
 		hiddenItems.forEach(function(id){
 			document.getElementById('context-chaika-' + id).hidden = true;
 		});
+
+
+		//現在設定されているスキンを選択状態にする
+		var skinMenu = document.getElementById("context-chaika-skin");
+		var currentSkinName = ChaikaBrowserOverlay.ChaikaCore.pref.getUniChar('thread_skin');
+		var currentSkinItem = skinMenu.querySelector('menuitem[value="' + currentSkinName + '"]');
+		if(currentSkinItem){
+			currentSkinItem.setAttribute('checked', 'true');
+		}
 	},
 
 
@@ -339,7 +358,7 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 	_addTab: function contextMenu__addTab(event){
-		var addTab = false;
+		var addTab = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_add_tab_by_click');
 
 		//中クリックか、コマンドボタンとともにクリックされたら
 		//デフォルト値を反転

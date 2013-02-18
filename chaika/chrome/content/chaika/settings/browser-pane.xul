@@ -9,6 +9,10 @@
 		<preference id="extensions.chaika.enable_browser_contextmenu"
 				name="extensions.chaika.enable_browser_contextmenu" type="bool"
 				onchange="setCcontainerDisabled(this.name, 'boxDisregardURLOption', true)"/>
+		<preference id="extensions.chaika.browser_contextmenu_only_bbs"
+				name="extensions.chaika.browser_contextmenu_only_bbs" type="bool" />
+		<preference id="extensions.chaika.browser_contextmenu_add_tab_by_click"
+				name="extensions.chaika.browser_contextmenu_add_tab_by_click" type="bool" />
 		<preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
 				name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
 		<preference id="extensions.chaika.browser.redirector.enabled"
@@ -39,10 +43,14 @@
 				<vbox>
 					<checkbox label="コンテキストメニューに chaika の項目を追加する *"
 							preference="extensions.chaika.enable_browser_contextmenu"/>
-					<hbox id="boxDisregardURLOption" class="indent">
+					<vbox id="boxDisregardURLOption" class="indent">
+						<checkbox label="chaikaおよび掲示板上でのみ表示する"
+								preference="extensions.chaika.browser_contextmenu_only_bbs" />
+						<checkbox label="左クリックで新しいタブに開く"
+								preference="extensions.chaika.browser_contextmenu_add_tab_by_click" />
 						<checkbox label="URL の表示制限を書き換えて開く"
 								preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
-					</hbox>
+					</vbox>
 				</vbox>
 			</row>
 
