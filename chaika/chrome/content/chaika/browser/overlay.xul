@@ -41,13 +41,75 @@
 
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">
-		<menu id="context-chaika" label="chaika" hidden="true"
-							insertbefore="context-bookmarklink">
+		<menu id="context-chaika" label="chaika" class="menu-iconic"
+				image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
 			<menupopup>
-				<menuitem label="Open"
-					oncommand="ChaikaBrowserOverlay.contextMenu.openThread(false)"/>
-				<menuitem label="Open In New Tab"
-					oncommand="ChaikaBrowserOverlay.contextMenu.openThread(true)"/>
+				<menu label="あぼーん" id="context-chaika-abone">
+					<menupopup>
+						<menuitem label="名前" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(0)" />
+						<menuitem label="メール" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(1)" />
+						<menuitem label="ID" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(2)" />
+						<menuitem label="ワード" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(3)" />
+						<menuseparator />
+						<menuitem label="あぼーんマネージャ..."
+									oncommand="ChaikaBrowserOverlay.contextMenu.openAboneManager()" />
+					</menupopup>
+				</menu>
+
+				<menu label="コピー" id="context-chaika-copy">
+					<menupopup>
+						<menuitem label="タイトル" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%TITLE%')" />
+						<menuitem label="URL" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%URL%')" />
+						<menuitem label="タイトルとURL" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%TITLE%%NEWLINE%%URL%')" />
+						<menuitem label="タイトルとURLと選択部分" id="context-chaika-copy-title-url-selection"
+									oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%')" />
+					</menupopup>
+				</menu>
+
+				<menu label="スキン" id="context-chaika-skin">
+					<menupopup>
+						<menuseparator id="context-chaika-skin-open-folder-sep" />
+						<menuitem label="スキンフォルダを開く..."
+									oncommand="ChaikaBrowserOverlay.contextMenu.openSkinFolder()" />
+					</menupopup>
+				</menu>
+
+				<menuseparator id="context-chaika-skin-sep" />
+
+				<menuitem label="このスレッドに書き込む" id="context-chaika-write"
+							oncommand="ChaikaBrowserOverlay.contextMenu.write()" />
+				<menuitem label="このスレッドのログを削除" id="context-chaika-delete-log"
+							oncommand="ChaikaBrowserOverlay.contextMenu.deleteLog()" />
+
+				<menuseparator id="context-chaika-thread-sep" />
+
+				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openInChaika(event, content.location.href)" />
+				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openInBrowser(event, content.location.href)" />
+				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openInChaika(event, gContextMenu.linkURL)" />
+				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openInBrowser(event, gContextMenu.linkURL)" />
+
+				<menuseparator id="context-chaika-open-in-sep" />
+
+				<menuitem label="すべてのレスを表示" id="context-chaika-show-all"
+							oncommand="ChaikaBrowserOverlay.contextMenu.rangeChange(event, './')" />
+				<menuitem label="新着50件を表示" id="context-chaika-show-l50"
+							oncommand="ChaikaBrowserOverlay.contextMenu.rangeChange(event, './l50')" />
+				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openBoard(event)" />
+
+				<menuseparator id="context-chaika-thread-show-sep" />
+
+				<menuitem label="サイドバーを表示" id="context-chaika-toggle-sidebar">
+					<observes element="viewChaikaSidebar" attribute="oncommand" />
+					<observes element="viewChaikaSidebar" attribute="type" />
+					<observes element="viewChaikaSidebar" attribute="checked" />
+				</menuitem>
+				<menuitem label="オプション..." id="context-chaika-open-option"
+							oncommand="ChaikaBrowserOverlay.contextMenu.openSettings()" />
 			</menupopup>
 		</menu>
 	</popup>

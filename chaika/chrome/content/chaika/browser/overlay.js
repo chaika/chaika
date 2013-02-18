@@ -54,66 +54,323 @@ var ChaikaBrowserOverlay = {
 
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js", ChaikaBrowserOverlay);
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBrowserOverlay);
 
 
 ChaikaBrowserOverlay.contextMenu = {
 
 	start: function contextMenu_start(){
-		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
-				"enable_browser_contextmenu");
+		var contextMenu = document.getElementById('context-chaika');
+		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
 
 		if(enableContextMenu){
+			contextMenu.hidden = false;
+			this._createSkinMenu();
 			document.getElementById("contentAreaContextMenu")
 						.addEventListener("popupshowing",
 							ChaikaBrowserOverlay.contextMenu.showMenu, false);
+		}else{
+			contextMenu.hidden = true;
 		}
 	},
 
 
 	stop: function contextMenu_stop(){
-		try{
+		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
+
+		if(enableContextMenu){
+			document.getElementById('context-chaika').hidden = true;
+			this._destorySkinMenu();
 			document.getElementById("contentAreaContextMenu")
 						.removeEventListener("popupshowing",
 							ChaikaBrowserOverlay.contextMenu.showMenu, false);
-		}catch(ex){}
+		}
+	},
+
+
+	_createSkinMenu: function contextMenu__createSkinMenu(){
+		var skinMenu = document.getElementById("context-chaika-skin");
+
+		//初期化
+		var skinItems = skinMenu.getElementsByClassName('context-chaika-skin-item');
+		while(skinItems.length){
+			skinMenu.menupopup.removeChild(skinItems[0]);
+		}
+
+		//デフォルトスキン
+		var defaultItem = skinMenu.insertItemAt(0, "(Default)", "");
+		defaultItem.setAttribute('class', 'context-chaika-skin-item');
+		defaultItem.setAttribute('name', 'context-chaika-skin-item');
+		defaultItem.setAttribute('type', 'radio');
+		defaultItem.addEventListener('command', this._setSkin, false);
+
+		//その他のスキン
+		var skinDir = this._getSkinDir();
+		var entries = skinDir.directoryEntries
+				.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
+		while(entry = entries.nextFile){
+			if(entry.isDirectory()){
+				let item = skinMenu.insertItemAt(skinMenu.itemCount - 2, entry.leafName, entry.leafName);
+				item.setAttribute('class', 'context-chaika-skin-item');
+				item.setAttribute('name', 'context-chaika-skin-item');
+				item.setAttribute('type', 'radio');
+				item.addEventListener('command', this._setSkin, false);
+			}
+		}
+		entries.close();
+
+		//現在設定されているスキンを選択状態にする
+		var currentSkinName = ChaikaBrowserOverlay.ChaikaCore.pref.getUniChar('thread_skin');
+		skinMenu.querySelector('menuitem[value="' + currentSkinName + '"]')
+				.setAttribute('checked', 'true');
+	},
+
+
+	_destroySkinMenu: function contextMenu__destroySkinMenu(){
+		var skinMenu = document.getElementById("context-chaika-skin");
+		var skinItems = skinMenu.getElementsByClassName('context-chaika-skin-item');
+
+		while(skinItems.length){
+			skinItems[0].removeEventListener('command', this._setSkin, false);
+			skinMenu.menupopup.removeChild(skinItems[0]);
+		}
 	},
 
 
 	showMenu: function contextMenu_showMenu(aEvent){
 		if(aEvent.originalTarget.id != "contentAreaContextMenu") return;
-		document.getElementById("context-chaika").hidden = true;
+		if(!gContextMenu) return;
 
-		if(!gContextMenu || !gContextMenu.onLink) return;
 
-		var pathname = gContextMenu.link.pathname;
-		if(pathname.indexOf("/test/read.cgi/")==-1 &&
-				pathname.indexOf("/test/read.html/")==-1 &&
-				pathname.indexOf("/bbs/read.cgi/")==-1) return;
+		var that = ChaikaBrowserOverlay.contextMenu;
+		var contextMenu = document.getElementById('context-chaika');
+		var url = gBrowser.currentURI.spec;
 
-		document.getElementById("context-chaika").hidden = false;
+
+		//すべての非表示・無効化を解除
+		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
+			item.hidden = false;
+			item.disabled = false;
+		});
+
+
+		//選択部分がない場合
+		if(!gContextMenu.isTextSelected){
+			Array.slice(
+				contextMenu.querySelectorAll('#context-chaika-copy-title-url-selection,' +
+				                             '#context-chaika-abone > menupopup > menuitem:not(:last-child),' +
+				                             '#context-chaika-abone > menupopup > menuseparator')
+			).forEach(function(item){
+				item.hidden = true;
+			})
+		}
+
+
+		//非表示にする項目のIDを入れておく配列
+		var hiddenItems = [];
+
+
+		//2chリンク上ではない場合
+		if(!gContextMenu.onLink || !that._isBBS(gContextMenu.linkURL)){
+			hiddenItems = hiddenItems.concat([
+				'open-link-in-chaika',
+				'open-link-in-browser',
+			]);
+		}
+
+		//掲示板上ではない時
+		if(!that._isBBS(url)){
+			hiddenItems = hiddenItems.concat([
+				'copy',
+				'write',
+				'delete-log',
+				'thread-sep',
+				'open-in-chaika',
+				'open-in-browser',
+				'show-all',
+				'show-l50',
+				'open-board',
+				'thread-show-sep',
+			]);
+
+			//2chリンク上でない場合、セパレータが2つ重なってしまうのに対処
+			if(!gContextMenu.onLink || !that._isBBS(gContextMenu.linkURL)){
+				hiddenItems.push('open-in-sep');
+			}
+		}else{
+			//chaika上ではない時
+			if(!that._isChaika(url)){
+				//共通
+				hiddenItems = hiddenItems.concat([
+					'write',
+					'delete-log',
+					'thread-sep',
+					'open-in-browser',
+				]);
+
+				//板の時
+//				if(that._isBoard(url)){
+					hiddenItems = hiddenItems.concat([
+						'show-all',
+						'show-l50',
+						'open-board',
+						'thread-show-sep',
+					]);
+//				}
+
+			//chaika上の時(スレッドの場合しかない)
+			}else{
+				hiddenItems = hiddenItems.concat([
+					'open-in-chaika',
+				]);
+			}
+		}
+
+		//まとめて非表示にする
+		hiddenItems.forEach(function(id){
+			document.getElementById('context-chaika-' + id).hidden = true;
+		});
 	},
 
 
-	openThread: function contextMenu_openThread(aAddTab){
-		if(!gContextMenu || !gContextMenu.onLink) return;
+	addAbone: function contextMenu_addAbone(ngType){
+		var ngWord = content.getSelection().toString();
+		ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
+	},
 
-				// スレッド表示数の制限
-		var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
-				"browser_contextmenu_disregard_url_option");
+	openAboneManager: function contextMenu_openAboneManager(){
+		document.getElementById("chaika-thread-toolbaritem")._openAboneManager();
+	},
 
+	copyClipBoard: function contextMenu_copyClipBoard(text){
+		var osName = Components.classes["@mozilla.org/xre/app-info;1"]
+						.getService(Components.interfaces.nsIXULRuntime).OS;
+		const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
+
+		var url = document.getElementById("chaika-thread-toolbaritem")._getCurrentThreadURL();
+		url = url ? url.spec : content.location.href;
+
+		text = text.replace('%TITLE%', content.document.title, 'g')
+					.replace('%URL%', url, 'g')
+					.replace('%SEL%', content.getSelection().toString(), 'g')
+					.replace('%NEWLINE%', NEWLINE, 'g');
+
+		var clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+							.getService(Components.interfaces.nsIClipboardHelper);
+		clipboard.copyString(text);
+	},
+
+	openSkinFolder: function contextMenu_openSkinFolder(){
+		var skinDir = this._getSkinDir();
+		ChaikaBrowserOverlay.ChaikaCore.io.revealDir(skinDir);
+	},
+
+	write: function contextMenu_write(){
+		document.getElementById("chaika-thread-toolbaritem")._write();
+	},
+
+	deleteLog: function contextMenu_deleteLog(){
+		document.getElementById("chaika-thread-toolbaritem")._deleteLog();
+	},
+
+	openInChaika: function contextMenu_openInChaika(event, url){
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var addTab = this._addTab(event);
 
 		try{
-			var threadURLSpec = gContextMenu.link.href;
-			threadURLSpec = threadURLSpec.replace("/test/read.html/", "/test/read.cgi/");
-			var threadURL = ioService.newURI(threadURLSpec, null, null);
-			ChaikaBrowserOverlay.ChaikaCore.browser.openThread(
-					threadURL, aAddTab, disregardURLOption, false);
+			if(this._isBoard(url)){
+				var boardURL = ioService.newURI(url, null, null);
+				ChaikaBrowserOverlay.ChaikaCore.browser.openBoard(boardURL, addTab);
+			}else{
+				// スレッド表示数の制限
+				var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
+											"browser_contextmenu_disregard_url_option");
+
+				//read.jsを修正
+				url = url.replace("/test/read.html/", "/test/read.cgi/");
+
+				var threadURL = ioService.newURI(url, null, null);
+				ChaikaBrowserOverlay.ChaikaCore.browser.openThread(threadURL, addTab, disregardURLOption, false);
+			}
 		}catch(ex){
 			ChaikaBrowserOverlay.ChaikaCore.logger.error(ex);
 			return;
 		}
+	},
+
+	openInBrowser: function contextMenu_openInBrowser(event, url){
+		var threadURL = document.getElementById("chaika-thread-toolbaritem")._getCurrentThreadURL();
+		ChaikaBrowserOverlay.ChaikaCore.browser.openURL(threadURL, this._addTab(event));
+	},
+
+	rangeChange: function contextMenu_rangeChange(event, range){
+		document.getElementById("chaika-thread-toolbaritem")._viewChange(range, this._addTab(event));
+	},
+
+	openBoard: function contextMenu_openBoard(event){
+		document.getElementById("chaika-thread-toolbaritem")._gotoBoard(this._addTab(event));
+	},
+
+	openSettings: function contextMenu_openSettings(){
+		var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
+		var features = "";
+		try{
+			var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+			var instantApply = pref.getBoolPref("browser.preferences.instantApply");
+			features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+		}catch(ex){
+			features = "chrome,titlebar,toolbar,centerscreen,modal";
+		}
+		window.openDialog(settingDialogURL, "", features);
+	},
+
+
+	_setSkin: function contextMenu__setSkin(aEvent){
+		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', this.getAttribute('value'));
+	},
+
+
+	_getSkinDir: function contextMenu__getSkinDir(){
+		var skinDir = ChaikaBrowserOverlay.ChaikaCore.getDataDir();
+		skinDir.appendRelativePath("skin");
+		return skinDir;
+	},
+
+	_addTab: function contextMenu__addTab(event){
+		var addTab = false;
+
+		//中クリックか、コマンドボタンとともにクリックされたら
+		//デフォルト値を反転
+		if(event.button === 1 || event.ctrlKey || event.metaKey){
+			addTab = !addTab;
+		}
+
+		return addTab;
+	},
+
+
+	/* *** 簡易URI判定 *** */
+	_isChaika: function contextMenu__isChaika(aURI){
+		return /^http:\/\/127\.0\.0\.1:\d+\/thread\//.test(aURI);
+	},
+
+	_isBBS: function contextMenu__isBBS(aURI){
+		if(!(aURI instanceof Components.interfaces.nsIURI)){
+			let ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+			aURI = ioService.newURI(aURI, null, null).QueryInterface(Components.interfaces.nsIURI);
+		}
+
+		return ChaikaBrowserOverlay.ChaikaBoard.getBoardType(aURI) !== ChaikaBrowserOverlay.ChaikaBoard.BOARD_TYPE_PAGE;
+	},
+
+	_isThread: function contextMenu__isThread(aURI){
+		return this._isBBS(aURI) && /\/(?:test|bbs)\/read\.(?:cgi|html)\//.test(aURI);
+	},
+
+	_isBoard: function contextMenu__isBoard(aURI){
+		return this._isBBS(aURI) && !this._isThread(aURI);
 	}
 
 };
