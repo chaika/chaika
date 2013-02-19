@@ -61,15 +61,6 @@ Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBr
 
 ChaikaBrowserOverlay.contextMenu = {
 
-	get _toolbar(){
-		if(!this.__toolbar){
-			this.__toolbar = document.getElementById("chaika-thread-toolbaritem");
-		}
-
-		return this.__toolbar;
-	},
-
-
 	start: function contextMenu_start(){
 		var contextMenu = document.getElementById('context-chaika');
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
@@ -77,6 +68,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(enableContextMenu){
 			contextMenu.hidden = false;
 			this._createSkinMenu();
+			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 			document.getElementById("contentAreaContextMenu")
 						.addEventListener("popupshowing",
 							ChaikaBrowserOverlay.contextMenu.showMenu, false);
