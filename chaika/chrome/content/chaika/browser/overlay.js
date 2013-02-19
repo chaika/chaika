@@ -61,6 +61,15 @@ Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBr
 
 ChaikaBrowserOverlay.contextMenu = {
 
+	get _toolbar(){
+		if(!this.__toolbar){
+			this.__toolbar = document.getElementById("chaika-thread-toolbaritem");
+		}
+
+		return this.__toolbar;
+	},
+
+
 	start: function contextMenu_start(){
 		var contextMenu = document.getElementById('context-chaika');
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
@@ -162,7 +171,6 @@ ChaikaBrowserOverlay.contextMenu = {
 		contextMenu.hidden = false;
 		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
 			item.hidden = false;
-			item.disabled = false;
 		});
 
 
@@ -221,14 +229,14 @@ ChaikaBrowserOverlay.contextMenu = {
 				]);
 
 				//板の時
-//				if(that._isBoard(url)){
+				if(that._isBoard(url)){
 					hiddenItems = hiddenItems.concat([
 						'show-all',
 						'show-l50',
 						'open-board',
 						'thread-show-sep',
 					]);
-//				}
+				}
 
 			//chaika上の時(スレッドの場合しかない)
 			}else{
@@ -259,90 +267,10 @@ ChaikaBrowserOverlay.contextMenu = {
 		ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
 	},
 
-	openAboneManager: function contextMenu_openAboneManager(){
-		document.getElementById("chaika-thread-toolbaritem")._openAboneManager();
-	},
-
-	copyClipBoard: function contextMenu_copyClipBoard(text){
-		var osName = Components.classes["@mozilla.org/xre/app-info;1"]
-						.getService(Components.interfaces.nsIXULRuntime).OS;
-		const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
-
-		var url = document.getElementById("chaika-thread-toolbaritem")._getCurrentThreadURL();
-		url = url ? url.spec : content.location.href;
-
-		text = text.replace('%TITLE%', content.document.title, 'g')
-					.replace('%URL%', url, 'g')
-					.replace('%SEL%', content.getSelection().toString(), 'g')
-					.replace('%NEWLINE%', NEWLINE, 'g');
-
-		var clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
-							.getService(Components.interfaces.nsIClipboardHelper);
-		clipboard.copyString(text);
-	},
 
 	openSkinFolder: function contextMenu_openSkinFolder(){
 		var skinDir = this._getSkinDir();
 		ChaikaBrowserOverlay.ChaikaCore.io.revealDir(skinDir);
-	},
-
-	write: function contextMenu_write(){
-		document.getElementById("chaika-thread-toolbaritem")._write();
-	},
-
-	deleteLog: function contextMenu_deleteLog(){
-		document.getElementById("chaika-thread-toolbaritem")._deleteLog();
-	},
-
-	openInChaika: function contextMenu_openInChaika(event, url){
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var addTab = this._addTab(event);
-
-		try{
-			if(this._isBoard(url)){
-				var boardURL = ioService.newURI(url, null, null);
-				ChaikaBrowserOverlay.ChaikaCore.browser.openBoard(boardURL, addTab);
-			}else{
-				// スレッド表示数の制限
-				var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
-											"browser_contextmenu_disregard_url_option");
-
-				//read.jsを修正
-				url = url.replace("/test/read.html/", "/test/read.cgi/");
-
-				var threadURL = ioService.newURI(url, null, null);
-				ChaikaBrowserOverlay.ChaikaCore.browser.openThread(threadURL, addTab, disregardURLOption, false);
-			}
-		}catch(ex){
-			ChaikaBrowserOverlay.ChaikaCore.logger.error(ex);
-			return;
-		}
-	},
-
-	openInBrowser: function contextMenu_openInBrowser(event, url){
-		var threadURL = document.getElementById("chaika-thread-toolbaritem")._getCurrentThreadURL();
-		ChaikaBrowserOverlay.ChaikaCore.browser.openURL(threadURL, this._addTab(event));
-	},
-
-	rangeChange: function contextMenu_rangeChange(event, range){
-		document.getElementById("chaika-thread-toolbaritem")._viewChange(range, this._addTab(event));
-	},
-
-	openBoard: function contextMenu_openBoard(event){
-		document.getElementById("chaika-thread-toolbaritem")._gotoBoard(this._addTab(event));
-	},
-
-	openSettings: function contextMenu_openSettings(){
-		var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
-		var features = "";
-		try{
-			var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-			var instantApply = pref.getBoolPref("browser.preferences.instantApply");
-			features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-		}catch(ex){
-			features = "chrome,titlebar,toolbar,centerscreen,modal";
-		}
-		window.openDialog(settingDialogURL, "", features);
 	},
 
 
@@ -357,6 +285,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		return skinDir;
 	},
 
+
 	_addTab: function contextMenu__addTab(event){
 		var addTab = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_add_tab_by_click');
 
@@ -370,26 +299,59 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
-	/* *** 簡易URI判定 *** */
+
+	openAboneManager: function contextMenu_openAboneManager(){
+		this._toolbar._openAboneManager();
+	},
+
+	copyClipBoard: function contextMenu_copyClipBoard(text){
+		this._toolbar._copyClipBoard(text);
+	},
+
+	write: function contextMenu_write(){
+		this._toolbar._write();
+	},
+
+	deleteLog: function contextMenu_deleteLog(){
+		this._toolbar._deleteLog();
+	},
+
+	viewChaika: function contextMenu_viewChaika(event, url){
+		var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
+									"browser_contextmenu_disregard_url_option");
+		this._toolbar._viewChaika(url, this._addTab(event), disregardURLOption);
+	},
+
+	viewBrowser: function contextMenu_viewBrowser(event, url){
+		this._toolbar._viewBrowser(url, this._addTab(event));
+	},
+
+	viewChange: function contextMenu_viewChange(event, option){
+		this._toolbar._viewChange(option, this._addTab(event));
+	},
+
+	goToBoard: function contextMenu_goToBoard(event){
+		this._toolbar._goToBoard(this._addTab(event));
+	},
+
+	openSettings: function contextMenu_openSettings(){
+		this._toolbar._openSettings();
+	},
+
 	_isChaika: function contextMenu__isChaika(aURI){
-		return /^http:\/\/127\.0\.0\.1:\d+\/thread\//.test(aURI);
+		return this._toolbar._isChaika(aURI);
 	},
 
 	_isBBS: function contextMenu__isBBS(aURI){
-		if(!(aURI instanceof Components.interfaces.nsIURI)){
-			let ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-			aURI = ioService.newURI(aURI, null, null).QueryInterface(Components.interfaces.nsIURI);
-		}
-
-		return ChaikaBrowserOverlay.ChaikaBoard.getBoardType(aURI) !== ChaikaBrowserOverlay.ChaikaBoard.BOARD_TYPE_PAGE;
+		return this._toolbar._isBBS(aURI);
 	},
 
 	_isThread: function contextMenu__isThread(aURI){
-		return this._isBBS(aURI) && /\/(?:test|bbs)\/read\.(?:cgi|html)\//.test(aURI);
+		return this._toolbar._isThread(aURI);
 	},
 
 	_isBoard: function contextMenu__isBoard(aURI){
-		return this._isBBS(aURI) && !this._isThread(aURI);
+		return this._toolbar._isBoard(aURI);
 	}
 
 };
@@ -412,8 +374,7 @@ ChaikaBrowserOverlay.threadToolbar = {
 	webProgress: {
 		onLocationChange: function(aWebProgress, aRequest, aLocation){
 			setTimeout(function(){
-				var threadToolbarItem = document.getElementById("chaika-thread-toolbaritem");
-				threadToolbarItem.showCheck();
+				ChaikaBrowserOverlay.contextMenu._toolbar.showCheck();
 			}, 0);
 		},
 		onStateChange: function(){},

@@ -10,15 +10,42 @@
 	<content>
 		<xul:toolbarbutton label="chaika" class="toolbarbutton-1 thread-toolbarbutton" type="menu">
 			<xul:menupopup anonid="menupopup" position="after_end">
-				<xul:menuitem anonid="goToBoard-menu" label="スレッド一覧を開く"/>
-				<xul:menuitem anonid="write-menu" label="このスレッドに書き込む"/>
-				<xul:menuitem anonid="deleteLog-menu" label="このスレッドのログを削除"/>
-				<xul:menuseparator/>
-				<xul:menuitem anonid="viewChange-all-menu" label="すべてのレスを表示"/>
-				<xul:menuitem anonid="viewChange-l50-menu" label="新着50件を表示"/>
-				<xul:menuitem anonid="viewBroser-menu" label="ブラウザで開く"/>
-				<xul:menuseparator/>
-				<xul:menuitem anonid="openAboneManager-menu" label="あぼーんマネージャ"/>
+				<xul:menu label="コピー" anonid="copy-menu">
+					<xul:menupopup>
+						<xul:menuitem label="タイトル" anonid="copy-title-menu" />
+						<xul:menuitem label="URL" anonid="copy-url-menu" />
+						<xul:menuitem label="タイトルとURL" anonid="copy-title-url-menu" />
+					</xul:menupopup>
+				</xul:menu>
+
+				<xul:menuseparator anonid="copy-sep" />
+
+				<xul:menuitem label="このスレッドに書き込む" anonid="write-menu" />
+				<xul:menuitem label="このスレッドのログを削除" anonid="deleteLog-menu" />
+
+				<xul:menuseparator anonid="thread-sep" />
+
+				<xul:menuitem label="chaikaで開く" anonid="viewChaika-menu" />
+				<xul:menuitem label="ブラウザで開く" anonid="viewBrowser-menu" />
+
+				<xul:menuseparator anonid="openIn-sep" />
+
+				<xul:menuitem label="すべてのレスを表示" anonid="viewChange-all-menu"/>
+				<xul:menuitem label="新着50件を表示" anonid="viewChange-l50-menu"/>
+				<xul:menuitem label="スレッド一覧を開く" anonid="goToBoard-menu"/>
+
+				<xul:menuseparator anonid="threadShow-sep" />
+
+				<xul:menuitem label="サイドバーを表示" anonid="toggleSidebar-menu">
+					<xul:observes element="viewChaikaSidebar" attribute="oncommand" />
+					<xul:observes element="viewChaikaSidebar" attribute="type" />
+					<xul:observes element="viewChaikaSidebar" attribute="checked" />
+				</xul:menuitem>
+
+				<xul:menuseparator anonid="sidebar-sep" />
+
+				<xul:menuitem label="あぼーんマネージャ..." anonid="openAboneManager-menu"/>
+				<xul:menuitem label="オプション..." anonid="openSettings-menu"/>
 			</xul:menupopup>
 		</xul:toolbarbutton>
 	</content>
@@ -30,18 +57,12 @@
 	<implementation>
 		<constructor><![CDATA[
 			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+			Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
 			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
 		]]></constructor>
 
 
-		<method name ="showCheck">
-			<body><![CDATA[
-				this.hidden = (this._getCurrentThreadURL() === null);
-			]]></body>
-		</method>
-
-
-		<method name ="_getCurrentThreadURL">
+		<method name="_getCurrentThreadURL">
 			<body><![CDATA[
 				var currentURI = null;
 				try{
@@ -49,27 +70,174 @@
 				}catch(ex){
 					return null;
 				}
-				if(!(currentURI.host === "localhost" || currentURI.host === "127.0.0.1")) return null;
-				if(currentURI.path.substring(0, 8) !== "/thread/") return null;
 
+				if(!this._isThread(currentURI)) return null;
 
-				var threadURL = null;
-				try{
-					 threadURL = Services.io.newURI(currentURI.path.substring(8), null, null)
-							 .QueryInterface(Ci.nsIURL);
-				}catch(ex){
-					this.ChaikaCore.logger.error(ex);
-				}
-
-				return threadURL;
+				return this._getPlainURL(currentURI);
 			]]></body>
 		</method>
 
 
-		<method name ="_doCommand">
+		<method name="_getCurrentBoardURL">
+			<body><![CDATA[
+				var currentURI = null;
+				try{
+					currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
+				}catch(ex){
+					return null;
+				}
+
+				var threadURI = this._getCurrentThreadURL();
+				if(threadURI){
+					return this.ChaikaThread.getBoardURL(threadURI);
+				}else if(this._isBoard(currentURI)){
+					return this._getPlainURL(currentURI);
+				}
+
+				return null;
+			]]></body>
+		</method>
+
+
+		<method name="_getPlainURL">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				if(!(aURI instanceof Components.interfaces.nsIURI)){
+					aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+				}
+
+				if(!this._isChaika(aURI)) return aURI;
+
+				var plainURL = aURI.path.substring(1).replace(/^thread\//, "");
+
+				plainURL = plainURL.replace("/test/read.html/", "/test/read.cgi/")
+									.replace("/test/mread.cgi/", "/test/read.cgi/");
+
+				try{
+					return Services.io.newURI(plainURL, null, null);
+				}catch(ex){
+					return null;
+				}
+			]]></body>
+		</method>
+
+
+		<method name="_isChaika">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				if(!(aURI instanceof Components.interfaces.nsIURI)){
+					aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+				}
+
+				var isThread = (aURI.host === "localhost" || aURI.host === "127.0.0.1") &&
+								aURI.path.substring(0, 8) === "/thread/";
+				var isBoard = aURI.spec.lastIndexOf("chaika://board/", 0) !== -1;
+
+				return isThread || isBoard;
+			]]></body>
+		</method>
+
+
+		<method name="_isBBS">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				var plainURL = this._getPlainURL(aURI);
+				return this.ChaikaBoard.getBoardType(plainURL) !== this.ChaikaBoard.BOARD_TYPE_PAGE;
+			]]></body>
+		</method>
+
+
+		<method name="_isThread">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				return this._isBBS(aURI) && /\/(?:test|bbs)\/m?read\.(?:cgi|html)\//.test(aURI.spec || aURI);
+			]]></body>
+		</method>
+
+
+		<method name="_isBoard">
+			<parameter name="aURI"/>
+			<body><![CDATA[
+				return this._isBBS(aURI) && !this._isThread(aURI);
+			]]></body>
+		</method>
+
+
+		<method name="showCheck">
+			<body><![CDATA[
+				if(!this.ChaikaCore.pref.getBool('enable_browser_toolbarbutton')){
+					this.hidden = true;
+					return;
+				}
+
+				const currentURI = getBrowser().currentURI;
+				const isBBS = this._isBBS(currentURI);
+				const isChaika = this._isChaika(currentURI);
+				const isThread = this._isThread(currentURI);
+				const isBoard = this._isBoard(currentURI);
+
+				if(this.ChaikaCore.pref.getBool('browser_toolbarbutton_only_bbs') && !isBBS){
+					this.hidden = true;
+					return;
+				}
+
+				this.hidden = false;
+
+				var menupopup = document.getAnonymousElementByAttribute(this, "anonid", "menupopup");
+				Array.slice(menupopup.childNodes).forEach(function(item, i, a){
+					item.hidden = false;
+				});
+
+				var hiddenItems = [];
+
+				if(!isBBS){
+					hiddenItems = hiddenItems.concat([
+						'copy-menu',
+						'copy-sep',
+						'write-menu',
+						'deleteLog-menu',
+						'thread-sep',
+						'viewChaika-menu',
+						'viewBrowser-menu',
+						'view-sep',
+						'viewChange-all-menu',
+						'viewChange-l50-menu',
+						'goToBoard-menu',
+						'threadShow-sep'
+					]);
+				}else{
+					if(isBoard){
+						hiddenItems = hiddenItems.concat([
+							'viewChange-all-menu',
+							'viewChange-l50-menu',
+							'goToBoard-menu',
+							'threadShow-sep'
+						]);
+					}
+
+					if(!isChaika){
+						hiddenItems = hiddenItems.concat([
+							'write-menu',
+							'deleteLog-menu',
+							'thread-sep',
+							'viewBrowser-menu'
+						]);
+					}else{
+						hiddenItems.push('viewChaika-menu');
+					}
+				}
+
+				this.ChaikaCore.logger.debug(hiddenItems);
+				hiddenItems.forEach(function(anonid){
+					document.getAnonymousElementByAttribute(this, 'anonid', anonid).hidden = true;
+				}, this)
+			]]></body>
+		</method>
+
+
+		<method name="_doCommand">
 			<parameter name="aEvent"/>
 			<parameter name="aMiddleClicked"/>
-
 			<body><![CDATA[
 				var menupopup = document.getAnonymousElementByAttribute(this, "anonid", "menupopup");
 				function hidePopupMenu(){
@@ -81,9 +249,38 @@
 				var targetElement = aEvent.originalTarget;
 				var anonymousID = targetElement.getAttribute("anonid");
 
+				var addTab = this.ChaikaCore.pref.getBool("browser_toolbarbutton_add_tab_by_click");
+				if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
+					addTab = !addTab;
+				}
+
 				switch(anonymousID){
+					case "copy-title-menu":
+					case "copy-url-menu":
+					case "copy-title-url-menu":
+						if(aMiddleClicked) break;
+
+						var text = "";
+
+						switch(anonymousID){
+							case "copy-title-menu":
+								text = "%TITLE%";
+								break;
+
+							case "copy-url-menu":
+								text = "%URL%";
+								break;
+
+							case "copy-title-url-menu":
+								text = "%TITLE%%NEWLINE%%URL%";
+								break;
+						}
+
+						this._copyClipBoard(text);
+						break;
+
 					case "goToBoard-menu":
-						this._goToBoard(aMiddleClicked);
+						this._goToBoard(addTab);
 						hidePopupMenu();
 						break;
 
@@ -96,41 +293,57 @@
 						break;
 
 					case "viewChange-all-menu":
-						this._viewChange("./", aMiddleClicked);
+						this._viewChange("./", addTab);
 						hidePopupMenu();
 						break;
 
 					case "viewChange-l50-menu":
-						this._viewChange("./l50", aMiddleClicked);
+						this._viewChange("./l50", addTab);
 						hidePopupMenu();
 						break;
 
-					case "viewBroser-menu":
-						this._viewBrowser(aMiddleClicked);
+					case "viewBrowser-menu":
+						this._viewBrowser(null, addTab);
+						hidePopupMenu();
+						break;
+
+					case "viewChaika-menu":
+						var disregardURLOption = this.ChaikaCore.pref.getBool(
+													"browser_toolbarbutton_disregard_url_option");
+						this._viewChaika(null, addTab, disregardURLOption);
 						hidePopupMenu();
 						break;
 
 					case "openAboneManager-menu":
 						if(!aMiddleClicked) this._openAboneManager();
 						break;
+
+					case "openSettings-menu":
+						if(!aMiddleClicked) this._openSettings();
+						break;
 				}
 			]]></body>
 		</method>
 
 
-		<method name ="_goToBoard">
+		<method name="_goToBoard">
 			<parameter name="aAddTab"/>
 			<body><![CDATA[
-				var threadURL = this._getCurrentThreadURL();
-				if(!threadURL) return;
+				var boardURL = this._getCurrentBoardURL();
+				if(boardURL){
+					var currentURI = getBrowser().currentURI;
 
-				var boardURL = this.ChaikaThread.getBoardURL(threadURL);
-				this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
+					if(this._isChaika(currentURI)){
+						this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
+					}else{
+						this.ChaikaCore.browser.openURL(boardURL, aAddTab);
+					}
+				}
 			]]></body>
 		</method>
 
 
-		<method name ="_write">
+		<method name="_write">
 			<body><![CDATA[
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
@@ -143,12 +356,12 @@
 		</method>
 
 
-		<method name ="_deleteLog">
+		<method name="_deleteLog">
 			<body><![CDATA[
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
 
-				if(this.ChaikaCore.pref.getBool('warn_when_delete_log')){
+				if(this.ChaikaCore.pref.getBool("warn_when_delete_log")){
 					var result = Services.prompt.confirm(null, "ログの削除 [chaika]",
 									"このスレッドのログを削除しますか?");
 					if(!result) return;
@@ -164,7 +377,7 @@
 		</method>
 
 
-		<method name ="_viewChange">
+		<method name="_viewChange">
 			<parameter name="aOption"/>
 			<parameter name="aAddTab"/>
 			<body><![CDATA[
@@ -174,7 +387,7 @@
 				try{
 					var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
 					threadURL = Services.io.newURI(aOption, null, threadPlainURL);
-					this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, false);
+					this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, !this._isChaika(threadURL));
 				}catch(ex){
 					this.ChaikaCore.logger.error(ex);
 				}
@@ -182,21 +395,83 @@
 		</method>
 
 
-		<method name ="_viewBrowser">
+		<method name="_viewBrowser">
+			<parameter name="aURI"/>
 			<parameter name="aAddTab"/>
 			<body><![CDATA[
-				var threadURL = this._getCurrentThreadURL();
-				if(!threadURL) return;
+				var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+				if(!url) return;
 
-				this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, true);
+				url = this._getPlainURL(url);
+				if(url)
+					this.ChaikaCore.browser.openURL(url, aAddTab);
 			]]></body>
 		</method>
 
 
-		<method name ="_openAboneManager">
+		<method name="_viewChaika">
+			<parameter name="aURI"/>
+			<parameter name="aAddTab"/>
+			<parameter name="disregardOption"/>
+			<body><![CDATA[
+				var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+				if(!url) return;
+
+				try{
+					if(this._isBoard(url)){
+						this.ChaikaCore.browser.openBoard(url, aAddTab);
+					}else{
+						var threadURL = this._getPlainURL(url);
+						this.ChaikaCore.browser.openThread(threadURL, aAddTab, disregardOption, false);
+					}
+				}catch(ex){
+					this.ChaikaCore.logger.error(ex);
+					return;
+				}
+			]]></body>
+		</method>
+
+
+		<method name="_openAboneManager">
 			<body><![CDATA[
 				var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
 				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar");
+			]]></body>
+		</method>
+
+
+		<method name="_openSettings">
+			<body><![CDATA[
+				var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
+				var features = "";
+				try{
+					var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+					var instantApply = pref.getBoolPref("browser.preferences.instantApply");
+					features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+				}catch(ex){
+					features = "chrome,titlebar,toolbar,centerscreen,modal";
+				}
+				window.openDialog(settingDialogURL, "", features);
+			]]></body>
+		</method>
+
+
+		<method name="_copyClipBoard">
+			<parameter name="text"/>
+			<body><![CDATA[
+				var osname= Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+				const NEWLINE = (osname== "Darwin") ? "\n" : "\r\n";
+
+				var url = (this._getCurrentThreadURL() || getBrowser().currentURI).spec;
+
+				text = text.replace("%TITLE%", content.document.title, "g")
+							.replace("%URL%", url, "g")
+							.replace("%SEL%", content.getSelection().toString(), "g")
+							.replace("%NEWLINE%", NEWLINE, "g");
+
+				var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"]
+									.getService(Ci.nsIClipboardHelper);
+				clipboard.copyString(text);
 			]]></body>
 		</method>
 	</implementation>

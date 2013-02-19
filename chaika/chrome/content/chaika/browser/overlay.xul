@@ -84,22 +84,22 @@
 				<menuseparator id="context-chaika-thread-sep" />
 
 				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openInChaika(event, content.location.href)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event)" />
 				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openInBrowser(event, content.location.href)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)" />
 				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openInChaika(event, gContextMenu.linkURL)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)" />
 				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openInBrowser(event, gContextMenu.linkURL)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)" />
 
 				<menuseparator id="context-chaika-open-in-sep" />
 
 				<menuitem label="すべてのレスを表示" id="context-chaika-show-all"
-							oncommand="ChaikaBrowserOverlay.contextMenu.rangeChange(event, './')" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')" />
 				<menuitem label="新着50件を表示" id="context-chaika-show-l50"
-							oncommand="ChaikaBrowserOverlay.contextMenu.rangeChange(event, './l50')" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')" />
 				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openBoard(event)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.goToBoard(event)" />
 
 				<menuseparator id="context-chaika-thread-show-sep" />
 
