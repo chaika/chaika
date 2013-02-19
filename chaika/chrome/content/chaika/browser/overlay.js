@@ -488,7 +488,7 @@ ChaikaBrowserOverlay.threadToolbar = {
 	webProgress: {
 		onLocationChange: function(aWebProgress, aRequest, aLocation){
 			setTimeout(function(){
-				ChaikaBrowserOverlay.contextMenu._toolbar.showCheck();
+				document.getElementById("chaika-thread-toolbaritem").showCheck();
 			}, 0);
 		},
 		onStateChange: function(){},
