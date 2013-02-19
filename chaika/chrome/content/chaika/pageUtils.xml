@@ -8,16 +8,21 @@
 <binding id="itemContext" extends="chrome://global/content/bindings/popup.xml#popup">
 	<content>
 		<xul:arrowscrollbox class="popup-internal-box" flex="1" orient="vertical">
-			<xul:menuitem label="開く"                     anonid="open"/>
-			<xul:menuitem label="新しいタブで開く"         anonid="openTab"/>
-			<xul:menuitem label="タブですべてを開く"       anonid="openTabAll"/>
-			<xul:menuitem label="ブラウザで開く"           anonid="openBrowser"/>
+			<xul:menuitem label="開く" anonid="open"/>
+			<xul:menuitem label="新しいタブで開く" anonid="openTab"/>
+			<xul:menuitem label="タブですべてを開く" anonid="openTabAll"/>
+			<xul:menuitem label="ブラウザで開く" anonid="openBrowser"/>
 			<xul:menuitem label="新しいブラウザタブで開く" anonid="openBrowserTab"/>
+
 			<xul:menuseparator/>
-			<xul:menuitem label="URL のコピー"             anonid="copyURL"/>
-			<xul:menuitem label="URL とタイトルのコピー"   anonid="copyTitleAndURL"/>
-			<xul:menuseparator                             anonid="deleteLogSeparator"/>
-			<xul:menuitem label="ログの削除"               anonid="deleteLog"/>
+
+			<xul:menuitem label="タイトルのコピー" anonid="copyTitle" />
+			<xul:menuitem label="URL のコピー" anonid="copyURL"/>
+			<xul:menuitem label="URL とタイトルのコピー" anonid="copyTitleAndURL"/>
+
+			<xul:menuseparator anonid="deleteLogSeparator"/>
+
+			<xul:menuitem label="ログの削除" anonid="deleteLog"/>
 		</xul:arrowscrollbox>
 	</content>
 
@@ -116,6 +121,16 @@
 					}else{
 						this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true, true);
 					}
+					break;
+
+				case "copyTitle":
+					var titles = this.items.map(function(aElement, aIndex, aArray){
+						return aElement.title;
+					}).join(NEWLINE);
+
+					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+							.getService(Ci.nsIClipboardHelper);
+					clipboardHelper.copyString(titles);
 					break;
 
 				case "copyURL":
