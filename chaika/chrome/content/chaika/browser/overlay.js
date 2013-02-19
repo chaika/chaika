@@ -481,6 +481,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 	_isBBS: function contextMenu__isBBS(aURI){
+		//Googleトラッキング対策
+		if(aURI.indexOf('google') > -1 && aURI.indexOf('/url?') > -1){
+			aURI = decodeURIComponent(aURI.match(/url=([^&]*)/i)[1]);
+		}
+
 		return this._toolbar._isBBS(aURI);
 	},
 
