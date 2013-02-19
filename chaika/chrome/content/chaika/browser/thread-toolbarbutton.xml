@@ -227,7 +227,6 @@
 					}
 				}
 
-				this.ChaikaCore.logger.debug(hiddenItems);
 				hiddenItems.forEach(function(anonid){
 					document.getAnonymousElementByAttribute(this, 'anonid', anonid).hidden = true;
 				}, this)
