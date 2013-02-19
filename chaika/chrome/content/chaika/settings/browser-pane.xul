@@ -67,7 +67,7 @@
 				<description class="setting-description">ツールバー :</description>
 				<vbox>
 					<checkbox label="ツールバーに chaika の項目を追加する"
-								preference="extensions.chaika.enable_browser_toobarbutton" />
+								preference="extensions.chaika.enable_browser_toolbarbutton" />
 					<vbox id="boxToolbarButton" class="indent">
 						<checkbox label="chaikaおよび掲示板上でのみ表示する"
 								preference="extensions.chaika.browser_toolbarbutton_only_bbs" />
