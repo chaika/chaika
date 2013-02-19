@@ -84,22 +84,29 @@
 				<menuseparator id="context-chaika-thread-sep" />
 
 				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event)"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewChaika(event)" />
 				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)" />
 				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)" />
 				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)" />
 
 				<menuseparator id="context-chaika-open-in-sep" />
 
 				<menuitem label="すべてのレスを表示" id="context-chaika-show-all"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')" />
 				<menuitem label="新着50件を表示" id="context-chaika-show-l50"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')"
+							onclick="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')" />
 				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board"
-							oncommand="ChaikaBrowserOverlay.contextMenu.goToBoard(event)" />
+							oncommand="ChaikaBrowserOverlay.contextMenu.goToBoard(event)"
+							onclick="ChaikaBrowserOverlay.contextMenu.goToBoard(event)" />
 				<menuitem label="次スレを検索する" id="context-chaika-find-next-thread"
 							oncommand="ChaikaBrowserOverlay.contextMenu.findNextThread()" />
 

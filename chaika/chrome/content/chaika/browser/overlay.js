@@ -64,6 +64,7 @@ ChaikaBrowserOverlay.contextMenu = {
 	start: function contextMenu_start(){
 		var isMac = navigator.platform.indexOf("Mac") == 0;
 		var contextMenu = document.getElementById('context-chaika');
+		var browserContextMenu = document.getElementById("contentAreaContextMenu");
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
 
 		if(enableContextMenu){
@@ -72,8 +73,8 @@ ChaikaBrowserOverlay.contextMenu = {
 			this._checkRequirements();
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 
-			document.getElementById("contentAreaContextMenu").addEventListener("popupshowing",
-											ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			browserContextMenu.addEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			browserContextMenu.addEventListener('click', ChaikaBrowserOverlay.contextMenu.hidePopup, false);
 			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}else{
 			contextMenu.hidden = true;
@@ -84,12 +85,13 @@ ChaikaBrowserOverlay.contextMenu = {
 	stop: function contextMenu_stop(){
 		var isMac = navigator.platform.indexOf("Mac") == 0;
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
+		var browserContextMenu = document.getElementById("contentAreaContextMenu");
 
 		if(enableContextMenu){
 			document.getElementById('context-chaika').hidden = true;
 			this._destorySkinMenu();
-			document.getElementById("contentAreaContextMenu").removeEventListener("popupshowing",
-											ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			browserContextMenu.removeEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			browserContextMenu.removeEventListener('click', ChaikaBrowserOverlay.contextMenu.hidePopup, false);
 			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}
 	},
@@ -260,6 +262,13 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	hidePopup: function contextMenu_hidePopup(event){
+		if(event.button == 1){
+			document.getElementById('contentAreaContextMenu').hidePopup();
+		}
+	},
+
+
 	addAbone: function contextMenu_addAbone(ngType){
 		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
 		var confirm = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_confirm_add_abone');
@@ -293,6 +302,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 	_addTab: function contextMenu__addTab(event){
 		var addTab = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_add_tab_by_click');
+		ChaikaBrowserOverlay.ChaikaCore.logger.debug(event.button);
 
 		//中クリックか、コマンドボタンとともにクリックされたら
 		//デフォルト値を反転
