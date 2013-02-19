@@ -251,7 +251,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 	addAbone: function contextMenu_addAbone(ngType){
-		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText(aEvent);
+		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
 		var confirm = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_confirm_add_abone');
 
 		if(confirm){
@@ -409,7 +409,7 @@ ChaikaBrowserOverlay.contextMenu = {
 			}
 		}
 
-    	return str;
+		return str;
 	},
 
 
