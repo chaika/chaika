@@ -28,7 +28,7 @@
 				<xul:menuitem label="chaikaで開く" anonid="viewChaika-menu" />
 				<xul:menuitem label="ブラウザで開く" anonid="viewBrowser-menu" />
 
-				<xul:menuseparator anonid="openIn-sep" />
+				<xul:menuseparator anonid="view-sep" />
 
 				<xul:menuitem label="すべてのレスを表示" anonid="viewChange-all-menu"/>
 				<xul:menuitem label="新着50件を表示" anonid="viewChange-l50-menu"/>
