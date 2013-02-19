@@ -62,6 +62,7 @@ Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBr
 ChaikaBrowserOverlay.contextMenu = {
 
 	start: function contextMenu_start(){
+		var isMac = navigator.platform.indexOf("Mac") == 0;
 		var contextMenu = document.getElementById('context-chaika');
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
 
@@ -69,9 +70,10 @@ ChaikaBrowserOverlay.contextMenu = {
 			contextMenu.hidden = false;
 			this._createSkinMenu();
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
-			document.getElementById("contentAreaContextMenu")
-						.addEventListener("popupshowing",
-							ChaikaBrowserOverlay.contextMenu.showMenu, false);
+
+			document.getElementById("contentAreaContextMenu").addEventListener("popupshowing",
+											ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}else{
 			contextMenu.hidden = true;
 		}
@@ -79,14 +81,15 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 	stop: function contextMenu_stop(){
+		var isMac = navigator.platform.indexOf("Mac") == 0;
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
 
 		if(enableContextMenu){
 			document.getElementById('context-chaika').hidden = true;
 			this._destorySkinMenu();
-			document.getElementById("contentAreaContextMenu")
-						.removeEventListener("popupshowing",
-							ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			document.getElementById("contentAreaContextMenu").removeEventListener("popupshowing",
+											ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}
 	},
 
@@ -166,20 +169,14 @@ ChaikaBrowserOverlay.contextMenu = {
 		});
 
 
-		//選択部分がない場合
-		if(!gContextMenu.isTextSelected){
-			Array.slice(
-				contextMenu.querySelectorAll('#context-chaika-copy-title-url-selection,' +
-				                             '#context-chaika-abone > menupopup > menuitem:not(:last-child),' +
-				                             '#context-chaika-abone > menupopup > menuseparator')
-			).forEach(function(item){
-				item.hidden = true;
-			})
-		}
-
-
 		//非表示にする項目のIDを入れておく配列
 		var hiddenItems = [];
+
+
+		//選択部分がない場合
+		if(!gContextMenu.isTextSelected){
+			hiddenItems.push('copy-title-url-selection');
+		}
 
 
 		//2chリンク上ではない場合
@@ -255,7 +252,8 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 	addAbone: function contextMenu_addAbone(ngType){
-		var ngWord = content.getSelection().toString();
+		ChaikaBrowserOverlay.ChaikaCore.logger.debug(this._getCursorPositionText());
+		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText(aEvent);
 		ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
 	},
 
@@ -269,6 +267,7 @@ ChaikaBrowserOverlay.contextMenu = {
 	_setSkin: function contextMenu__setSkin(aEvent){
 		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', this.getAttribute('value'));
 	},
+
 
 
 	_getSkinDir: function contextMenu__getSkinDir(){
@@ -288,6 +287,125 @@ ChaikaBrowserOverlay.contextMenu = {
 		}
 
 		return addTab;
+	},
+
+
+	//This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	//(MIT License)
+	_setCursorPosition: function contextMenu__setCursorPosition(event){
+		var that = ChaikaBrowserOverlay.contextMenu;
+
+		if (event.button === 2) {
+			that._clickNode = event.rangeParent;
+			that._clickOffset = event.rangeOffset;
+			that._clientX = event.clientX;
+		} else {
+			that._clickNode = null;
+			that._clickOffset = 0;
+			that._clientX = 0;
+		}
+	},
+
+
+	//This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	//(MIT License)
+	_getCursorPositionText: function contextMenu__getCursorPositionText(){
+		var cursorPositionData = {
+			_regexp: {
+				hiragana: "[\\u3040-\\u309F]+",
+				katakana: "[\\u30A0-\\u30FA\\u30FC]+",
+				kanji	 : "[\\u4E00-\\u9FA0]+",
+				suuji	 : "[0-9_./,%-]+",
+				eisu_han: "\\w[\\w\\-]*",
+				eisu_zen: "[\\uFF41-\\uFF5A\\uFF21-\\uFF3A\\uFF10-\\uFF19]+",
+				hankaku : "[\\uFF00-\\uFFEF]+",
+				hangul	: "[\\u1100-\\u11FF\\uAC00-\\uD7AF\\u3130-\\u318F]+",
+			},
+
+			get startReg() {
+				let reg = {};
+				for(let n in this._regexp) {
+					reg[n] = new RegExp('^' + this._regexp[n]);
+				}
+				delete this.startReg;
+				return this.startReg = reg;
+			},
+			get endReg() {
+				let reg = {};
+				for(let n in this._regexp) {
+					reg[n] = new RegExp(this._regexp[n] + '$');
+				}
+				delete this.endReg;
+				return this.endReg = reg;
+			},
+			getCharType: function(aChar) {
+				var c = aChar.charCodeAt(0);
+				//if (c >= 0x30 && c <= 0x39) return "suuji";
+				if (c >= 0x30 && c <= 0x39 || c >= 0x41 && c <= 0x5A || c >= 0x61 && c <= 0x7A || c === 0x5F) return "eisu_han";
+				if (c >= 0x30A0 && c <= 0x30FA || c === 0x30FC) return "katakana";
+				if (c >= 0x3040 && c <= 0x309F) return "hiragana";
+				if (c >= 0x4E00 && c <= 0x9FA0) return "kanji";
+				if (c >= 0xFF41 && c <= 0x9F5A || c >= 0xFF21 && c <= 0xFF3A || c >= 0xFF10 && c <= 0xFF19) return "eisu_zen";
+				if (c >= 0xFF00 && c <= 0xFFEF) return "hankaku";
+				if (c >= 0x1100 && c <= 0x11FF || c >= 0xAC00 && c <= 0xD7AF || c >= 0x3130 && c <= 0x318F) return "hangul";
+				return "";
+			},
+		};
+
+
+		//カーソル直下の要素を取得
+		var node = this._clickNode;
+		if(!node || node.nodeType !== Node.TEXT_NODE) return '';
+
+		//もし20文字以内なら、そのまま返す
+		if(node.nodeValue.length < 20){
+			return node.nodeValue;
+		}
+
+		//20文字より長い場合は、単語を抜き出すことを試みる
+		var offset = this._clickOffset;
+		var clientX = this._clientX;
+		var text = node.nodeValue;
+
+		// 文字の右半分をクリック時に次の文字を取得する対策
+		var range = node.ownerDocument.createRange();
+		range.setStart(node, offset);
+
+		var rect = range.getBoundingClientRect();
+		range.detach();
+
+		if (rect.left >= this._clientX){
+			offset--;
+		}
+
+		//文字範囲外の場合はエラー
+		if (!text[offset]) return "";
+
+		//文字種を取得
+		var type = cursorPositionData.getCharType(text[offset]);
+		if (!type) return "";
+
+		//単語を抜き出す
+		//カーソル直下で同じ文字種のものが続いている部分を抜き出す
+		var beforeOffset = text.substr(0, offset);
+		var afterOffset = text.substr(offset); // text[offset] はこっちに含まれる
+		var beforeOffsetWord = (cursorPositionData.endReg[type].exec(beforeOffset) || [""])[0];
+		var afterOffsetWord = (cursorPositionData.startReg[type].exec(afterOffset) || [""])[0];
+		var str = beforeOffsetWord + afterOffsetWord;
+
+		//漢字一文字の場合、送り仮名があれば付け加える
+		//ない場合は空文字にする
+		if (str.length === 1) {
+			if (type === "kanji") {
+				if (cursorPositionData.startReg["hiragana"].test(afterOffset.substr(afterOffsetWord.length))){
+					str += RegExp.lastMatch;
+				}else{
+					return "";
+				}
+			}
+		}
+
+    	return str;
 	},
 
 
