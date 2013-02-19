@@ -126,15 +126,19 @@
 		<method name="_isChaika">
 			<parameter name="aURI"/>
 			<body><![CDATA[
-				if(!(aURI instanceof Components.interfaces.nsIURI)){
-					aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+				try{
+					if(!(aURI instanceof Components.interfaces.nsIURI)){
+						aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+					}
+
+					var isThread = (aURI.host === "localhost" || aURI.host === "127.0.0.1") &&
+									aURI.path.substring(0, 8) === "/thread/";
+					var isBoard = aURI.spec.lastIndexOf("chaika://board/", 0) !== -1;
+
+					return isThread || isBoard;
+				}catch(ex){
+					return false;
 				}
-
-				var isThread = (aURI.host === "localhost" || aURI.host === "127.0.0.1") &&
-								aURI.path.substring(0, 8) === "/thread/";
-				var isBoard = aURI.spec.lastIndexOf("chaika://board/", 0) !== -1;
-
-				return isThread || isBoard;
 			]]></body>
 		</method>
 
