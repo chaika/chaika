@@ -4,6 +4,7 @@ pref("extensions.chaika.enable_browser_contextmenu", true);
 pref('extensions.chaika.browser_contextmenu_only_bbs', true);
 pref('extensions.chaika.browser_contextmenu_add_tab_by_click', false);
 pref("extensions.chaika.browser_contextmenu_disregard_url_option", true);
+pref('extensions.chaika.browser_contextmenu_confirm_add_abone', true);
 pref("extensions.chaika.enable_browser_toolbarbutton", true);
 pref('extensions.chaika.browser_toolbarbutton_only_bbs', true);
 pref('extensions.chaika.browser_toolbarbutton_add_tab_by_click', false);

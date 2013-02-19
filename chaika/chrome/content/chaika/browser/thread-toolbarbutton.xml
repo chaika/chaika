@@ -432,9 +432,10 @@
 
 
 		<method name="_openAboneManager">
+			<parameter name="data"/>
 			<body><![CDATA[
 				var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar");
+				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar", data);
 			]]></body>
 		</method>
 

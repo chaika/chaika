@@ -15,6 +15,8 @@
 				name="extensions.chaika.browser_contextmenu_add_tab_by_click" type="bool" />
 		<preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
 				name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
+		<preference id="extensions.chaika.browser_contextmenu_confirm_add_abone"
+				name="extensions.chaika.browser_contextmenu_confirm_add_abone" type="bool" />
 		<preference id="extensions.chaika.enable_browser_toolbarbutton"
 				name="extensions.chaika.enable_browser_toolbarbutton" type="bool"
 				onchange="setCcontainerDisabled(this.name, 'boxToolbarButton', true)"/>
@@ -58,7 +60,9 @@
 						<checkbox label="左クリックで新しいタブに開く"
 								preference="extensions.chaika.browser_contextmenu_add_tab_by_click" />
 						<checkbox label="URL の表示制限を書き換えて開く"
-								preference="extensions.chaika.browser_contextmenu_disregard_url_option"/>
+								preference="extensions.chaika.browser_contextmenu_disregard_url_option" />
+						<checkbox label="NGワードを直接登録せずにあぼーんマネージャを開く"
+								preference="extensions.chaika.browser_contextmenu_confirm_add_abone" />
 					</vbox>
 				</vbox>
 			</row>

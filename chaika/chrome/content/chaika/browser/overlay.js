@@ -178,7 +178,6 @@ ChaikaBrowserOverlay.contextMenu = {
 			hiddenItems.push('copy-title-url-selection');
 		}
 
-
 		//2chリンク上ではない場合
 		if(!gContextMenu.onLink || !that._isBBS(gContextMenu.linkURL)){
 			hiddenItems = hiddenItems.concat([
@@ -252,9 +251,14 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 	addAbone: function contextMenu_addAbone(ngType){
-		ChaikaBrowserOverlay.ChaikaCore.logger.debug(this._getCursorPositionText());
 		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText(aEvent);
-		ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
+		var confirm = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_confirm_add_abone');
+
+		if(confirm){
+			this._toolbar._openAboneManager({ ngType: ngType, ngWord: ngWord });
+		}else{
+			ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
+		}
 	},
 
 

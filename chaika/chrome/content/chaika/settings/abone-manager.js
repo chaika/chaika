@@ -76,7 +76,6 @@ function startup(){
 	var aboneIDListBox = document.getElementById("aboneIDListBox");
 	var aboneWordListBox = document.getElementById("aboneWordListBox");
 
-
 	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_NAME), aboneNameListBox);
 	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_MAIL), aboneMailListBox);
 	initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_ID), aboneIDListBox);
@@ -86,6 +85,42 @@ function startup(){
 				.getService(Components.interfaces.nsIObserverService);
 	os.addObserver(gAboneObserver, "b2r-abone-data-add", false);
 	os.addObserver(gAboneObserver, "b2r-abone-data-remove", false);
+
+
+	//右クリックあぼーんの時
+	if('arguments' in window && window.arguments.length > 0 && typeof window.arguments[0] === 'object'){
+		var ngData = window.arguments[0];
+
+		//ngTypeから名前へ変換
+		var ngTypeName = '';
+		switch(ngData.ngType){
+			case 0:
+				ngTypeName = 'Name'; break;
+
+			case 1:
+				ngTypeName = 'Mail'; break;
+
+			case 2:
+				ngTypeName = 'ID'; break;
+
+			case 3:
+				ngTypeName = 'Word'; break;
+
+			default:
+				ngTypeName = 'Name'; break;
+		}
+
+		//該当するタブを選択
+		var textbox = document.getElementById('abone' + ngTypeName + 'TextBox');
+		var tabpanel = textbox.parentNode.parentNode;
+		var tabbox = document.getElementById('aboneManagerTabBox');
+		tabbox.selectedPanel = tabpanel;
+		tabbox.selectedIndex = tabpanel.parentNode.selectedIndex;
+
+		//テキストボックスにngWordを入れてフォーカスを当てる
+		textbox.value = ngData.ngWord;
+		textbox.focus();
+	}
 }
 
 
