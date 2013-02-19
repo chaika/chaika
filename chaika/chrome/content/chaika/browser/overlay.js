@@ -69,6 +69,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(enableContextMenu){
 			contextMenu.hidden = false;
 			this._createSkinMenu();
+			this._checkRequirements();
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 
 			document.getElementById("contentAreaContextMenu").addEventListener("popupshowing",
@@ -143,6 +144,15 @@ ChaikaBrowserOverlay.contextMenu = {
 		while(skinItems.length){
 			skinItems[0].removeEventListener('command', this._setSkin, false);
 			skinMenu.menupopup.removeChild(skinItems[0]);
+		}
+	},
+
+
+	_checkRequirements: function contextMenu__checkRequirements(){
+		const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
+
+		if(!FOX_AGE_2CH){
+			document.getElementById('context-chaika-find-next-thread').disabled = true;
 		}
 	},
 
@@ -446,6 +456,10 @@ ChaikaBrowserOverlay.contextMenu = {
 
 	goToBoard: function contextMenu_goToBoard(event){
 		this._toolbar._goToBoard(this._addTab(event));
+	},
+
+	findNextThread: function contextMenu_findNextThread(){
+		this._toolbar._findNextThread();
 	},
 
 	openSettings: function contextMenu_openSettings(){

@@ -33,6 +33,7 @@
 				<xul:menuitem label="すべてのレスを表示" anonid="viewChange-all-menu"/>
 				<xul:menuitem label="新着50件を表示" anonid="viewChange-l50-menu"/>
 				<xul:menuitem label="スレッド一覧を開く" anonid="goToBoard-menu"/>
+				<xul:menuitem label="次スレを検索する" anonid="findNextThread-menu"/>
 
 				<xul:menuseparator anonid="threadShow-sep" />
 
@@ -229,7 +230,14 @@
 
 				hiddenItems.forEach(function(anonid){
 					document.getAnonymousElementByAttribute(this, 'anonid', anonid).hidden = true;
-				}, this)
+				}, this);
+
+
+				const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
+
+				if(!FOX_AGE_2CH){
+					document.getAnonymousElementByAttribute(this, 'anonid', 'findNextThread-menu').disabled = true;
+				}
 			]]></body>
 		</method>
 
@@ -310,6 +318,11 @@
 						var disregardURLOption = this.ChaikaCore.pref.getBool(
 													"browser_toolbarbutton_disregard_url_option");
 						this._viewChaika(null, addTab, disregardURLOption);
+						hidePopupMenu();
+						break;
+
+					case "findNextThread-menu":
+						this._findNextThread();
 						hidePopupMenu();
 						break;
 
@@ -427,6 +440,23 @@
 					this.ChaikaCore.logger.error(ex);
 					return;
 				}
+			]]></body>
+		</method>
+
+
+		<method name="_findNextThread">
+			<body><![CDATA[
+				var threadURI = this._getCurrentThreadURL();
+				if(!threadURI) return;
+
+				var thread = new this.ChaikaThread(threadURI);
+				var boardURL = thread.boardURL;
+				var datID = thread.datID;
+
+				window.openDialog(
+					"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
+					"chrome,centerscreen,modal,dialog=no,all", boardURL.host + boardURL.path + datID
+				);
 			]]></body>
 		</method>
 

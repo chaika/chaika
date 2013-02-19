@@ -100,6 +100,8 @@
 							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')" />
 				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board"
 							oncommand="ChaikaBrowserOverlay.contextMenu.goToBoard(event)" />
+				<menuitem label="次スレを検索する" id="context-chaika-find-next-thread"
+							oncommand="ChaikaBrowserOverlay.contextMenu.findNextThread()" />
 
 				<menuseparator id="context-chaika-thread-show-sep" />
 
