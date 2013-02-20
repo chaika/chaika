@@ -669,15 +669,18 @@ Thread2ch.prototype = {
 			this._readLogCount = 0;
 		}
 
-		lines.forEach(function(line){
-			//既読レスは書き出さない
+		//新着レスのみからなる変換済みデータを作成
+		var newResLines = "";
+		for(let i=0, l=lines.length; i<l; i++){
 			if(this._readLogCount > 0){
 				this._readLogCount--;
-				return;
+				continue;
 			}
 
-			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
-		}, this);
+			newResLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+		}
+
+		this.write(newResLines);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
@@ -908,8 +911,9 @@ ThreadJbbs.prototype = {
 		let lines = [];  //空白挿入後のdatLines
 
 		// サーバ側で透明あぼーんがある場合そこに空白行を挿入する
-		_lines.forEach(function(line){
-			var resNum = parseInt(line.match(/^(\d+)<>/));
+		for(let i=0, l=_lines.length; i<l; i++){
+			let line = _lines[i];
+			let resNum = parseInt(line.match(/^(\d+)<>/));
 
 			//透明あぼーんの分だけ空行を挿入
 			while(lineCount < resNum){
@@ -919,7 +923,7 @@ ThreadJbbs.prototype = {
 
 			lineCount++;
 			lines.push(line);
-		});
+		}
 
 
 		//差分取得の場合は受信したデータの中に既読レスは含まれない
@@ -927,16 +931,19 @@ ThreadJbbs.prototype = {
 			this._readLogCount = 0;
 		}
 
-		//データをブラウザに書き出す
-		lines.forEach(function(line){
-			//既読レスは書き出さない
+		//新着レスのみからなる変換済みデータを作成
+		var newResLines = "";
+		for(let i=0, l=lines.length; i<l; i++){
 			if(this._readLogCount > 0){
 				this._readLogCount--;
-				return;
+				continue;
 			}
 
-			this.write(this.datLineParse(line, ++this.thread.lineCount, true) + "\n");
-		}, this);
+			newResLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+		}
+
+		//データをブラウザに書き出す
+		this.write(newResLines);
 
 
 		//変換後の受信データを保存用配列に追加
