@@ -217,7 +217,7 @@ chContentHandler.prototype = {
 
 		switch(url.host){
 			case "post": // 書き込みウィザード
-				this._openPostWizaed(url.filePath.substring(1));
+				this._openPostWizard(url.filePath.substring(1));
 				break;
 			default:
 				ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
@@ -226,7 +226,7 @@ chContentHandler.prototype = {
 	},
 
 
-	_openPostWizaed: function chContentHandler__openPostWizaed(aThreadURLSpec){
+	_openPostWizard: function chContentHandler__openPostWizard(aThreadURLSpec){
 		var argString = Cc["@mozilla.org/supports-string;1"]
 				.createInstance(Ci.nsISupportsString);
 		argString.data = aThreadURLSpec;
