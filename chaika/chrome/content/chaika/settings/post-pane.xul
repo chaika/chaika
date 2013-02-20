@@ -33,64 +33,56 @@
 				name="extensions.chaika.post.auto_p2_disable" type="bool" />
 	</preferences>
 
-	<grid  flex="1">
-		<columns>
-			<column flex="1"/>
-			<column flex="6"/>
-		</columns>
-		<rows>
-			<row class="setting-row">
-				<description class="setting-description">成功時の動作 :</description>
-				<vbox>
-					<checkbox label="スレッドの再読み込み"
-							preference="extensions.chaika.post.thread_reload"/>
-					<checkbox label="ウィザードを自動的に閉じる"
-							preference="extensions.chaika.post.auto_finish"/>
-				</vbox>
-			</row>
+	<groupbox>
+		<caption class="setting-description" label="成功時の動作" />
+		<vbox>
+			<checkbox label="スレッドの再読み込み"
+					preference="extensions.chaika.post.thread_reload"/>
+			<checkbox label="ウィザードを自動的に閉じる"
+					preference="extensions.chaika.post.auto_finish"/>
+		</vbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">書き込みログ :</description>
-				<vbox>
-					<checkbox label="成功時に kakikomi.txt に保存する"
-							preference="extensions.chaika.post.write_log.succeeded"/>
-					<checkbox label="失敗時に kakikomi.txt に保存する"
-							preference="extensions.chaika.post.write_log.failed"/>
-				</vbox>
-			</row>
+	<groupbox>
+		<caption class="setting-description" label="書き込みログ" />
+		<vbox>
+			<checkbox label="成功時に kakikomi.txt に保存する"
+					preference="extensions.chaika.post.write_log.succeeded"/>
+			<checkbox label="失敗時に kakikomi.txt に保存する"
+					preference="extensions.chaika.post.write_log.failed"/>
+		</vbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">警告 :</description>
-				<vbox>
-					<checkbox label="ウィザードを閉じるときに警告する"
-						preference="extensions.chaika.post.warn_when_close" />
-					<checkbox label="書き込む前にプレビューを表示する(推奨)"
-						preference="extensions.chaika.post.show_preview" />
+	<groupbox>
+		<caption class="setting-description" label="警告" />
+		<vbox>
+			<checkbox label="ウィザードを閉じるときに警告する"
+				preference="extensions.chaika.post.warn_when_close" />
+			<checkbox label="書き込む前にプレビューを表示する(推奨)"
+				preference="extensions.chaika.post.show_preview" />
 
-					<vbox id="previewWarnings" class="indent">
-						<checkbox label="fusianasanを警告する"
-							preference="extensions.chaika.post.warn_fusianasan" />
-						<checkbox label="Beが有効なときに警告する"
-							preference="extensions.chaika.post.warn_be" />
-						<checkbox label="p2経由で書き込むときに警告する"
-							preference="extensions.chaika.post.warn_p2" />
-					</vbox>
-				</vbox>
-			</row>
+			<vbox id="previewWarnings" class="indent">
+				<checkbox label="fusianasanを警告する"
+					preference="extensions.chaika.post.warn_fusianasan" />
+				<checkbox label="Beが有効なときに警告する"
+					preference="extensions.chaika.post.warn_be" />
+				<checkbox label="p2経由で書き込むときに警告する"
+					preference="extensions.chaika.post.warn_p2" />
+			</vbox>
+		</vbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">自動ログイン :</description>
-				<vbox>
-					<checkbox label="Be関連板に書き込む時に自動的にBeを有効にする"
-						preference="extensions.chaika.post.auto_be_enable" />
-					<checkbox label="書き込みが終わるごとにBeを無効にする"
-						preference="extensions.chaika.post.auto_be_disable" />
-					<checkbox label="書き込みが終わるごとにp2を無効にする"
-						preference="extensions.chaika.post.auto_p2_disable" />
-				</vbox>
-			</row>
-		</rows>
-	</grid>
+	<groupbox>
+		<caption class="setting-description" label="自動ログイン" />
+		<vbox>
+			<checkbox label="Be関連板に書き込む時に自動的にBeを有効にする"
+				preference="extensions.chaika.post.auto_be_enable" />
+			<checkbox label="書き込みが終わるごとにBeを無効にする"
+				preference="extensions.chaika.post.auto_be_disable" />
+			<checkbox label="書き込みが終わるごとにp2を無効にする"
+				preference="extensions.chaika.post.auto_p2_disable" />
+		</vbox>
+	</groupbox>
 
 </prefpane>
 

@@ -25,56 +25,52 @@
 	<script type="application/x-javascript; version=1.7"
 			src="chrome://chaika/content/settings/bbsmenu-pane.js"/>
 
-	<grid flex="1">
-		<columns>
-			<column flex="1"/>
-			<column flex="6"/>
-		</columns>
-		<rows>
+	<groupbox>
+		<caption class="setting-description" label="履歴メニュー" />
+		<vbox align="left">
+			<hbox align="center">
+				<label value="板表示数:"/>
+				<textbox type="number" min="0" max="20" size="1"
+						 preference="extensions.chaika.historymenu.board_max"/>
+			</hbox>
+			<hbox align="center">
+				<label value="スレ表示数:"/>
+				<textbox type="number" min="0" max="20" size="1"
+						 preference="extensions.chaika.historymenu.thread_max"/>
+			</hbox>
+		</vbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">履歴メニュー :</description>
-				<hbox align="center">
-					<label value="板表示数"/>
-					<textbox type="number" min="0" max="20" style="width:6ch;"
-							 preference="extensions.chaika.historymenu.board_max"/>
-					<label value="スレ表示数"/>
-					<textbox type="number" min="0" max="20" style="width:6ch;"
-							 preference="extensions.chaika.historymenu.thread_max"/>
-				</hbox>
-			</row>
+	<groupbox>
+		<caption class="setting-description" label="ツリー" />
+		<vbox>
+			<hbox align="center" pack="start">
+				<label value="ツリーのテキスト"/>
+				<menulist preference="extensions.chaika.bbsmenu.tree_size">
+					<menupopup>
+						<menuitem label="小" value="small"/>
+						<menuitem label="中" value="medium"/>
+						<menuitem label="大" value="big"/>
+					</menupopup>
+				</menulist>
+			</hbox>
+			<checkbox label="一度に開けるカテゴリをひとつに制限する"
+					preference="extensions.chaika.bbsmenu.toggle_open_container"/>
+			<checkbox label="シングルクリックで開く"
+					preference="extensions.chaika.bbsmenu.open_single_click"/>
+			<checkbox label="新しいタブで開く"
+					preference="extensions.chaika.bbsmenu.open_new_tab"/>
+		</vbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">ツリー :</description>
-				<vbox>
-					<hbox align="center" pack="start">
-						<label value="ツリーのテキスト"/>
-						<menulist preference="extensions.chaika.bbsmenu.tree_size">
-							<menupopup>
-								<menuitem label="小" value="small"/>
-								<menuitem label="中" value="medium"/>
-								<menuitem label="大" value="big"/>
-							</menupopup>
-						</menulist>
-					</hbox>
-					<checkbox label="一度に開けるカテゴリをひとつに制限する"
-							preference="extensions.chaika.bbsmenu.toggle_open_container"/>
-					<checkbox label="シングルクリックで開く"
-							preference="extensions.chaika.bbsmenu.open_single_click"/>
-					<checkbox label="新しいタブで開く"
-							preference="extensions.chaika.bbsmenu.open_new_tab"/>
-				</vbox>
-			</row>
+	<groupbox>
+		<caption class="setting-description" label="板一覧取得 URL" />
+		<hbox align="center">
+			<textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
+			<button label="規定値に戻す" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
+		</hbox>
+	</groupbox>
 
-			<row class="setting-row">
-				<description class="setting-description">板一覧取得 URL :</description>
-				<hbox align="center">
-					<textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
-					<button label="規定値" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
-				</hbox>
-			</row>
-		</rows>
-	</grid>
 </prefpane>
 
 

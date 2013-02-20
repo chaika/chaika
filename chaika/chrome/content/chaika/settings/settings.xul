@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/settings/settings.css" type="text/css"?>
+<?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
+<?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css" type="text/css"?>
 
 <prefwindow id="BrowserPreferences" title="設定 [chaika]" windowtype="chaika:settings"
 	onload="startup()" onunload="shutdown()"
-	style="width:70ch; min-height:32em;"
+	style="min-width: 40em; min-height:32em;"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <prefpane id="paneGeneral" label="全般"     flex="1" src="chrome://chaika/content/settings/general-pane.xul"/>
