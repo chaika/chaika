@@ -272,11 +272,11 @@ Thread2ch.prototype = {
 				if(end > datLines.length) end = datLines.length;
 				if(start > end) start = end;
 
-				var content = new Array();
+				var content = "";
 				for(var i=start-1; i<end; i++){
-					content.push(this.datLineParse(datLines[i], i+1, false));
+					content += ( this.datLineParse(datLines[i], i+1, false) + '\n' );
 				}
-				this.write(content.join("\n"));
+				this.write(content);
 
 
 				this.write(this.converter.getFooter("log_pickup_mode"));
@@ -309,12 +309,12 @@ Thread2ch.prototype = {
 					if(start > end) start = end;
 				}
 
-				var content = new Array();
+				var content = "";
 				for(var i=start; i<end; i++){
-					content.push(this.datLineParse(datLines[i], i+1, false));
+					content += ( this.datLineParse(datLines[i], i+1, false) + '\n' );
 				}
 
-				this.write(content.join("\n"));
+				this.write(content);
 				this.write(this.converter.getNewMark() +"\n");
 			}
 		}
