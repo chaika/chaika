@@ -67,6 +67,10 @@
 				<menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
 						type="checkbox" checked="false" persist="checked"
 						oncommand="FormPage.setUseAAFont()"/>
+				<menuseparator />
+				<menuitem id="alwaysRaisedCheck" label="常に最前面にする"
+							type="checkbox" checked="false" persist="checked"
+							oncommand="FormPage.setAlwaysRaised()" />
 			</menupopup>
 		</toolbarbutton>
 		<panel id="aaPanel" insertTextbox="messeageForm" position="before_end"/>

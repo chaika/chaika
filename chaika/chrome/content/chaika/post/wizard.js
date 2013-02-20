@@ -144,7 +144,6 @@ function startup(){
 	}else{
 		gWizard.goTo("formPage");
 	}
-
 }
 
 
@@ -163,6 +162,12 @@ function shutdown(){
 	if(!useAAFontCheck.hasAttribute("checked")){
 		useAAFontCheck.setAttribute("checked", "false");
 	}
+
+	var alwaysRaisedCheck = document.getElementById('alwaysRaisedCheck');
+	if(!alwaysRaisedCheck.hasAttribute('checked')){
+		alwaysRaisedCheck.setAttribute('checked', 'false');
+	}
+
 
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	try{
@@ -314,8 +319,9 @@ var FormPage = {
 		this._beCheck = document.getElementById("beCheck");
 		this._p2Check = document.getElementById("p2Check");
 
-		//aa, defaultmail/name.txt, タイトル設定
+		//初期化処理
 		this.setUseAAFont();
+		this.setAlwaysRaised();
 		this._setDefaultMailName();
 		setTitle();
 
@@ -341,7 +347,7 @@ var FormPage = {
 		//AAメニュー有効化
 		document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
 
-		//gPostの設定
+		//gPostの初期化
 		this._setPost();
 
 		//このレスにレス
@@ -470,6 +476,7 @@ var FormPage = {
 		return pref.getIntPref("network.cookie.cookieBehavior") != COOKIE_BEHAVIOR_REJECT;
 	},
 
+
 	toggleBeLogin: function FormPage_toggleBeLogin(){
 		if(FormPage._beCheck.checked){
 			FormPage._beCheck.checked = false;
@@ -483,6 +490,7 @@ var FormPage = {
 			ChaikaBeLogin.logout();
 		}
 	},
+
 
 	beLoginObserver: {
 		observe: function(aSubject, aTopic, aData){
@@ -499,6 +507,7 @@ var FormPage = {
 			}
 		}
 	},
+
 
 	toggleP2Login: function FormPage_toggleP2Login(){
 		if(this._p2Check.checked){
@@ -518,6 +527,7 @@ var FormPage = {
 			FormPage._setPost();
 		}
 	},
+
 
 	p2LoginObserver: {
 		observe: function(aSubject, aTopic, aData){
@@ -546,6 +556,7 @@ var FormPage = {
 		}
 	},
 
+
 	/**
 	 * sageチェックボックスを管理する
 	 * @param {Boolean} init 初期化する場合はtrue
@@ -565,6 +576,40 @@ var FormPage = {
 
 		return this._sageCheck.checked;
 	},
+
+
+	/**
+	 * 常に最前面にするかどうかを設定する
+	 */
+	setAlwaysRaised: function FormPage_toggleAlwaysRaised(){
+		var alwaysRaisedCheck = document.getElementById('alwaysRaisedCheck');
+		var value = alwaysRaisedCheck.getAttribute('checked') === 'true';
+
+		if(typeof this._alwaysRaised === 'undefined'){
+			this._alwaysRaised = false;
+		}
+
+		if(this._alwaysRaised != value){
+			//alwaysRaised属性はwindow.openのパラメータでしか設定できないので
+			//ウィザード上で切り替えることができない上、Windowsでのみ有効な属性である
+			//そこで、blurイベントが発生した時に自動でフォーカスする方法をとることにする
+			if(value){
+				this._alwaysRaised = true;
+				window.addEventListener('blur', this._focus, false);
+			}else{
+				this._alwaysRaised = false;
+				window.removeEventListener('blur', this._focus, false);
+			}
+		}
+	},
+
+
+	_focus: function FormPage__focus(){
+		setTimeout(function(){
+			Cc['@mozilla.org/focus-manager;1'].getService(Ci.nsIFocusManager).activeWindow = window;
+		}, 0);
+	},
+
 
 	setUseAAFont: function FormPage_setUseAAFont(){
 		var useAAFontCheck = document.getElementById("useAAFontCheck");
