@@ -400,10 +400,12 @@
 				var threadURL = this._getCurrentThreadURL();
 				if(!threadURL) return;
 
+				var currentURL = getBrowser().currentURI;
+
 				try{
 					var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
 					threadURL = Services.io.newURI(aOption, null, threadPlainURL);
-					this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, !this._isChaika(threadURL));
+					this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, !this._isChaika(currentURL));
 				}catch(ex){
 					this.ChaikaCore.logger.error(ex);
 				}
