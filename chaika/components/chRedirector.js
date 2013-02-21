@@ -92,7 +92,14 @@ chRedirector.prototype = {
 		}
 
 		var spec = aContentLocation.spec;
-			// Be Profile Page
+
+		// コンテキストメニュー等の「ブラウザーで開く」
+		if(spec.lastIndexOf('?chaika_force_browser=1') !== -1){
+			aContentLocation.spec = spec.replace('?chaika_force_browser=1', '');
+			return Ci.nsIContentPolicy.ACCEPT;
+		}
+
+		// Be Profile Page
 		if(spec.indexOf("http://be.2ch.net/test/p.php")!=-1){
 			return Ci.nsIContentPolicy.ACCEPT;
 		}

@@ -421,8 +421,12 @@
 				if(!url) return;
 
 				url = this._getPlainURL(url);
-				if(url)
+				if(url){
+					/* スレッドリダイレクタを回避 */
+					url = Services.io.newURI(url.spec + '?chaika_force_browser=1', null, null);
+
 					this.ChaikaCore.browser.openURL(url, aAddTab);
+				}
 			]]></body>
 		</method>
 
