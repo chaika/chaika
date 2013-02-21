@@ -587,10 +587,10 @@ Thread2ch.prototype = {
 		this._aboneChecked = true;
 		this._threadAbone = false;
 
-			// 差分GET
+		// 差分GET
 		if(this.thread.datFile.exists() && this.thread.lastModified){
 			var lastModified = this.thread.lastModified;
-			var range = this.thread.datFile.fileSize - 1;
+			var range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
 			this.httpChannel.setRequestHeader("Accept-Encoding", "", false);
 			this.httpChannel.setRequestHeader("If-Modified-Since", lastModified, false);
 			this.httpChannel.setRequestHeader("Range", "bytes=" + range + "-", false);
@@ -616,20 +616,30 @@ Thread2ch.prototype = {
 
 		var httpStatus = aRequest.responseStatus;
 
-		// 通信失敗の場合は終了
+		// あぼーん発生の場合
+		if(httpStatus == 416){
+			this._threadAbone = true;
+			return;
+		}
+
+		// 新着がない場合は終了
 		if(!(httpStatus == 200 || httpStatus == 206)) return;
 		if(aCount == 0) return;
 
 		this._bInputStream.setInputStream(aInputStream);
 
+		// 206でもあぼーん発生の場合があるので、
+		// データ全体の先頭の1byteを調べる
+		// ついでに受信したデータを読み込む
 		var availableData = "";
-		if(!this._aboneChecked){
-			var firstChar = this._bInputStream.readBytes(1)
+		if(!this._aboneChecked && httpStatus == 206){
+			var firstChar = this._bInputStream.readBytes(1);
 			availableData = this._bInputStream.readBytes(aCount - 1);
+
+			//もし改行でなければあぼーん発生ということ
 			if(firstChar.charCodeAt(0) != 10){
 				this._threadAbone = true;
 			}
-
 		}else{
 			availableData = this._bInputStream.readBytes(aCount);
 		}
@@ -647,21 +657,19 @@ Thread2ch.prototype = {
 		// NULL 文字を変換
 		availableData = availableData.replace(/\x00/g, "*");
 
-		// 送られてきたデータを保存用配列に追加
-		this._data.push(availableData);
-
-		//前回のバッファと結合
+		//前回のバッファと結合し先頭のレス断片を解消
 		availableData = this._dataBuffer + availableData;
 
-		//データの最後にあるレスの断片をバッファに追加する
-		this._dataBuffer = availableData.replace(/.*\n/g, '');
-
-
-		//受信したデータを書き出す
+		//受信したデータをレスごとに分割
 		var lines = availableData.split(/\n/);
 
-		//最後の空要素、または\nのないレス断片をカットする
-		lines.pop();
+		//データの最後にレス断片がある場合にはバッファに追加する
+		this._dataBuffer = lines.pop();
+
+		//レス断片しかない場合は終了
+		if(!lines.length){
+			return;
+		}
 
 		//ステータスが206 Partial Contentの場合、
 		//受信したデータの中に既読レスは含まれない
@@ -670,17 +678,24 @@ Thread2ch.prototype = {
 		}
 
 		//新着レスのみからなる変換済みデータを作成
-		var newResLines = "";
+		var newResLines = "";      //新着レスの生データ
+		var newResHTMLLines = ""   //新着レスの変換済みデータ
 		for(let i=0, l=lines.length; i<l; i++){
+			//既読部分は飛ばす
 			if(this._readLogCount > 0){
 				this._readLogCount--;
 				continue;
 			}
 
-			newResLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+			newResLines += ( lines[i] + '\n' );
+			newResHTMLLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
 		}
 
-		this.write(newResLines);
+		//ブラウザに書き出す
+		this.write(newResHTMLLines);
+
+		//新着レスをを保存用配列に追加
+		this._data.push(newResLines);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
@@ -809,6 +824,8 @@ ThreadJbbs.prototype = {
 		this._deltaMode = false;
 
 		// 差分GET
+		// したらばの場合、差分取得でも206ではなく200が返るので
+		// こちらで記録しておかないといけない
 		if(this.thread.datFile.exists() && this.thread.lineCount){
 			this._deltaMode = true;
 			datURLSpec += (this.thread.lineCount + 1) + "-";
@@ -869,35 +886,46 @@ ThreadJbbs.prototype = {
 
 		var httpStatus = aRequest.responseStatus;
 
-		// 通信失敗の場合は終了
+		// あぼーん発生の場合
+		if(httpStatus == 416){
+			this._threadAbone = true;
+			return;
+		}
+
+		// 新着がない場合は終了
 		if(!(httpStatus == 200 || httpStatus == 206)) return;
 		if(aCount == 0) return;
 
 		this._bInputStream.setInputStream(aInputStream);
 
+		// 206でもあぼーん発生の場合があるので、
+		// データ全体の先頭の1byteを調べる
+		// ついでに受信したデータを読み込む
 		var availableData = "";
-		if(!this._aboneChecked){
-			var firstChar = this._bInputStream.readBytes(1)
+		if(!this._aboneChecked && httpStatus == 206){
+			var firstChar = this._bInputStream.readBytes(1);
 			availableData = this._bInputStream.readBytes(aCount - 1);
+
+			//もし改行でなければあぼーん発生ということ
 			if(firstChar.charCodeAt(0) != 10){
 				this._threadAbone = true;
 			}
-
 		}else{
 			availableData = this._bInputStream.readBytes(aCount);
 		}
 		this._aboneChecked = true;
 
+
 		// NULL 文字を変換
 		availableData = availableData.replace(/\x00/g, "*");
 
-
-		//前回のバッファと結合し、受信データ先頭のレス断片を解消する
+		//前回のバッファと結合し先頭のレス断片を解消する
 		availableData = this._dataBuffer + availableData;
 
 		//受信したデータをレスごとに分割
-		//最後にレス断片が付いている場合にはそれをバッファに追加する
 		var _lines = availableData.split("\n");
+
+		//最後にレス断片が付いている場合にはそれをバッファに追加する
 		this._dataBuffer = _lines.pop();
 
 		//もしレス断片しかない場合にはここで終了
@@ -932,22 +960,24 @@ ThreadJbbs.prototype = {
 		}
 
 		//新着レスのみからなる変換済みデータを作成
-		var newResLines = "";
+		var newResLines = "";      //新着レスの生データ
+		var newResHTMLLines = "";  //新着レスの変換済みデータ
 		for(let i=0, l=lines.length; i<l; i++){
+			//既読部分は飛ばす
 			if(this._readLogCount > 0){
 				this._readLogCount--;
 				continue;
 			}
 
-			newResLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+			newResLines += ( lines[i] + '\n' );
+			newResHTMLLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
 		}
 
 		//データをブラウザに書き出す
-		this.write(newResLines);
+		this.write(newResHTMLLines);
 
-
-		//変換後の受信データを保存用配列に追加
-		this._data.push(lines.join('\n') + '\n');
+		//新着レスを保存用配列に追加
+		this._data.push(newResLines);
 	},
 
 	onStopRequest: function(aRequest, aContext, aStatus){
