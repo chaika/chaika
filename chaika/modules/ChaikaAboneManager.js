@@ -36,7 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
+EXPORTED_SYMBOLS = ["ChaikaAboneManager", "ChaikaNGFiles"];
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
@@ -253,3 +254,240 @@ var ChaikaAboneManager = {
 
 };
 
+
+
+/**
+ * NGFiles.txtに基づき画像をブロックする
+ * @class
+ */
+var ChaikaNGFiles = {
+
+	/** @private */
+	_enabled: false,
+
+	HTTP_REQUEST_TOPIC: '',
+
+	ngData: [],
+
+
+	/** @private */
+	_startup: function(){
+		//NGFiles.txtのロード
+		this._loadFile();
+
+
+		//Firefox 18以降は http-on-opening-request を,
+		//それ以前は　http-on-modify-request を使用する
+		if(ChaikaCore.browser.geckoVersionCompare(18) <= 0){
+			this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
+		}else{
+			this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
+		}
+
+		//オブザーバの登録
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
+
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
+		this._enabled = pref.getBoolPref("extensions.chaika.ngfiles.enabled");
+		pref.addObserver("extensions.chaika.ngfiles.enabled", this, true);
+
+
+		this._serverURL = ChaikaCore.getServerURL();
+	},
+
+
+	/** @private */
+	_quit: function(){
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
+
+		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
+		pref.removeObserver("extensions.chaika.ngfiles.enabled", this);
+	},
+
+
+	_loadFile: function ChaikaNGFiles__loadFile(){
+		this.ngData = null;
+		this.ngData = [];
+
+		const NGFILES_NAME = 'NGFiles.txt';
+
+		var ngFile = ChaikaCore.getDataDir();
+		ngFile.appendRelativePath(NGFILES_NAME);
+
+		if(!ngFile.exists()){
+			var defaultsFile = ChaikaCore.getDefaultsDir();
+			defaultsFile.appendRelativePath(NGFILES_NAME);
+			defaultsFile.copyTo(ngFile.parent, null);
+			ngFile = ngFile.clone().QueryInterface(Ci.nsILocalFile);
+		}
+
+		var lines = ChaikaCore.io.readString(ngFile, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
+		for(let i=0, l=lines.length; i<l; i++){
+			var data = lines[i].split(/=\*/);
+
+			if(data[0] && !(/^\s*;|'|#|\/\//).test(data[0])){
+				this.ngData.push({
+					hash: data[0],
+					description: data[1]
+				});
+			}
+		}
+
+		ChaikaCore.logger.debug(this.ngData.length);
+	},
+
+
+	/**
+	 * URIからそのファイルのMD5を得る
+	 * @param {nsIURI} uri 対象のファイル
+	 * @param {String} MD5ハッシュ エラー時はnullが返る
+	 */
+	_getMD5: function ChaikaNGFiles__getMD5(uri){
+		try{
+			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+			var channel = ioService.newChannelFromURI(uri);
+
+			var stream = channel.open();
+			var binaryInputStream = Cc["@mozilla.org/binaryinputstream;1"].createInstance(Ci.nsIBinaryInputStream);
+			binaryInputStream.setInputStream(stream);
+
+			if(channel instanceof Ci.nsIHttpChannel && channel.responseStatus != 200){
+				ChaikaCore.logger.error('channel status: ' + channel.responseStatus);
+			}else{
+				var byteArray = new Array();
+				var readLength = binaryInputStream.available();
+
+				while(readLength != 0){
+					byteArray = byteArray.concat(binaryInputStream.readByteArray(readLength));
+					readLength = binaryInputStream.available();
+				}
+
+				var cryptoHash = Cc["@mozilla.org/security/hash;1"].createInstance(Ci.nsICryptoHash);
+				cryptoHash.init(cryptoHash.MD5);
+				cryptoHash.update(byteArray, byteArray.length);
+
+				var hash = cryptoHash.finish(false);
+
+				function toHexString(charCode){
+					return ("0" + charCode.toString(16)).slice(-2);
+				}
+
+				return [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}finally{
+			if(binaryInputStream) binaryInputStream.close();
+			if(stream) stream.close();
+		}
+
+		return null;
+	},
+
+
+	/**
+	 * MD5からNGFiles.txt互換のハッシュを得る
+	 * @param {String} md5 MD5ハッシュ値
+	 * @return {String} ハッシュ
+	 */
+	_getHash: function ChaikaNGFiles__getHash(md5){
+		//NGFiles.txt互換ハッシュを算出
+		//Based on nghash.c by taotao1942
+		//http://www6.atpages.jp/appsouko/souko/pkg/nghash.zip
+		const NGHASH_CHAR = [
+			'0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+			'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+			'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
+			'U', 'V'
+		];
+
+		const NGHASH_LEN = 26;
+
+		function make_word(lo, hi){
+			return lo + (hi << 8);
+		}
+
+
+		//2文字ごとに16進数とみなして数値に変換する
+		md5 = Array.slice(md5.match(/../g));
+		for(let i=0, l=md5.length; i<l; i++){
+			md5[i] = parseInt(md5[i], 16);
+		}
+
+		md5.push(0);
+
+		var hash = '';
+		for(let i=0; i<NGHASH_LEN; i++){
+			let num = ~~(5 * i / 8);
+			hash += NGHASH_CHAR[(make_word(md5[num], md5[num + 1]) >> (5 * i % 8)) & 31];
+		}
+
+		return hash;
+	},
+
+
+	_shouldBlock: function ChaikaNGFiles__shouldBlock(uri){
+		var md5 = this._getMD5(uri);
+		if(!md5) return false;
+
+		var hash = this._getHash(md5);
+
+		for(let i=0, l=this.ngData.length; i<l; i++){
+			if(this.ngData[i].hash === hash){
+				uri = uri.QueryInterface(Ci.nsIURL);
+
+				var alertStr = decodeURIComponent(escape(
+					'NGFiles.txt に基づき' + uri.fileName + ' (' + hash + ') をブロックしました。'
+				));
+
+				var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
+				alertsService.showAlertNotification("chrome://chaika/content/icon.png", "Chaika", alertStr, false, "", null);
+
+				return true;
+			}
+		}
+
+		return false;
+	},
+
+
+	/** @private */
+	observe: function ChaikaNGFiles_observe(aSubject, aTopic, aData){
+		if(aTopic == this.HTTP_REQUEST_TOPIC && this._enabled){
+			var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
+
+			// リファラがなければ終了
+			if(!httpChannel.referrer) return;
+
+			// リファラが内部サーバ以外なら終了
+			if(this._serverURL.hostPort != httpChannel.referrer.hostPort) return;
+
+			// 読み込むリソースが内部サーバなら終了
+			if(this._serverURL.hostPort == httpChannel.URI.hostPort) return;
+
+			//画像の時はNGFiles.txtに記載されていないかチェックする
+			if(/(?:jpe?g|png|gif|bmp)$/.test(httpChannel.URI.spec)){
+				if(this._shouldBlock(httpChannel.URI)){
+					return httpChannel.cancel(Cr.NS_ERROR_FAILURE);
+				}
+			}
+
+			return;
+		}
+
+		if((aTopic == "nsPref:changed") && (aData == "extensions.chaika.ngfiles.enabled")){
+			var pref = aSubject.QueryInterface(Ci.nsIPrefBranch);
+			this._enabled = pref.getBoolPref("extensions.chaika.ngfiles.enabled");
+		}
+	},
+
+
+	/** @private */
+	QueryInterface: XPCOMUtils.generateQI([
+		Ci.nsIObserver,
+		Ci.nsISupportsWeakReference,
+		Ci.nsISupports
+	])
+};
