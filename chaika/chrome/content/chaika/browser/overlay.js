@@ -97,6 +97,9 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * スキンのメニューを作成する
+	 */
 	_createSkinMenu: function contextMenu__createSkinMenu(){
 		var skinMenu = document.getElementById("context-chaika-skin");
 
@@ -139,6 +142,9 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * スキンのメニューを削除する
+	 */
 	_destroySkinMenu: function contextMenu__destroySkinMenu(){
 		var skinMenu = document.getElementById("context-chaika-skin");
 		var skinItems = skinMenu.getElementsByClassName('context-chaika-skin-item');
@@ -150,6 +156,9 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * 他アドオンが必要なメニュー項目をチェックする
+	 */
 	_checkRequirements: function contextMenu__checkRequirements(){
 		const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
 
@@ -159,6 +168,9 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * コンテキストメニューが表示された時に呼ばれる
+	 */
 	showMenu: function contextMenu_showMenu(aEvent){
 		if(aEvent.originalTarget.id != "contentAreaContextMenu") return;
 		if(!gContextMenu) return;
@@ -271,6 +283,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * 選択文字列またはカーソル直下の文字列をNGワードに追加する
+	 * @param {Number} ngType NGワードの種類
+	 * @see ChaikaAboneManager
+	 */
 	addAbone: function contextMenu_addAbone(ngType){
 		var ngWord = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
 		var confirm = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_confirm_add_abone');
@@ -283,18 +300,28 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+	/**
+	 * スキンのフォルダを開く
+	 */
 	openSkinFolder: function contextMenu_openSkinFolder(){
 		var skinDir = this._getSkinDir();
 		ChaikaBrowserOverlay.ChaikaCore.io.revealDir(skinDir);
 	},
 
 
+	/**
+	 * スキンを変更する
+	 * スキンメニューから呼ばれる
+	 */
 	_setSkin: function contextMenu__setSkin(aEvent){
 		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', this.getAttribute('value'));
 	},
 
 
 
+	/**
+	 * スキンフォルダを返す
+	 */
 	_getSkinDir: function contextMenu__getSkinDir(){
 		var skinDir = ChaikaBrowserOverlay.ChaikaCore.getDataDir();
 		skinDir.appendRelativePath("skin");
@@ -302,13 +329,16 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
-	_addTab: function contextMenu__addTab(event){
+	/**
+	 * 新規タブに開くかどうかを調べる
+	 */
+	_addTab: function contextMenu__addTab(aEvent){
 		var addTab = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_add_tab_by_click');
-		ChaikaBrowserOverlay.ChaikaCore.logger.debug(event.button);
+		ChaikaBrowserOverlay.ChaikaCore.logger.debug(aEvent.button);
 
 		//中クリックか、コマンドボタンとともにクリックされたら
 		//デフォルト値を反転
-		if(event.button === 1 || event.ctrlKey || event.metaKey){
+		if(aEvent.button === 1 || aEvent.ctrlKey || aEvent.metaKey){
 			addTab = !addTab;
 		}
 
@@ -316,8 +346,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
-	//This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
-	//(MIT License)
+	/**
+	 * クリックされた時のカーソルの状態を保存する
+	 * This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	 * @license MIT License
+	 */
 	_setCursorPosition: function contextMenu__setCursorPosition(event){
 		var that = ChaikaBrowserOverlay.contextMenu;
 
@@ -333,8 +366,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
-	//This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
-	//(MIT License)
+	/**
+	 * カーソル直下の文字列を取得して返す
+	 * This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	 * @license MIT License
+	 */
 	_getCursorPositionText: function contextMenu__getCursorPositionText(){
 		var cursorPositionData = {
 			_regexp: {
@@ -435,6 +471,8 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
+
+	/* **** ここより下の関数は thread-toolbarbutton.xml の関数に処理を投げる関数 **** */
 
 	openAboneManager: function contextMenu_openAboneManager(){
 		this._toolbar._openAboneManager();
