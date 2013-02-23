@@ -80,7 +80,7 @@
 
 				<menuseparator id="context-chaika-thread-sep" />
 
-				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika" />
+				<menuitem label="chaika で開く" id="context-chaika-open-in-chaika" />
 				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser" />
 				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika" />
 				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser" />

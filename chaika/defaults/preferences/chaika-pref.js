@@ -19,6 +19,7 @@ pref('extensions.chaika.browser_contextmenu_flatten', false);
 pref('extensions.chaika.browser_contextmenu_add_tab_by_click', false);
 pref("extensions.chaika.browser_contextmenu_disregard_url_option", true);
 pref('extensions.chaika.browser_contextmenu_confirm_add_abone', true);
+pref('extensions.chaika.browser_contextmenu_reload_when_skin_changed', false);
 pref("extensions.chaika.contextmenu.abone.enabled", true);
 pref("extensions.chaika.contextmenu.copy.enabled", true);
 pref("extensions.chaika.contextmenu.skin.enabled", true);

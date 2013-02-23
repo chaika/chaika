@@ -130,7 +130,7 @@ ChaikaBrowserOverlay.contextMenu = {
 					item.setAttribute('class', 'context-chaika-skin-item');
 					item.setAttribute('name', 'context-chaika-skin-item');
 					item.setAttribute('type', 'radio');
-					item.addEventListener('command', this._setSkin, false);
+					item.addEventListener('command', this._setSkin.bind(this), false);
 				}
 			}
 			entries.close();
@@ -460,8 +460,13 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * スキンメニューから呼ばれる
 	 */
 	_setSkin: function contextMenu__setSkin(aEvent){
-		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', this.getAttribute('value'));
 		aEvent.stopPropagation();
+		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', aEvent.target.getAttribute('value'));
+
+		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_reload_when_skin_changed') &&
+		   this._isChaika(content.location.href) && this._isThread(content.location.href)){
+			content.location.reload();
+		}
 	},
 
 
