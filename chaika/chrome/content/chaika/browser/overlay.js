@@ -210,6 +210,7 @@ ChaikaBrowserOverlay.contextMenu = {
 				'show-all',
 				'show-l50',
 				'open-board',
+				'find-next-thread',
 				'thread-show-sep',
 			]);
 
@@ -234,6 +235,7 @@ ChaikaBrowserOverlay.contextMenu = {
 						'show-all',
 						'show-l50',
 						'open-board',
+						'find-next-thread',
 						'thread-show-sep',
 					]);
 				}
