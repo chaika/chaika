@@ -74,7 +74,6 @@ ChaikaBrowserOverlay.contextMenu = {
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 
 			browserContextMenu.addEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
-			browserContextMenu.addEventListener('click', ChaikaBrowserOverlay.contextMenu.hidePopup, false);
 			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}else{
 			contextMenu.hidden = true;
@@ -91,7 +90,6 @@ ChaikaBrowserOverlay.contextMenu = {
 			document.getElementById('context-chaika').hidden = true;
 			this._destorySkinMenu();
 			browserContextMenu.removeEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
-			browserContextMenu.removeEventListener('click', ChaikaBrowserOverlay.contextMenu.hidePopup, false);
 			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}
 	},
@@ -178,7 +176,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 		var that = ChaikaBrowserOverlay.contextMenu;
 		var contextMenu = document.getElementById('context-chaika');
-		var url = gBrowser.currentURI.spec;
+		var url = gBrowser.currentURI;
 
 		//掲示板上でのみ表示する設定の場合
 		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs') && !that._isBBS(url)){
@@ -276,8 +274,108 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 
-	hidePopup: function contextMenu_hidePopup(event){
-		if(event.button == 1){
+	/**
+	 * メニューコマンドを実行する
+	 */
+	_doCommand: function contextMenu__doCommand(aEvent){
+		//clickの場合は中クリックでなければ終了
+		if(aEvent.type === 'click' && aEvent.button !== 1) return;
+
+		var addTab = this._addTab(aEvent);
+		var middleClicked = aEvent.type === 'click' && aEvent.button === 1;
+
+		var id = aEvent.target.getAttribute('id').replace('context-chaika-', '');
+		ChaikaBrowserOverlay.ChaikaCore.logger.debug(id);
+
+		switch(id){
+			case 'abone-name':
+				if(!middleClicked) this.addAbone(0);
+				break;
+
+			case 'abone-mail':
+				if(!middleClicked) this.addAbone(1);
+				break;
+
+			case 'abone-id':
+				if(!middleClicked) this.addAbone(2);
+				break;
+
+			case 'abone-word':
+				if(!middleClicked) this.addAbone(3);
+				break;
+
+			case 'abone-manager':
+				if(!middleClicked) this.openAboneManager();
+				break;
+
+			case 'copy-title':
+				if(!middleClicked) this.copyClipBoard('%TITLE%');
+				break;
+
+			case 'copy-url':
+				if(!middleClicked) this.copyClipBoard('%URL%');
+				break;
+
+			case 'copy-title-url':
+				if(!middleClicked) this.copyClipBoard('%TITLE%%NEWLINE%%URL%');
+				break;
+
+			case 'copy-title-url-selection':
+				if(!middleClicked) this.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%');
+				break;
+
+			case 'open-skin-folder':
+				if(!middleClicked) this.openSkinFolder();
+				break;
+
+			case 'write':
+				if(!middleClicked) this.write();
+				break;
+
+			case 'delete-log':
+				if(!middleClicked) this.deleteLog();
+				break;
+
+			case 'open-in-chaika':
+				this.viewChaika(null, addTab);
+				break;
+
+			case 'open-in-browser':
+				this.viewBrowser(null, addTab);
+				break;
+
+			case 'open-link-in-chaika':
+				this.viewChaika(gContextMenu.linkURL, addTab);
+				break;
+
+			case 'open-link-in-browser':
+				this.viewBrowser(gContextMenu.linkURL, addTab);
+				break;
+
+			case 'show-all':
+				this.viewChange('./', addTab);
+				break;
+
+			case 'show-l50':
+				this.viewChange('./l50', addTab);
+				break;
+
+			case 'open-board':
+				this.goToBoard(addTab);
+				break;
+
+			case 'find-next-thread':
+				if(!middleClicked) this.findNextThread();
+				break;
+
+			case 'open-settings':
+				if(!middleClicked) this.openSettings();
+				break;
+		}
+
+
+		//中クリックの場合明示的にコンテキストメニューを閉じる必要がある
+		if(middleClicked){
 			document.getElementById('contentAreaContextMenu').hidePopup();
 		}
 	},
@@ -315,6 +413,7 @@ ChaikaBrowserOverlay.contextMenu = {
 	 */
 	_setSkin: function contextMenu__setSkin(aEvent){
 		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', this.getAttribute('value'));
+		aEvent.stopPropagation();
 	},
 
 
@@ -334,7 +433,6 @@ ChaikaBrowserOverlay.contextMenu = {
 	 */
 	_addTab: function contextMenu__addTab(aEvent){
 		var addTab = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_add_tab_by_click');
-		ChaikaBrowserOverlay.ChaikaCore.logger.debug(aEvent.button);
 
 		//中クリックか、コマンドボタンとともにクリックされたら
 		//デフォルト値を反転
@@ -348,17 +446,17 @@ ChaikaBrowserOverlay.contextMenu = {
 
 	/**
 	 * クリックされた時のカーソルの状態を保存する
-	 * This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	 * This function is based on contextSearcher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
 	 * @license MIT License
 	 */
-	_setCursorPosition: function contextMenu__setCursorPosition(event){
+	_setCursorPosition: function contextMenu__setCursorPosition(aEvent){
 		var that = ChaikaBrowserOverlay.contextMenu;
 
-		if (event.button === 2) {
-			that._clickNode = event.rangeParent;
-			that._clickOffset = event.rangeOffset;
-			that._clientX = event.clientX;
-		} else {
+		if(aEvent.button === 2){
+			that._clickNode = aEvent.rangeParent;
+			that._clickOffset = aEvent.rangeOffset;
+			that._clientX = aEvent.clientX;
+		}else{
 			that._clickNode = null;
 			that._clickOffset = 0;
 			that._clientX = 0;
@@ -368,7 +466,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 	/**
 	 * カーソル直下の文字列を取得して返す
-	 * This function is based on contextSercher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
+	 * This function is based on contextSearcher.uc.js by Griever (http://d.hatena.ne.jp/Griever/)
 	 * @license MIT License
 	 */
 	_getCursorPositionText: function contextMenu__getCursorPositionText(){
@@ -490,22 +588,22 @@ ChaikaBrowserOverlay.contextMenu = {
 		this._toolbar._deleteLog();
 	},
 
-	viewChaika: function contextMenu_viewChaika(event, url){
+	viewChaika: function contextMenu_viewChaika(aURI, aAddTab){
 		var disregardURLOption = ChaikaBrowserOverlay.ChaikaCore.pref.getBool(
 									"browser_contextmenu_disregard_url_option");
-		this._toolbar._viewChaika(url, this._addTab(event), disregardURLOption);
+		this._toolbar._viewChaika(aURI, aAddTab, disregardURLOption);
 	},
 
-	viewBrowser: function contextMenu_viewBrowser(event, url){
-		this._toolbar._viewBrowser(url, this._addTab(event));
+	viewBrowser: function contextMenu_viewBrowser(aURI, aAddTab){
+		this._toolbar._viewBrowser(aURI, aAddTab);
 	},
 
-	viewChange: function contextMenu_viewChange(event, option){
-		this._toolbar._viewChange(option, this._addTab(event));
+	viewChange: function contextMenu_viewChange(aOption, aAddTab){
+		this._toolbar._viewChange(aOption, aAddTab);
 	},
 
-	goToBoard: function contextMenu_goToBoard(event){
-		this._toolbar._goToBoard(this._addTab(event));
+	goToBoard: function contextMenu_goToBoard(aAddTab){
+		this._toolbar._goToBoard(aAddTab);
 	},
 
 	findNextThread: function contextMenu_findNextThread(){
@@ -521,9 +619,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	},
 
 	_isBBS: function contextMenu__isBBS(aURI){
+		var url = aURI.spec || aURI;
+
 		//Googleトラッキング対策
-		if(aURI.indexOf('google') > -1 && aURI.indexOf('/url?') > -1){
-			aURI = decodeURIComponent(aURI.match(/url=([^&]*)/i)[1]);
+		if(url.indexOf('google') > -1 && url.indexOf('/url?') > -1){
+			aURI = decodeURIComponent(url.match(/url=([^&]*)/i)[1]);
 		}
 
 		return this._toolbar._isBBS(aURI);

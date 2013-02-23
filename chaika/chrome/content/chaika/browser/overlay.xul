@@ -42,73 +42,55 @@
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">
 		<menu id="context-chaika" label="chaika" class="menu-iconic"
+				oncommand="ChaikaBrowserOverlay.contextMenu._doCommand(event)"
+				onclick="ChaikaBrowserOverlay.contextMenu._doCommand(event)"
 				image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
 			<menupopup>
 				<menu label="あぼーん" id="context-chaika-abone">
 					<menupopup>
-						<menuitem label="名前" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(0)" />
-						<menuitem label="メール" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(1)" />
-						<menuitem label="ID" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(2)" />
-						<menuitem label="ワード" oncommand="ChaikaBrowserOverlay.contextMenu.addAbone(3)" />
+						<menuitem label="名前" id="context-chaika-abone-name" />
+						<menuitem label="メール" id="context-chaika-abone-mail" />
+						<menuitem label="ID" id="context-chaika-abone-word" />
+						<menuitem label="ワード" id="context-chaika-abone-word" />
 						<menuseparator />
-						<menuitem label="あぼーんマネージャ..."
-									oncommand="ChaikaBrowserOverlay.contextMenu.openAboneManager()" />
+						<menuitem label="あぼーんマネージャ..." id="context-chaika-abone-manager" />
 					</menupopup>
 				</menu>
 
 				<menu label="コピー" id="context-chaika-copy">
 					<menupopup>
-						<menuitem label="タイトル" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%TITLE%')" />
-						<menuitem label="URL" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%URL%')" />
-						<menuitem label="タイトルとURL" oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%TITLE%%NEWLINE%%URL%')" />
-						<menuitem label="タイトルとURLと選択部分" id="context-chaika-copy-title-url-selection"
-									oncommand="ChaikaBrowserOverlay.contextMenu.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%')" />
+						<menuitem label="タイトル" id="context-chaika-copy-title" />
+						<menuitem label="URL" id="context-chaika-copy-url" />
+						<menuitem label="タイトルとURL" id="context-chaika-copy-title-url" />
+						<menuitem label="タイトルとURLと選択部分" id="context-chaika-copy-title-url-selection" />
 					</menupopup>
 				</menu>
 
 				<menu label="スキン" id="context-chaika-skin">
 					<menupopup>
 						<menuseparator id="context-chaika-skin-open-folder-sep" />
-						<menuitem label="スキンフォルダを開く..."
-									oncommand="ChaikaBrowserOverlay.contextMenu.openSkinFolder()" />
+						<menuitem label="スキンフォルダを開く..." id="context-chaika-open-skin-folder" />
 					</menupopup>
 				</menu>
 
 				<menuseparator id="context-chaika-skin-sep" />
 
-				<menuitem label="このスレッドに書き込む" id="context-chaika-write"
-							oncommand="ChaikaBrowserOverlay.contextMenu.write()" />
-				<menuitem label="このスレッドのログを削除" id="context-chaika-delete-log"
-							oncommand="ChaikaBrowserOverlay.contextMenu.deleteLog()" />
+				<menuitem label="このスレッドに書き込む" id="context-chaika-write" />
+				<menuitem label="このスレッドのログを削除" id="context-chaika-delete-log" />
 
 				<menuseparator id="context-chaika-thread-sep" />
 
-				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event)"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewChaika(event)" />
-				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewBrowser(event)" />
-				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewChaika(event, gContextMenu.linkURL)" />
-				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewBrowser(event, gContextMenu.linkURL)" />
+				<menuitem label="chaikaで開く" id="context-chaika-open-in-chaika" />
+				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser" />
+				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika" />
+				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser" />
 
 				<menuseparator id="context-chaika-open-in-sep" />
 
-				<menuitem label="すべてのレスを表示" id="context-chaika-show-all"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewChange(event, './')" />
-				<menuitem label="新着50件を表示" id="context-chaika-show-l50"
-							oncommand="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')"
-							onclick="ChaikaBrowserOverlay.contextMenu.viewChange(event, './l50')" />
-				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board"
-							oncommand="ChaikaBrowserOverlay.contextMenu.goToBoard(event)"
-							onclick="ChaikaBrowserOverlay.contextMenu.goToBoard(event)" />
-				<menuitem label="次スレを検索する" id="context-chaika-find-next-thread"
-							oncommand="ChaikaBrowserOverlay.contextMenu.findNextThread()" />
+				<menuitem label="すべてのレスを表示" id="context-chaika-show-all" />
+				<menuitem label="新着50件を表示" id="context-chaika-show-l50" />
+				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board" />
+				<menuitem label="次スレを検索する" id="context-chaika-find-next-thread" />
 
 				<menuseparator id="context-chaika-thread-show-sep" />
 
@@ -117,8 +99,7 @@
 					<observes element="viewChaikaSidebar" attribute="type" />
 					<observes element="viewChaikaSidebar" attribute="checked" />
 				</menuitem>
-				<menuitem label="オプション..." id="context-chaika-open-option"
-							oncommand="ChaikaBrowserOverlay.contextMenu.openSettings()" />
+				<menuitem label="オプション..." id="context-chaika-open-settings" />
 			</menupopup>
 		</menu>
 	</popup>
