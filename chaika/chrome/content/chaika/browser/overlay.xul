@@ -50,7 +50,7 @@
 					<menupopup>
 						<menuitem label="名前" id="context-chaika-abone-name" />
 						<menuitem label="メール" id="context-chaika-abone-mail" />
-						<menuitem label="ID" id="context-chaika-abone-word" />
+						<menuitem label="ID" id="context-chaika-abone-id" />
 						<menuitem label="ワード" id="context-chaika-abone-word" />
 						<menuseparator />
 						<menuitem label="あぼーんマネージャ..." id="context-chaika-abone-manager" />
