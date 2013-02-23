@@ -66,6 +66,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		var contextMenu = document.getElementById('context-chaika');
 		var browserContextMenu = document.getElementById("contentAreaContextMenu");
 		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
+		var flattenContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_flatten');
 
 		if(enableContextMenu){
 			contextMenu.hidden = false;
@@ -73,8 +74,12 @@ ChaikaBrowserOverlay.contextMenu = {
 			this._checkRequirements();
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 
-			browserContextMenu.addEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
-			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
+			if(flattenContextMenu){
+				this._flattenContextMenu();
+			}
+
+			browserContextMenu.addEventListener("popupshowing", this.showMenu.bind(this), false);
+			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition.bind(this), false);
 		}else{
 			contextMenu.hidden = true;
 		}
@@ -89,7 +94,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(enableContextMenu){
 			document.getElementById('context-chaika').hidden = true;
 			this._destorySkinMenu();
-			browserContextMenu.removeEventListener("popupshowing", ChaikaBrowserOverlay.contextMenu.showMenu, false);
+			browserContextMenu.removeEventListener("popupshowing", this.showMenu, false);
 			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}
 	},
@@ -167,19 +172,51 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 	/**
+	 * コンテキストメニューをフラットにする
+	 */
+	_flattenContextMenu: function contextMenu__flattenContextMenu(){
+		var browserContextMenu = document.getElementById('contentAreaContextMenu');
+		var contextMenu = document.getElementById('context-chaika');
+		var range = document.createRange();
+		var vbox = document.createElement('vbox');
+
+		//#context-chaika > menupopupの中身をvboxに移す
+		range.selectNodeContents(contextMenu.menupopup);
+		vbox.appendChild(range.extractContents());
+
+		//vboxをコンテキストメニューの先頭に挿入
+		range.setStartBefore(browserContextMenu.firstChild);
+		range.insertNode(vbox);
+
+		//vboxの後にセパレータを挿入
+		var separator = document.createElement('menuseparator');
+		range.setStartAfter(vbox);
+		range.insertNode(separator);
+
+		//#context-chaikaを消去
+		range.selectNode(contextMenu);
+		range.deleteContents();
+
+		//vboxにid等を移す
+		vbox.setAttribute('id', 'context-chaika');
+		vbox.addEventListener('command', this._doCommand.bind(this), false);
+		vbox.addEventListener('click', this._doCommand.bind(this), false);
+	},
+
+
+
+	/**
 	 * コンテキストメニューが表示された時に呼ばれる
 	 */
 	showMenu: function contextMenu_showMenu(aEvent){
 		if(aEvent.originalTarget.id != "contentAreaContextMenu") return;
 		if(!gContextMenu) return;
 
-
-		var that = ChaikaBrowserOverlay.contextMenu;
 		var contextMenu = document.getElementById('context-chaika');
 		var url = gBrowser.currentURI;
 
 		//掲示板上でのみ表示する設定の場合
-		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs') && !that._isBBS(url)){
+		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs') && !this._isBBS(url)){
 			contextMenu.hidden = true;
 			return;
 		}
@@ -212,7 +249,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		}
 
 		//2chリンク上ではない場合
-		if(!gContextMenu.onLink || !that._isBBS(gContextMenu.linkURL)){
+		if(!gContextMenu.onLink || !this._isBBS(gContextMenu.linkURL)){
 			hiddenItems = hiddenItems.concat([
 				'open-link-in-chaika',
 				'open-link-in-browser',
@@ -220,7 +257,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		}
 
 		//掲示板上ではない時
-		if(!that._isBBS(url)){
+		if(!this._isBBS(url)){
 			hiddenItems = hiddenItems.concat([
 				'copy',
 				'write',
@@ -236,12 +273,12 @@ ChaikaBrowserOverlay.contextMenu = {
 			]);
 
 			//2chリンク上でない場合、セパレータが2つ重なってしまうのに対処
-			if(!gContextMenu.onLink || !that._isBBS(gContextMenu.linkURL)){
+			if(!gContextMenu.onLink || !this._isBBS(gContextMenu.linkURL)){
 				hiddenItems.push('open-in-sep');
 			}
 		}else{
 			//chaika上ではない時
-			if(!that._isChaika(url)){
+			if(!this._isChaika(url)){
 				//共通
 				hiddenItems = hiddenItems.concat([
 					'write',
@@ -251,7 +288,7 @@ ChaikaBrowserOverlay.contextMenu = {
 				]);
 
 				//板の時
-				if(that._isBoard(url)){
+				if(this._isBoard(url)){
 					hiddenItems = hiddenItems.concat([
 						'show-all',
 						'show-l50',
@@ -461,16 +498,14 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * @license MIT License
 	 */
 	_setCursorPosition: function contextMenu__setCursorPosition(aEvent){
-		var that = ChaikaBrowserOverlay.contextMenu;
-
 		if(aEvent.button === 2){
-			that._clickNode = aEvent.rangeParent;
-			that._clickOffset = aEvent.rangeOffset;
-			that._clientX = aEvent.clientX;
+			this._clickNode = aEvent.rangeParent;
+			this._clickOffset = aEvent.rangeOffset;
+			this._clientX = aEvent.clientX;
 		}else{
-			that._clickNode = null;
-			that._clickOffset = 0;
-			that._clientX = 0;
+			this._clickNode = null;
+			this._clickOffset = 0;
+			this._clientX = 0;
 		}
 	},
 

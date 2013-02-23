@@ -11,6 +11,8 @@
                 onchange="setCcontainerDisabled(this.name, 'boxContextMenu', true)"/>
         <preference id="extensions.chaika.browser_contextmenu_only_bbs"
                 name="extensions.chaika.browser_contextmenu_only_bbs" type="bool" />
+        <preference id="extensions.chaika.browser_contextmenu_flatten"
+                name="extensions.chaika.browser_contextmenu_flatten" type="bool" />
         <preference id="extensions.chaika.browser_contextmenu_add_tab_by_click"
                 name="extensions.chaika.browser_contextmenu_add_tab_by_click" type="bool" />
         <preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
@@ -84,6 +86,8 @@
             <caption label="表示" />
             <checkbox label="chaikaおよび掲示板上でのみ表示する"
                     preference="extensions.chaika.browser_contextmenu_only_bbs" />
+            <checkbox label="コンテキストメニューをフラットにする *"
+                    preference="extensions.chaika.browser_contextmenu_flatten" />
         </groupbox>
 
         <groupbox>
