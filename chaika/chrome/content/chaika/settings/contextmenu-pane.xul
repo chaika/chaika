@@ -1,0 +1,107 @@
+<?xml version="1.0"?>
+<overlay id="bbsmenuPaneOverlay"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<prefpane id="paneContextmenu">
+
+    <preferences>
+        <preference id="extensions.chaika.enable_browser_contextmenu"
+                name="extensions.chaika.enable_browser_contextmenu" type="bool"
+                onchange="setCcontainerDisabled(this.name, 'boxContextMenu', true)"/>
+        <preference id="extensions.chaika.browser_contextmenu_only_bbs"
+                name="extensions.chaika.browser_contextmenu_only_bbs" type="bool" />
+        <preference id="extensions.chaika.browser_contextmenu_add_tab_by_click"
+                name="extensions.chaika.browser_contextmenu_add_tab_by_click" type="bool" />
+        <preference id="extensions.chaika.browser_contextmenu_disregard_url_option"
+                name="extensions.chaika.browser_contextmenu_disregard_url_option" type="bool"/>
+        <preference id="extensions.chaika.browser_contextmenu_confirm_add_abone"
+                name="extensions.chaika.browser_contextmenu_confirm_add_abone" type="bool" />
+
+        <preference id="extensions.chaika.contextmenu.abone.enabled"
+				name="extensions.chaika.contextmenu.abone.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.copy.enabled"
+				name="extensions.chaika.contextmenu.copy.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.skin.enabled"
+				name="extensions.chaika.contextmenu.skin.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.write.enabled"
+				name="extensions.chaika.contextmenu.write.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.delete-log.enabled"
+				name="extensions.chaika.contextmenu.delete-log.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-in-chaika.enabled"
+				name="extensions.chaika.contextmenu.open-in-chaika.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-in-browser.enabled"
+				name="extensions.chaika.contextmenu.open-in-browser.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-link-in-chaika.enabled"
+				name="extensions.chaika.contextmenu.open-link-in-chaika.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-link-in-browser.enabled"
+				name="extensions.chaika.contextmenu.open-link-in-browser.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.show-all.enabled"
+				name="extensions.chaika.contextmenu.show-all.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.show-l50.enabled"
+				name="extensions.chaika.contextmenu.show-l50.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-board.enabled"
+				name="extensions.chaika.contextmenu.open-board.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.find-next-thread.enabled"
+				name="extensions.chaika.contextmenu.find-next-thread.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.toggle-sidebar.enabled"
+				name="extensions.chaika.contextmenu.toggle-sidebar.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-settings.enabled"
+                name="extensions.chaika.contextmenu.open-settings.enabled" type="bool" />
+    </preferences>
+
+    <checkbox label="コンテキストメニューに chaika の項目を追加する *"
+            preference="extensions.chaika.enable_browser_contextmenu" />
+    <vbox id="boxContextMenu" class="indent">
+        <groupbox>
+            <caption label="項目" />
+            <hbox align="center">
+                <vbox>
+                    <checkbox label="あぼーん" preference="extensions.chaika.contextmenu.abone.enabled" />
+                    <checkbox label="コピー" preference="extensions.chaika.contextmenu.copy.enabled" />
+                    <checkbox label="スキン" preference="extensions.chaika.contextmenu.skin.enabled" />
+                    <checkbox label="このスレッドに書き込む" preference="extensions.chaika.contextmenu.write.enabled" />
+                    <checkbox label="このスレッドのログを削除" preference="extensions.chaika.contextmenu.delete-log.enabled" />
+                </vbox>
+                <vbox>
+                    <checkbox label="chaikaで開く" preference="extensions.chaika.contextmenu.open-in-chaika.enabled" />
+                    <checkbox label="ブラウザで開く" preference="extensions.chaika.contextmenu.open-in-browser.enabled" />
+                    <checkbox label="リンク先をchaikaで開く" preference="extensions.chaika.contextmenu.open-link-in-chaika.enabled" />
+                    <checkbox label="リンク先をブラウザで開く" preference="extensions.chaika.contextmenu.open-link-in-browser.enabled" />
+                    <checkbox label="すべてのレスを表示" preference="extensions.chaika.contextmenu.show-all.enabled" />
+                </vbox>
+                <vbox>
+                    <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.show-l50.enabled" />
+                    <checkbox label="スレッド一覧を開く" preference="extensions.chaika.contextmenu.open-board.enabled" />
+                    <checkbox label="次スレを検索する" preference="extensions.chaika.contextmenu.find-next-thread.enabled" />
+                    <checkbox label="サイドバーを表示" preference="extensions.chaika.contextmenu.toggle-sidebar.enabled" />
+                    <checkbox label="オプション..." preference="extensions.chaika.contextmenu.open-settings.enabled" />
+                </vbox>
+            </hbox>
+        </groupbox>
+
+        <groupbox>
+            <caption label="表示" />
+            <checkbox label="chaikaおよび掲示板上でのみ表示する"
+                    preference="extensions.chaika.browser_contextmenu_only_bbs" />
+        </groupbox>
+
+        <groupbox>
+            <caption label="挙動" />
+            <checkbox label="左クリックで新しいタブに開く"
+                    preference="extensions.chaika.browser_contextmenu_add_tab_by_click" />
+            <checkbox label="URL の表示制限を書き換えて開く"
+                    preference="extensions.chaika.browser_contextmenu_disregard_url_option" />
+            <checkbox label="NGワードを直接登録せずにあぼーんマネージャを開く"
+                    preference="extensions.chaika.browser_contextmenu_confirm_add_abone" />
+        </groupbox>
+    </vbox>
+
+    <vbox style="margin:0.5em 0px 0px 0.5em">
+        <description>* 設定変更はブラウザ再起動後に反映されます</description>
+    </vbox>
+
+</prefpane>
+
+
+</overlay>

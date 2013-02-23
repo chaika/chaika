@@ -188,6 +188,17 @@ ChaikaBrowserOverlay.contextMenu = {
 		contextMenu.hidden = false;
 		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
 			item.hidden = false;
+
+			//設定で非表示のものを非表示にする
+			var id = item.getAttribute('id');
+			if(!id) return;
+
+			id = id.replace('context-chaika-', '');
+			try{
+				if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.' + id + '.enabled')){
+					item.hidden = true;
+				}
+			}catch(ex){}
 		});
 
 
