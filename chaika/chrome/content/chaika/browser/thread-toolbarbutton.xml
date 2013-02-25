@@ -14,7 +14,7 @@
 					<xul:menupopup>
 						<xul:menuitem label="タイトル" anonid="copy-title-menu" />
 						<xul:menuitem label="URL" anonid="copy-url-menu" />
-						<xul:menuitem label="タイトルとURL" anonid="copy-title-url-menu" />
+						<xul:menuitem label="タイトルと URL" anonid="copy-title-url-menu" />
 					</xul:menupopup>
 				</xul:menu>
 
@@ -25,7 +25,7 @@
 
 				<xul:menuseparator anonid="thread-sep" />
 
-				<xul:menuitem label="chaikaで開く" anonid="viewChaika-menu" />
+				<xul:menuitem label="chaika で開く" anonid="viewChaika-menu" />
 				<xul:menuitem label="ブラウザで開く" anonid="viewBrowser-menu" />
 
 				<xul:menuseparator anonid="view-sep" />
@@ -33,7 +33,7 @@
 				<xul:menuitem label="すべてのレスを表示" anonid="viewChange-all-menu"/>
 				<xul:menuitem label="新着50件を表示" anonid="viewChange-l50-menu"/>
 				<xul:menuitem label="スレッド一覧を開く" anonid="goToBoard-menu"/>
-				<xul:menuitem label="次スレを検索する" anonid="findNextThread-menu"/>
+				<xul:menuitem label="次のスレッドを検索する" anonid="findNextThread-menu"/>
 
 				<xul:menuseparator anonid="threadShow-sep" />
 
@@ -261,7 +261,8 @@
 						'viewChange-all-menu',
 						'viewChange-l50-menu',
 						'goToBoard-menu',
-						'threadShow-sep'
+						'findNextThread-menu',
+						'threadShow-sep',
 					]);
 				}else{
 					if(isBoard){
@@ -269,7 +270,8 @@
 							'viewChange-all-menu',
 							'viewChange-l50-menu',
 							'goToBoard-menu',
-							'threadShow-sep'
+							'findNextThread-menu',
+							'threadShow-sep',
 						]);
 					}
 
@@ -278,7 +280,7 @@
 							'write-menu',
 							'deleteLog-menu',
 							'thread-sep',
-							'viewBrowser-menu'
+							'viewBrowser-menu',
 						]);
 					}else{
 						hiddenItems.push('viewChaika-menu');

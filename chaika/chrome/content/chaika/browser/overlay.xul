@@ -61,8 +61,8 @@
 					<menupopup>
 						<menuitem label="タイトル" id="context-chaika-copy-title" />
 						<menuitem label="URL" id="context-chaika-copy-url" />
-						<menuitem label="タイトルとURL" id="context-chaika-copy-title-url" />
-						<menuitem label="タイトルとURLと選択部分" id="context-chaika-copy-title-url-selection" />
+						<menuitem label="タイトルと URL" id="context-chaika-copy-title-url" />
+						<menuitem label="タイトルと URL と選択部分" id="context-chaika-copy-title-url-selection" />
 					</menupopup>
 				</menu>
 
@@ -90,7 +90,7 @@
 
 				<menuitem label="chaika で開く" id="context-chaika-open-in-chaika" />
 				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser" />
-				<menuitem label="リンク先をchaikaで開く" id="context-chaika-open-link-in-chaika" />
+				<menuitem label="リンク先を chaika で開く" id="context-chaika-open-link-in-chaika" />
 				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser" />
 
 				<menuseparator id="context-chaika-open-in-sep" />
