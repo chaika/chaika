@@ -63,6 +63,12 @@
 		]]></constructor>
 
 
+		<!--
+		/**
+		 * 現在開いているスレッドのURLを返す
+		 * @return {nsIURI} スレッドURL(chaika 形式ではない) ない場合はnullが返る
+		 */
+		-->
 		<method name="_getCurrentThreadURL">
 			<body><![CDATA[
 				var currentURI = null;
@@ -79,6 +85,12 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 現在開いている板、または開いているスレッドが所属している板のURLを返す
+		 * @return {nsIURI} 板URL(chaika 形式ではない) ない場合はnullが返る
+		 */
+		-->
 		<method name="_getCurrentBoardURL">
 			<body><![CDATA[
 				var currentURI = null;
@@ -100,6 +112,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * chaika 形式の URL を標準の形式に変換する
+		 * @param {nsIURI|String} aURI 変換するURL
+		 * @return {nsIURI} chaika 用ではない標準のURL 変換できなかった場合はnullが返る
+		 */
+		-->
 		<method name="_getPlainURL">
 			<parameter name="aURI"/>
 			<body><![CDATA[
@@ -123,6 +142,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * chaika 形式の URL であるかどうかを返す
+		 * @param {nsIURI|String} aURI 調べる URL
+		 * @return {Boolean}
+		 */
+		-->
 		<method name="_isChaika">
 			<parameter name="aURI"/>
 			<body><![CDATA[
@@ -143,6 +169,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 掲示板の URL であるかどうかを返す
+		 * @param {nsIURI|String} aURI 調べる URL
+		 * @return {Boolean}
+		 */
+		-->
 		<method name="_isBBS">
 			<parameter name="aURI"/>
 			<body><![CDATA[
@@ -152,6 +185,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * スレッドの URL であるかどうかを返す
+		 * @param {nsIURI|String} aURI 調べる URL
+		 * @return {Boolean}
+		 */
+		-->
 		<method name="_isThread">
 			<parameter name="aURI"/>
 			<body><![CDATA[
@@ -160,6 +200,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 板の URL であるかどうかを返す
+		 * @param {nsIURI|String} aURI 調べる URL
+		 * @return {Boolean}
+		 */
+		-->
 		<method name="_isBoard">
 			<parameter name="aURI"/>
 			<body><![CDATA[
@@ -168,6 +215,12 @@
 		</method>
 
 
+		<!--
+		/**
+		 * メニューの表示・非表示を変える
+		 * 開いているページが変更されるたびに呼び出される
+		 */
+		-->
 		<method name="showCheck">
 			<body><![CDATA[
 				if(!this.ChaikaCore.pref.getBool('enable_browser_toolbarbutton')){
@@ -246,6 +299,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * メニューのコマンドを実行する
+		 * @param {Event} aEvent
+		 * @param {Boolean} aMiddleClicked 中クリックかどうか
+		 */
+		-->
 		<method name="_doCommand">
 			<parameter name="aEvent"/>
 			<parameter name="aMiddleClicked"/>
@@ -342,6 +402,12 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 板を開く
+		 * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+		 */
+		-->
 		<method name="_goToBoard">
 			<parameter name="aAddTab"/>
 			<body><![CDATA[
@@ -359,6 +425,11 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 書き込みウィザードを開く
+		 */
+		-->
 		<method name="_write">
 			<body><![CDATA[
 				var threadURL = this._getCurrentThreadURL();
@@ -372,6 +443,11 @@
 		</method>
 
 
+		<!--
+		/**
+		 * ログを削除する
+		 */
+		-->
 		<method name="_deleteLog">
 			<body><![CDATA[
 				var threadURL = this._getCurrentThreadURL();
@@ -393,6 +469,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * スレッドの表示オプションを変更する
+		 * @param {String} aOption 表示オプション l30 や 45- など
+		 * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+		 */
+		-->
 		<method name="_viewChange">
 			<parameter name="aOption"/>
 			<parameter name="aAddTab"/>
@@ -413,6 +496,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * ブラウザで開く
+		 * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+		 * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+		 */
+		-->
 		<method name="_viewBrowser">
 			<parameter name="aURI"/>
 			<parameter name="aAddTab"/>
@@ -431,6 +521,14 @@
 		</method>
 
 
+		<!--
+		/**
+		 * chaika で開く
+		 * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+		 * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+		 * @param {Boolean} [disregardOption=false] 表示制限を置き換えるかどうか
+		 */
+		-->
 		<method name="_viewChaika">
 			<parameter name="aURI"/>
 			<parameter name="aAddTab"/>
@@ -454,6 +552,14 @@
 		</method>
 
 
+		<!--
+		/**
+		 * 次のスレッドを検索する
+		 * FoxAge2ch がインストールされている時は FoxAge2ch の次スレ検索機能を呼び出す
+		 * ない場合は板一覧でスレタイで検索する
+		 * @param {Boolean} [aAddTab=false] 板一覧で検索する場合に新規タブで開くかどうか
+		 */
+		-->
 		<method name="_findNextThread">
 			<parameter name="aAddTab" />
 			<body><![CDATA[
@@ -482,15 +588,26 @@
 		</method>
 
 
+		<!--
+		/**
+		 * あぼーんマネージャを開く
+		 * @param {String} aData あぼーんマネージャに送るデータ(右クリックあぼーんで使用)
+		 */
+		-->
 		<method name="_openAboneManager">
-			<parameter name="data"/>
+			<parameter name="aData"/>
 			<body><![CDATA[
 				var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar", data);
+				window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, toolbar", aData);
 			]]></body>
 		</method>
 
 
+		<!--
+		/**
+		 * 設定画面を開く
+		 */
+		-->
 		<method name="_openSettings">
 			<body><![CDATA[
 				var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
@@ -507,6 +624,13 @@
 		</method>
 
 
+		<!--
+		/**
+		 * クリップボードに指定された文字をコピーする
+		 * @param {String} text コピーする文字列
+		 * @note 特殊文字一覧 %TITLE%: ページタイトル, %URL%: ページURL, %SEL: 選択文字列, %NEWLINE%: 改行
+		 */
+		-->
 		<method name="_copyClipBoard">
 			<parameter name="text"/>
 			<body><![CDATA[
