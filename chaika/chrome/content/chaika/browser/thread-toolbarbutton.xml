@@ -116,7 +116,7 @@
 		/**
 		 * chaika 形式の URL を標準の形式に変換する
 		 * @param {nsIURI|String} aURI 変換するURL
-		 * @return {nsIURI} chaika 用ではない標準のURL 変換できなかった場合はnullが返る
+		 * @return {nsIURI} 変換後の URL 変換できなかった場合はnullが返る
 		 */
 		-->
 		<method name="_getPlainURL">
@@ -474,7 +474,7 @@
 		<!--
 		/**
 		 * スレッドの表示オプションを変更する
-		 * @param {String} aOption 表示オプション l30 や 45- など
+		 * @param {String} aOption 表示オプション "./l30", "./45-", "./" など
 		 * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
 		 */
 		-->
