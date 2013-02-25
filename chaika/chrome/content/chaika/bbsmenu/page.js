@@ -586,7 +586,7 @@ var Find2ch = {
 
 	search: function Find2ch_search(aSearchStr){
 		const isHTML = this.isHTMLMode;
-		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&STR=" : 'http://find.2ch.net/rss.php/';
+		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=" : 'http://find.2ch.net/rss.php/';
 		const ENCODE = isHTML ? 'EUC-JP' : 'UTF-8';
 		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) :
 								encodeURIComponent(ChaikaCore.io.escapeHTML(aSearchStr));
