@@ -208,18 +208,25 @@ ChaikaBrowserOverlay.contextMenu = {
 			return;
 		}
 
+
 		//すべての非表示・無効化を解除
+
+		//ChaikaCore.pref を使うと存在しない設定値の場合エラーが出てしまうので自前で用意する
+		var prefs = Components.classes["@mozilla.org/preferences-service;1"].
+						getService(Components.interfaces.nsIPrefService);
+		prefs = prefs.getBranch("extensions.chaika.contextmenu.");
+
 		contextMenu.hidden = false;
 		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
 			item.hidden = false;
 
-			//設定で非表示のものを非表示にする
+			//非表示に設定されているものを非表示にする
 			var id = item.getAttribute('id');
 			if(!id) return;
 
 			id = id.replace('context-chaika-', '');
 			try{
-				if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.' + id + '.enabled')){
+				if(!prefs.getBoolPref(id + '.enabled')){
 					item.hidden = true;
 				}
 			}catch(ex){}

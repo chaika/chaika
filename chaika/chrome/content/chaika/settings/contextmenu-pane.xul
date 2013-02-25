@@ -63,7 +63,7 @@
     <vbox id="boxContextMenu" class="indent">
         <groupbox>
             <caption label="項目" />
-            <hbox align="center">
+            <hbox>
                 <vbox>
                     <checkbox label="あぼーん" preference="extensions.chaika.contextmenu.abone.enabled" />
                     <checkbox label="コピー" preference="extensions.chaika.contextmenu.copy.enabled" />
