@@ -71,7 +71,6 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(enableContextMenu){
 			contextMenu.hidden = false;
 			this._createSkinMenu();
-			this._checkRequirements();
 			this._toolbar = document.getElementById("chaika-thread-toolbaritem");
 
 			if(flattenContextMenu){
@@ -155,18 +154,6 @@ ChaikaBrowserOverlay.contextMenu = {
 		while(skinItems.length){
 			skinItems[0].removeEventListener('command', this._setSkin, false);
 			skinMenu.menupopup.removeChild(skinItems[0]);
-		}
-	},
-
-
-	/**
-	 * 他アドオンが必要なメニュー項目をチェックする
-	 */
-	_checkRequirements: function contextMenu__checkRequirements(){
-		const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
-
-		if(!FOX_AGE_2CH){
-			document.getElementById('context-chaika-find-next-thread').disabled = true;
 		}
 	},
 
@@ -427,7 +414,7 @@ ChaikaBrowserOverlay.contextMenu = {
 				break;
 
 			case 'find-next-thread':
-				if(!middleClicked) this.findNextThread();
+				this.findNextThread(addTab);
 				break;
 
 			case 'open-settings':
@@ -749,8 +736,8 @@ ChaikaBrowserOverlay.contextMenu = {
 		this._toolbar._goToBoard(aAddTab);
 	},
 
-	findNextThread: function contextMenu_findNextThread(){
-		this._toolbar._findNextThread();
+	findNextThread: function contextMenu_findNextThread(aAddTab){
+		this._toolbar._findNextThread(aAddTab);
 	},
 
 	openSettings: function contextMenu_openSettings(){

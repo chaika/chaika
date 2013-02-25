@@ -326,7 +326,7 @@
 						break;
 
 					case "findNextThread-menu":
-						this._findNextThread();
+						this._findNextThread(addTab);
 						hidePopupMenu();
 						break;
 
@@ -455,18 +455,29 @@
 
 
 		<method name="_findNextThread">
+			<parameter name="aAddTab" />
 			<body><![CDATA[
+				const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
+
 				var threadURI = this._getCurrentThreadURL();
 				if(!threadURI) return;
 
 				var thread = new this.ChaikaThread(threadURI);
-				var boardURL = thread.boardURL;
-				var datID = thread.datID;
 
-				window.openDialog(
-					"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
-					"chrome,centerscreen,modal,dialog=no,all", boardURL.host + boardURL.path + datID
-				);
+				if(FOX_AGE_2CH){
+					var boardURL = thread.boardURL;
+					var datID = thread.datID;
+
+					window.openDialog(
+						"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
+						"chrome,centerscreen,modal,dialog=no,all", boardURL.host + boardURL.path + datID
+					);
+				}else{
+					var boardURL = this._getCurrentBoardURL();
+					var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(thread.title), null, null);
+
+					this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+				}
 			]]></body>
 		</method>
 
