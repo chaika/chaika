@@ -66,6 +66,14 @@
 					</menupopup>
 				</menu>
 
+				<menu label="検索" id="context-chaika-search">
+					<menupopup>
+						<menuitem label="find.2ch.net で検索" id="context-chaika-search-find-2ch" />
+						<menuitem label="板で検索" id="context-chaika-search-in-board" />
+						<menuitem label="スレッド内を検索" id="context-chaika-search-in-thread" />
+					</menupopup>
+				</menu>
+
 				<menu label="スキン" id="context-chaika-skin">
 					<menupopup>
 						<menuseparator id="context-chaika-skin-open-folder-sep" />
@@ -90,7 +98,7 @@
 				<menuitem label="すべてのレスを表示" id="context-chaika-show-all" />
 				<menuitem label="新着50件を表示" id="context-chaika-show-l50" />
 				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board" />
-				<menuitem label="次スレを検索する" id="context-chaika-find-next-thread" />
+				<menuitem label="次のスレッドを検索する" id="context-chaika-find-next-thread" />
 
 				<menuseparator id="context-chaika-thread-show-sep" />
 

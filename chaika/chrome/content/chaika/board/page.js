@@ -106,6 +106,18 @@ function startup(){
 	}
 
 	UpdateObserver.startup();
+
+
+	//Search Queryが指定されていた時は始めから絞り込んでおく
+	if(location.search){
+		var query = location.search.match(/query=([^&]+)/);
+
+		if(query){
+			var searchBox = document.getElementById('searchTextBox');
+			searchBox.value = decodeURIComponent(query[1]);
+			BoardTree.initTree(true);
+		}
+	}
 }
 
 /**

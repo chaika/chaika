@@ -10,6 +10,8 @@
                 name="extensions.chaika.contextmenu.abone.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.copy.enabled"
                 name="extensions.chaika.contextmenu.copy.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.search.enabled"
+                name="extensions.chaika.contextmenu.search.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.skin.enabled"
                 name="extensions.chaika.contextmenu.skin.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.write.enabled"
@@ -52,6 +54,8 @@
                 name="extensions.chaika.browser_contextmenu_confirm_add_abone" type="bool" />
         <preference id="extensions.chaika.browser_contextmenu_reload_when_skin_changed"
                 name="extensions.chaika.browser_contextmenu_reload_when_skin_changed" type="bool" />
+        <preference id="extensions.chaika.browser_contextmenu_find_2ch_in_sidebar"
+                name="extensions.chaika.browser_contextmenu_find_2ch_in_sidebar" type="bool" />
     </preferences>
 
     <checkbox label="コンテキストメニューに chaika の項目を追加する *"
@@ -63,6 +67,7 @@
                 <vbox>
                     <checkbox label="あぼーん" preference="extensions.chaika.contextmenu.abone.enabled" />
                     <checkbox label="コピー" preference="extensions.chaika.contextmenu.copy.enabled" />
+                    <checkbox label="検索" preference="extensions.chaika.contextmenu.search.enabled" />
                     <checkbox label="スキン" preference="extensions.chaika.contextmenu.skin.enabled" />
                     <checkbox label="このスレッドに書き込む" preference="extensions.chaika.contextmenu.write.enabled" />
                     <checkbox label="このスレッドのログを削除" preference="extensions.chaika.contextmenu.delete-log.enabled" />
@@ -73,9 +78,9 @@
                     <checkbox label="リンク先をchaikaで開く" preference="extensions.chaika.contextmenu.open-link-in-chaika.enabled" />
                     <checkbox label="リンク先をブラウザで開く" preference="extensions.chaika.contextmenu.open-link-in-browser.enabled" />
                     <checkbox label="すべてのレスを表示" preference="extensions.chaika.contextmenu.show-all.enabled" />
+                    <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.show-l50.enabled" />
                 </vbox>
                 <vbox>
-                    <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.show-l50.enabled" />
                     <checkbox label="スレッド一覧を開く" preference="extensions.chaika.contextmenu.open-board.enabled" />
                     <checkbox label="次スレを検索する" preference="extensions.chaika.contextmenu.find-next-thread.enabled" />
                     <checkbox label="サイドバーを表示" preference="extensions.chaika.contextmenu.toggle-sidebar.enabled" />
@@ -102,6 +107,8 @@
                     preference="extensions.chaika.browser_contextmenu_confirm_add_abone" />
             <checkbox label="chaika 上でスキンを変更した時に自動で再読み込みする"
                     preference="extensions.chaika.browser_contextmenu_reload_when_skin_changed" />
+            <checkbox label="find.2ch.net での検索をサイドバーで行う"
+                    preference="extensions.chaika.browser_contextmenu_find_2ch_in_sidebar" />
         </groupbox>
     </vbox>
 

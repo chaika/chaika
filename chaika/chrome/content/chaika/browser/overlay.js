@@ -260,6 +260,8 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(!this._isBBS(url)){
 			hiddenItems = hiddenItems.concat([
 				'copy',
+				'search-in-board',
+				'search-in-thread',
 				'write',
 				'delete-log',
 				'thread-sep',
@@ -290,6 +292,7 @@ ChaikaBrowserOverlay.contextMenu = {
 				//板の時
 				if(this._isBoard(url)){
 					hiddenItems = hiddenItems.concat([
+						'search-in-thread',
 						'show-all',
 						'show-l50',
 						'open-board',
@@ -333,7 +336,6 @@ ChaikaBrowserOverlay.contextMenu = {
 		var middleClicked = aEvent.type === 'click' && aEvent.button === 1;
 
 		var id = aEvent.target.getAttribute('id').replace('context-chaika-', '');
-		ChaikaBrowserOverlay.ChaikaCore.logger.debug(id);
 
 		switch(id){
 			case 'abone-name':
@@ -370,6 +372,18 @@ ChaikaBrowserOverlay.contextMenu = {
 
 			case 'copy-title-url-selection':
 				if(!middleClicked) this.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%');
+				break;
+
+			case 'search-find-2ch':
+				this.searchFind2ch(addTab);
+				break;
+
+			case 'search-in-board':
+				this.searchInBoard(addTab);
+				break;
+
+			case 'search-in-thread':
+				this.searchInThread();
 				break;
 
 			case 'open-skin-folder':
@@ -443,6 +457,84 @@ ChaikaBrowserOverlay.contextMenu = {
 		}else{
 			ChaikaBrowserOverlay.ChaikaAboneManager.addAbone(ngWord, ngType);
 		}
+	},
+
+
+	/**
+	 * find.2ch.net での検索結果を開く
+	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
+	 */
+	searchFind2ch: function contextMenu_searchFind2ch(aAddTab){
+		var sidebarMode = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_find_2ch_in_sidebar');
+		var searchStr = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
+
+		if(!sidebarMode){
+			const QUERY_URL = 'http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=';
+
+			var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
+			converter.charset = 'EUC-JP';
+			searchStr = escape(converter.ConvertFromUnicode(searchStr));
+
+			var searchURI = Services.io.newURI(QUERY_URL + searchStr, null, null);
+			ChaikaBrowserOverlay.ChaikaCore.browser.openURL(searchURI, aAddTab);
+		}else{
+			const SIDEBAR_URL = 'chrome://chaika/content/bbsmenu/page.xul';
+			var sidebarBox = document.getElementById("sidebar-box");
+			var sidebar = document.getElementById("sidebar");
+
+			function _search(aEvent){
+				if(aEvent){
+					sidebar.removeEventListener('DOMContentLoaded', _search, false);
+				}
+
+				setTimeout(function(){
+					var sideDoc = sidebar.contentDocument;
+					var sideWin = sidebar.contentWindow;
+					var searchBox = sideDoc.getElementById("searchBox");
+
+					searchBox.focus();
+					searchBox.value = searchStr;
+					sideWin.SearchBox.setSearchMode("find2ch");
+					sideWin.SearchBox.search(searchStr);
+				}, 0);
+			}
+
+			if(sidebarBox.hidden || sidebar.getAttribute('src') !== SIDEBAR_URL){
+				sidebar.addEventListener("DOMContentLoaded", _search, false);
+				toggleSidebar("viewChaikaSidebar", true);
+			}else{
+				_search();
+			}
+		}
+	},
+
+
+	/**
+	 * 板一覧で検索する
+	 * @param {Boolean} aAddTab 新規タブに開くかどうか
+	 */
+	searchInBoard: function contextMenu_searchInBoard(aAddTab){
+		var boardURL = this._toolbar._getCurrentBoardURL();
+		if(!boardURL) return;
+
+		var searchStr = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
+		var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(searchStr), null, null);
+
+		ChaikaBrowserOverlay.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+	},
+
+
+	/**
+	 * スレッド内で検索する
+	 * @note 本来ならスキンの検索機能を呼び出したいが、仕様が固まっておらず困難
+	 */
+	searchInThread: function contextMenu_searchInThread(){
+		var searchStr = gContextMenu.isTextSelected ? content.getSelection().toString() : this._getCursorPositionText();
+
+		//今のところ標準の検索バーを出して検索するだけ
+		gFindBar.onFindCommand();
+		gFindBar._findField.value = searchStr;
+		gFindBar._find();
 	},
 
 
