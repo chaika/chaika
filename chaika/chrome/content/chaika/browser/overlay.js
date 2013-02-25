@@ -476,11 +476,7 @@ ChaikaBrowserOverlay.contextMenu = {
 			var sidebarBox = document.getElementById("sidebar-box");
 			var sidebar = document.getElementById("sidebar");
 
-			function _search(aEvent){
-				if(aEvent){
-					sidebar.removeEventListener('DOMContentLoaded', _search, false);
-				}
-
+			function _search(){
 				setTimeout(function(){
 					var sideDoc = sidebar.contentDocument;
 					var sideWin = sidebar.contentWindow;
@@ -490,6 +486,10 @@ ChaikaBrowserOverlay.contextMenu = {
 					searchBox.value = searchStr;
 					sideWin.SearchBox.setSearchMode("find2ch");
 					sideWin.SearchBox.search(searchStr);
+
+					try{
+						sidebar.removeEventListener('DOMContentLoaded', _search, false);
+					}catch(ex){}
 				}, 0);
 			}
 
