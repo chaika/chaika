@@ -615,8 +615,7 @@
 				var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
 				var features = "";
 				try{
-					var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-					var instantApply = pref.getBoolPref("browser.preferences.instantApply");
+					var instantApply = Services.prefs.getBoolPref("browser.preferences.instantApply");
 					features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
 				}catch(ex){
 					features = "chrome,titlebar,toolbar,centerscreen,modal";
@@ -636,7 +635,7 @@
 		<method name="_copyClipBoard">
 			<parameter name="text"/>
 			<body><![CDATA[
-				var osname= Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+				var osname= Services.appinfo.OS;
 				const NEWLINE = (osname== "Darwin") ? "\n" : "\r\n";
 
 				var url = (this._getCurrentThreadURL() || getBrowser().currentURI).spec;

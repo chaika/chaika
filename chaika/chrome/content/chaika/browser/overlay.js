@@ -256,9 +256,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		//すべての非表示・無効化を解除
 
 		//ChaikaCore.pref を使うと存在しない設定値の場合エラーが出てしまうので自前で用意する
-		var prefs = Components.classes["@mozilla.org/preferences-service;1"].
-						getService(Components.interfaces.nsIPrefService);
-		prefs = prefs.getBranch("extensions.chaika.contextmenu.");
+		var prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
 
 		contextMenu.hidden = false;
 		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
@@ -857,14 +855,12 @@ ChaikaBrowserOverlay.threadToolbar = {
 ChaikaBrowserOverlay.aboneEvent = {
 
 	start: function aboneEvent_start(){
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.addObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
+		Services.obs.addObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
 	},
 
 
 	stop: function aboneEvent_stop(){
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.removeObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
+		Services.obs.removeObserver(ChaikaBrowserOverlay.aboneEvent, "b2r-abone-data-add", false);
 	},
 
 
