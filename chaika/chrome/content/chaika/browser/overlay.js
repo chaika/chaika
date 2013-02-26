@@ -92,7 +92,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 		if(enableContextMenu){
 			document.getElementById('context-chaika').hidden = true;
-			this._destorySkinMenu();
+			this._destroySkinMenu();
 			browserContextMenu.removeEventListener("popupshowing", this.showMenu, false);
 			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
 		}
@@ -103,37 +103,49 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * スキンのメニューを作成する
 	 */
 	_createSkinMenu: function contextMenu__createSkinMenu(){
-		var skinMenu = document.getElementById("context-chaika-skin");
+		var skinMenu = document.getElementById('context-chaika-skin');
 
 		//初期化
-		var skinItems = skinMenu.getElementsByClassName('context-chaika-skin-item');
-		while(skinItems.length){
-			skinMenu.menupopup.removeChild(skinItems[0]);
-		}
+		this._destroySkinMenu();
+
 
 		//デフォルトスキン
-		var defaultItem = skinMenu.insertItemAt(0, "(Default)", "");
-		defaultItem.setAttribute('class', 'context-chaika-skin-item');
+		var defaultItem = skinMenu.appendItem('(Default)', '');
 		defaultItem.setAttribute('name', 'context-chaika-skin-item');
 		defaultItem.setAttribute('type', 'radio');
-		defaultItem.addEventListener('command', this._setSkin, false);
+
+		//セパレータ
+		var sep1 = document.createElement('menuseparator');
+		sep1.setAttribute('id', 'context-chaika-skin-default-sep');
+		skinMenu.menupopup.appendChild(sep1);
 
 		//その他のスキン
 		var skinDir = this._getSkinDir();
 		if(skinDir.exists()){
 			let entries = skinDir.directoryEntries
 					.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
+			let entry;
+
 			while(entry = entries.nextFile){
 				if(entry.isDirectory()){
-					let item = skinMenu.insertItemAt(skinMenu.itemCount - 2, entry.leafName, entry.leafName);
-					item.setAttribute('class', 'context-chaika-skin-item');
+					let item = skinMenu.appendItem(entry.leafName, entry.leafName);
 					item.setAttribute('name', 'context-chaika-skin-item');
 					item.setAttribute('type', 'radio');
-					item.addEventListener('command', this._setSkin.bind(this), false);
 				}
 			}
+
 			entries.close();
 		}
+
+		//セパレータ
+		var sep2 = document.createElement('menuseparator');
+		sep2.setAttribute('id', 'context-chaika-skin-open-folder-sep');
+		skinMenu.menupopup.appendChild(sep2);
+
+		//スキンフォルダを開く
+		var folderOpenItem = skinMenu.appendItem('スキンフォルダを開く...', '');
+		folderOpenItem.setAttribute('id', 'context-chaika-open-skin-folder');
+
 
 		//現在設定されているスキンを選択状態にする
 		var currentSkinName = ChaikaBrowserOverlay.ChaikaCore.pref.getUniChar('thread_skin');
@@ -141,6 +153,9 @@ ChaikaBrowserOverlay.contextMenu = {
 		if(currentSkinItem){
 			currentSkinItem.setAttribute('checked', 'true');
 		}
+
+		//イベント設定
+		skinMenu.addEventListener('command', this._setSkin.bind(this), false);
 	},
 
 
@@ -148,13 +163,13 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * スキンのメニューを削除する
 	 */
 	_destroySkinMenu: function contextMenu__destroySkinMenu(){
-		var skinMenu = document.getElementById("context-chaika-skin");
-		var skinItems = skinMenu.getElementsByClassName('context-chaika-skin-item');
+		var skinMenu = document.getElementById('context-chaika-skin');
 
-		while(skinItems.length){
-			skinItems[0].removeEventListener('command', this._setSkin, false);
-			skinMenu.menupopup.removeChild(skinItems[0]);
-		}
+		var range = document.createRange();
+		range.selectNodeContents(skinMenu.menupopup);
+		range.deleteContents();
+
+		skinMenu.removeEventListener('command', this._setSkin, false);
 	},
 
 
@@ -487,9 +502,7 @@ ChaikaBrowserOverlay.contextMenu = {
 					sideWin.SearchBox.setSearchMode("find2ch");
 					sideWin.SearchBox.search(searchStr);
 
-					try{
-						sidebar.removeEventListener('DOMContentLoaded', _search, false);
-					}catch(ex){}
+					sidebar.removeEventListener('DOMContentLoaded', _search, false);
 				}, 0);
 			}
 
@@ -546,8 +559,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * スキンメニューから呼ばれる
 	 */
 	_setSkin: function contextMenu__setSkin(aEvent){
+		var target = aEvent.target;
+		if(target.getAttribute('name') !== 'context-chaika-skin-item') return;
+
 		aEvent.stopPropagation();
-		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', aEvent.target.getAttribute('value'));
+		ChaikaBrowserOverlay.ChaikaCore.pref.setUniChar('thread_skin', target.getAttribute('value'));
 
 		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_reload_when_skin_changed') &&
 		   this._isChaika(content.location.href) && this._isThread(content.location.href)){

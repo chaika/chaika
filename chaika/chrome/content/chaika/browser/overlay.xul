@@ -75,10 +75,7 @@
 				</menu>
 
 				<menu label="スキン" id="context-chaika-skin">
-					<menupopup>
-						<menuseparator id="context-chaika-skin-open-folder-sep" />
-						<menuitem label="スキンフォルダを開く..." id="context-chaika-open-skin-folder" />
-					</menupopup>
+					<menupopup />
 				</menu>
 
 				<menuseparator id="context-chaika-skin-sep" />
