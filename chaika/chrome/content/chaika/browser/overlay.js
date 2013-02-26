@@ -75,10 +75,13 @@ ChaikaBrowserOverlay.contextMenu = {
 
 			if(flattenContextMenu){
 				this._flattenContextMenu();
+				contextMenu = document.getElementById('context-chaika');
 			}
 
-			browserContextMenu.addEventListener("popupshowing", this.showMenu.bind(this), false);
-			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition.bind(this), false);
+			browserContextMenu.addEventListener("popupshowing", this, false);
+			gBrowser.mPanelContainer.addEventListener(isMac ? 'mousedown' : 'click', this, false);
+			contextMenu.addEventListener('command', this, false);
+			contextMenu.addEventListener('click', this, false);
 		}else{
 			contextMenu.hidden = true;
 		}
@@ -87,15 +90,16 @@ ChaikaBrowserOverlay.contextMenu = {
 
 	stop: function contextMenu_stop(){
 		var isMac = navigator.platform.indexOf("Mac") == 0;
-		var enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("enable_browser_contextmenu");
+		var contextMenu = document.getElementById('context-chaika');
 		var browserContextMenu = document.getElementById("contentAreaContextMenu");
 
-		if(enableContextMenu){
-			document.getElementById('context-chaika').hidden = true;
-			this._destroySkinMenu();
-			browserContextMenu.removeEventListener("popupshowing", this.showMenu, false);
-			gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this._setCursorPosition, false);
-		}
+		contextMenu.hidden = true;
+		this._destroySkinMenu();
+
+		browserContextMenu.removeEventListener("popupshowing", this, false);
+		gBrowser.mPanelContainer.removeEventListener(isMac ? 'mousedown' : 'click', this, false);
+		contextMenu.removeEventListener('command', this, false);
+		contextMenu.removeEventListener('click', this, false);
 	},
 
 
@@ -155,7 +159,7 @@ ChaikaBrowserOverlay.contextMenu = {
 		}
 
 		//イベント設定
-		skinMenu.addEventListener('command', this._setSkin.bind(this), false);
+		skinMenu.addEventListener('command', this, false);
 	},
 
 
@@ -164,12 +168,11 @@ ChaikaBrowserOverlay.contextMenu = {
 	 */
 	_destroySkinMenu: function contextMenu__destroySkinMenu(){
 		var skinMenu = document.getElementById('context-chaika-skin');
+		skinMenu.removeEventListener('command', this, false);
 
 		var range = document.createRange();
-		range.selectNodeContents(skinMenu.menupopup);
+		range.selectNodeContents(skinMenu.firstChild);
 		range.deleteContents();
-
-		skinMenu.removeEventListener('command', this._setSkin, false);
 	},
 
 
@@ -199,12 +202,38 @@ ChaikaBrowserOverlay.contextMenu = {
 		range.selectNode(contextMenu);
 		range.deleteContents();
 
-		//vboxにid等を移す
+		//vboxにidを移す
 		vbox.setAttribute('id', 'context-chaika');
-		vbox.addEventListener('command', this._doCommand.bind(this), false);
-		vbox.addEventListener('click', this._doCommand.bind(this), false);
 	},
 
+
+
+	handleEvent: function contextMenu_handleEvent(aEvent){
+		var element = aEvent.currentTarget;
+
+		switch(element.getAttribute('id')){
+			case 'contentAreaContextMenu':
+				this.showMenu(aEvent);
+				break;
+
+			case 'context-chaika':
+				this._doCommand(aEvent);
+				break;
+
+			case 'context-chaika-skin':
+				this._setSkin(aEvent);
+				break;
+
+			default:
+				switch(element.nodeName){
+					case 'xul:tabpanels':
+						this._setCursorPosition(aEvent);
+						break;
+				}
+				break;
+		}
+
+	},
 
 
 	/**

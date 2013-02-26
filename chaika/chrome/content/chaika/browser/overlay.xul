@@ -42,8 +42,6 @@
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">
 		<menu id="context-chaika" label="chaika" class="menu-iconic"
-				oncommand="ChaikaBrowserOverlay.contextMenu._doCommand(event)"
-				onclick="ChaikaBrowserOverlay.contextMenu._doCommand(event)"
 				image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
 			<menupopup>
 				<menu label="あぼーん" id="context-chaika-abone">
