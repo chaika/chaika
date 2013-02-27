@@ -38,9 +38,9 @@ pref("extensions.chaika.contextmenu.find-next-thread.enabled", true);
 pref("extensions.chaika.contextmenu.toggle-sidebar.enabled", true);
 pref("extensions.chaika.contextmenu.open-settings.enabled", true);
 
-pref('extensions.chaika.ngfiles.enabled', false);
-
 pref("extensions.chaika.refController.enabled", true);
+pref('extensions.chaika.imageViewURLReplace.enabled', false);
+pref('extensions.chaika.ngfiles.enabled', false);
 
 pref("extensions.chaika.logger.level", 2);
 

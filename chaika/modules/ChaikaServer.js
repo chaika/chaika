@@ -99,9 +99,6 @@ var ChaikaServer = {
 			ChaikaCore.logger.error(ex);
 		}
 
-		this.refController = new ChaikaRefController();
-		this.refController.startup();
-
 		this.startServer();
 	},
 
@@ -561,102 +558,5 @@ var StatusCode = {
 		// throw "Not Difined Response Code";
 		return "200 OK";
 	}
-
-};
-
-
-
-
-// TODO リンク先ごとにリファラを設定できるようにする
-/**
- * スレッド表示の リファラを制御するオブジェクト
- * @constructor
- * @private
- */
-function ChaikaRefController(){
-}
-
-ChaikaRefController.prototype = {
-
-	/** @private */
-	_enabled: true,
-
-	HTTP_REQUEST_TOPIC: '',
-
-	/** @private */
-	startup: function(){
-		//Firefox 18以降は http-on-opening-request を,
-		//それ以前は　http-on-modify-request を使用する
-		if(ChaikaCore.browser.geckoVersionCompare(18) <= 0){
-			this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
-		}else{
-			this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
-		}
-
-
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
-
-		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
-		this._enabled = pref.getBoolPref("extensions.chaika.refController.enabled");
-		pref.addObserver("extensions.chaika.refController.enabled", this, true);
-
-		this._serverURL = ChaikaCore.getServerURL();
-	},
-
-
-	/** @private */
-	quit: function(){
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
-
-		var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
-		pref.removeObserver("extensions.chaika.refController.enabled", this);
-	},
-
-
-	/** @private */
-	_referrerOverwrite: function ChaikaRefController__referrerOverwrite(aHttpChannel){
-		var targetSpec = aHttpChannel.URI.spec;
-		var newReferrer = null;
-
-		ChaikaCore.logger.debug(targetSpec +" >> "+ ((newReferrer) ? newReferrer.spec : "(null)"));
-		aHttpChannel.referrer = newReferrer;
-	},
-
-
-  	// ********** ********* implements nsIObserver ********** **********
-
-	/** @private */
-	observe: function ChaikaRefController_observe(aSubject, aTopic, aData){
-		if(aTopic == this.HTTP_REQUEST_TOPIC && this._enabled){
-			var httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-				// リファラがなければ終了
-			if(!httpChannel.referrer) return;
-
-				// リファラが内部サーバ以外なら終了
-			if(this._serverURL.hostPort != httpChannel.referrer.hostPort) return;
-
-				// 読み込むリソースが内部サーバなら終了
-			if(this._serverURL.hostPort == httpChannel.URI.hostPort) return;
-
-			this._referrerOverwrite(httpChannel);
-			return;
-		}
-
-		if((aTopic == "nsPref:changed") && (aData == "extensions.chaika.refController.enabled")){
-			var pref = aSubject.QueryInterface(Ci.nsIPrefBranch);
-			this._enabled = pref.getBoolPref("extensions.chaika.refController.enabled");
-		}
-
-	},
-
-
-	/** @private */
-	QueryInterface: XPCOMUtils.generateQI([
-		Ci.nsIObserver,
-		Ci.nsISupportsWeakReference,
-		Ci.nsISupports
-	])
 
 };

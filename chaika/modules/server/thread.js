@@ -42,6 +42,7 @@ Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
 
 
 const Ci = Components.interfaces;
@@ -389,23 +390,24 @@ Thread2ch.prototype = {
 							.replace("<b>", "</span>", "g");
 		}
 
-
+		//日付のデコード
 		if(resDate.indexOf("<") != -1){
 			resDate	= this.htmlToText(resDate);
 		}
 
-			// resDate を DATE、BeID に分割
+		// resDate を DATE と BeID に分割
 		if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
 			resDate = RegExp.$1;
 			resBeID = RegExp.$2;
 		}
 
-			// resDate を DATE と ID に分割
+		// resDate を DATE と ID に分割
 		if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:([^ ]+)/)){
 			resDate = RegExp.$1;
 			resID = RegExp.$2;
 		}
 
+		//BeIDのリンク処理
 		if(resBeID){
 			var regBeID = /^(\d+)/;
 			if(resBeID.match(regBeID)){
@@ -415,6 +417,7 @@ Thread2ch.prototype = {
 			}
 		}
 
+		//あぼーん処理
 		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
@@ -423,14 +426,14 @@ Thread2ch.prototype = {
 			}
 		}
 
-			// JSでは "\" が特殊な意味を持つため、数値文字参照に変換
+		// JSでは "\" が特殊な意味を持つため、数値文字参照に変換
 		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 
 		var resMailName = resName;
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
-		// レス番リンク処理 & 連鎖あぼーん
+		// レス番リンク処理 & 連鎖あぼーんの判定
 		// \x81\x84 = ＞
 		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
@@ -505,6 +508,7 @@ Thread2ch.prototype = {
 			}
 		});
 
+		//連鎖あぼーん処理
 		if(shouldChainAbone){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
@@ -514,24 +518,33 @@ Thread2ch.prototype = {
 			}
 		}
 
-			// 通常リンク処理
+		// 通常リンク処理
 		if(resMes.indexOf("ttp")!=-1){
 			var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
-			resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
+			resMes = resMes.replace(regUrlLink, function(aStr, aScheme, aSecure, aSpec, aOffset, aS){
+				var url = 'http' + aSecure + ':' + aSpec;
+
+				//ImageViewURLReplace.datが有効な時
+				if(ChaikaHttpController.ivur.enabled){
+					url = ChaikaHttpController.ivur.replaceURL(url);
+				}
+
+				return '<a href="' + url + '" class="outLink">' + aScheme + aSecure + ':' + aSpec + '</a>';
+			});
 		}
 
-			// Beアイコン処理
+		// Beアイコン処理
 		if(this._showBeIcon && resMes.indexOf("sssp://")!=-1){
 			var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.gif)/g;
 			resMes = resMes.replace(regUrlLink,
 						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
 		}
 
-			// レスID
+		// レスID
 		var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/]+)/g;
 		resMes = resMes.replace(regResID, '$1<span class="resMesID" resID="$3"><span class="mesID_$3">$2$3</span></span>');
 
-			// スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
+		// スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
 		if(!this._headerResponded && resArray[4]){
 			this._headerResponded = true;
 			var title = resArray[4];

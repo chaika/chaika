@@ -198,12 +198,13 @@ ChaikaBrowserOverlay.contextMenu = {
 		range.setStartAfter(vbox);
 		range.insertNode(separator);
 
-		//#context-chaikaを消去
+		//vboxにidを移す
+		contextMenu.removeAttribute('id');
+		vbox.setAttribute('id', 'context-chaika');
+
+		//menu#context-chaikaを消去
 		range.selectNode(contextMenu);
 		range.deleteContents();
-
-		//vboxにidを移す
-		vbox.setAttribute('id', 'context-chaika');
 	},
 
 
