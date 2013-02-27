@@ -434,7 +434,8 @@ ChaikaImageViewURLReplace.prototype = {
 /**
  * ImageViewURLReplace のリクエストを行う
  * @constructor
- * @private*/
+ * @private
+ */
 ChaikaImageViewURLReplace.prototype.Request = function(ivurObj){
     this.init(ivurObj);
 };
@@ -471,9 +472,9 @@ ChaikaImageViewURLReplace.prototype.Request.prototype = {
         this._request.open('GET', this._ivurObj.referrer, true);
         this._request.addEventListener('load', this.destroy.bind(this), false);
 
-        this._request.setRequestHeader('Referer', this._ivurObj.cookie.referrer, false);
+        this._request.setRequestHeader('Referer', this._ivurObj.cookie.referrer);
         if(this._ivurObj.userAgent){
-            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent, false);
+            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
         }
 
         this._request.send(null);
@@ -488,10 +489,10 @@ ChaikaImageViewURLReplace.prototype.Request.prototype = {
         this._request.timeout = this.timeout;
         this._request.open('GET', this._ivurObj.referrer, false);
 
-        this._request.setRequestHeader('Content-Type', 'text/html', false);
-        this._request.setRequestHeader('Referer', this._ivurObj.extract.referrer, false);
+        this._request.setRequestHeader('Content-Type', 'text/html');
+        this._request.setRequestHeader('Referer', this._ivurObj.extract.referrer);
         if(this._ivurObj.userAgent){
-            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent, false);
+            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
         }
 
         this._request.send(null);

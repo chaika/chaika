@@ -644,7 +644,7 @@ var FormPage = {
 							.replace(/\r/g, "\n").split(/\n+/);
 			for(var i=0; i<lines.length; i++){
 				var data = lines[i].split(/\t+/);
-				if(!(/^\s*;|'|#|\/\//).test(data[0]) && urlSpec.indexOf(data[0]) != -1){
+				if(!(/^\s*(?:;|'|#|\/\/)/).test(data[0]) && urlSpec.indexOf(data[0]) != -1){
 					return (data[1]);
 				}
 			}
