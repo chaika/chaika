@@ -181,10 +181,11 @@ Thread2ch.prototype = {
 		this._handler = aHandler;
 
 		this._chainAboneNumbers = new Array();
-		this._enableChainAbone = ChaikaCore.pref.getBool("thread_chain_abone");
+		this._disableAbone = aThreadURL.query.indexOf('chaika_disable_abone=1') !== -1;
+		this._enableChainAbone = !this._disableAbone && ChaikaCore.pref.getBool("thread_chain_abone");
 		this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
 
-			// HTML ヘッダを送信したら true になる
+		// HTML ヘッダを送信したら true になる
 		this._headerResponded = false;
 		this._opened = true;
 		this.httpChannel = null;
@@ -418,7 +419,7 @@ Thread2ch.prototype = {
 		}
 
 		//あぼーん処理
-		if(ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
+		if(!this._disableAbone && ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
 			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
