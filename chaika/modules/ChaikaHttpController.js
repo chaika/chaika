@@ -229,7 +229,10 @@ ChaikaImageViewURLReplace.prototype = {
 
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('imageViewURLReplace.enabled');
-        this._loadFile();
+
+        if(this.enabled){
+            this._loadFile();
+        }
     },
 
     quit: function(){
@@ -542,7 +545,10 @@ ChaikaNGFiles.prototype = {
 
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('ngfiles.enabled');
-        this._loadFile();
+
+        if(this.enabled){
+            this._loadFile();
+        }
     },
 
     quit: function(){
