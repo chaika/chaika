@@ -241,7 +241,6 @@ ChaikaBrowserOverlay.contextMenu = {
 	 * コンテキストメニューが表示された時に呼ばれる
 	 */
 	showMenu: function contextMenu_showMenu(aEvent){
-		if(aEvent.originalTarget.id != "contentAreaContextMenu") return;
 		if(!gContextMenu) return;
 
 		var contextMenu = document.getElementById('context-chaika');
@@ -255,17 +254,20 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
 		//すべての非表示・無効化を解除
+		contextMenu.hidden = false;
 
 		//ChaikaCore.pref を使うと存在しない設定値の場合エラーが出てしまうので自前で用意する
 		var prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
+		var menuitems = contextMenu.querySelectorAll('menu, menuitem, menuseparator');
+		for(let i=0, l=menuitems.length; i<l; i++){
+			let item = menuitems[i];
 
-		contextMenu.hidden = false;
-		Array.slice(contextMenu.querySelectorAll('menu, menuitem, menuseparator')).forEach(function(item){
+			//非表示を解除
 			item.hidden = false;
 
 			//非表示に設定されているものを非表示にする
-			var id = item.getAttribute('id');
-			if(!id) return;
+			let id = item.getAttribute('id');
+			if(!id) continue;
 
 			id = id.replace('context-chaika-', '');
 			try{
@@ -273,7 +275,7 @@ ChaikaBrowserOverlay.contextMenu = {
 					item.hidden = true;
 				}
 			}catch(ex){}
-		});
+		}
 
 
 		//非表示にする項目のIDを入れておく配列
@@ -347,9 +349,9 @@ ChaikaBrowserOverlay.contextMenu = {
 		}
 
 		//まとめて非表示にする
-		hiddenItems.forEach(function(id){
-			document.getElementById('context-chaika-' + id).hidden = true;
-		});
+		for(let i=0, l=hiddenItems.length; i<l; i++){
+			document.getElementById('context-chaika-' + hiddenItems[i]).hidden = true;
+		}
 
 
 		//現在設定されているスキンを選択状態にする
