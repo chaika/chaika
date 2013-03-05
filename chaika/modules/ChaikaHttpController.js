@@ -326,7 +326,9 @@ ChaikaImageViewURLReplace.prototype = {
      * @return {String}
      */
     _resolveBackReference: function ChaikaIvur__resolvBackReference(aStr, aMatch, aExtractMatch){
-       return aStr.replace(/\$(\d+|&)/g, function(_str, _backRefs){
+        if(!aStr) return '';
+
+        return aStr.replace(/\$(\d+|&)/g, function(_str, _backRefs){
             if(_backRefs === '&'){
                 return aMatch[0];
             }else if(parseInt(_backRefs)){
