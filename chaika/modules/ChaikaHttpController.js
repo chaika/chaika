@@ -261,7 +261,6 @@ ChaikaImageViewURLReplace.prototype = {
                 this.rules.push(config);
             }
         }
-
     },
 
 
@@ -272,20 +271,20 @@ ChaikaImageViewURLReplace.prototype = {
      */
     _parseConfig: function(line){
         var config = {
-            target: null,           //検索文字列
-            image: '',              //補正文字列 $EXTRACT1 などになる可能性あり
-            referrer: '',           //リファラ
+            target: null,           //検索文字列 RegExpオブジェクト
+            image: '',              //補正文字列 [後方参照有]
+            referrer: '',           //リファラ [後方参照有]
             cookie: {
                 shouldGet: false,   //Cookieを取得するかどうか
-                referrer: '',       //Cookieを取得するときに送るリファラ
+                referrer: '',       //Cookieを取得するときに送るリファラ [後方参照有]
                 str: '',            //Cookie本体
             },
             processFlag: '',        //動作制御パラメータ
             extract: {
-                pattern: '',        //スクレイピング時に画像URLを取得する正規表現
-                referrer: '',       //スクレイピング時に送るリファラ
+                pattern: '',        //スクレイピング時に画像URLを取得する正規表現 [後方参照有]
+                referrer: '',       //スクレイピング時に送るリファラ [後方参照有]
             },
-            userAgent: '',          //ユーザーエージェント
+            userAgent: '',          //ユーザーエージェント (chaika 独自拡張)
         };
 
         var data = line.split(/\t/);
@@ -300,18 +299,20 @@ ChaikaImageViewURLReplace.prototype = {
         config.referrer = data[2];
         config.userAgent = data[5];
 
-        if(data[3].indexOf('$COOKIE') > -1){
-            config.cookie.shouldGet = true;
-            config.cookie.referrer = data[3].match(/\$COOKIE=?([^\$]*)/)[1];
-        }
+        if(data[3]){
+            if(data[3].indexOf('$COOKIE') > -1){
+                config.cookie.shouldGet = true;
+                config.cookie.referrer = data[3].match(/\$COOKIE=?([^\$]*)/)[1];
+            }
 
-        if(data[3].indexOf('$EXTRACT') > -1){
-            config.extract.pattern = data[4];
-            config.extract.referrer = data[3].match(/\$EXTRACT=?([^\$]*)/)[1];
-            config.cookie.shouldGet = true;
-        }
+            if(data[3].indexOf('$EXTRACT') > -1 && data[4]){
+                config.extract.pattern = data[4];
+                config.extract.referrer = data[3].match(/\$EXTRACT=?([^\$]*)/)[1];
+                config.cookie.shouldGet = true;
+            }
 
-        config.processFlag = data[3];
+            config.processFlag = data[3];
+        }
 
         return config;
     },
