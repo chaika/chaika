@@ -880,9 +880,16 @@ var Tree = {
 	getRowProperties: function(aIndex, aProperties){},
 	getCellProperties: function(aRow, aCol, aProperties){
 		if (aCol.index == 0){
-			aProperties.AppendElement(this._atomService.getAtom("title"));
 			var type = "type-" + this._visibleNodes[aRow].getAttribute("type");
-			aProperties.AppendElement(this._atomService.getAtom(type));
+
+			if(aProperties){
+				// Firefox 21-
+				aProperties.AppendElement(this._atomService.getAtom("title"));
+				aProperties.AppendElement(this._atomService.getAtom(type));
+			}else{
+				// Firefox 22+
+				return ['title', type].join(' ');
+			}
 		}
 	},
 	getColumnProperties: function(aCol, aProperties){},
