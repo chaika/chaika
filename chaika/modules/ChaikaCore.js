@@ -356,7 +356,7 @@ var ChaikaCore = {
 	 */
 	getDefaultsDir: function ChaikaCore_getDefaultsDir(){
 		var defaultsDir = __LOCATION__.parent.parent.clone().QueryInterface(Ci.nsILocalFile);
-		defaultsDir.append("defaults");
+		defaultsDir.setRelativeDescriptor(defaultsDir, 'chrome/content/chaika/defaults');
 		return defaultsDir;
 	},
 
