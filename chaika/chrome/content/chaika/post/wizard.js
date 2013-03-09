@@ -292,7 +292,7 @@ var BoardSettingPage = {
 	_downloaded: function BoardSettingPage__downloaded(){
 		BoardSettingPage._progress.mode = "determined";
 		gBoard = new ChaikaBoard(gBoard.url); // gBoard の再初期化
-		setTimeout("gWizard.goTo('formPage')", 500);
+		setTimeout(gWizard.goTo, 500, 'formPage');
 	}
 
 };
@@ -391,7 +391,7 @@ var FormPage = {
 			gWizard.canAdvance = false;
 			Notification.removeAll(true);
 			Notification.warning(errorMessages[0]);
-			setTimeout("gWizard.canAdvance = true;", 750);
+			setTimeout(function(){ gWizard.canAdvance = true; }, 750);
 		}else{
 			Notification.removeAll(false);
 
@@ -678,7 +678,7 @@ var PreviewPage = {
 			});
 		}
 
-		setTimeout("PreviewPage._createPreview()", 0);
+		setTimeout(PreviewPage._createPreview, 0);
 	},
 
 	pageRewound: function PreviewPage_pageRewound(aEvent){
@@ -717,7 +717,7 @@ var PreviewPage = {
 		previewDoc.getElementById("mail").innerHTML = previewData["mail"];
 		previewDoc.getElementById("message").innerHTML = previewData["message"];
 
-		setTimeout("gWizard.canAdvance = true;", 250);
+		setTimeout(function(){ gWizard.canAdvance = true; }, 250);
 	}
 
 };
@@ -742,12 +742,12 @@ var SubmitPage = {
 	},
 
 
-	pageRewound: function SubmitPage_pageShow(aEvent){
+	pageRewound: function SubmitPage_pageRewound(aEvent){
 		document.getElementById("response").value = "";
 		Notification.removeAll();
 		document.getElementById("submitProgress").hidden = true;
 
-		setTimeout("gWizard.goTo('formPage')", 0);
+		setTimeout(gWizard.goTo, 0, 'formPage');
 		return false;
 	},
 
@@ -797,7 +797,7 @@ var SubmitPage = {
 
 		if(ChaikaCore.pref.getBool("post.auto_finish")){
 			var delay = ChaikaCore.pref.getInt("post.auto_finish_delay");
-			setTimeout(function(){ gWizard.advance(null); }, delay);
+			setTimeout(function(){ gWizard.advance(null) }, delay);
 		}
 	},
 

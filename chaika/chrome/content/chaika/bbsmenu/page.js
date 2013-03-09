@@ -60,7 +60,7 @@ var Page = {
 		this.showViewFoxAge2chMenu();
 		SearchBox.init();
 
-		setTimeout("Page.delayStartup()", 0);
+		setTimeout(Page.delayStartup, 0);
 	},
 
 	delayStartup: function Page_delayStartup(){

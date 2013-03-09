@@ -33,10 +33,10 @@
 	<marbletextbox id="searchTextBox" value="" emptytext="フィルタ" type="search"
 			timeout="500" oncommand="BoardTree.initTree(true)"/>
 	<marblebuttongroup id="filterGroup" value="0" persist2="value">
-		<marblebutton label="すべて"  value="0"   oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="TOP200"  value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="既読"  value="-2"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="DAT落ち" value="-1"  oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+		<marblebutton label="すべて"  value="0"   oncommand="setTimeout(BoardTree.initTree, 0)"/>
+		<marblebutton label="TOP200"  value="200" oncommand="setTimeout(BoardTree.initTree, 0)"/>
+		<marblebutton label="既読"  value="-2"  oncommand="setTimeout(BoardTree.initTree, 0)"/>
+		<marblebutton label="DAT落ち" value="-1"  oncommand="setTimeout(BoardTree.initTree, 0)"/>
 	</marblebuttongroup>
 
 	<spacer width="3"/>

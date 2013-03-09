@@ -51,7 +51,7 @@ const Cr = Components.results;
  */
 function startup(){
 	ThreadUpdateObserver.startup();
-	setTimeout("delayStartup()", 0);
+	setTimeout(delayStartup, 0);
 }
 
 function delayStartup(){
@@ -79,7 +79,7 @@ function eventBubbleCheck(aEvent){
 
 function vacuum(){
 	document.getElementById("vacuumButton").disabled = true;
-	setTimeout("delayVacuum()", 0);
+	setTimeout(delayVacuum, 0);
 }
 
 
