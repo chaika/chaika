@@ -1314,21 +1314,22 @@ b2rThreadConverter.prototype = {
 	},
 
 	toFunction: function(aRes){
-		return new Function("aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage",
-				"return \"" + aRes
-				.replace(/\\/g,"\\\\").replace(/\"/g,"\\\"")
-				.replace(/(\r|\n|\t)/g,"").replace(/<!--.*?-->/g,"")
-				.replace(/<PLAINNUMBER\/>/g, "\"+aNumber+\"")
-				.replace(/<NUMBER\/>/g, "\"+aNumber+\"")
-				.replace(/<NAME\/>/g, "\"+aName+\"")
-				.replace(/<MAIL\/>/g, "\"+aMail+\"")
-				.replace(/<MAILNAME\/>/g, "\"+aMailName+\"")
-				.replace(/<DATE\/>/g, "\"+aDate+\"")
-				.replace(/<ID\/>/g, "\"+aID+\"")
-				.replace(/<IDCOLOR\/>/g, "\"+resIDColor+\"")
-				.replace(/<IDBACKGROUNDCOLOR\/>/g, "\"+resIDBgColor+\"")
-				.replace(/<BEID\/>/g, "\"+aBeID+\"")
-				.replace(/<MESSAGE\/>/g, "\"+aMessage+\"") + "\"");
+		return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage){
+			return aRes
+					.replace(/(?:\r|\n|\t)/g, "")
+					.replace(/<!--.*?-->/g, "")
+					.replace(/<PLAINNUMBER\/>/g, aNumber)
+					.replace(/<NUMBER\/>/g, aNumber)
+					.replace(/<NAME\/>/g, aName)
+					.replace(/<MAIL\/>/g, aMail)
+					.replace(/<MAILNAME\/>/g, aMailName)
+					.replace(/<DATE\/>/g, aDate)
+					.replace(/<ID\/>/g, aID)
+					.replace(/<IDCOLOR\/>/g, resIDColor)
+					.replace(/<IDBACKGROUNDCOLOR\/>/g, resIDBgColor)
+					.replace(/<BEID\/>/g, aBeID)
+					.replace(/<MESSAGE\/>/g, aMessage);
+		};
 	},
 
 	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone){
@@ -1371,7 +1372,7 @@ b2rThreadConverter.prototype = {
 		}
 
 		return resFunc(aNumber, aName, aMail, aMailName, aDate, aID,
-						resIDColor, resIDBgColor,aBeID, aMessage);
+						resIDColor, resIDBgColor, aBeID, aMessage);
 	},
 
 	isAA: function(aMessage) {
