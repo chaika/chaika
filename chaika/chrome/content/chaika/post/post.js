@@ -202,7 +202,7 @@ Post.prototype = {
 
 			var trip = Trip.getTrip(tripKey);
 			name = [name.substring(0, tripPos),
-						"<span class='resSystem'>", "◆", trip, "</span>"].join("");
+						" <span class='resSystem'>", "◆", trip, "</span>"].join("");
 		}
 		preview["name"] = name;
 
