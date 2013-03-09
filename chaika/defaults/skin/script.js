@@ -132,6 +132,9 @@ var Effects = {
 		});
 
 		if(option.remove){
+			element.addEventListener('mozAnimationEnd', function(){
+				this.parentNode.removeChild(this);
+			});
 			element.addEventListener('animationend', function(){
 				this.parentNode.removeChild(this);
 			});
@@ -149,6 +152,9 @@ var Effects = {
 		});
 
 		if(option.remove){
+			element.addEventListener('mozAnimationEnd', function(){
+				this.parentNode.removeChild(this);
+			});
 			element.addEventListener('animationend', function(){
 				this.parentNode.removeChild(this);
 			});
@@ -175,7 +181,10 @@ function init(){
 	if(!location.hash){
 		var newMark = $.id("newMark");
 		var pageTitle = $.id("pageTitle");
-		window.scrollTo(0, ($.rect(newMark).top - $.rect(pageTitle).height - 30));
+
+		if(newMark && pageTitle){
+			window.scrollTo(0, ($.rect(newMark).top - $.rect(pageTitle).height - 30));
+		}
 	}
 
 	ResCollapse.startup();
