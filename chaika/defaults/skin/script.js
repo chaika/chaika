@@ -1,26 +1,61 @@
 /* *** Utils *** */
 var $ = {
 
+	/**
+	 * id から要素を取得
+	 * @param {String} id ID
+	 * @return {Node}
+	 */
 	id: function(id){
 		return document.getElementById(id);
 	},
 
+	/**
+	 * class から要素を取得
+	 * @param {String} className class 名
+	 * @param {Node} [parent=document] 親要素
+	 * @return {NodeList}
+	 */
 	klass: function(className, parent){
 		return (parent || document).getElementsByClassName(className);
 	},
 
+	/**
+	 * 要素名から要素を取得
+	 * @param {String} tagName 要素名
+	 * @param {Node} [parent=document] 親要素
+	 * @return {NodeList}
+	 */
 	tag: function(tagName, parent){
 		return (parent || document).getElementsByTagName(tagName);
 	},
 
+	/**
+	 * CSS Selector から要素を取得
+	 * @param {String} selector セレクタ
+	 * @param {Node} [parent=document] 親要素
+	 * @return {Node}
+	 */
 	selector: function(selector, parent){
 		return (parent || document).querySelector(selector);
 	},
 
+	/**
+	 * CSS Selector から要素を取得
+	 * @param {String} selector セレクタ
+	 * @param {Node} [parent=document] 親要素
+	 * @return {NodeList}
+	 */
 	selectorAll: function(selector, parent){
 		return (parent || document).querySelectorAll(selector);
 	},
 
+	/**
+	 * class から親要素を取得
+	 * @param {String} className class 名
+	 * @param {Node} element 起点の要素
+	 * @return {Node}
+	 */
 	parentByClass: function(className, element){
 		if(!element) return null;
 
@@ -33,20 +68,41 @@ var $ = {
 		return null;
 	},
 
+	/**
+	 * TextRectangle を取得
+	 * @param {Node} element 対象の要素
+	 * @return {TextRectangle}
+	 */
 	rect: function(element){
 		return element.getBoundingClientRect();
 	},
 
+	/**
+	 * 表示状態にする
+	 * @param {Node} element 対象の要素
+	 * @return {Node}
+	 */
 	show: function(element){
 		$.css(element, { display: '-moz-initial' });
 		return element;
 	},
 
+	/**
+	 * 非表示にする
+	 * @param {Node} element 対象の要素
+	 * @return {Node}
+	 */
 	hide: function(element){
 		$.css(element, { display: 'none' });
 		return element;
 	},
 
+	/**
+	 * CSS スタイルを設定する
+	 * @param {Node} element 対象の要素
+	 * @return {Node}
+	 * @note プロパティ名はキャメルケース化してある必要あり
+	 */
 	css: function(element, cssList){
 		for(let property in cssList){
 			element.style[property] = cssList[property];
@@ -55,7 +111,14 @@ var $ = {
 	},
 
 	/**
-	 * { div: { id: 'header', children: { span } } }
+	 * ノードを生成する
+	 * 以下の nodeList により生成するノードを指定する
+	 * @param {Object} nodeList キーに要素名、値に属性をもつオブジェクト 属性の指定方法は $.attrs に準ずる
+	 * @return {Node|DocumentFragment} もし最上位が１つのノードからなる場合はそのノードが,
+	 *                                 複数のノードの場合は DocumentFragment が返る
+	 * @example { 'div': { id: 'hoge', children: { 'span': text: 'fuga' } } }
+	 *         -> <div id="hoge"><span>fuga</span></div>
+	 * @see $.attrs
 	 */
 	node: function(nodeList){
 		var fragment = document.createDocumentFragment();
@@ -73,6 +136,18 @@ var $ = {
 		return fragment.childNodes.length === 1 ? fragment.firstChild : fragment;
 	},
 
+	/**
+	 * 要素に属性を指定する、もしくは属性値を取得する
+	 * @param {Node} element 対象の要素
+	 * @param {Object|String} 属性
+	 *     String が渡された場合はその属性の値を返す
+	 *     キーに属性名、値に属性値を持つハッシュが渡された場合は、それらの値をまとめて設定する
+	 *     特殊な属性名として children, text がある
+	 *         {nodeList|Node} children 指定された要素を子要素として追加する $.node の nodeList 形式でも指定可能
+	 *         {String} text 指定されたテキストを子要素として追加する children と共に指定された場合の挙動は未定義
+	 * @return {Node|String}
+	 * @see $.node
+	 */
 	attrs: function(element, attrs){
 		if(attrs instanceof Object){
 			for(let name in attrs){
@@ -95,12 +170,20 @@ var $ = {
 		}
 	},
 
+	/**
+	 * 簡易テンプレートから文字列を生成
+	 * @param {String} template テンプレート 置換する場所を @@ で指定する
+	 * @param {String} args 可変引数 テンプレート文字列の @@ を初めから順に置換する
+	 * @example $.template('@@ is a @@.', 'This', 'pen') //=> This is a pen.
+	 * @return {String} 置換後の文字列
+	 */
 	template: function(){
 		var args = Array.slice(arguments);
-		var template = args.unshift();
+		var template = args.shift();
+		var count = 0;
 
-		template.replace('@@', function(a, count){
-			return args[count];
+		template = template.replace('@@', function(){
+			return args[count++];
 		}, 'g');
 
 		return template;
