@@ -366,6 +366,15 @@ Thread2ch.prototype = {
 	},
 
 
+	sanitizeHTML: function(aStr){
+		return aStr.replace('<', '&lt;', 'g')
+					.replace('>', '&gt;', 'g')
+					.replace('"', '&quot;', 'g')
+					.replace("'", '&#039;', 'g');
+
+	},
+
+
 	datLineParse: function(aLine, aNumber, aNew){
 		if(!aLine) return "";
 
@@ -386,15 +395,30 @@ Thread2ch.prototype = {
 			resMes = resArray[3];
 		}
 
-		if(resName.indexOf("<") != -1){
-			resName =  resName.replace("</b>", "<span class=\"resSystem\">", "g")
-							.replace("<b>", "</span>", "g");
-		}
 
-		//日付のデコード
+		//名前、レス本文の特殊なタグが無効化されないように置換する
+		resName = resName.replace("<b>", "%RES_SYSTEM_BEGIN%", "g")
+							.replace("</b>", "%RES_SYSTEM_END%", "g");
+		resMes = resMes.replace('<br>', '%NEWLINE%', 'g');
+
+		//日付中のHTMLを除去
 		if(resDate.indexOf("<") != -1){
 			resDate	= this.htmlToText(resDate);
 		}
+
+		//sanitize HTML special characters
+		//掲示板側でサニタイズ済みなため本来は不要だが、
+		//AMOの指摘に基づきより安全性を高めることにする
+		resName = this.sanitizeHTML(resName);
+		resMail = this.sanitizeHTML(resMail);
+		resDate = this.sanitizeHTML(resDate);
+		resMes = this.sanitizeHTML(resMes.replace(/<\/?a(?: .*?)?>/g, ''));
+
+		//特殊タグを元に戻す
+		resName = resName.replace('%RES_SYSTEM_BEGIN%', '<span class="resSystem">', 'g')
+							.replace('%RES_SYSTEM_END%', '</span>', 'g');
+		resMes = resMes.replace('%NEWLINE%', '<br>', 'g');
+
 
 		// resDate を DATE と BeID に分割
 		if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
@@ -431,12 +455,13 @@ Thread2ch.prototype = {
 		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 
+		//メール欄
 		var resMailName = resName;
 		if(resMail) resMailName = '<a href="mailto:' + resMail + '">' + resName + '</a>';
 
 		// レス番リンク処理 & 連鎖あぼーんの判定
 		// \x81\x84 = ＞
-		var regResPointer = /(?:<a .*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
+		var regResPointer = /((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
@@ -449,7 +474,7 @@ Thread2ch.prototype = {
 				//最大500個に制限する
 				var ancNums = [];
 
-				ancStr.replace(/(?:\s|<\/a>)*/g, '').split(',').forEach(function(ancNumRange){
+				ancStr.replace(/\s+/g, '').split(',').forEach(function(ancNumRange){
 					if(ancNumRange && !isNaN(ancNumRange)){
 						//範囲指定がないとき
 						if(ancNums.length < 500){
@@ -541,9 +566,10 @@ Thread2ch.prototype = {
 						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
 		}
 
-		// レスID
+		// レス本文中のレスID
 		var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/]+)/g;
 		resMes = resMes.replace(regResID, '$1<span class="resMesID" resID="$3"><span class="mesID_$3">$2$3</span></span>');
+
 
 		// スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
 		if(!this._headerResponded && resArray[4]){
@@ -555,6 +581,7 @@ Thread2ch.prototype = {
 			this.write(header);
 			this._handler.response.flush();
 		}
+
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
 								resMailName, resDate, resID, resBeID, resMes, isAbone);
 		return response;
