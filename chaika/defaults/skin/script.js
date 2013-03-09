@@ -114,9 +114,9 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'mozAnimationName': 'fadein',
+			'MozAnimationName': 'fadein',
 			'animationName': 'fadein',
-			'mozAnimationDuration': option.speed || '0.3s',
+			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 	},
@@ -125,9 +125,9 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'mozAnimationName': 'fadeout',
+			'MozAnimationName': 'fadeout',
 			'animationName': 'fadeout',
-			'mozAnimationDuration': option.speed || '0.3s',
+			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 
@@ -145,9 +145,9 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'mozAnimationName': 'slidedown',
+			'MozAnimationName': 'slidedown',
 			'animationName': 'slidedown',
-			'mozAnimationDuration': option.speed || '0.3s',
+			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 
@@ -165,9 +165,9 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'mozAnimationName': 'slideup',
+			'MozAnimationName': 'slideup',
 			'animationName': 'slideup',
-			'mozAnimationDuration': option.speed || '0.3s',
+			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 	},
