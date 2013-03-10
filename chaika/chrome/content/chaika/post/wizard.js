@@ -292,7 +292,7 @@ var BoardSettingPage = {
 	_downloaded: function BoardSettingPage__downloaded(){
 		BoardSettingPage._progress.mode = "determined";
 		gBoard = new ChaikaBoard(gBoard.url); // gBoard の再初期化
-		setTimeout(gWizard.goTo, 500, 'formPage');
+		setTimeout(function(){ gWizard.goTo('formPage'); }, 500);
 	}
 
 };
@@ -747,7 +747,7 @@ var SubmitPage = {
 		Notification.removeAll();
 		document.getElementById("submitProgress").hidden = true;
 
-		setTimeout(gWizard.goTo, 0, 'formPage');
+		setTimeout(function(){ gWizard.goTo('formPage'); }, 0);
 		return false;
 	},
 
