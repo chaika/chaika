@@ -397,8 +397,8 @@ Thread2ch.prototype = {
 
 
 		//名前、レス本文の特殊なタグが無効化されないように置換する
-		resName = resName.replace("<b>", "%RES_SYSTEM_BEGIN%", "g")
-							.replace("</b>", "%RES_SYSTEM_END%", "g");
+		resName = resName.replace("</b>", "%RES_SYSTEM_BEGIN%", "g")
+							.replace("<b>", "%RES_SYSTEM_END%", "g");
 		resMes = resMes.replace('<br>', '%NEWLINE%', 'g');
 
 		//日付中のHTMLを除去
