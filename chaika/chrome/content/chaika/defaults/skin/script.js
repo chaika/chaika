@@ -266,7 +266,7 @@ function init(){
 		var pageTitle = $.id("pageTitle");
 
 		if(newMark && pageTitle){
-			window.scrollTo(0, ($.rect(newMark).top - $.rect(pageTitle).height - 30));
+			window.scrollTo(0, (newMark.offsetTop - $.rect(pageTitle).height - 30));
 		}
 	}
 
