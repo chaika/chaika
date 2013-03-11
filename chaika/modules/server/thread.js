@@ -1430,13 +1430,15 @@ b2rThreadConverter.prototype = {
 
 	isAA: function(aMessage) {
 		var lineCount = aMessage.match(/<br\s*\/?>/g);
+
 		if(lineCount && lineCount.length >= 3){
-			// \x8140 = 全角空白(Shift_JIS)
-			var spaceCount = aMessage.match(/[ \x8140\.:i\|]/g);
-			if(spaceCount && (spaceCount.length / aMessage.length) >= 0.3){
+			// \x81\x40 = 全角空白(Shift_JIS)
+			var spaceCount = aMessage.match(/(?: |\x81\x40|\.|\:|i|\|)/g);
+			if(spaceCount && (spaceCount.length / aMessage.length) >= 0.25){
 				return true;
 			}
 		}
+
 		return false;
 	}
 
