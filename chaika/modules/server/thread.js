@@ -179,6 +179,8 @@ Thread2ch.prototype = {
 
 	init: function(aHandler, aThreadURL, aBoardURL, aType){
 		this._handler = aHandler;
+		this._parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
+		this._serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
 
 		this._chainAboneNumbers = new Array();
 		this._disableAbone = aThreadURL.query.indexOf('chaika_disable_abone=1') !== -1;
@@ -366,12 +368,69 @@ Thread2ch.prototype = {
 	},
 
 
+	/**
+	 * Remove all tags and attributes except for
+	 * <font>, <i>, <b>, <u>, <s>, <hr>, <blockquote>, <span>, <br>, <a>, class and color attributes
+	 * @param {String} aStr HTML string
+	 * @return {String} sanitized HTML string
+	 */
 	sanitizeHTML: function(aStr){
-		return aStr.replace('<', '&lt;', 'g')
-					.replace('>', '&gt;', 'g')
-					.replace('"', '&quot;', 'g')
-					.replace("'", '&#039;', 'g');
+		if(aStr.indexOf('<') === -1) return aStr;
 
+		const allowTags = [ 'FONT', 'I', 'B', 'U', 'S', 'HR', 'BLOCKQUOTE', 'SPAN', 'BR', 'A' ];
+		const allowAttrs = [ 'color', 'class' ];
+
+		var doc = this._parser.parseFromString(aStr, 'text/html');
+
+		// Error
+		if(doc.documentElement.nodeName === 'parsererror'){
+			ChaikaCore.logger.error('Parse Error: \n' + aStr);
+			return aStr;
+		}
+
+
+		function _filterElement(nodeList){
+			for(let i = nodeList.length - 1; i >= 0; i--){
+				let node = nodeList[i];
+
+				switch(node.nodeType){
+					case node.COMMENT_NODE:
+					case node.TEXT_NODE:
+						break;
+
+					case node.ELEMENT_NODE:
+						let nodeName = node.nodeName.toUpperCase();
+
+						if(allowTags.indexOf(nodeName) === -1){
+							node.parentNode.removeChild(node);
+						}
+
+						for(let j = node.attributes.length - 1; j >= 0; j--){
+							let attrName = node.attributes[j].name;
+
+							if(allowAttrs.indexOf(attrName) === -1){
+								node.removeAttribute(attrName);
+							}
+						}
+
+						break;
+
+					default:
+						if(node.parentNode){
+							node.parentNode.removeChild(node);
+						}
+
+						break;
+				}
+			}
+		}
+
+
+		var body = doc.getElementsByTagName('body')[0];
+
+		_filterElement(body.getElementsByTagName('*'));
+
+		return this._serializer.serializeToString(body).replace(/<\/?body.*?>/g, '');
 	},
 
 
@@ -396,10 +455,9 @@ Thread2ch.prototype = {
 		}
 
 
-		//名前、レス本文の特殊なタグが無効化されないように置換する
-		resName = resName.replace("</b>", "%RES_SYSTEM_BEGIN%", "g")
-							.replace("<b>", "%RES_SYSTEM_END%", "g");
-		resMes = resMes.replace('<br>', '%NEWLINE%', 'g');
+		//特殊な名前欄の置換
+		resName = resName.replace("</b>", '<span class="resSystem">', "g")
+							.replace("<b>", "</span>", "g");
 
 		//日付中のHTMLを除去
 		if(resDate.indexOf("<") != -1){
@@ -412,12 +470,7 @@ Thread2ch.prototype = {
 		resName = this.sanitizeHTML(resName);
 		resMail = this.sanitizeHTML(resMail);
 		resDate = this.sanitizeHTML(resDate);
-		resMes = this.sanitizeHTML(resMes.replace(/<\/?a(?: .*?)?>/g, ''));
-
-		//特殊タグを元に戻す
-		resName = resName.replace('%RES_SYSTEM_BEGIN%', '<span class="resSystem">', 'g')
-							.replace('%RES_SYSTEM_END%', '</span>', 'g');
-		resMes = resMes.replace('%NEWLINE%', '<br>', 'g');
+		resMes = this.sanitizeHTML(resMes);
 
 
 		// resDate を DATE と BeID に分割
@@ -461,7 +514,7 @@ Thread2ch.prototype = {
 
 		// レス番リンク処理 & 連鎖あぼーんの判定
 		// \x81\x84 = ＞
-		var regResPointer = /((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*[,\-]*\s*)+)/g;
+		var regResPointer = /(?:<a>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
 		var enableChainAbone = this._enableChainAbone;
 		var chainAboneNumbers = this._chainAboneNumbers;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
@@ -474,7 +527,7 @@ Thread2ch.prototype = {
 				//最大500個に制限する
 				var ancNums = [];
 
-				ancStr.replace(/\s+/g, '').split(',').forEach(function(ancNumRange){
+				ancStr.replace(/(?:\s+|<\/a>)/g, '').split(',').forEach(function(ancNumRange){
 					if(ancNumRange && !isNaN(ancNumRange)){
 						//範囲指定がないとき
 						if(ancNums.length < 500){
@@ -1376,9 +1429,9 @@ b2rThreadConverter.prototype = {
 	},
 
 	isAA: function(aMessage) {
-		var lineCount = aMessage.match(/<br>/g);
+		var lineCount = aMessage.match(/<br\s*\/?>/g);
 		if(lineCount && lineCount.length >= 3){
-				// \x8140 = 全角空白(Shift_JIS)
+			// \x8140 = 全角空白(Shift_JIS)
 			var spaceCount = aMessage.match(/[ \x8140\.:i\|]/g);
 			if(spaceCount && (spaceCount.length / aMessage.length) >= 0.3){
 				return true;
