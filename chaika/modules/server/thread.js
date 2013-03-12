@@ -455,15 +455,15 @@ Thread2ch.prototype = {
 
 	_sanitizeByRegExp: function(aStr){
 		return aStr
-					.replace(/<span class="resSystem">(.*?)<\/span>/, '%RESSYSTEM_$1%')
-					.replace('<br>', '%NEWLINE%', 'g')
+					.replace(/<span class="resSystem">(.*?)<\/span>/, '%_RESSYSTEM_$1_%')
+					.replace(/<br>/gi, '%_NEWLINE_%')
 
 					.replace(/<.*?>/g, '')
 					.replace(/</g, '&lt;')
 					.replace(/>/g, '&gt;')
 
-					.replace(/%RESSYSTEM_(.*?)%/, '<span class="resSystem">$1</span>')
-					.replace('%NEWLINE%', '<br>', 'g');
+					.replace(/%_RESSYSTEM_(.*?)_%/, '<span class="resSystem">$1</span>')
+					.replace('%_NEWLINE_%', '<br>', 'g');
 	},
 
 
