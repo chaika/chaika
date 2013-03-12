@@ -440,9 +440,7 @@ Thread2ch.prototype = {
 			}
 		}
 
-
 		var body = doc.getElementsByTagName('body')[0];
-		ChaikaCore.logger.debug(doc.characterSet);
 
 		_filterElement(body.getElementsByTagName('*'));
 
@@ -461,8 +459,6 @@ Thread2ch.prototype = {
 					.replace('<br>', '%NEWLINE%', 'g')
 
 					.replace(/<.*?>/g, '')
-					.replace('"', '&quot;', 'g')
-					.replace("'", '&#8216;', 'g')
 
 					.replace(/%RESSYSTEM_(.*?)%/, '<span class="resSystem">$1</span>')
 					.replace('%NEWLINE%', '<br>', 'g');
