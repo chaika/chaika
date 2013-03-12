@@ -459,6 +459,8 @@ Thread2ch.prototype = {
 					.replace('<br>', '%NEWLINE%', 'g')
 
 					.replace(/<.*?>/g, '')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;')
 
 					.replace(/%RESSYSTEM_(.*?)%/, '<span class="resSystem">$1</span>')
 					.replace('%NEWLINE%', '<br>', 'g');
