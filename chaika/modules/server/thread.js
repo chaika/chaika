@@ -369,14 +369,29 @@ Thread2ch.prototype = {
 
 
 	/**
-	 * Remove all tags and attributes except for
-	 * <font>, <i>, <b>, <u>, <s>, <hr>, <blockquote>, <span>, <br>, <a>, class and color attributes
+	 * HTMLタグをサニタイズする
 	 * @param {String} aStr HTML string
 	 * @return {String} sanitized HTML string
 	 */
 	sanitizeHTML: function(aStr){
 		if(aStr.indexOf('<') === -1) return aStr;
 
+		if(ChaikaCore.pref.getBool('thread_enable_advanced_sanitizing')){
+			return this._sanitizeByDOM(aStr);
+		}else{
+			return this._sanitizeByRegExp(aStr);
+		}
+	},
+
+
+	/**
+	 * Remove all tags and attributes except for
+	 * <font>, <i>, <b>, <u>, <s>, <hr>, <blockquote>, <span>, <br>, <a>, class and color attributes
+	 * @param {String} aStr HTML string
+	 * @return {String} sanitized HTML string
+	 * @note DOM を使うので遅い
+	 */
+	_sanitizeByDOM: function(aStr){
 		const allowTags = [ 'FONT', 'I', 'B', 'U', 'S', 'HR', 'BLOCKQUOTE', 'SPAN', 'BR', 'A' ];
 		const allowAttrs = [ 'color', 'class' ];
 
@@ -427,11 +442,32 @@ Thread2ch.prototype = {
 
 
 		var body = doc.getElementsByTagName('body')[0];
+		ChaikaCore.logger.debug(doc.characterSet);
 
 		_filterElement(body.getElementsByTagName('*'));
 
-		return this._serializer.serializeToString(body).replace(/<\/?body.*?>/g, '');
+		var sanitizedStr = this._serializer.serializeToString(body);
+
+		sanitizedStr = sanitizedStr.replace(/<\/?body.*?>/g, '')
+									.replace(/<br\s*\/?>/g, '<br>');
+
+		return sanitizedStr;
 	},
+
+
+	_sanitizeByRegExp: function(aStr){
+		return aStr
+					.replace(/<span class="resSystem">(.*?)<\/span>/, '%RESSYSTEM_$1%')
+					.replace('<br>', '%NEWLINE%', 'g')
+
+					.replace(/<.*?>/g, '')
+					.replace('"', '&quot;', 'g')
+					.replace("'", '&#8216;', 'g')
+
+					.replace(/%RESSYSTEM_(.*?)%/, '<span class="resSystem">$1</span>')
+					.replace('%NEWLINE%', '<br>', 'g');
+	},
+
 
 
 	datLineParse: function(aLine, aNumber, aNew){
@@ -469,7 +505,6 @@ Thread2ch.prototype = {
 		//AMOの指摘に基づきより安全性を高めることにする
 		resName = this.sanitizeHTML(resName);
 		resMail = this.sanitizeHTML(resMail);
-		resDate = this.sanitizeHTML(resDate);
 		resMes = this.sanitizeHTML(resMes);
 
 
@@ -1429,7 +1464,7 @@ b2rThreadConverter.prototype = {
 	},
 
 	isAA: function(aMessage) {
-		var lineCount = aMessage.match(/<br\s*\/?>/g);
+		var lineCount = aMessage.match(/<br>/g);
 
 		if(lineCount && lineCount.length >= 3){
 			// \x81\x40 = 全角空白(Shift_JIS)
@@ -1444,7 +1479,7 @@ b2rThreadConverter.prototype = {
 		// refs.  AA（アスキーアート）簡易判定アルゴリズム - awef
 		//        http://d.hatena.ne.jp/awef/20110412/1302605740
 		// @license MIT License (Copyright (c) 2011 awef) (only the following one-line)
-		if(/(?:(?:\x81\x40) ){2,}(?!<br\s*\/?>|$)/i.test(aMessage)){
+		if(/(?:(?:\x81\x40) ){2,}(?!<br>|$)/i.test(aMessage)){
 			return true;
 		}
 

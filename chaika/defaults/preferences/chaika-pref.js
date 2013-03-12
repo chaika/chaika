@@ -99,6 +99,7 @@ pref("extensions.chaika.thread_show_be_icon", false);
 pref("extensions.chaika.thread_get_log_from_mimizun", false);
 pref("extensions.chaika.thread_alert_got_log", true);
 pref("extensions.chaika.thread_fix_invalid_anchor", false);
+pref('extensions.chaika.thread_enable_advanced_sanitizing', false);
 
 pref("extensions.chaika.post.thread_reload", true);
 pref("extensions.chaika.post.auto_finish", false);
