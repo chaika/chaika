@@ -407,47 +407,39 @@ Thread2ch.prototype = {
 		function _filterElement(nodeList){
 			for(let i = nodeList.length - 1; i >= 0; i--){
 				let node = nodeList[i];
+				let nodeName = node.nodeName.toUpperCase();
 
-				switch(node.nodeType){
-					case node.COMMENT_NODE:
-					case node.TEXT_NODE:
-						break;
+				if(allowTags.indexOf(nodeName) === -1){
+					node.parentNode.removeChild(node);
+				}
 
-					case node.ELEMENT_NODE:
-						let nodeName = node.nodeName.toUpperCase();
+				for(let j = node.attributes.length - 1; j >= 0; j--){
+					let attrName = node.attributes[j].name;
 
-						if(allowTags.indexOf(nodeName) === -1){
-							node.parentNode.removeChild(node);
-						}
-
-						for(let j = node.attributes.length - 1; j >= 0; j--){
-							let attrName = node.attributes[j].name;
-
-							if(allowAttrs.indexOf(attrName) === -1){
-								node.removeAttribute(attrName);
-							}
-						}
-
-						break;
-
-					default:
-						if(node.parentNode){
-							node.parentNode.removeChild(node);
-						}
-
-						break;
+					if(allowAttrs.indexOf(attrName) === -1){
+						node.removeAttribute(attrName);
+					}
 				}
 			}
 		}
 
 		var body = doc.getElementsByTagName('body')[0];
 
+		// body 以下をフィルタリングする
 		_filterElement(body.getElementsByTagName('*'));
 
+		// 文字列に戻す
 		var sanitizedStr = this._serializer.serializeToString(body);
-
 		sanitizedStr = sanitizedStr.replace(/<\/?body.*?>/g, '')
 									.replace(/<br\s*\/?>/g, '<br>');
+
+		// 実体参照化されたレスの文字コードが正しく判別されず
+		// 文字化けすることがある問題を解決
+		if(/(?:&#\d+;){5}/.test(aStr) && ! /(?:(?:\x82[\x9F-\xF2])|(?:\x83[\x40-\x96])){3}/.test(sanitizedStr)){
+			try{
+				sanitizedStr = UniConverter.toSJIS(sanitizedStr);
+			}catch(ex){}
+		}
 
 		return sanitizedStr;
 	},
