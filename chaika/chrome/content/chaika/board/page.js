@@ -421,7 +421,7 @@ var BoardTree = {
 	openThread: function BoardTree_openThread(aAddTab){
 		var index = this.tree.currentIndex;
 		if(index == -1) return null;
-		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true);
+		ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true, false, true);
 	},
 
 		// nsDragAndDrop Observer

@@ -722,9 +722,11 @@ ChaikaBrowser.prototype = {
 	 * @param {Boolean} aAddTab 新しいタブで開くかどうか
 	 * @param {Boolean} aReplaceViewLimit 表示制限オプションの上書き
 	 * @param {Boolean} aOpenBrowser 真ならブラウザで開く
+	 * @param {Boolean} aChildTab TreeStyleViewで子タブとして開くかどうか
+	 * @return {nsIURL} 開いたスレッドのURL
 	 */
 	openThread: function ChaikaBrowser_openThread(aThreadURL, aAddTab,
-														aReplaceViewLimit, aOpenBrowser){
+													aReplaceViewLimit, aOpenBrowser, aChildTab){
 		try{
 			var threadURL = this._getThreadURL(aThreadURL, aReplaceViewLimit, aOpenBrowser);
 		}catch(ex){
@@ -732,10 +734,11 @@ ChaikaBrowser.prototype = {
 		}
 
 		try{
-			this.openURL(threadURL, aAddTab);
+			this.openURL(threadURL, aAddTab, aChildTab);
 		}catch(ex){
 			throw makeException(ex.result);
 		}
+
 		return threadURL;
 	},
 
@@ -811,8 +814,9 @@ ChaikaBrowser.prototype = {
 	 * ブラウザウィンドウが無いときは新規ウィンドウで開く。
 	 * @param {nsIURI} aURI 開くページの URI
 	 * @param {Boolean} aAddTab タブで開くかどうか
+	 * @param {Boolean} aChildTab TreeStyleViewで子タブとして開くかどうか
 	 */
-	openURL: function ChaikaBrowser_openURL(aURI, aAddTab){
+	openURL: function ChaikaBrowser_openURL(aURI, aAddTab, aChildTab){
 		if(!(aURI instanceof Ci.nsIURI)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
@@ -821,9 +825,16 @@ ChaikaBrowser.prototype = {
 		if(browserWindow && browserWindow.getBrowser){
 			try{
 				var contentBrowser = browserWindow.getBrowser();
+
 				if(aAddTab){
+					//For Tree Style Tab user
+					if(aChildTab && 'TreeStyleTabService' in browserWindow){
+						browserWindow.TreeStyleTabService.readyToOpenChildTab(contentBrowser.selectedTab);
+					}
+
 					var loadInForeground = ChaikaCore.pref.getBool("tab_load_in_foreground");
 					ChaikaCore.logger.debug("loadOneTab: " + aURI.spec + " : " + loadInForeground);
+
 					contentBrowser.loadOneTab(aURI.spec, null, null, null, !loadInForeground, false);
 				}else{
 					ChaikaCore.logger.debug("loadURI: " + aURI.spec);

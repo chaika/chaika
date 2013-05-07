@@ -35,6 +35,8 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+/* *** Automatically modified by Chaika Abone Helper 0.0.23 [Tue May 07 2013 23:08:54 GMT+0900 (JST)] *** */
+
 
 EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
@@ -42,6 +44,7 @@ Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+Components.utils.import("resource://cah/ChaikaAboneManager+.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
 
 
@@ -183,6 +186,7 @@ Thread2ch.prototype = {
 		this._serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
 
 		this._chainAboneNumbers = new Array();
+					this._chainHideAboneNumbers = new Array();
 		this._disableAbone = aThreadURL.query.indexOf('chaika_disable_abone=1') !== -1;
 		this._enableChainAbone = !this._disableAbone && ChaikaCore.pref.getBool("thread_chain_abone");
 		this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
@@ -472,6 +476,12 @@ Thread2ch.prototype = {
 		var resBeID = "";
 		var resMes	= "";
 		var isAbone = false;
+					var resIP = "";
+					var resHost = "";
+					var resBeBaseID = "";
+					var aboneResult;         //あぼーん結果オブジェクト
+					var aboneWord = "";      //あぼーん元NGワード
+					var chainParentNum = 0;  //連鎖あぼーんの大元のレス番号
 
 		if(resArray.length > 3){
 			resName = resArray[0]; //.replace(/<\/?b>|/g, "");
@@ -511,7 +521,29 @@ Thread2ch.prototype = {
 		}
 
 		//BeIDのリンク処理
-		if(resBeID){
+		// resDate を DATE と 発信元 に分割（resIPはどのスキンも対応してないはずなのでとりあえず発信元は日付のところに残しておく）
+					// \x94\xad \x90\x4d \x8c\xb3 = 発信元
+					if(resDate.indexOf("\x94\xad\x90\x4d\x8c\xb3") != -1 && resDate.match(/(.+)\x94\xad\x90\x4d\x8c\xb3:([\d\.]+)/)){
+						//resDate = RegExp.$1;
+						resIP = RegExp.$2;
+					}
+
+					// resDate を DATE と HOST に分割（resHostはどのスキンも対応してないはずなのでとりあえずHOSTは日付のところに残しておく）
+					if(resDate.indexOf("HOST:") != -1 && resDate.match(/(.+)HOST:([^ ]+)/)){
+						//resDate = RegExp.$1;
+						resHost = RegExp.$2;
+					}
+
+					// Be基礎番号を取得
+					// refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
+					if(resBeID){
+						var benum = Number(resBeID.match(/^(\d+)/)[0]);
+						resBeBaseID = ( Math.floor(benum/100) + ( Math.floor(benum/10) % 10 ) - (benum % 10) - 5 ) /
+											( (Math.floor(benum/10) % 10) * (benum % 10) * 3 );
+						resBeBaseID = String(resBeBaseID);
+					}
+
+					if(resBeID){
 			var regBeID = /^(\d+)/;
 			if(resBeID.match(regBeID)){
 				var idInfoUrl = "http://be.2ch.net/test/p.php?i=" + RegExp.$1 +
@@ -521,7 +553,51 @@ Thread2ch.prototype = {
 		}
 
 		//あぼーん処理
-		if(!this._disableAbone && ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
+		if(!this._disableAbone && (aboneResult = ChaikaAboneManager2.shouldAbone(resName, resMail, resID, resMes, this.thread,
+					   												resBeID, false, resIP, resDate, resHost, resBeBaseID) ||
+						ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes))){
+
+						//あぼーんフラグを立てる
+						isAbone = true;
+
+						//あぼーん元のNGワードを記録する
+						aboneWord = aboneResult.reason || "";
+
+						//連鎖あぼーん用に記録
+						if(typeof aboneResult.chain === "boolean" ? aboneResult.chain : this._enableChainAbone){
+							this._chainAboneNumbers.push(aNumber);
+						}
+
+						//自動NGID
+						if(aboneResult.autoNGID && resID){
+							//翌日の0:00に設定する
+							var now = new Date();
+							var expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
+							var aboneObj = {
+								title: "Auto NGID: " + resID,
+								targetType: "RES",
+								expire: expire.getTime(),
+								autoNGID: false,
+								conditions: [{
+									type: "ID",
+									strType: "STR",
+									str: resID,
+									andor: "AND",
+									condStr: "ALL_EQUAL",
+									ignoreCase: false
+								}]
+							};
+
+							ChaikaAboneManager2.addAbone(JSON.stringify(aboneObj));
+						}
+
+						//透明あぼーん
+						if(typeof aboneResult.hide === "boolean" ? aboneResult.hide : aNumber>1 && ChaikaCore.pref.getBool("thread_hide_abone")){
+							this._chainHideAboneNumbers.push(aNumber);
+							return "";
+						}
+					}/*
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
 			if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
@@ -529,7 +605,7 @@ Thread2ch.prototype = {
 			}
 		}
 
-		// JSでは "\" が特殊な意味を持つため、数値文字参照に変換
+		*/ // JSでは "\" が特殊な意味を持つため、数値文字参照に変換
 		resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 		resMail = resMail.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");
 
@@ -540,13 +616,15 @@ Thread2ch.prototype = {
 		// レス番リンク処理 & 連鎖あぼーんの判定
 		// \x81\x84 = ＞
 		var regResPointer = /(?:<a>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
-		var enableChainAbone = this._enableChainAbone;
+		
 		var chainAboneNumbers = this._chainAboneNumbers;
+				    var chainHideAboneNumbers = this._chainHideAboneNumbers;
+					var shouldChainHideAbone = false;
 		var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
 		var shouldChainAbone = false;
 		resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
 			//必要なときにのみアンカーの詳細解析を行う
-			if(enableChainAbone || fixInvalidAnchor){
+			if(chainAboneNumbers.length > 0 || fixInvalidAnchor){
 				//アンカー番号解析
 				//アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
 				//最大500個に制限する
@@ -584,11 +662,17 @@ Thread2ch.prototype = {
 
 
 			//連鎖あぼーんの判定
-			if(enableChainAbone){
+			if(chainAboneNumbers.length > 0){
 				let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
 
 				shouldChainAbone = shouldChainAbone || ancNumsFlattened.some(function(ancNum){
-					return chainAboneNumbers.indexOf(ancNum) !== -1;
+					var index = chainAboneNumbers.indexOf(ancNum);
+					if(index !== -1){
+						shouldChainHideAbone = shouldChainHideAbone || chainHideAboneNumbers.indexOf(ancNum) !== -1;
+						chainParentNum = chainAboneNumbers[index];
+						return true;
+					}
+					return false;
 				});
 			}
 
@@ -614,6 +698,17 @@ Thread2ch.prototype = {
 
 		//連鎖あぼーん処理
 		if(shouldChainAbone){
+						this._chainAboneNumbers.push(aNumber);
+						isAbone = true;
+						aboneWord = "[Chain Abone] >>" + chainParentNum;
+
+						//連鎖透明あぼーん
+						//親が透明あぼーんの時に発動
+						if(shouldChainHideAbone){
+							this._chainHideAboneNumbers.push(aNumber);
+							return "";
+						}
+					}/*
 			this._chainAboneNumbers.push(aNumber);
 			isAbone = true;
 
@@ -623,7 +718,7 @@ Thread2ch.prototype = {
 		}
 
 		// 通常リンク処理
-		if(resMes.indexOf("ttp")!=-1){
+		*/ if(resMes.indexOf("ttp")!=-1){
 			var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
 
 			if(ChaikaHttpController.ivur.enabled){
@@ -661,7 +756,7 @@ Thread2ch.prototype = {
 		}
 
 		var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
-								resMailName, resDate, resID, resBeID, resMes, isAbone);
+								resMailName, resDate, resID, resBeID, resMes, isAbone, aboneWord);
 		return response;
 	},
 
@@ -1392,8 +1487,18 @@ b2rThreadConverter.prototype = {
 	},
 
 	toFunction: function(aRes){
-		return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage){
-			return aRes
+		return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage, aAboneWord){
+			if(aAboneWord && ChaikaCore.pref.getBool('abone.auto_skin_mod')){
+						aRes = aRes
+							.replace(/class\=['"]?(resHeader|rh|header|resNewHeader)['"]?>/g, "class='$1' aboneWord='<ABONEWORD/>'>")
+							.replace('<dd ondblclick="javascript:ChgFontstyle(event);">',
+									"<dd ondblclick='javascript:ChgFontstyle(event);' aboneWord='<ABONEWORD/>'>")
+							.replace('<h2 class="ng">', '<h2 class="ng" aboneWord="<ABONEWORD/>">');
+					}
+					if(ChaikaCore.pref.getBool('abone.show_reason_on_thread')){
+						aRes = aRes.replace(/<ABONEWORD\/>/g, aAboneWord || "");
+					}
+					return aRes
 					.replace(/(?:\r|\n|\t)/g, "")
 					.replace(/<!--.*?-->/g, "")
 					.replace(/<PLAINNUMBER\/>/g, aNumber)
@@ -1410,7 +1515,7 @@ b2rThreadConverter.prototype = {
 		};
 	},
 
-	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone){
+	getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone, aAboneWord){
 
 		if(aIsAbone && !(this._tmpGetNGNewRes && this._tmpGetNGRes)){
 			aName = aMail = aMailName = aDate = aMessage = "ABONE";
