@@ -417,15 +417,40 @@ var ChaikaP2Login = {
 			return this.login();
 		}
 
-		this._req = null;
+
+		//一度ブラウザでログインしないとCookieを受け取れない問題への対策
+		//強制的に送られてきたCookieを追加する
+		var cookieStr = this._req.getResponseHeader('Set-Cookie');
+		var cookies = this._parseCookie(cookieStr.replace(/\n/g, ', '));
+
+		cookies.forEach(function(cookie){
+			if(cookie.options.value !== 'deleted' && cookie.options.domain){
+				this.cookieManager.add(
+					'.' + cookie.options.domain,
+					cookie.options.path,
+					cookie.name,
+					cookie.value,
+					false, false, false,
+					cookie.options.expires ?
+						cookie.options.expires.getTime() / 1000 :
+						( Date.now() / 1000 ) + ( 10 * 365 * 24 * 60 * 60 )
+				);
+			}
+		}, this);
+
 
 		//ログインの成功の可否を通知する
 		if(this.isLoggedIn()){
 			this.os.notifyObservers(null, "ChaikaP2Login:Login", "OK");
 		}else{
+			ChaikaCore.logger.error('Fail to login p2.\n\n' +
+			                        '[Status] ' + this._req.status + '\n' +
+			                        '[Header] ' + this._req.getAllResponseHeaders());
 			this.logout();
 			this.os.notifyObservers(null, "ChaikaP2Login:Login", "NG");
 		}
+
+		this._req = null;
 	},
 
 	/**
@@ -454,5 +479,52 @@ var ChaikaP2Login = {
 		}else{
 			return null;
 		}
+	},
+
+
+	/**
+	 * Cookie 文字列をパースする
+	 * @param {String} cookieStr
+	 * @return {Object}
+	 * @license MIT, GPL
+	 * @copyright (c) 2012 Daniel Jordan (https://github.com/danjordan/cookie-parser)
+	 */
+	_parseCookie: function(cookieStr){
+		var attributes = ['name', 'value', 'expires', 'path', 'domain', 'secure', 'httponly', 'max-age'];
+		var splitter = /,\s(?=[a-zA-Z\-_]+=[a-zA-Z0-9\-_%\.])/g;
+
+		var cookies = [];
+		var cookie_array = cookieStr.split(splitter);
+
+		ChaikaCore.logger.debug(cookie_array);
+
+		cookie_array.forEach(function(e){
+			var cookie = {
+				options: {}
+			};
+			var params = e.split('; ');
+
+			params.forEach(function(param) {
+				param = param.split('=');
+				var key = param[0];
+				var _key = param[0].toLowerCase();
+				var value = param[1];
+
+				if (attributes.indexOf(_key) > 0) {
+					if (_key === 'expires') {
+						cookie.options[_key] = new Date(value.replace(/-/g, ' '));
+					} else {
+						cookie.options[_key] = value || true;
+					}
+				} else {
+					cookie.name = key;
+					cookie.value = value;
+				}
+			});
+
+			cookies.push(cookie);
+		});
+
+		return cookies;
 	}
 };
