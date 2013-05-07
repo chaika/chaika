@@ -587,22 +587,29 @@ var Find2ch = {
 	search: function Find2ch_search(aSearchStr){
 		const isHTML = this.isHTMLMode;
 		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=" : 'http://find.2ch.net/rss.php/';
-		const ENCODE = isHTML ? 'EUC-JP' : 'UTF-8';
+		const ENCODE = isHTML ? 'euc-jp' : 'utf-8';
 		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) :
 								encodeURIComponent(ChaikaCore.io.escapeHTML(aSearchStr));
 
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var find2chURL = ioService.newURI(QUERY_URL + QUERY, null, null);
-
-		this._downloader = new ChaikaSimpleDownloader();
-		this._downloader.download(find2chURL, ENCODE, this);
+		this._downloader = new XMLHttpRequest();
+		this._downloader.onerror = this.onError;
+		this._downloader.onreadystatechange = this.onReadyStateChange;
+		this._downloader.open("GET", QUERY_URL + QUERY, true);
+		this._downloader.overrideMimeType('text/plain; charset=' + ENCODE);
+		this._downloader.send(null);
 
 		Notification.removeAll();
 		this._infoNode = Notification.info("検索中");
 	},
 
 
-	onStop: function Find2ch_onStop(aDownloader, aResponse, aHttpStatus){
+	onReadyStateChange: function Find2ch_onReadyStateChange(aEvent){
+		if(aEvent.target.readyState === 4 && aEvent.target.status === 200){
+			Find2ch.onStop(aEvent.target.responseText);
+		}
+	},
+
+	onStop: function Find2ch_onStop(aResponse){
 		if(aResponse){
 			if( (this.isHTMLMode && aResponse.indexOf('<html') !== -1) ||
 			   aResponse.indexOf('<rdf:RDF') !== -1){
@@ -616,7 +623,7 @@ var Find2ch = {
 	},
 
 
-	onError: function Find2ch_onError(aDownloader, aErrorCode){
+	onError: function Find2ch_onError(aEvent){
 		Notification.critical("検索に失敗しました", 2500);
 		Notification.remove(this._infoNode);
 		this._downloader = null;
