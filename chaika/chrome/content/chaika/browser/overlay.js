@@ -883,7 +883,7 @@ ChaikaBrowserOverlay.aboneEvent = {
 				var win = gBrowser.getBrowserAtIndex(i).contentWindow;
 				var sourceEvent = doc.createEvent("Events");
 				sourceEvent.initEvent(aData, false, false);
-				var event = document.createEvent('XULCommandEvents');
+				var event = doc.createEvent('XULCommandEvents');
 				event.initCommandEvent("b2raboneadd", true, false, win, aboneType,
 										false, false, false, false, sourceEvent);
 				doc.dispatchEvent(event);
