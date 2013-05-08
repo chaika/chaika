@@ -644,7 +644,7 @@ Thread2ch.prototype = {
 						'<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
 		}
 
-		// レス本文中のレスID
+		// レス本文中のIDを抽出
 		var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/!]+)/g;
 		resMes = resMes.replace(regResID, '$1<span class="resMesID" resID="$3"><span class="mesID_$3">$2$3</span></span>');
 
