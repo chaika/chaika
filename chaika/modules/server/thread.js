@@ -645,7 +645,7 @@ Thread2ch.prototype = {
 		}
 
 		// レス本文中のレスID
-		var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/]+)/g;
+		var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/!]+)/g;
 		resMes = resMes.replace(regResID, '$1<span class="resMesID" resID="$3"><span class="mesID_$3">$2$3</span></span>');
 
 
