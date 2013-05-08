@@ -14,17 +14,6 @@
         }, false);
     </script>
     <style>
-        body:before {
-            content: "";
-            position: fixed;
-            top: -10px;
-            left: -10px;
-            width: 110%;
-            height: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.65);
-            z-index: 100;
-        }
-
         body{
             background-color: #eee;
             color: black;
@@ -190,6 +179,12 @@
             </li>
             <li class="new">Be関連板で書き込む際に自動的にBeを有効にする機能を追加</li>
             <li class="new">書き込みが終わるごとにBe, p2を無効にする機能を追加</li>
+            <li class="new">レス中の不正なタグを無効化する機能を追加
+                <aside class="info">
+                    <p>デフォルトでは文字色の変更など、外部板の一部機能が無効になります。設定画面の「厳密なサニタイズ処理を行う」を有効にすることで、
+                        そうした外部板との互換性が向上することがあります。</p>
+                </aside>
+            </li>
             <li class="new">ログマネージャ、スレッド一覧、トラブルシューティング情報にfaviconを追加</li>
             <li class="changed">Be、 p2、●のパスワードをログインマネージャで保管するように変更
                 <aside class="info">
@@ -205,6 +200,8 @@
             <li class="changed">設定ウィンドウのサイズを内容に応じて変化するように変更</li>
             <li class="changed">板のSETTING.TXTを取得してから3ヶ月以上経っていたら更新するように変更</li>
             <li class="changed">連鎖あぼーん機能とアンカー修正機能が共に無効の時はアンカーの詳細解析をしないよう変更</li>
+            <li class="changed">デフォルトスキンのスクリプトを書きなおしたことで速度が向上した</li>
+            <li class="changed">minVersionをFirefox 17に変更</li>
             <li class="fixed">範囲が非常に大きいアンカーを含むレスがあるとメモリ不足になってスレッドが読み込めなくなる問題を修正</li>
             <li class="fixed">Firefox 18以降でトラブルシューティング情報が動かない問題を修正</li>
             <li class="fixed">defaultmail.txtで設定されたメールアドレスと書き込みウィザードのsageチェックボックスの値が矛盾することがある問題を修正</li>
