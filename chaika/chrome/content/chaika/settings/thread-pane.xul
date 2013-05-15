@@ -26,8 +26,6 @@
 				name="extensions.chaika.thread_chain_abone" type="bool"/>
 		<preference id="extensions.chaika.refController.enabled"
 				name="extensions.chaika.refController.enabled" type="bool"/>
-		<preference id="extensions.chaika.thread_enable_advanced_sanitizing"
-				name="extensions.chaika.thread_enable_advanced_sanitizing" type="bool" />
 	</preferences>
 
 	<script type="application/x-javascript; version=1.7"
@@ -124,9 +122,6 @@
 		<vbox>
 			<checkbox label="スレッド表示のリンクからはリファラを送らない"
 					preference="extensions.chaika.refController.enabled"/>
-			<checkbox label="厳密なサニタイズ処理を行う"
-				tooltiptext="外部板の表示が改善されますが, スレッド表示が遅くなります"
-				preference="extensions.chaika.thread_enable_advanced_sanitizing" />
 		</vbox>
 	</groupbox>
 
