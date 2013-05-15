@@ -374,67 +374,20 @@ Thread2ch.prototype = {
 	 * @return {String} sanitized HTML string
 	 */
 	sanitizeHTML: function(aStr){
-		if(aStr.indexOf('<') === -1) return aStr;
+		var doc = this._parser.parseFromString("<html><body></body></html>", 'text/html');
+		var parserutils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
+		var fragment = parserutils.parseFragment(aStr, 0, false, null, doc.documentElement);
+		var sanitizedStr = this._serializer.serializeToString(fragment);
 
-		if(ChaikaCore.pref.getBool('thread_enable_advanced_sanitizing')){
-			return this._sanitizeByDOM(aStr);
-		}else{
-			return this._sanitizeByRegExp(aStr);
-		}
-	},
+		//serializeで余計に挿入されるxmlns属性を削除
+		//ToDo: レス中に同文字列が含まれていたらどうするか？
+		sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml" ', '', 'g')
 
-
-	/**
-	 * Remove all tags and attributes except for
-	 * <font>, <i>, <b>, <u>, <s>, <hr>, <blockquote>, <span>, <br>, <a>, class and color attributes
-	 * @param {String} aStr HTML string
-	 * @return {String} sanitized HTML string
-	 * @note DOM を使うので遅い
-	 */
-	_sanitizeByDOM: function(aStr){
-		const allowTags = [ 'FONT', 'I', 'B', 'U', 'S', 'HR', 'BLOCKQUOTE', 'SPAN', 'BR', 'A' ];
-		const allowAttrs = [ 'color', 'class' ];
-
-		var doc = this._parser.parseFromString(aStr, 'text/html');
-
-		// Error
-		if(doc.documentElement.nodeName === 'parsererror'){
-			ChaikaCore.logger.error('Parse Error: \n' + aStr);
-			return aStr;
-		}
-
-
-		function _filterElement(nodeList){
-			for(let i = nodeList.length - 1; i >= 0; i--){
-				let node = nodeList[i];
-				let nodeName = node.nodeName.toUpperCase();
-
-				if(allowTags.indexOf(nodeName) === -1){
-					node.parentNode.removeChild(node);
-				}
-
-				for(let j = node.attributes.length - 1; j >= 0; j--){
-					let attrName = node.attributes[j].name;
-
-					if(allowAttrs.indexOf(attrName) === -1){
-						node.removeAttribute(attrName);
-					}
-				}
-			}
-		}
-
-		var body = doc.getElementsByTagName('body')[0];
-
-		// body 以下をフィルタリングする
-		_filterElement(body.getElementsByTagName('*'));
-
-		// 文字列に戻す
-		var sanitizedStr = this._serializer.serializeToString(body);
-		sanitizedStr = sanitizedStr.replace(/<\/?body.*?>/g, '')
-									.replace(/<br\s*\/?>/g, '<br>');
-
-		// 実体参照化されたレスの文字コードが正しく判別されず
-		// 文字化けすることがある問題を解決
+		// 実体参照化されたレスの文字コードが正しく判別されず文字化けすることがある問題を解決
+		// 元データに実体参照らしき文字が5文字続き、
+		// かつ変換後のデータにShift-JISのひらがなかカタカナが3文字以上続かない場合にShift-JISに変換する
+		// 　※「Shift-JISが2文字以上」だと、キリル文字にマッチしてしまう可能性がある
+		// 　　参考：http://tokkono.cute.coocan.jp/blog/slow/index.php/bbs-spam/checking-kana-in-shift_jis/
 		if(/(?:&#\d+;){5}/.test(aStr) && ! /(?:(?:\x82[\x9F-\xF2])|(?:\x83[\x40-\x96])){3}/.test(sanitizedStr)){
 			try{
 				sanitizedStr = UniConverter.toSJIS(sanitizedStr);
@@ -443,21 +396,6 @@ Thread2ch.prototype = {
 
 		return sanitizedStr;
 	},
-
-
-	_sanitizeByRegExp: function(aStr){
-		return aStr
-					.replace(/<span class="resSystem">(.*?)<\/span>/, '%_RESSYSTEM_$1_%')
-					.replace(/<br>/gi, '%_NEWLINE_%')
-
-					.replace(/<.*?>/g, '')
-					.replace(/</g, '&lt;')
-					.replace(/>/g, '&gt;')
-
-					.replace(/%_RESSYSTEM_(.*?)_%/, '<span class="resSystem">$1</span>')
-					.replace('%_NEWLINE_%', '<br>', 'g');
-	},
-
 
 
 	datLineParse: function(aLine, aNumber, aNew){
