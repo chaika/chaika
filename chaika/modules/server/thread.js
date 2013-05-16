@@ -181,6 +181,7 @@ Thread2ch.prototype = {
 		this._handler = aHandler;
 		this._parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
 		this._serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
+		this._parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
 
 		this._chainAboneNumbers = new Array();
 		this._disableAbone = aThreadURL.query.indexOf('chaika_disable_abone=1') !== -1;
@@ -375,8 +376,7 @@ Thread2ch.prototype = {
 	 */
 	sanitizeHTML: function(aStr){
 		var doc = this._parser.parseFromString("<html><body></body></html>", 'text/html');
-		var parserutils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
-		var fragment = parserutils.parseFragment(aStr, 0, false, null, doc.documentElement);
+		var fragment = this._parserUtils.parseFragment(aStr, 0, false, null, doc.documentElement);
 		var sanitizedStr = this._serializer.serializeToString(fragment);
 
 		//serializeで余計に挿入されるxmlns属性を削除
