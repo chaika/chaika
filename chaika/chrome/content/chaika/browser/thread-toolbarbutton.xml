@@ -290,13 +290,6 @@
 				hiddenItems.forEach(function(anonid){
 					document.getAnonymousElementByAttribute(this, 'anonid', anonid).hidden = true;
 				}, this);
-
-
-				const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
-
-				if(!FOX_AGE_2CH){
-					document.getAnonymousElementByAttribute(this, 'anonid', 'findNextThread-menu').disabled = true;
-				}
 			]]></body>
 		</method>
 
