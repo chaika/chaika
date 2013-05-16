@@ -18,7 +18,7 @@ var ChaikaBrowserOverlay = {
 			setTimeout(function(){ ChaikaBrowserOverlay._showReleaseNotes(); }, 0);
 		}else{
 			ChaikaBrowserOverlay._initCount++;
-			setTimeout(ChaikaBrowserOverlay.start, 100);
+			setTimeout(function(){ ChaikaBrowserOverlay.start(); }, 100);
 		}
 	},
 

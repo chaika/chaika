@@ -60,7 +60,7 @@ var Page = {
 		this.showViewFoxAge2chMenu();
 		SearchBox.init();
 
-		setTimeout(Page.delayStartup, 0);
+		setTimeout(function(){ Page.delayStartup(); }, 0);
 	},
 
 	delayStartup: function Page_delayStartup(){
@@ -192,8 +192,9 @@ var Notification = {
 				notification.PRIORITY_INFO_MEDIUM, null);
 
 		if(aTimeout){
-			setTimeout(Notification.remove, aTimeout, newNode);
+			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
 		}
+
 		return newNode;
 	},
 
@@ -204,7 +205,7 @@ var Notification = {
 				notification.PRIORITY_WARNING_MEDIUM, null);
 
 		if(aTimeout){
-			setTimeout(Notification.remove, aTimeout, newNode);
+			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
 		}
 		return newNode;
 	},
@@ -216,7 +217,7 @@ var Notification = {
 				notification.PRIORITY_CRITICAL_MEDIUM, null);
 
 		if(aTimeout){
-			setTimeout(Notification.remove, aTimeout, newNode);
+			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
 		}
 		return newNode;
 	},

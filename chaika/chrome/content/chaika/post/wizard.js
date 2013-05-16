@@ -678,7 +678,7 @@ var PreviewPage = {
 			});
 		}
 
-		setTimeout(PreviewPage._createPreview, 0);
+		setTimeout(function(){ PreviewPage._createPreview(); }, 0);
 	},
 
 	pageRewound: function PreviewPage_pageRewound(aEvent){

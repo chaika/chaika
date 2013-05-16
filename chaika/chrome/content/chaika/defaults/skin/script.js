@@ -480,8 +480,7 @@ Popup.Res = {
 
 		var popupContent = Popup.Res.createContent(startRes, endRes);
 
-		this._popupTimeout = setTimeout(Popup.showPopupDelay, Popup.POPUP_DELAY,
-				aEvent, popupContent, "ResPopup");
+			this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "ResPopup"); }, Popup.POPUP_DELAY);
 	},
 
 
@@ -564,9 +563,7 @@ Popup.ID = {
 			popupContent = fragment;
 		}
 
-		this._popupTimeout = setTimeout(Popup.showPopupDelay,  Popup.POPUP_DELAY,
-				aEvent, popupContent, "IDPopup");
-	}
+			this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "IDPopup"); }, Popup.POPUP_DELAY);
 
 };
 
@@ -589,8 +586,7 @@ Popup.Image = {
 
 		var popupContent = $.node({ 'div': { children: image }});
 
-		this._popupTimeout = setTimeout(Popup.showPopupDelay,  Popup.POPUP_DELAY,
-				aEvent, popupContent, "imagePopup");
+				this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "imagePopup"); }, Popup.POPUP_DELAY);
 	}
 
 };
