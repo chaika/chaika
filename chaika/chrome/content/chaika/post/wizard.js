@@ -802,9 +802,8 @@ var SubmitPage = {
 
 
 	onCookieCheck: function SubmitPage_onCookieCheck(aPost, aResponseData, aStatus){
-		var unescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"]
-				.getService(Ci.nsIScriptableUnescapeHTML);
-		var response = unescapeHTML.unescape(aResponseData).replace(/[\r\n]{3,}/g, "\n\n");
+		var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
+		var response = parserUtils.convertToPlainText(aResponseData, 0, 0).replace(/[\r\n]{3,}/g, "\n\n");
 		document.getElementById("response").value += response + "\n----- ----- ----- ----- -----\n\n";
 	},
 
@@ -812,9 +811,8 @@ var SubmitPage = {
 	onError: function SubmitPage_onError(aPost, aResponseData, aStatus){
 		this.succeeded = false;
 
-		var unescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"]
-				.getService(Ci.nsIScriptableUnescapeHTML);
-		var response = unescapeHTML.unescape(aResponseData).replace(/[\r\n]{3,}/g, "\n\n");
+		var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
+		var response = parserUtils.convertToPlainText(aResponseData, 0, 0).replace(/[\r\n]{3,}/g, "\n\n");
 		document.getElementById("response").value += response + "\n----- ----- ----- ----- -----\n\n";
 
 
