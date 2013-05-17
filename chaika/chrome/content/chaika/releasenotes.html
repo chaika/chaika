@@ -98,14 +98,33 @@
             background-size: 1em;
         }
 
-        .info{
+        section > ul > li > ul.list{
+            margin: 0.5em 0 0.5em 1em;
+        }
+
+        aside.info{
             font-size: 90%;
             width: 80%;
-            margin: 0 0 0 2em;
-            padding: 12px 0 5px 40px;
+            margin: 1em 0 1em 3em;
             opacity: 0.75;
-            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAPtJREFUeNrslYEJxCAMRWu5AW4UR3CDOkJHcLWb4EbwNnEETw9jQ7AWNEU4DHwKtmmeUb/Ce7+MjHUZHBNgAkyACTABJkAzgBAiC42ZIBvkieKYoXm/3Hgdt4iEDnJB/kIufXtEKwCC2EmRd1CcrUoyaQx/s0PtXgBNZqcqoIp0SXMAOFRc4o5CIbJcEud0AaTWwmwUXdITAOgE5JkeAIvWvLqnCgF7wvb4gEzPV0Mu5MgHg5d8qD/EWcfzD0O1nL+wYtmTszK0fmvI3fI/uI9hdrjj3T3H8MyILgBYjahoxZW281oxijGXEcd1zAZANqYtFLbp3ZOSfwUYAEd3xzL8/6eQAAAAAElFTkSuQmCC) no-repeat left top;
-            background-size: 30px;
+        }
+
+        aside.info:before{
+            content: '';
+            width: 20px;
+            height: 20px;
+            display: block;
+            margin-right: 10px;
+            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QURBgExDnlXEgAAAhdJREFUWMPtl79rU1EUxz+mQUpBEcliL3SOOBTEgy4BEXFph1IFBzsV6lCcFcHSQECMCC4u/gV26NBChOKaweGAuClB0OlSimQoDbRRU5cbeDzy7r2PJtGh3+29e3587z0/7rlwin+MM3mEReQCMA9UgDJQckttoAU0gYaq/hwqARGZAdaAJWAyIN4FNoCaqn4L2Z7wLVarVTqdziqwDVwHihF8J4BZ4KEx5pcx5qO19jj3CYhIEXgLLJ8wzJvAA1XtDlosZO18SM4B7gHvRKQQHQJ37M8Chj8Ad4DnwDngmkf2MtC11jaDIXAJ9wWY8hjsAZdUdc/pFIDvwEwgOWdV9WsoBGsB531j7f6HqvaAvYDOWaDmzQFX50sRcZ0EHiX0bgFXI/QWRGQ6+SNdVvMRdd7HaxG5DxwAN7MSOoUisAi8yQpBJWeG3wBuR/aHgT7SiuUchuaSeQC8By5G6JV9BEo5CHxS1d1EHnQj9UrBRjROpAm0x+Cz7SPQGgOBlo9AcwwEmj4CDdflRoUesJVJwE0yGyMk0FDVH6EqqAGHI3D+G1iPGkhE5DFQDxh8AuwnvuvAeY/8C1V9Oqg3D8IrQNwwkYV6jt3vuFs2biCx1h4bY7aBK26YOAl2gLuqepRrKLXW/jHGbLqqqIQG2IyYvwRWspznGcvLLjkXIm6+nivndVX9POyHybS7z30Pk610qZ3iv8ZfRbeUiox602IAAAAASUVORK5CYII=) no-repeat left top;
+            background-size: 20px;
+        }
+
+        aside.info > :first-child{
+            margin-top: -1.5em;
+        }
+
+        aside.info > *{
+            margin-left: 30px;
         }
 
 
@@ -157,6 +176,62 @@
     </section>
 
     <section>
+        <h1>1.6.1</h1>
+        <ul>
+            <li class="new">コンテキストメニューを大幅に拡充し, 以下の項目を追加
+                <ul class="list">
+                    <li>右クリックあぼーん機能</li>
+                    <li>スレッドタイトルなどのコピー</li>
+                    <li>find.2ch.net/板/スレッド内での検索</li>
+                    <li>次のスレッドの検索</li>
+                    <li>スキンの変更</li>
+                    <li>スレッドへの書き込み</li>
+                    <li>スレッドのログ削除</li>
+                    <li>chaika/ブラウザ表示の切り替え</li>
+                    <li>レス表示範囲の変更</li>
+                    <li>スレッド一覧画面の表示</li>
+                    <li>サイドバー表示の切り替え</li>
+                    <li>オプション画面の表示</li>
+                </ul>
+                <aside class="info">
+                    <p>「次のスレッドの検索」はFoxAge2chがインストールされている環境では、FoxAge2chの次スレ検索機能を使用します。
+                        未インストール環境では、スレッドタイトルで板内検索を行います。</p>
+                </aside>
+            </li>
+            <li class="new">ツールバーボタンのメニューをコンテキストメニューと同じく拡充</li>
+            <li class="new">コンテキストメニューに関する設定項目を拡充</li>
+            <li class="new">ツールバーボタンを表示するかどうかの設定を追加</li>
+            <li class="new">末尾が ! のIDに対応</li>
+            <li class="new">書きこみウィザードの「ツール」に常に最前面にする設定を追加</li>
+            <li class="new">V2Cなどと同様のAA判定方法を追加し, 従来の方法と併用するようにした</li>
+            <li class="new">板一覧からスレッドを開く際, TreeStyleTabがある環境ではスレッドを板一覧の子タブとして開くようにした</li>
+            <li class="new">デフォルトスキンで騙しAAの表示に対応</li>
+            <li class="new">URLの末尾に「?chaika_force_browser=1」を追加することでスレッドリダイレクタを一時的に無効化する機能を追加</li>
+            <li class="new">URLの末尾に「?chaika_disable_abone=1」を追加することであぼーん処理を一時的に無効化する機能を追加</li>
+            <li class="new"><a href="http://janesoft.net/janestyle/help/view/NGfiles.html">NGFiles.txt</a>に対応
+                <aside class="info">
+                    <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「NGFiles.txt」をお読み下さい。</p>
+                </aside>
+            </li>
+            <li class="new"><a href="http://janesoft.net/janestyle/help/first/ImageViewURLReplace.html">ImageViewURLReplace.dat</a>に対応
+                <aside class="info">
+                    <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「ImageViewURLReplace.dat」をお読み下さい。</p>
+                </aside>
+            </li>
+            <li class="changed">スレッドの書き出し処理を大幅に高速化</li>
+            <li class="changed">設定画面のデザインを変更</li>
+            <li class="fixed">みみずんからログを取得したときに毎回あぼーん発生になってしまう問題を修正</li>
+            <li class="fixed">レス中で特定の文字の後にあるID:にリンクが貼られない問題を修正</li>
+            <li class="fixed">書きこみプレビューでトリップの前に空白がなかった問題を修正</li>
+            <li class="fixed">Firefox 22以降でサイドバーが表示されない問題を修正</li>
+            <li class="fixed">従来のAA判定方法に誤りがあったのを修正</li>
+            <li class="fixed">Firefox 20以降で即時あぼーんが動作しない問題を修正</li>
+            <li class="fixed">サイドバーでの2ch検索(HTML版)が動作しなくなっていた問題を修正</li>
+            <li class="fixed">ブラウザーで一度ログインしないとchaikaからp2にログインできなくなっていた問題を修正</li>
+        </ul>
+    </section>
+
+    <section>
         <h1>1.6.0 - 2013/02/11</h1>
         <ul>
             <li class="new">p2経由での書き込みに対応
@@ -179,12 +254,7 @@
             </li>
             <li class="new">Be関連板で書き込む際に自動的にBeを有効にする機能を追加</li>
             <li class="new">書き込みが終わるごとにBe, p2を無効にする機能を追加</li>
-            <li class="new">レス中の不正なタグを無効化する機能を追加
-                <aside class="info">
-                    <p>デフォルトでは文字色の変更など、外部板の一部機能が無効になります。設定画面の「厳密なサニタイズ処理を行う」を有効にすることで、
-                        そうした外部板との互換性が向上することがあります。</p>
-                </aside>
-            </li>
+            <li class="new">レス中の不正なタグを無効化する機能を追加</li>
             <li class="new">ログマネージャ、スレッド一覧、トラブルシューティング情報にfaviconを追加</li>
             <li class="changed">Be、 p2、●のパスワードをログインマネージャで保管するように変更
                 <aside class="info">
@@ -219,13 +289,13 @@
             <li class="new">SETTING.TXTに板名が書かれていない板ではページタイトルを板名に設定するようにした</li>
             <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした
                 <aside class="info">
-                    Web Fontなど、従来Internal Server Errorとなっていたファイルがスキンで使えるようになりました。
+                    <p>Web Fontなど、従来Internal Server Errorとなっていたファイルがスキンで使えるようになりました。</p>
                 </aside>
             </li>
             <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
             <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正
                 <aside class="info">
-                    本修正に伴い、透明削除があるスレッドのdatが過去のchaikaと非互換になりました。表示がおかしい場合にはdatを再取得して下さい。
+                    <p>本修正に伴い、透明削除があるスレッドのdatが過去のchaikaと非互換になりました。表示がおかしい場合にはdatを再取得して下さい。</p>
                 </aside>
             </li>
             <li class="fixed">ログピックアップモードの時に新着を取得しない問題を修正</li>
@@ -242,13 +312,12 @@
             <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
             <li class="new">HTML版の2ch検索を実装
                 <aside class="info">
-                    about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで従来のRSSを用いた検索と切り替えることができます(デフォルトはRSS検索)。
+                    <p>about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで従来のRSSを用いた検索と切り替えることができます(デフォルトはRSS検索)。</p>
                 </aside>
             </li>
             <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装
                 <aside class="info">
-                    本機能は実験的機能となっています。<br />
-                    about:configよりextensions.chaika.thread_fix_invalid_anchorで切り替えることができます(デフォルトOFF)。
+                    <p>本機能は実験的機能となっています。about:configよりextensions.chaika.thread_fix_invalid_anchorで切り替えることができます(デフォルトOFF)。</p>
                 </aside>
             </li>
             <li class="changed">maxVersionをFirefox 18に変更</li>
