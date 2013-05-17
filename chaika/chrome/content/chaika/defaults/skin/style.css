@@ -267,3 +267,7 @@ div.imagePopup {
     max-height: none;
     max-width: none;
 }
+
+.popup .aaRes{
+    white-space: pre !important;
+}
