@@ -58,14 +58,24 @@ function makeException(aResult){
 var ChaikaClipboard = {
 
 
+	_getTransferable: function(){
+		var nsTransferable = Components.Constructor("@mozilla.org/widget/transferable;1", "nsITransferable");
+		var res = nsTransferable();
+
+		res.init(null);
+
+		return res;
+	},
+
+
 	/**
 	 * クリップボードの文字列を取得する。
 	 * @return {String} クリップボードの文字列
 	 */
 	getString: function ChaikaClipboard_getString(){
 		var clipBoard = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard);
-		var transferable = Cc["@mozilla.org/widget/transferable;1"]
-				.createInstance(Ci.nsITransferable);
+		var transferable = this._getTransferable();
+
 		transferable.addDataFlavor("text/unicode");
 
 		var resultStr = null;
@@ -73,14 +83,16 @@ var ChaikaClipboard = {
 		if(!this.hasStringData()){
 			return resultStr;
 		}
+
 		try{
 			var transferData = {};
 			clipBoard.getData(transferable, clipBoard.kGlobalClipboard);
 			transferable.getTransferData("text/unicode", transferData, {});
-			resultStr = transferData.value.QueryInterface(Ci.nsISupportsString);
+			resultStr = transferData.value.QueryInterface(Ci.nsISupportsString).data;
 		}catch(ex){
 			throw makeException(ex.result);
 		}
+
 		return resultStr;
 	},
 
@@ -91,9 +103,9 @@ var ChaikaClipboard = {
 	 */
 	hasStringData: function ChaikaClipboard_hasStringData(){
 		const kGlobalClipboard = Ci.nsIClipboard.kGlobalClipboard;
-		var clipBoard = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard);
+		var clipboard = Cc["@mozilla.org/widget/clipboard;1"].getService(Ci.nsIClipboard);
 
-		return clipBoard.hasDataMatchingFlavors(["text/unicode"], 1,kGlobalClipboard);
+		return clipboard.hasDataMatchingFlavors(["text/unicode"], 1, kGlobalClipboard);
 	},
 
 
