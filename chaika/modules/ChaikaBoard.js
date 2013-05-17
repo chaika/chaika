@@ -51,13 +51,6 @@ function makeException(aResult){
 	return new Components.Exception("exception", aResult, stack);
 }
 
-/** @ignore */
-function convertEntities(aString){
-	if(aString.indexOf("&") == -1) return aString;
-	return aString.replace(/&quot;/g, "\"").replace(/&amp;/g, "&")
-				.replace(/&lt;/g, "<").replace(/&gt;/g, ">");
-}
-
 
 // getBoardType で利用する例外的な URL のリスト (2ch だけど板じゃない URL)
 const EX_HOSTS = [
@@ -619,7 +612,7 @@ ChaikaBoard.prototype = {
 				var datID = RegExp.$1;
 				var threadID = boardID + datID;
 				var count = Number(RegExp.$3);
-				var title = convertEntities(RegExp.$2);
+				var title = ChaikaCore.io.unescapeHTML(RegExp.$2);
 				// ChaikaCore.logger.debug([threadID, boardID, datID, count, ordinal]);
 				statement.bindStringParameter(0, threadID);
 				statement.bindStringParameter(1, boardID);

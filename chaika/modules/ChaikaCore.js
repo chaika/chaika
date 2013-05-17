@@ -1227,14 +1227,7 @@ ChaikaHistory.prototype = {
 
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
-		var title = aTitle;
-		if(title.indexOf("&") != -1){
-			title = title.replace("&quot;", "\"", "g")
-						.replace("&amp;", "&", "g")
-						.replace("&lt;", "<", "g")
-						.replace("&gt;", ">", "g");
-		}
-
+		var title = ChaikaCore.io.unescapeHTML(aTitle);
 		var storage = ChaikaCore.storage;
 
 		storage.beginTransaction();
