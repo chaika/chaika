@@ -157,10 +157,8 @@ var PrefObserver = {
 	PREF_BRANCH: "extensions.chaika.bbsmenu.",
 
 	start: function PrefObserver_start(){
-		var prefService = Cc["@mozilla.org/preferences-service;1"]
-				.getService(Ci.nsIPrefService);
-		this._branch = prefService.getBranch(this.PREF_BRANCH)
-				.QueryInterface(Ci.nsIPrefBranch2);
+		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+		this._branch = prefService.getBranch(this.PREF_BRANCH).QueryInterface(Ci.nsIPrefBranch);
 		this._branch.addObserver("", this, false);
 	},
 

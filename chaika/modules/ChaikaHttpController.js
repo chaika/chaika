@@ -77,7 +77,7 @@ var ChaikaHttpController = {
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
 
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
+        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.addObserver("extensions.chaika.refController.enabled", this, true);
         pref.addObserver('extensions.chaika.imageViewURLReplace.enabled', this, true);
         pref.addObserver('extensions.chaika.ngfiles.enabled', this, true);
@@ -91,7 +91,7 @@ var ChaikaHttpController = {
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
 
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch2);
+        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.removeObserver("extensions.chaika.refController.enabled", this);
         pref.removeObserver('extensions.chaika.imageViewURLReplace.enabled', this);
         pref.removeObserver('extensions.chaika.ngfiles.enabled', this);
