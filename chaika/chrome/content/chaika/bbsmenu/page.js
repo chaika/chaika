@@ -546,7 +546,7 @@ var Bbsmenu = {
 			defaultOutsideFile.appendRelativePath("outside.xml");
 			defaultOutsideFile.copyTo(outsidexmlFile.parent, null);
 
-			outsidexmlFile = outsidexmlFile.clone().QueryInterface(Ci.nsILocalFile);
+			outsidexmlFile = outsidexmlFile.clone();
 		}
 
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);

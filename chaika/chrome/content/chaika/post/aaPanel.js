@@ -109,7 +109,7 @@ var AAPanel = {
 		var column = dirTree.columns.getFirstColumn();
 		var filePath = dirTree.view.getCellValue(dirTree.currentIndex, column);
 
-		var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+		var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
 		file.initWithPath(filePath);
 
 		this._initListTree(file);
@@ -125,7 +125,7 @@ var AAPanel = {
 			aaListXML = ChaikaCore.io.readString(aFile, "UTF-8");
 			listTreeDoc = (new DOMParser()).parseFromString(aaListXML, "text/xml");
 		}else{
-			var defaultFile = aFile.clone().QueryInterface(Ci.nsILocalFile);
+			var defaultFile = aFile.clone();
 			defaultFile.appendRelativePath(aFile.leafName + ".aa.xml");
 			if(defaultFile.exists()){
 				aaListXML = ChaikaCore.io.readString(defaultFile, "UTF-8");

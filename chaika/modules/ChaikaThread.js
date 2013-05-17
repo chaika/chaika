@@ -121,7 +121,7 @@ ChaikaThread.prototype = {
 	datID: null,
 	/**
 	 *
-	 * @type nsILocalFIle
+	 * @type nsIFile
 	 */
 	datFile: null,
 	/**
@@ -344,7 +344,7 @@ ChaikaThread.prototype = {
 		var fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"]
 						.createInstance(Ci.nsIFileOutputStream);
 		try{
-				// nsILocalFIle.create は親フォルダをふくめて作成する
+				// nsIFile.create は親フォルダをふくめて作成する
 			if(!this.datFile.exists()){
 				this.datFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
 			}

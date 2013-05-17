@@ -303,7 +303,7 @@ var ChaikaCore = {
 	/**
 	 * Chaika の使用するデータを保存するプロファイル内のディレクトリを返す。
 	 * ディレクトリが存在しない場合はこのメソッドが呼ばれた時に作成される。
-	 * @return {nsILocalFile}
+	 * @return {nsIFile}
 	 */
 	getDataDir: function ChaikaCore_getDataDir(){
 		if(!this._dataDir){
@@ -321,14 +321,14 @@ var ChaikaCore = {
 			if(!this._dataDir){
 				var dirService = Cc["@mozilla.org/file/directory_service;1"]
 						.getService(Ci.nsIProperties);
-				this._dataDir = dirService.get("ProfD", Ci.nsILocalFile);
+				this._dataDir = dirService.get("ProfD", Ci.nsIFile);
 				this._dataDir.appendRelativePath(DATA_DIR_NAME);
 			}
 		}
 
-		var dataDir = this._dataDir.clone().QueryInterface(Ci.nsILocalFile);
+		var dataDir = this._dataDir.clone();
 		if(!dataDir.exists()){
-			dataDir.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+			dataDir.create(Ci.nsIFile.DIRECTORY_TYPE, PR_PERMS_DIR);
 		}
 
 		return dataDir;
@@ -338,13 +338,13 @@ var ChaikaCore = {
 	/**
 	 * DAT ファイル等を保存するディレクトリを返す。
 	 * ディレクトリが存在しない場合はこのメソッドが呼ばれた時に作成される。
-	 * @return {nsILocalFile}
+	 * @return {nsIFile}
 	 */
 	getLogDir: function ChaikaCore_getLogDir(){
 		var logDir = this.getDataDir();
 		logDir.appendRelativePath(LOGS_DIR_NAME);
 		if(!logDir.exists()){
-			logDir.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+			logDir.create(Ci.nsIFile.DIRECTORY_TYPE, PR_PERMS_DIR);
 		}
 		return logDir;
 	},
@@ -352,10 +352,10 @@ var ChaikaCore = {
 
 	/**
 	 * 拡張機能のインストールディレクトリ内にある defaults ディレクトリを返す。
-	 * @return {nsILocalFile}
+	 * @return {nsIFile}
 	 */
 	getDefaultsDir: function ChaikaCore_getDefaultsDir(){
-		var defaultsDir = __LOCATION__.parent.parent.clone().QueryInterface(Ci.nsILocalFile);
+		var defaultsDir = __LOCATION__.parent.parent.clone();
 		defaultsDir.setRelativeDescriptor(defaultsDir, 'chrome/content/chaika/defaults');
 		return defaultsDir;
 	},
@@ -686,7 +686,7 @@ ChaikaPref.prototype = {
 
 	getFile: function ChaikaPref_getFile(aPrefName){
 		try{
-			return this._branch.getComplexValue(aPrefName, Ci.nsILocalFile);
+			return this._branch.getComplexValue(aPrefName, Ci.nsIFile);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
@@ -694,7 +694,7 @@ ChaikaPref.prototype = {
 	},
 	setFile: function ChaikaPref_setFile(aPrefName, aPrefValue){
 		try{
-			return this._branch.setComplexValue(aPrefName, Ci.nsILocalFile, aPrefValue);
+			return this._branch.setComplexValue(aPrefName, Ci.nsIFile, aPrefValue);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
@@ -926,12 +926,12 @@ function ChaikaIO(){
 ChaikaIO.prototype = {
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @param {nsIFile} aFile 読み込むファイル
 	 * @param {String} aCharset 読み込むファイルの文字コード。指定しない場合は UTF-8
 	 * @return {nsIConverterInputStream}
 	 */
-	getFileInputStream: function ChaikaIO_getFileInputStream(aLocalFile, aCharset){
-		if(!(aLocalFile instanceof Ci.nsILocalFile)){
+	getFileInputStream: function ChaikaIO_getFileInputStream(aFile, aCharset){
+		if(!(aFile instanceof Ci.nsIFile)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
@@ -943,7 +943,7 @@ ChaikaIO.prototype = {
 				.createInstance(Ci.nsIConverterInputStream);
 
 		try{
-			fileInputStream.init(aLocalFile, PR_RDONLY, PR_PERMS_FILE,
+			fileInputStream.init(aFile, PR_RDONLY, PR_PERMS_FILE,
 					Ci.nsIFileInputStream.CLOSE_ON_EOF);
 			converterInputStream.init(fileInputStream, charset, 1024*8,
 					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
@@ -956,13 +956,13 @@ ChaikaIO.prototype = {
 
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {nsIFile} aFile 書き込むファイル
 	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
 	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
 	 * @return {nsIConverterOutputStream}
 	 */
-	getFileOutputStream: function ChaikaIO_getFileOutputStream(aLocalFile, aCharset, aAppend){
-		if(!(aLocalFile instanceof Ci.nsILocalFile)){
+	getFileOutputStream: function ChaikaIO_getFileOutputStream(aFile, aCharset, aAppend){
+		if(!(aFile instanceof Ci.nsIFile)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 
@@ -976,12 +976,12 @@ ChaikaIO.prototype = {
 				.createInstance(Ci.nsIConverterOutputStream);
 
 		try{
-				// nsILocalFile.create は親フォルダもふくめて作成する
-			if(!aLocalFile.exists()){
-				aLocalFile.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
+				// nsIFile.create は親フォルダもふくめて作成する
+			if(!aFile.exists()){
+				aFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
 			}
 
-			fileOutputStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
+			fileOutputStream.init(aFile, ioFlags, PR_PERMS_FILE, 0);
 			converterOutputStream.init(fileOutputStream, charset, 0,
 					Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
 		}catch(ex){
@@ -995,15 +995,15 @@ ChaikaIO.prototype = {
 
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @param {nsIFile} aFile 読み込むファイル
 	 * @param {String} aCharset 読み込むファイルの文字コード。指定しない場合は UTF-8
 	 * @return {String}
 	 */
-	readString: function ChaikaIO_readString(aLocalFile, aCharset){
+	readString: function ChaikaIO_readString(aFile, aCharset){
 		var result = [];
 		var stream;
 		try{
-			stream = this.getFileInputStream(aLocalFile, aCharset);
+			stream = this.getFileInputStream(aFile, aCharset);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
@@ -1026,15 +1026,15 @@ ChaikaIO.prototype = {
 
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {nsIFile} aFile 書き込むファイル
 	 * @param {String} aCharset 書き込む文字コード。指定しない場合は UTF-8
 	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
 	 * @param {String} aContent 書き込む内容
 	 */
-	writeString: function ChaikaIO_writeString(aLocalFile, aCharset, aAppend, aContent){
+	writeString: function ChaikaIO_writeString(aFile, aCharset, aAppend, aContent){
 		var stream;
 		try{
-			stream = ChaikaCore.io.getFileOutputStream(aLocalFile, aCharset, aAppend);
+			stream = ChaikaCore.io.getFileOutputStream(aFile, aCharset, aAppend);
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			throw makeException(ex.result);
@@ -1052,10 +1052,10 @@ ChaikaIO.prototype = {
 
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 読み込むファイル
+	 * @param {nsIFile} aFile 読み込むファイル
 	 * @return {String}
 	 */
-	readData: function ChaikaIO_readData(aLocalFile){
+	readData: function ChaikaIO_readData(aFile){
 		var result = [];
 		var fileStream = Cc["@mozilla.org/network/file-input-stream;1"]
 					.createInstance(Ci.nsIFileInputStream);
@@ -1063,7 +1063,7 @@ ChaikaIO.prototype = {
 					.createInstance(Ci.nsIBinaryInputStream);
 
 		try{
-			fileStream.init(aLocalFile, PR_RDONLY, PR_PERMS_FILE, 0);
+			fileStream.init(aFile, PR_RDONLY, PR_PERMS_FILE, 0);
 			binaryStream.setInputStream(fileStream);
 
 			var str;
@@ -1084,22 +1084,24 @@ ChaikaIO.prototype = {
 
 
 	/**
-	 * @param {nsILocalFile} aLocalFile 書き込むファイル
+	 * @param {nsIFile} aFile 書き込むファイル
 	 * @param {Boolean} aAppend 真ならファイルの末尾から追加書き込み
 	 * @param {String} aContent 書き込む内容
+	 * @return {Boolean} 成功したら true を返す
 	 */
-	writeData: function ChaikaIO_writeData(aLocalFile, aContent, aAppend){
+	writeData: function ChaikaIO_writeData(aFile, aContent, aAppend){
 		var fileStream = Cc["@mozilla.org/network/file-output-stream;1"]
 						.createInstance(Ci.nsIFileOutputStream);
 		try{
-				// nsILocalFile.create は親フォルダもふくめて作成する
-			if(!aLocalFile.exists()){
-				aLocalFile.create(Ci.nsILocalFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
+				// nsIFile.create は親フォルダもふくめて作成する
+			if(!aFile.exists()){
+				aFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
 			}
 
 			var ioFlags = PR_WRONLY|PR_CREATE_FILE;
 			ioFlags |= (aAppend) ? PR_APPEND : PR_TRUNCATE;
-			fileStream.init(aLocalFile, ioFlags, PR_PERMS_FILE, 0);
+			fileStream.init(aFile, ioFlags, PR_PERMS_FILE, 0);
+
 			var content = String(aContent);
 			fileStream.write(content, content.length);
 			fileStream.flush();
@@ -1109,17 +1111,18 @@ ChaikaIO.prototype = {
 		}finally{
 			fileStream.close();
 		}
+
 		return true;
 	},
 
 
 	/**
 	 * ファイラで指定したディレクトリを開く
-	 * @param {nsILocalFile} aDir 開くディレクトリ
+	 * @param {nsIFile} aDir 開くディレクトリ
 	 * @return {Boolean} 成功したら真を返す
 	 */
 	revealDir: function ChaikaIO_revealDir(aDir){
-		if(!(aDir instanceof Ci.nsILocalFile)){
+		if(!(aDir instanceof Ci.nsIFile)){
 			throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 		}
 		if(!aDir.isDirectory()){
@@ -1137,7 +1140,7 @@ ChaikaIO.prototype = {
 		}catch(ex){}
 
 		try{ // file: プロトコルで開く
-			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);	
+			var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 			var dirURI = ioService.newFileURI(aDir);
 		    var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
     					.getService(Ci.nsIExternalProtocolService);

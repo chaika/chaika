@@ -73,18 +73,18 @@ function makeException(aResult){
  * シンプルなダウンローダオブジェクト。
  * @constructor
  * @param {nsIURL} aURL 保存する URL
- * @param {nsILocalFile} aLocalFile 保存先ファイル
+ * @param {nsIFile} aFile 保存先ファイル
  */
-function ChaikaDownloader(aURL, aLocalFile){
+function ChaikaDownloader(aURL, aFile){
 	if(!(aURL instanceof Ci.nsIURL)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 	}
-	if(!(aLocalFile instanceof Ci.nsILocalFile)){
+	if(!(aFile instanceof Ci.nsIFile)){
 		throw makeException(Cr.NS_ERROR_INVALID_POINTER);
 	}
 
 	this.url = aURL;
-	this.file = aLocalFile;
+	this.file = aFile;
 
 	this.loading = false;
 }
@@ -101,7 +101,7 @@ ChaikaDownloader.prototype = {
 
 	/**
 	 * ダウンロード先ファイル。
-	 * @type nsILocalFile
+	 * @type nsIFile
 	 */
 	file: null,
 
@@ -122,7 +122,7 @@ ChaikaDownloader.prototype = {
 		try{
 			try{
 				if(!this.file.parent.exists()){
-					this.file.parent.create(Ci.nsILocalFile.DIRECTORY_TYPE, PR_PERMS_DIR);
+					this.file.parent.create(Ci.nsIFile.DIRECTORY_TYPE, PR_PERMS_DIR);
 				}
 			}catch(ex){
 				ChaikaCore.logger.error(ex);

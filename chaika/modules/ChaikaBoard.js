@@ -777,9 +777,9 @@ ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
 
 /**
  * 指定した URL に対応する ログディレクトリ内のファイル、ディレクトリを、
- * nsILocalFile で返す。
+ * nsIFile で返す。
  * @param {nsIURL} aURL
- * @return {nsILocalFile}
+ * @return {nsIFile}
  */
 ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 	var logFile = null;
@@ -790,15 +790,16 @@ ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
 		ChaikaCore.logger.error(ex);
 		throw makeException(ex.result);
 	}
+
 	return logFile;
 }
 
 
 /**
  * 指定した 板ID に対応する ログディレクトリ内のファイル、ディレクトリを、
- * nsILocalFile で返す。
+ * nsIFile で返す。
  * @param {nsIURL} aBoardID
- * @return {nsILocalFile}
+ * @return {nsIFile}
  */
 ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoardID){
 	var logFile = ChaikaCore.getLogDir();
@@ -807,6 +808,7 @@ ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoar
 	for(var i=0; i<pathArray.length; i++){
 		if(pathArray[i]) logFile.appendRelativePath(pathArray[i]);
 	}
+
 	return logFile;
 }
 

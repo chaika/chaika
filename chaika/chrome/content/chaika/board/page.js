@@ -551,7 +551,7 @@ function showBrowser(aTab){
 }
 
 function openLogsDir(){
-	var logDir = gBoard.subjectFile.parent.QueryInterface(Ci.nsILocalFile);
+	var logDir = gBoard.subjectFile.parent;
 	ChaikaCore.io.revealDir(logDir);
 }
 

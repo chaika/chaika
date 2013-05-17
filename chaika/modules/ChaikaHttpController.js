@@ -251,7 +251,7 @@ ChaikaImageViewURLReplace.prototype = {
             let defaultsFile = ChaikaCore.getDefaultsDir();
             defaultsFile.appendRelativePath(IVUR_NAME);
             defaultsFile.copyTo(file.parent, null);
-            file = file.clone().QueryInterface(Ci.nsILocalFile);
+            file = file.clone();
         }
 
         var lines = ChaikaCore.io.readString(file, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
@@ -571,7 +571,7 @@ ChaikaNGFiles.prototype = {
             var defaultsFile = ChaikaCore.getDefaultsDir();
             defaultsFile.appendRelativePath(NGFILES_NAME);
             defaultsFile.copyTo(ngFile.parent, null);
-            ngFile = ngFile.clone().QueryInterface(Ci.nsILocalFile);
+            ngFile = ngFile.clone();
         }
 
         var lines = ChaikaCore.io.readString(ngFile, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);

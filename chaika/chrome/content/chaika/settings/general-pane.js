@@ -57,7 +57,7 @@ var gGeneralPane = {
 
 			// 初期表示フォルダ
 		var displayDirectory = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsILocalFile);
+				.createInstance(Components.interfaces.nsIFile);
 		try{
 			displayDirectory.initWithPath(dataDirPref.value);
 			if(displayDirectory.exists()){
@@ -68,7 +68,7 @@ var gGeneralPane = {
 		if (filePicker.show() != nsIFilePicker.returnOK) return;
 
 		var selectedDir = filePicker.file
-				.QueryInterface(Components.interfaces.nsILocalFile);
+				.QueryInterface(Components.interfaces.nsIFile);
 		dataDirPref.value = selectedDir.path;
 	},
 

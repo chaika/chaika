@@ -636,7 +636,7 @@ var FormPage = {
 				var defaultsFile = ChaikaCore.getDefaultsDir();
 				defaultsFile.appendRelativePath(defaultDataFile.leafName);
 				defaultsFile.copyTo(defaultDataFile.parent, null);
-				defaultDataFile = defaultDataFile.clone().QueryInterface(Ci.nsILocalFile);
+				defaultDataFile = defaultDataFile.clone();
 			}
 
 			var urlSpec = gBoard.url.spec;
