@@ -7,6 +7,7 @@
 			em:version="1.6.0"
 			em:description="2ch.net(Japanese Web Forums) Browser"
 			em:id="chaika@chaika.xrea.jp"
+			em:type="2"
 			em:unpack="true"
 			em:homepageURL="http://chaika.xrea.jp/"
 			em:optionsURL="chrome://chaika/content/settings/settings.xul"
