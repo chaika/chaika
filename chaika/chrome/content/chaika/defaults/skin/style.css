@@ -1,12 +1,4 @@
 /* ***** ***** Animations ***** ***** */
-@-moz-keyframes fadeout{
-    from{
-        opacity: 1.0;
-    }
-    to{
-        opacity: 0.0;
-    }
-}
 @keyframes fadeout{
     from{
         opacity: 1.0;
@@ -16,14 +8,6 @@
     }
 }
 
-@-moz-keyframes fadein{
-    from{
-        opacity: 0.0;
-    }
-    to{
-        opacity: 1.0;
-    }
-}
 @keyframes fadein{
     from{
         opacity: 0.0;
@@ -33,20 +17,6 @@
     }
 }
 
-@-moz-keyframes slidedown{
-    from{
-        line-height: 0;
-        margin: 0;
-        padding: 0 35px 0 25px;
-        opacity: 0;
-    }
-    to{
-        line-height: 1.5;
-        margin: 0 0 20px 0;
-        padding: 12px 35px 12px 25px;
-        opacity: 1.0;
-    }
-}
 @keyframes slidedown{
     from{
         line-height: 0;
@@ -62,20 +32,6 @@
     }
 }
 
-@-moz-keyframes slideup{
-    from{
-        line-height: 1.5;
-        margin: 0 0 20px 0;
-        padding: 12px 35px 12px 25px;
-        opacity: 1.0;
-    }
-    to{
-        line-height: 0;
-        margin: 0;
-        padding: 0 35px 0 25px;
-        opacity: 0;
-    }
-}
 @keyframes slideup{
     from{
         line-height: 1.5;

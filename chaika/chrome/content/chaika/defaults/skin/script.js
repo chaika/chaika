@@ -197,9 +197,7 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'MozAnimationName': 'fadein',
 			'animationName': 'fadein',
-			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 	},
@@ -208,16 +206,11 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'MozAnimationName': 'fadeout',
 			'animationName': 'fadeout',
-			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 
 		if(option.remove){
-			element.addEventListener('mozAnimationEnd', function(){
-				this.parentNode.removeChild(this);
-			});
 			element.addEventListener('animationend', function(){
 				this.parentNode.removeChild(this);
 			});
@@ -228,16 +221,11 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'MozAnimationName': 'slidedown',
 			'animationName': 'slidedown',
-			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 
 		if(option.remove){
-			element.addEventListener('mozAnimationEnd', function(){
-				this.parentNode.removeChild(this);
-			});
 			element.addEventListener('animationend', function(){
 				this.parentNode.removeChild(this);
 			});
@@ -248,9 +236,7 @@ var Effects = {
 		option = option || {};
 
 		$.css(element, {
-			'MozAnimationName': 'slideup',
 			'animationName': 'slideup',
-			'MozAnimationDuration': option.speed || '0.3s',
 			'animationDuration': option.speed || '0.3s',
 		});
 	},
