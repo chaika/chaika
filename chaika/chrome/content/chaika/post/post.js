@@ -332,22 +332,27 @@ Post.prototype = {
 			try{
 				var doc = document.implementation.createDocument("", "", null);
 				doc.appendChild(doc.createElement("root"));
-				var unescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"]
-						.getService(Ci.nsIScriptableUnescapeHTML);
-				var fragment = unescapeHTML.parseFragment(responseData, false, null, doc.documentElement);
+
+				var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
+				var fragment = parserUtils.parseFragment(responseData, 0, false, null, doc.documentElement);
 				doc.documentElement.appendChild(fragment);
+
 				var inputNodes = doc.getElementsByTagName("input");
 				var additionalData = new Array();
-				var ignoreInputs = ["submit","subject","bbs","key","time","MESSAGE","FROM","mail"];
-				for(var [i, input] in Iterator(inputNodes)){
+				var ignoreInputs = ["submit", "subject", "bbs", "key", "time", "MESSAGE", "FROM", "mail"];
+
+				for(let [i, input] in Iterator(inputNodes)){
 					if(input.type != "hidden") continue;
 					if(ignoreInputs.indexOf(input.name) != -1) continue;
-					additionalData.push(input.name +"="+ input.value);
+
+					additionalData.push(input.name + "=" + input.value);
 				}
+
 				this._listener.onCookieCheck(this, responseData, postStatus);
 				this.submit(this._listener, additionalData);
+
 				ChaikaCore.logger.debug("AdditionalData: " + additionalData);
-				return;
+
 			}catch(ex){
 				ChaikaCore.logger.error(ex);
 			}
@@ -355,7 +360,6 @@ Post.prototype = {
 		}else{
 			this._listener.onError(this, responseData, postStatus);
 		}
-
 	},
 
 

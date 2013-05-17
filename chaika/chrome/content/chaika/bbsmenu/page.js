@@ -353,14 +353,12 @@ var Bbsmenu = {
 
 
 	update: function Bbsmenu_update(aHtmlSource){
-		var unescapeHTML = Cc["@mozilla.org/feed-unescapehtml;1"]
-				.getService(Ci.nsIScriptableUnescapeHTML);
+		var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
 		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
 		var bbsmenuDoc = domParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
-		var fragment = unescapeHTML.parseFragment(aHtmlSource, false, null,
-							bbsmenuDoc.documentElement);
+		var fragment = parserUtils.parseFragment(aHtmlSource, 0, false, null, bbsmenuDoc.documentElement);
 		bbsmenuDoc.documentElement.appendChild(fragment);
 
 
