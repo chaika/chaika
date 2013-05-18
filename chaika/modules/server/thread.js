@@ -381,7 +381,7 @@ Thread2ch.prototype = {
 
 		//serializeで余計に挿入されるxmlns属性を削除
 		//ToDo: レス中に同文字列が含まれていたらどうするか？
-		sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml" ', '', 'g')
+		sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g')
 
 		// 実体参照化されたレスの文字コードが正しく判別されず文字化けすることがある問題を解決
 		// 元データに実体参照らしき文字が5文字続き、
