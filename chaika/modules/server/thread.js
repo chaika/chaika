@@ -1392,7 +1392,7 @@ b2rThreadConverter.prototype = {
 	},
 
 	isAA: function(aMessage) {
-		var lineCount = aMessage.match(/<br>/g);
+		var lineCount = aMessage.match(/<br\s*\/?>/g);
 
 		if(lineCount && lineCount.length >= 3){
 			// \x81\x40 = 全角空白(Shift_JIS)
