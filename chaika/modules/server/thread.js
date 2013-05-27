@@ -114,7 +114,7 @@ ThreadServerScript.prototype  = {
 		try{
 			var threadURL = ioService.newURI(threadURLSpec, null, null).QueryInterface(Ci.nsIURL);
 				// URL が、DAT ID で終わるときは "/" を追加する
-			if(threadURL.fileName.match(/^\d{9,10}$/)){
+			if(/^\d{9,10}$/.test(threadURL.fileName)){
 				threadURL = ioService.newURI(threadURLSpec + "/", null, null)
 						.QueryInterface(Ci.nsIURL);
 			}
@@ -174,7 +174,7 @@ Thread2ch.prototype = {
 		return (this.thread.url.fileName.match(/\-(\d+)/)) ? parseInt(RegExp.$1) : null;
 	},
 	get optionsNoFirst(){
-		return (this.thread.url.fileName.indexOf("n") != -1);
+		return (this.thread.url.fileName.indexOf("n") !== -1);
 	},
 
 	init: function(aHandler, aThreadURL, aBoardURL, aType){
@@ -1236,8 +1236,8 @@ b2rThreadConverter.prototype = {
 			this._tmpGetNGNewRes = this.toFunction(this._tmpNGNewRes);
 		}
 
-				// 旧仕様の互換性確保
-		if(!this._tmpFooter.match(/<STATUS\/>/)){
+		// 旧仕様の互換性確保
+		if(this._tmpFooter.indexOf('<STATUS/>') === -1){
 			this._tmpFooter = '<p class="info"><STATUS/></p>\n' + this._tmpFooter;
 		}
 	},
@@ -1340,7 +1340,7 @@ b2rThreadConverter.prototype = {
 				}
 			}
 
-			//タグを置換する 
+			//タグを置換する
 			return aRes
 					.replace(/(?:\r|\n|\t)/g, "")
 					.replace(/<!--.*?-->/g, "")
@@ -1367,14 +1367,19 @@ b2rThreadConverter.prototype = {
 
 
 		var template = aNew ? this._tmpNewRes : this._tmpRes;
-		if(!template.match(/<ID\/>/))
-			aDate = aDate + " ID:" + aID;
-		if(!template.match(/<BEID\/>/))
-			aDate = aDate + " Be:" + aBeID;
 
-		var resIDColor = (template.search(/<IDCOLOR\/>/) != -1) ?
+		if(template.indexOf('<ID/>') === -1){
+			aDate = aDate + " ID:" + aID;
+		}
+
+		if(template.indexOf('<BEID/>') === -1){
+			aDate = aDate + " Be:" + aBeID;
+		}
+
+		var resIDColor = (template.indexOf('<IDCOLOR/>') !== -1) ?
 				this._id2Color.getColor(aID, false) : "inherit";
-		var resIDBgColor = (template.search(/<IDBACKGROUNDCOLOR\/>/) != -1) ?
+
+		var resIDBgColor = (template.indexOf('<IDBACKGROUNDCOLOR/>') !== -1) ?
 				this._id2Color.getColor(aID, true) : "inherit";
 
 		if(this.isAA(aMessage)){
