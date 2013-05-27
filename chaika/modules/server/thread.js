@@ -435,6 +435,8 @@ Thread2ch.prototype = {
 		resMail = this.sanitizeHTML(resMail);
 		resMes = this.sanitizeHTML(resMes);
 
+		ChaikaCore.logger.debug(resMes);
+
 
 		// resDate を DATE と BeID に分割
 		if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
@@ -1331,6 +1333,14 @@ b2rThreadConverter.prototype = {
 
 	toFunction: function(aRes){
 		return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage){
+			//置換文字列で特殊な意味を持つ$をエスケープする
+			for(let i=0, l=arguments.length; i<l; i++){
+				if(typeof arguments[i] === 'string'){
+					arguments[i] = arguments[i].replace('$', '&#36;', 'g');
+				}
+			}
+
+			//タグを置換する
 			return aRes
 					.replace(/(?:\r|\n|\t)/g, "")
 					.replace(/<!--.*?-->/g, "")
