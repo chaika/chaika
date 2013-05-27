@@ -435,9 +435,6 @@ Thread2ch.prototype = {
 		resMail = this.sanitizeHTML(resMail);
 		resMes = this.sanitizeHTML(resMes);
 
-		ChaikaCore.logger.debug(resMes);
-
-
 		// resDate を DATE と BeID に分割
 		if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
 			resDate = RegExp.$1;
