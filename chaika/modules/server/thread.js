@@ -1340,7 +1340,7 @@ b2rThreadConverter.prototype = {
 				}
 			}
 
-			//タグを置換する
+			//タグを置換する 
 			return aRes
 					.replace(/(?:\r|\n|\t)/g, "")
 					.replace(/<!--.*?-->/g, "")
