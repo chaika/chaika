@@ -36,17 +36,14 @@ var ChaikaBrowserOverlay = {
 	 */
 	_showReleaseNotes: function ChaikaBrowserOverlay__showReleaseNotes(){
 		//現在のバージョン
-		var currentVersion = ChaikaBrowserOverlay.ChaikaAddonInfo.version.split('.');
+		var currentVersion = ChaikaBrowserOverlay.ChaikaAddonInfo.version;
 
 		//前回リリースノートを表示した時のバージョン
-		var showedVersion = ChaikaBrowserOverlay.ChaikaCore.pref.getChar('releasenotes_showed').split('.');
+		var showedVersion = ChaikaBrowserOverlay.ChaikaCore.pref.getChar('releasenotes_showed');
 
-		for(let i=0; i<currentVersion.length; i++){
-			if(currentVersion[i] > ( showedVersion[i] || 0 )){
-				gBrowser.selectedTab = gBrowser.addTab('chaika://releasenotes/?updated=1');
-				ChaikaBrowserOverlay.ChaikaCore.pref.setChar('releasenotes_showed', currentVersion.join('.'));
-				break;
-			}
+		if(Services.vc.compare(currentVersion, showedVersion) > 0){
+			gBrowser.selectedTab = gBrowser.addTab('chaika://releasenotes/?updated=1');
+			ChaikaBrowserOverlay.ChaikaCore.pref.setChar('releasenotes_showed', currentVersion);
 		}
 	},
 
