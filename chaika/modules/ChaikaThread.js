@@ -344,16 +344,22 @@ ChaikaThread.prototype = {
 		var fileOutputStream = Cc["@mozilla.org/network/file-output-stream;1"]
 						.createInstance(Ci.nsIFileOutputStream);
 		try{
-				// nsIFile.create は親フォルダをふくめて作成する
+			// nsIFile.create は親フォルダをふくめて作成する
 			if(!this.datFile.exists()){
 				this.datFile.create(Ci.nsIFile.NORMAL_FILE_TYPE, PR_PERMS_FILE);
 			}
 
+			//書き込む
 			var flag = PR_WRONLY | PR_CREATE_FILE | PR_APPEND;
 			fileOutputStream.init(this.datFile, flag, PR_PERMS_FILE, 0);
 			fileOutputStream.write(aContent, aContent.length);
 			fileOutputStream.flush();
 			fileOutputStream.close();
+
+			//lastModifiedをサーバーから返された値に設定する
+			if(this.lastModified){
+				this.datFile.lastModifiedTime = Date.parse(this.lastModified);
+			}
 		}catch(ex){
 			ChaikaCore.logger.error(ex);
 			return false;
