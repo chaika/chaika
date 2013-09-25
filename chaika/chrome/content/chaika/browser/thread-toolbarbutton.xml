@@ -566,16 +566,29 @@
 				var thread = new this.ChaikaThread(threadURI);
 
 				if(FOX_AGE_2CH){
-					var boardURL = thread.boardURL;
-					var datID = thread.datID;
+					let boardURL = thread.boardURL;
+					let datID = thread.datID;
 
 					window.openDialog(
 						"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
 						"chrome,centerscreen,modal,dialog=no,all", boardURL.host + boardURL.path + datID
 					);
 				}else{
-					var boardURL = this._getCurrentBoardURL();
-					var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(thread.title), null, null);
+					let query = thread.title;
+
+					//最も後ろの数字がある場所を探索する
+					//String#lastIndexOfには正規表現が渡せないため、
+					//reverseしてからsearchを用いる
+					let index = query.split('').reverse().join('').search(/\d+/);
+
+					//もし中間よりも後に数字が存在した場合、それより後ろをカットする
+					if(index !== -1 && (index + 1) < (query.length / 2)){
+						query = query.replace(/^(.*?)\d+\D*$/, '$1');
+					}
+
+					//検索文字列を設定して板を開く
+					let boardURL = this._getCurrentBoardURL();
+					let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
 
 					this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
 				}
