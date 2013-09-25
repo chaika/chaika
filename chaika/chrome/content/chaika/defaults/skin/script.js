@@ -83,7 +83,8 @@ var $ = {
 	 * @return {Node}
 	 */
 	show: function(element){
-		$.css(element, { display: '-moz-initial' });
+		$.css(element, { display: '-moz-initial' });  // For Firefox 17-23
+		$.css(element, { display: 'initial' });
 		return element;
 	},
 
