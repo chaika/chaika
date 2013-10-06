@@ -245,7 +245,9 @@ var Chaika2chViewer = {
 					Chaika2chViewer._maruLoginNG();
 					return;
 				}
-				Chaika2chViewer._maruLoginOK(data.substring(11, data.length -1));
+
+				//先頭のSESSION-ID=と改行コードを取り除く
+				Chaika2chViewer._maruLoginOK(data.replace('SESSION-ID=', '').replace(/[\n\r]/g, ''));
 			}
 		};
 

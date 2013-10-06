@@ -609,11 +609,18 @@ Thread2ch.prototype = {
 
 		if(aKako){
 			if(Chaika2chViewer.logined){
-				var sid = encodeURIComponent(Chaika2chViewer.sessionID);
-				var datURLSpec = this.thread.plainURL.spec.replace(/\/read\.cgi\//, "/offlaw.cgi/");
-				datURLSpec += "?raw=.0&sid=" + sid;
+				//Rokka spec: https://github.com/Cipherwraith/Rokka/blob/master/README.md
+				var KAGI = encodeURIComponent(Chaika2chViewer.sessionID);
+				var hostParts = this.thread.plainURL.host.split('.');
+				var pathParts = this.thread.plainURL.path.split('/');
+				var rokkaURLSpec = [
+					"http://rokka." + hostParts[1] + '.' + hostParts[2],  //2ch.com or bbspink.com
+					hostParts[0],  //SERVER
+					pathParts[3],  //BOARD
+					this.thread.datID
+				].join('/');
 				var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-				var datKakoURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
+				var datKakoURL = ioService.newURI(rokkaURLSpec + '/?sid=' + KAGI, null, null).QueryInterface(Ci.nsIURL);
 				this.httpChannel = ChaikaCore.getHttpChannel(datKakoURL);
 				this._maruMode = true;
 			}else if(ChaikaCore.pref.getBool("thread_get_log_from_mimizun")){
