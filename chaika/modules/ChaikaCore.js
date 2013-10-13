@@ -37,11 +37,9 @@
 
 
 EXPORTED_SYMBOLS = ["ChaikaCore"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
-try{
-	Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
-}catch(ex){}
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 
 
 const Ci = Components.interfaces;
@@ -1217,16 +1215,9 @@ ChaikaHistory.prototype = {
 
 
 	visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
-
-		if(typeof PrivateBrowsingUtils !== 'undefined'){
-			//Firefox 20+
-			var win = ChaikaCore.browser.getBrowserWindow();
-			if(PrivateBrowsingUtils.isWindowPrivate(win)) return;
-		}else{
-			var privateBrowsingService = Cc["@mozilla.org/privatebrowsing;1"]
-					.getService(Ci.nsIPrivateBrowsingService);
-			if(privateBrowsingService.privateBrowsingEnabled) return;
-		}
+		//プライベートモードの時は履歴に残さない
+		var win = ChaikaCore.browser.getBrowserWindow();
+		if(PrivateBrowsingUtils.isWindowPrivate(win)) return;
 
 		ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
