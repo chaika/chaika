@@ -36,6 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://gre/modules/FormHistory.jsm");
+
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
@@ -446,40 +448,26 @@ var FormPage = {
 
 
 	addFormHistory: function FormPage_addFormHistory(){
-		try{
-			//Firefox 24+
-			let FormHistory = (Components.utils.import("resource://gre/modules/FormHistory.jsm", {})).FormHistory;
+		var changes = [];
 
-			var changes = [];
+		if(this._nameForm && this._nameForm.value){
+			changes.push({
+				op: "add",
+				fieldname: 'chaika-post-name-history',
+				value: this._nameForm.value
+			});
+		}
 
-			if(this._nameForm && this._nameForm.value){
-				changes.push({
-					op: "add",
-					fieldname: 'chaika-post-name-history',
-					value: this._nameForm.value
-				});
-			}
-			if(this._nameForm && this._mailForm.value){
-				changes.push({
-					op: "add",
-					fieldname: 'chaika-post-mail-history',
-					value: this._mailForm.value
-				});
-			}
+		if(this._nameForm && this._mailForm.value){
+			changes.push({
+				op: "add",
+				fieldname: 'chaika-post-mail-history',
+				value: this._mailForm.value
+			});
+		}
 
-			if(changes.length > 0){
-				FormHistory.update(changes);
-			}
-		}catch(ex){
-			//Firefox 17-23
-			var formHistory	= Cc["@mozilla.org/satchel/form-history;1"].getService(Ci.nsIFormHistory2);
-
-			if(this._nameForm && this._nameForm.value){
-				formHistory.addEntry("chaika-post-name-history", this._nameForm.value);
-			}
-			if(this._nameForm && this._mailForm.value){
-				formHistory.addEntry("chaika-post-mail-history", this._mailForm.value);
-			}
+		if(changes.length > 0){
+			FormHistory.update(changes);
 		}
 	},
 
