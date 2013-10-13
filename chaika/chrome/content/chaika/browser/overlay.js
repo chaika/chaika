@@ -243,10 +243,39 @@ ChaikaBrowserOverlay.contextMenu = {
 		var contextMenu = document.getElementById('context-chaika');
 		var url = gBrowser.currentURI;
 
+		//非表示にする項目のIDを入れておく配列
+		var hiddenItems = [];
+
+
 		//掲示板上でのみ表示する設定の場合
-		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs') && !this._isBBS(url)){
-			contextMenu.hidden = true;
-			return;
+		// i) ページが掲示板上である -> 表示
+		// ii) ページが掲示板上でない
+		//     a) 設定が有効 かつ カーソルがリンク上 かつ リンク先が掲示板なら, リンク先に関する項目のみ表示
+		//     b) それ以外の時は表示しない
+		if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs')){
+			if(this._isBBS(url)){
+				// i)
+			}else{
+				// ii)
+				if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser_contextmenu_only_bbs_except_open_link') &&
+				   gContextMenu.onLink && this._isBBS(gContextMenu.linkURL)){
+				   		// ii) - a)
+						hiddenItems = hiddenItems.concat([
+							'abone',
+							'copy',
+							'search',
+							'skin',
+							'skin-sep',
+							'open-in-sep',
+							'toggle-sidebar',
+							'open-settings'
+						]);
+				}else{
+					// ii) - b)
+					contextMenu.hidden = true;
+					return;
+				}
+			}
 		}
 
 
@@ -273,10 +302,6 @@ ChaikaBrowserOverlay.contextMenu = {
 				}
 			}catch(ex){}
 		}
-
-
-		//非表示にする項目のIDを入れておく配列
-		var hiddenItems = [];
 
 
 		//選択部分がない場合

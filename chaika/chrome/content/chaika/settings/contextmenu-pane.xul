@@ -41,9 +41,12 @@
 
         <preference id="extensions.chaika.enable_browser_contextmenu"
                 name="extensions.chaika.enable_browser_contextmenu" type="bool"
-                onchange="setCcontainerDisabled(this.name, 'boxContextMenu', true)"/>
+                onchange="setCcontainerDisabled(this.name, 'subprefs_contextmenu', true)"/>
         <preference id="extensions.chaika.browser_contextmenu_only_bbs"
-                name="extensions.chaika.browser_contextmenu_only_bbs" type="bool" />
+                name="extensions.chaika.browser_contextmenu_only_bbs" type="bool"
+                onchange="setCcontainerDisabled(this.name, 'subprefs_only_bbs', true)" />
+        <preference id="extensions.chaika.browser_contextmenu_only_bbs_except_open_link"
+                name="extensions.chaika.browser_contextmenu_only_bbs_except_open_link" type="bool" />
         <preference id="extensions.chaika.browser_contextmenu_flatten"
                 name="extensions.chaika.browser_contextmenu_flatten" type="bool" />
         <preference id="extensions.chaika.browser_contextmenu_add_tab_by_click"
@@ -60,7 +63,7 @@
 
     <checkbox label="コンテキストメニューに chaika の項目を追加する *"
             preference="extensions.chaika.enable_browser_contextmenu" />
-    <vbox id="boxContextMenu" class="indent">
+    <vbox id="subprefs_contextmenu" class="indent">
         <groupbox>
             <caption label="項目" />
             <hbox>
@@ -93,6 +96,10 @@
             <caption label="表示" />
             <checkbox label="chaika および掲示板上でのみ表示する"
                     preference="extensions.chaika.browser_contextmenu_only_bbs" />
+                <vbox class="indent" id="subprefs_only_bbs">
+                    <checkbox label="リンク先についての項目は一般サイトでも表示する"
+                        preference="extensions.chaika.browser_contextmenu_only_bbs_except_open_link" />
+                </vbox>
             <checkbox label="コンテキストメニューをフラットにする *"
                     preference="extensions.chaika.browser_contextmenu_flatten" />
         </groupbox>
