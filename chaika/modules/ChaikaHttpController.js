@@ -52,8 +52,6 @@ const Cr = Components.results;
  */
 var ChaikaHttpController = {
 
-    HTTP_REQUEST_TOPIC: '',
-
     /** @private */
     _startup: function(){
         this.ref = new ChaikaRefController();
@@ -66,16 +64,8 @@ var ChaikaHttpController = {
         this.ngfiles.startup();
 
 
-        //Firefox 18以降は http-on-opening-request を,
-        //それ以前は　http-on-modify-request を使用する
-        if(ChaikaCore.browser.geckoVersionCompare(18) <= 0){
-            this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
-        }else{
-            this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
-        }
-
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
+        os.addObserver(this, 'http-on-opening-request', true);
 
         var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.addObserver("extensions.chaika.refController.enabled", this, true);
@@ -89,7 +79,7 @@ var ChaikaHttpController = {
     /** @private */
     _quit: function(){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
+        os.removeObserver(this, 'http-on-opening-request');
 
         var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.removeObserver("extensions.chaika.refController.enabled", this);
@@ -102,7 +92,7 @@ var ChaikaHttpController = {
 
     /** @private */
     observe: function ChaikaHttpController_observe(aSubject, aTopic, aData){
-        if(aTopic === this.HTTP_REQUEST_TOPIC){
+        if(aTopic === 'http-on-opening-request'){
             let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 
             // リファラがなければ終了
@@ -452,7 +442,7 @@ ChaikaImageViewURLReplace.prototype.Request.prototype = {
 
     init: function(ivurObj){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.addObserver(this, ChaikaHttpController.HTTP_REQUEST_TOPIC, false);
+        os.addObserver(this, 'http-on-opening-request', false);
         os.addObserver(this, 'http-on-examine-response', false);
 
         this._ivurObj = ivurObj;
@@ -463,7 +453,7 @@ ChaikaImageViewURLReplace.prototype.Request.prototype = {
 
     destroy: function(){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.removeObserver(this, ChaikaHttpController.HTTP_REQUEST_TOPIC);
+        os.removeObserver(this, 'http-on-opening-request');
         os.removeObserver(this, 'http-on-examine-response');
 
         this._ivurObj = null;
