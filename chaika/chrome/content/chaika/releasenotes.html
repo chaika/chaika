@@ -175,6 +175,36 @@
         </p>
     </section>
 
+
+    <section>
+        <h1>1.6.2 - 2013/10/13</h1>
+        <ul>
+            <li class="new"><a href="http://2ch.tora3.net/">Rokka システム</a>
+                に暫定的に対応 (<a href="https://github.com/chaika/chaika/issues/38">#38</a>)</li>
+            <li class="new">「chaika および掲示板上でのみ表示する」オプションが有効の場合でも、
+                掲示板へのリンク上では常にリンク先関連のコンテキストメニューを表示するオプションを追加
+                (<a href="https://github.com/chaika/chaika/issues/28">#28</a>)</li>
+            <li class="new">chaika 内蔵の「次のスレッドを検索」機能を使う場合に検索文字列を最適化するようにした
+                (<a href="https://github.com/chaika/chaika/issues/30">#30</a>)
+                <aside class="info">
+                    <p>スレッドタイトルの後半にあるパート番号と思われる数字の除去を試みるようになりました。</p>
+                </aside>
+            </li>
+            <li class="changed">chaika が取得した dat ファイルの更新日時をサーバー側の最終更新日時と一致させるようにした
+                (<a href="https://github.com/chaika/chaika/issues/40">#40</a>)
+                <aside class="info">
+                    <p>以前は chaika が dat を取得してディスクに書き込んだ日時となっていました。</p>
+                </aside>
+            </li>
+            <li class="fixed">FoxAge2ch が存在する環境で、FoxAge2ch に登録されていないスレッドに対して「次のスレッドを検索」が実行できない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/44">#44</a>)</li>
+            <li class="fixed">Firefox 24 以降において、デフォルトスキンであぼーんされたレスの表示が崩れる問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/42">#42</a>)</li>
+            <li class="fixed">Firefox 24 以降において、書き込みウィザードで警告が出る問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/39">#39</a>)</li>
+        </ul>
+    </section>
+
     <section>
         <h1>1.6.1 - 2013/6/1</h1>
         <ul>
@@ -387,8 +417,8 @@
 <footer>
     <ul class="list">
         <li><a href="http://chaika.xrea.jp/">chaika 公式サイト</a></li>
-        <li>chaikaは<a href="http://code.google.com/p/chaika/">Google Code</a>でホスティングされています。
-            より詳細な更新履歴については<a href="http://code.google.com/p/chaika/source/list">コミットログ</a>をご覧ください。
+        <li>chaikaは<a href="https://github.com/chaika/chaika">Github</a>でホスティングされています。
+            より詳細な更新履歴については<a href="https://github.com/chaika/chaika/commits/develop">コミットログ</a>をご覧ください。
         </li>
         <li>Icons by <a href="http://www.picol.org/">picol.org</a></li>
     </ul>

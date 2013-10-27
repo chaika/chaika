@@ -563,22 +563,45 @@
 				var threadURI = this._getCurrentThreadURL();
 				if(!threadURI) return;
 
-				var thread = new this.ChaikaThread(threadURI);
-
+				//FoxAge2chがインストールされている場合は
+				//FoxAge2chの次スレ検索機能の使用を試みる
 				if(FOX_AGE_2CH){
-					var boardURL = thread.boardURL;
-					var datID = thread.datID;
+					//FoxAge2chに登録されている場合のみ次スレ検索が可能
+					let FoxAge2chUtils = (Components.utils.import("resource://foxage2ch/utils.jsm", {})).FoxAge2chUtils;
+                    let [boardID, threadID] = FoxAge2chUtils.parseFromURL(threadURI.spec);
+					let item = FoxAge2chUtils.service.getItem(threadID);
 
-					window.openDialog(
-						"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
-						"chrome,centerscreen,modal,dialog=no,all", boardURL.host + boardURL.path + datID
-					);
-				}else{
-					var boardURL = this._getCurrentBoardURL();
-					var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(thread.title), null, null);
-
-					this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+					if(item){
+						window.openDialog(
+							"chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
+							"chrome,centerscreen,modal,dialog=no,all", threadID
+						);
+						return;
+					}
 				}
+
+				//FoxAge2chがインストールされていない場合および
+				//FoxAge2chに未登録のスレッドの場合は
+				//chaika の検索機能を使用する
+
+				//検索文字列
+				let query = (new this.ChaikaThread(threadURI)).title;
+
+				//最も後ろの数字がある場所を探索する
+				//String#lastIndexOfには正規表現が渡せないため、
+				//reverseしてからsearchを用いる
+				let index = query.split('').reverse().join('').search(/\d+/);
+
+				//もし中間よりも後に数字が存在した場合、それより後ろをカットする
+				if(index !== -1 && (index + 1) < (query.length / 2)){
+					query = query.replace(/^(.*?)\d+\D*$/, '$1');
+				}
+
+				//検索文字列を設定して板を開く
+				let boardURL = this._getCurrentBoardURL();
+				let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
+
+				this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
 			]]></body>
 		</method>
 
