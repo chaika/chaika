@@ -117,7 +117,8 @@ ChaikaBoard.prototype = {
 				.QueryInterface(Ci.nsIURL);
 		this.settingFile = ChaikaBoard.getLogFileAtURL(this.settingURL);
 		if(this.type == ChaikaBoard.BOARD_TYPE_JBBS){
-			var spec = this.url.spec.replace(".livedoor.jp/", ".livedoor.jp/bbs/api/setting.cgi/");
+			var spec = this.url.spec.replace(".livedoor.jp/", ".livedoor.jp/bbs/api/setting.cgi/")
+									.replace('.shitaraba.net/', '.shitaraba.net/bbs/api/setting.cgi/');
 			this.settingURL = ioService.newURI(spec, null, null).QueryInterface(Ci.nsIURL);
 		}
 
@@ -765,7 +766,7 @@ ChaikaBoard.getBoardID = function ChaikaBoard_getBoardID(aBoardURL){
 		boardID += "machi" + aBoardURL.path;
 	}else if(aBoardURL.host.indexOf(".bbspink.com")!=-1){
 		boardID += "bbspink" + aBoardURL.path;
-	}else if(aBoardURL.host == "jbbs.livedoor.jp"){
+	}else if(aBoardURL.host == "jbbs.livedoor.jp" || aBoardURL.host == 'jbbs.shitaraba.net'){
 		boardID += "jbbs" + aBoardURL.path;
 	}else{
 		boardID += "outside/";
@@ -841,6 +842,7 @@ ChaikaBoard.getBoardType = function ChaikaBoard_getBoardType(aURL){
 	if(aURL.host.indexOf(".machi.to") != -1) return ChaikaBoard.BOARD_TYPE_MACHI;
 		// JBBS
 	if(aURL.host == "jbbs.livedoor.jp") return ChaikaBoard.BOARD_TYPE_JBBS;
+	if(aURL.host == "jbbs.shitaraba.net") return ChaikaBoard.BOARD_TYPE_JBBS;
 
 		// スレッド URL
 	if(aURL.directory.indexOf("/test/read.cgi/") != -1) return ChaikaBoard.BOARD_TYPE_2CH;

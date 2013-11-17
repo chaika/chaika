@@ -524,7 +524,8 @@ PostP2.prototype = {
 		this._httpRequest = new HttpRequest(postURI, null, this);
 
 		//JBBS用に調整
-		if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1){
+		if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1 ||
+		   this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
 			var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
 			var host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
 		}else{
@@ -640,9 +641,15 @@ PostJBBSNewThread.prototype = {
 		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 		var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
 		var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
-		var postURI = ioService.newURI('http://jbbs.livedoor.jp/bbs/write.cgi/'+dir+'/'+bbs+'/new/', null, null);
+		var postURI;
 
-		this._httpRequest = new HttpRequest(postURI, null, this);
+		if(this._board.url.host.indexOf('jbbs.shitaraba.net') > -1)){
+			postURI = 'http://jbbs.shitaraba.net/bbs/write.cgi/';
+		}else{
+			postURI = 'http://jbbs.livedoor.jp/bbs/write.cgi/';
+		}
+
+		this._httpRequest = new HttpRequest(ioService.newURI(postURI + dir + '/' + bbs + '/new/', null, null), null, this);
 
 		var postData = [];
 		postData.push("BBS="    + bbs);
@@ -680,7 +687,8 @@ PostNewThreadP2.prototype = {
 		this._httpRequest = new HttpRequest(postURI, null, this);
 
 		//JBBS用に調整
-		if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1){
+		if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1 ||
+		   this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
 			var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
 			var host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
 		}else{

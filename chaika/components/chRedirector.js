@@ -80,8 +80,10 @@ chRedirector.prototype = {
 		if(aContentLocation.scheme.substring(0, 4) != "http") return Ci.nsIContentPolicy.ACCEPT;
 
 		var host = aContentLocation.host;
-		if(host.indexOf(".2ch.net")==-1 && host.indexOf(".bbspink.com")==-1 &&
-				host!="jbbs.livedoor.jp"){
+		if(host.indexOf(".2ch.net") == -1 &&
+		   host.indexOf(".bbspink.com") == -1 &&
+		   host != "jbbs.livedoor.jp" &&
+		   host != "jbbs.shitaraba.net"){
 			return Ci.nsIContentPolicy.ACCEPT;
 		}
 

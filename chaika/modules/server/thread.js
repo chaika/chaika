@@ -375,24 +375,19 @@ Thread2ch.prototype = {
 	 * @return {String} sanitized HTML string
 	 */
 	sanitizeHTML: function(aStr){
+		//実体参照を保護する
+		aStr = aStr.replace("&#", " &# ", "g");
+
+		//sanitize
 		var doc = this._parser.parseFromString("<html><body></body></html>", 'text/html');
 		var fragment = this._parserUtils.parseFragment(aStr, 0, false, null, doc.documentElement);
 		var sanitizedStr = this._serializer.serializeToString(fragment);
 
 		//serializeで余計に挿入されるxmlns属性を削除
-		//ToDo: レス中に同文字列が含まれていたらどうするか？
 		sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g')
 
-		// 実体参照化されたレスの文字コードが正しく判別されず文字化けすることがある問題を解決
-		// 元データに実体参照らしき文字が5文字続き、
-		// かつ変換後のデータにShift-JISのひらがなかカタカナが3文字以上続かない場合にShift-JISに変換する
-		// 　※「Shift-JISが2文字以上」だと、キリル文字にマッチしてしまう可能性がある
-		// 　　参考：http://tokkono.cute.coocan.jp/blog/slow/index.php/bbs-spam/checking-kana-in-shift_jis/
-		if(/(?:&#\d+;){5}/.test(aStr) && ! /(?:(?:\x82[\x9F-\xF2])|(?:\x83[\x40-\x96])){3}/.test(sanitizedStr)){
-			try{
-				sanitizedStr = UniConverter.toSJIS(sanitizedStr);
-			}catch(ex){}
-		}
+		//実体参照を元に戻す
+		sanitizedStr = sanitizedStr.replace(" &amp;# ", "&#", "g");
 
 		return sanitizedStr;
 	},
