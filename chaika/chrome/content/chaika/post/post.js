@@ -643,7 +643,7 @@ PostJBBSNewThread.prototype = {
 		var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
 		var postURI;
 
-		if(this._board.url.host.indexOf('jbbs.shitaraba.net') > -1)){
+		if(this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
 			postURI = 'http://jbbs.shitaraba.net/bbs/write.cgi/';
 		}else{
 			postURI = 'http://jbbs.livedoor.jp/bbs/write.cgi/';
