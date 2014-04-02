@@ -433,7 +433,7 @@
 				var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
 				var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
 				window.openDialog(postWizardURLSpec, "_blank",
-							"chrome, resizable, dialog", threadPlainURL.spec);
+							"chrome, resizable, minimizable, dialog", threadPlainURL.spec);
 			]]></body>
 		</method>
 

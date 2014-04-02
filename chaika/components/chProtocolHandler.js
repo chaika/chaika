@@ -236,7 +236,7 @@ chContentHandler.prototype = {
 				.getService(Ci.nsIWindowWatcher);
 		var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
 		winWatcher.openWindow(null, postWizardURLSpec,
-				"_blank", "chrome, resizable, dialog", argString);
+				"_blank", "chrome, resizable, minimizable, dialog", argString);
 	},
 
 
