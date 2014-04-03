@@ -158,6 +158,7 @@ var ChaikaBeLogin = {
 				.createInstance(Ci.nsIXMLHttpRequest);
 
 		httpReq.open("POST", this._getLoginURI().spec, true);
+
 		httpReq.onload = function(aEvent){
 			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 			this.channel.contentCharset = "euc-jp";
@@ -188,7 +189,7 @@ var ChaikaBeLogin = {
 		var fromStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
 		var mail = "m=" + encodeURIComponent(account.id);
 		var pass = "p=" + encodeURIComponent(account.password);
-		var submit = "submit=%C5%D0%CF%BF";
+		var submit = "submit=%A5%ED%A5%B0%A5%A4%A5%F3";
 		fromStr.data = [mail, pass, submit].join("&");
 
 		httpReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
