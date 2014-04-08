@@ -36,7 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-EXPORTED_SYMBOLS = ["ChaikaBeLogin", "ChaikaP2Login"];
+EXPORTED_SYMBOLS = ["ChaikaRoninLogin", "ChaikaBeLogin", "ChaikaP2Login"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
@@ -53,8 +53,268 @@ function makeException(aResult, aMessage){
 
 
 /**
+ * ひな形ログインオブジェクト
+ * @abstract
+ */
+var ChaikaLogin = {
+
+	/**
+	 * ユーザーIDとパスワードを返す
+	 * @return {{id: string, password: string}}
+	 */
+	getLoginInfo: function(){},
+
+	/**
+	 * ユーザーIDとパスワードをセットする関数
+	 * @param {String} id
+	 * @param {String} password
+	 */
+	setLoginInfo: function(){},
+
+	/**
+	 * ログインしているか否かを返す
+	 * @return {bool}
+	 */
+	isLoggedIn: function(){},
+
+	/**
+	 * ログイン処理を行う
+	 */
+	login: function(){},
+
+	/**
+	 * ログアウト処理を行う
+	 */
+	logout: function(){},
+
+};
+
+
+/**
+ * 浪人アカウント
+ * @extends ChaikaLogin
+ */
+var ChaikaRoninLogin = {
+
+	/**
+	 * Ronin経由で書き込むかどうか
+	 * @type {bool}
+	 */
+	_enabled: false,
+
+	/**
+	 * 起動時に実行される
+	 */
+	_startup: function(){
+		this.login();
+	},
+
+
+	/**
+	 * 終了時に実行される
+	 */
+	_quit: function(){
+		//this.logout();
+	},
+
+
+	get enabled(){
+		return this._enabled && this.isLoggedIn();
+	},
+
+
+	set enabled(bool){
+		this._enabled = bool;
+	},
+
+
+	/**
+	 * ユーザーIDとパスワードを返す関数
+	 * @return {Object}  {String} .id ID
+	 *                   {String} .password Password
+	 */
+	getLoginInfo: function ChaikaRoninLogin_getLoginInfo(){
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+
+		var account = {
+			id: '',
+			password: ''
+		};
+
+		account.id = ChaikaCore.pref.getChar('login.ronin.id');
+
+
+		//保存されている古いパスワードをログインマネージャへ移行
+		try{
+			if(ChaikaCore.pref.getChar('maru_password')){
+				account.password = ChaikaCore.pref.getChar('maru_password');
+				ChaikaCore.pref.setChar('maru_password', '');
+				this.setLoginInfo(account.id, account.password);
+
+				return account;
+			}
+		}catch(ex){}
+
+
+		var logins = lm.findLogins({}, 'chrome://chaika', null, '2ch Viewer Registration');
+
+		logins.some(function(login){
+			if(login.username === account.id){
+				account.password = login.password;
+				return true;
+			}
+
+			return false;
+		});
+
+		//パスワードがない時はそのアカウントは無効
+		if(!account.password) account.id = '';
+
+		return account;
+	},
+
+
+	/**
+	 * ユーザーIDとパスワードをセットする関数
+	 * @param {String} id
+	 * @param {String} password
+	 */
+	setLoginInfo: function ChaikaRoninLogin_setLoginInfo(id, password){
+		if(!(id && password)) return;
+
+		var lm = Cc["@mozilla.org/login-manager;1"].getService(Ci.nsILoginManager);
+		var loginInfo = new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+														Ci.nsILoginInfo, "init");
+
+		var login = new loginInfo('chrome://chaika', null, '2ch Viewer Registration', id, password, '', '');
+
+		try{
+			var oldLogin = this.getLoginInfo();
+
+			if(oldLogin.id == id && oldLogin.password == password) return;
+
+			if(oldLogin.id && oldLogin.id == id){
+				var oldLoginInfo = new loginInfo('chrome://chaika', null, '2ch Viewer Registration',
+										oldLogin.id, oldLogin.password, '', '');
+				lm.modifyLogin(oldLoginInfo, login);
+			}else{
+				lm.addLogin(login);
+			}
+		}catch(ex){
+			ChaikaCore.logger.error(ex);
+		}
+	},
+
+
+	login: function ChaikaRoninLogin_login(){
+		//すでに有効なセッションIDが存在する場合にはスキップする
+		if(this.isLoggedIn()){
+			return;
+		}
+
+		//確実にログアウトする
+		this.logout();
+
+		var httpChannel = ChaikaCore.getHttpChannel(this._getLoginURI());
+		httpChannel.setRequestHeader("User-Agent", "DOLIB/1.00", false);
+		httpChannel.setRequestHeader("X-2ch-UA", ChaikaCore.getUserAgent(), false);
+		httpChannel.setRequestHeader("Content-Type", "application/x-www-form-urlencoded", false);
+		httpChannel = httpChannel.QueryInterface(Ci.nsIUploadChannel);
+
+		var account = this.getLoginInfo();
+
+		if(!account){
+			return;
+		}
+
+		var strStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
+		var postString = String("ID=" + account.id + "&PW=" + account.password);
+
+		strStream.setData(postString, postString.length);
+		httpChannel.setUploadStream(strStream, "application/x-www-form-urlencoded", -1);
+		httpChannel.requestMethod = "POST";
+
+		httpChannel.asyncOpen(this._listener, null);
+	},
+
+
+	logout: function ChaikaRoninLogin_logout(){
+		ChaikaCore.pref.setChar("login.ronin.session_id", "");
+	},
+
+	isLoggedIn: function ChaikaRoninLogin_isLoggedIn(){
+		//6時間以内に取得したセッションIDがある場合にログインしているとみなす
+		//  ※実際の有効期限は24時間である
+		//  https://pink-chan-store.myshopify.com/pages/developers
+		let lastAuthTime = ChaikaCore.pref.getInt("login.ronin.last_auth_time");
+		let now = Date.now();
+
+		return (now - lastAuthTime) < 6 * 60 * 60 * 1000 && ChaikaCore.pref.getChar("login.ronin.session_id");
+	},
+
+	_getLoginURI: function ChaikaRoninLogin__getLoginURI(){
+		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+		var loginURLSpec = ChaikaCore.pref.getChar("login.ronin.login_url");
+		return ioService.newURI(loginURLSpec, null, null).QueryInterface(Ci.nsIURL);
+	},
+
+	/**
+	 * ログイン失敗時に呼ばれる
+	 */
+	_onFail: function ChaikaRoninLogin__onFail(){
+		this.logout();
+
+		ChaikaCore.logger.debug("Auth: NG");
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.notifyObservers(null, "Chaika2chViewer:Auth", "NG");
+	},
+
+	/**
+	 * ログイン成功時に呼ばれる
+	 */
+	_onSuccess: function ChaikaRoninLogin__onSuccess(aSessionID){
+		ChaikaCore.pref.setChar("login.ronin.session_id", aSessionID);
+		ChaikaCore.pref.setInt("login.ronin.last_auth_time", Date.now());
+
+		ChaikaCore.logger.debug("Auth: OK");
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.notifyObservers(null, "Chaika2chViewer:Auth", "OK");
+	},
+
+	_listener: {
+		onStartRequest: function authListener_onStartRequest(aRequest, aContext){
+			this._binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
+					.createInstance(Ci.nsIBinaryInputStream);
+			this._data = [];
+		},
+
+		onDataAvailable: function authListener_onDataAvailable(aRequest, aContext,
+											aInputStream, aOffset, aCount){
+			this._binaryStream.setInputStream(aInputStream);
+			this._data.push(this._binaryStream.readBytes(aCount));
+		},
+
+		onStopRequest: function authListener_onStopRequest(aRequest, aContext, aStatus){
+			var data = this._data.join("");
+
+			ChaikaCore.logger.debug("Auth Response: " + data);
+
+			if(data.lastIndexOf("SESSION-ID=ERROR:", 0) !== -1){
+				ChaikaRoninLogin._onFail();
+				return;
+			}
+
+			//先頭のSESSION-ID=と改行コードを取り除く
+			ChaikaRoninLogin._onSuccess(data.replace('SESSION-ID=', '').replace(/[\n\r]/g, ''));
+		}
+	},
+};
+
+
+
+/**
  * Be@2ch ログインオブジェクト
- * @class
+ * @extends ChaikaLogin
  */
 var ChaikaBeLogin = {
 
@@ -147,6 +407,7 @@ var ChaikaBeLogin = {
 				this._loggedIn = true;
 			}
 		}
+
 		return this._loggedIn;
 	},
 
@@ -229,7 +490,7 @@ var ChaikaBeLogin = {
 
 /**
  * p2.2ch.net ログインオブジェクト
- * @class
+ * @extends ChaikaLogin
  */
 var ChaikaP2Login = {
 

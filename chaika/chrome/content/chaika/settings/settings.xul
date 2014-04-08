@@ -6,10 +6,10 @@
 
 <prefwindow id="BrowserPreferences" title="設定 [chaika]" windowtype="chaika:settings"
 	onload="startup()" onunload="shutdown()"
-	style="min-width: 40em; min-height:32em;"
 	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <prefpane id="paneGeneral" label="全般"     flex="1" src="chrome://chaika/content/settings/general-pane.xul"/>
+<prefpane id="paneAccounts" label="アカウント" flex="1" src="chrome://chaika/content/settings/accounts-pane.xul" />
 <prefpane id="paneBrowser" label="ブラウザ" flex="1" src="chrome://chaika/content/settings/browser-pane.xul"/>
 <prefpane id="paneContextmenu" label="コンテキストメニュー" flex="1" src="chrome://chaika/content/settings/contextmenu-pane.xul" />
 <prefpane id="paneBbsmenu" label="板一覧"   flex="1" src="chrome://chaika/content/settings/bbsmenu-pane.xul"/>

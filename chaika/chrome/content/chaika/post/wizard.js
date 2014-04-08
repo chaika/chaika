@@ -42,7 +42,6 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
-Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 
 const Ci = Components.interfaces;

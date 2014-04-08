@@ -47,13 +47,11 @@ pref("extensions.chaika.logger.level", 2);
 
 pref("extensions.chaika.history_expire_days", 60);
 
-pref("extensions.chaika.maru_auth_url", "https://2chv.tora3.net/futen.cgi");
-pref("extensions.chaika.maru_auto_auth", true);
-pref("extensions.chaika.maru_last_auth_time", 0);
-pref("extensions.chaika.maru_enabled", false);
-pref("extensions.chaika.maru_id", "");
-pref("extensions.chaika.maru_password", "");
-pref("extensions.chaika.maru_session_id", "");
+pref("extensions.chaika.login.ronin.login_url", "https://2chv.tora3.net/futen.cgi");
+pref("extensions.chaika.login.ronin.last_auth_time", 0);
+pref("extensions.chaika.login.ronin.session_id", "");
+pref("extensions.chaika.login.ronin.id", "");
+pref("extensions.chaika.login.ronin.password", "");
 
 pref("extensions.chaika.login.be.login_url", "http://be.2ch.net/test/login.php");
 pref("extensions.chaika.login.be.id", "");

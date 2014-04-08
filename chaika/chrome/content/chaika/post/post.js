@@ -264,9 +264,10 @@ Post.prototype = {
 		}
 
 
-		if(Chaika2chViewer.logined){
-			postData.push("sid=" + encodeURIComponent(Chaika2chViewer.sessionID));
+		if(ChaikaRoninLogin.enabled){
+			postData.push("sid=" + encodeURIComponent(ChaikaCore.pref.getChar('login.ronin.session_id')));
 		}
+
 		this._httpRequest.post(postData.join("&"));
 	},
 
@@ -616,9 +617,10 @@ Post2chNewThread.prototype = {
 		}
 
 
-		if(Chaika2chViewer.logined){
-			postData.push("sid=" + encodeURIComponent(Chaika2chViewer.sessionID));
+		if(ChaikaRoninLogin.enabled){
+			postData.push("sid=" + encodeURIComponent(ChaikaCore.pref.getChar('login.ronin.session_id')));
 		}
+
 		this._httpRequest.post(postData.join("&"));
 	}
 

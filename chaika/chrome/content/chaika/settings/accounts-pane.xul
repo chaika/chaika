@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<overlay id="bbsmenuPaneOverlay"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<prefpane id="paneAccounts" onpaneload="gAccountsPane.startup()">
+
+    <preferences>
+        <preference id="extensions.chaika.login.ronin.id" type="string"
+                name="extensions.chaika.login.ronin.id"/>
+        <preference id="extensions.chaika.login.ronin.password" type="string"
+                name="extensions.chaika.login.ronin.password"/>
+        <preference id="extensions.chaika.login.be.id" type="string"
+                name="extensions.chaika.login.be.id"/>
+        <preference id="extensions.chaika.login.be.password" type="string"
+                name="extensions.chaika.login.be.password"/>
+        <preference id="extensions.chaika.login.p2.id" type="string"
+                name="extensions.chaika.login.p2.id"/>
+        <preference id="extensions.chaika.login.p2.password" type="string"
+                name="extensions.chaika.login.p2.password"/>
+    </preferences>
+
+    <script type="application/x-javascript; version=1.7"
+            src="chrome://chaika/content/settings/accounts-pane.js"/>
+
+    <groupbox>
+        <caption class="setting-description" label="浪人 / ●" />
+        <hbox align="start">
+            <grid style="min-height: auto;">
+                <columns>
+                    <column />
+                    <column width="200"/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="ID" style="text-align:right;"/>
+                        <textbox preference="extensions.chaika.login.ronin.id"/>
+                    </row>
+                    <row>
+                        <label value="秘密鍵" style="text-align:right;"/>
+                        <textbox type="password"
+                            preference="extensions.chaika.login.ronin.password"
+                            onsyncfrompreference="return gAccountsPane.setPasswordBox('Ronin')"
+                            onsynctopreference="return gAccountsPane.setPasswordPref('Ronin', this.value)"/>
+                    </row>
+                </rows>
+            </grid>
+        </hbox>
+    </groupbox>
+
+    <groupbox>
+        <caption class="setting-description" label="Be" />
+        <hbox align="start">
+            <grid style="min-height: auto;">
+                <columns>
+                    <column />
+                    <column width="200"/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="ID" style="text-align:right;"/>
+                        <textbox preference="extensions.chaika.login.be.id"/>
+                    </row>
+                    <row>
+                        <label value="パスワード" style="text-align:right;"/>
+                        <textbox type="password"
+                            preference="extensions.chaika.login.be.password"
+                            onsyncfrompreference="return gAccountsPane.setPasswordBox('Be')"
+                            onsynctopreference="return gAccountsPane.setPasswordPref('Be', this.value)"/>
+                    </row>
+                </rows>
+            </grid>
+        </hbox>
+    </groupbox>
+
+    <groupbox>
+        <caption class="setting-description" label="p2.2ch.net" />
+        <hbox align="start">
+            <grid style="min-height: auto;">
+                <columns>
+                    <column />
+                    <column width="200"/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="ID" style="text-align:right;"/>
+                        <textbox preference="extensions.chaika.login.p2.id"/>
+                    </row>
+                    <row>
+                        <label value="パスワード" style="text-align:right;"/>
+                        <textbox type="password"
+                            preference="extensions.chaika.login.p2.password"
+                            onsyncfrompreference="return gAccountsPane.setPasswordBox('p2')"
+                            onsynctopreference="return gAccountsPane.setPasswordPref('p2', this.value)"/>
+                    </row>
+                </rows>
+            </grid>
+        </hbox>
+    </groupbox>
+
+</prefpane>
+
+
+</overlay>

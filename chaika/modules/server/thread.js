@@ -40,7 +40,6 @@ EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
-Components.utils.import("resource://chaika-modules/Chaika2chViewer.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
 
@@ -603,9 +602,9 @@ Thread2ch.prototype = {
 		this._mimizunMode = false;
 
 		if(aKako){
-			if(Chaika2chViewer.logined){
+			if(ChaikaRoninLogin.isLoggedIn()){
 				//Rokka spec: https://github.com/Cipherwraith/Rokka/blob/master/README.md
-				var KAGI = encodeURIComponent(Chaika2chViewer.sessionID);
+				var KAGI = encodeURIComponent(ChaikaCore.pref.getChar("login.ronin.session_id"));
 				var hostParts = this.thread.plainURL.host.split('.');
 				var pathParts = this.thread.plainURL.path.split('/');
 				var rokkaURLSpec = [

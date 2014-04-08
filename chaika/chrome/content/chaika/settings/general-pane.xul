@@ -16,14 +16,6 @@
 				onchange="setCcontainerDisabled(this.name, 'boxDataDir', true)"/>
 		<preference id="extensions.chaika.data_dir"
 				name="extensions.chaika.data_dir" type="unichar"/>
-		<preference id="extensions.chaika.login.be.id" type="string"
-				name="extensions.chaika.login.be.id"/>
-		<preference id="extensions.chaika.login.be.password" type="string"
-				name="extensions.chaika.login.be.password"/>
-		<preference id="extensions.chaika.login.p2.id" type="string"
-				name="extensions.chaika.login.p2.id"/>
-		<preference id="extensions.chaika.login.p2.password" type="string"
-				name="extensions.chaika.login.p2.password"/>
 		<preference id="extensions.chaika.warn_when_delete_log" type="bool"
 				name="extensions.chaika.warn_when_delete_log"/>
 	</preferences>
@@ -47,64 +39,6 @@
 				<spacer flex="1"/>
 			</hbox>
 		</vbox>
-	</groupbox>
-
-	<groupbox>
-		<caption class="setting-description" label="2ch ビューア" />
-		<vbox align="start">
-			<button id="btnDataDirSelect" label="設定..."
-						oncommand="gGeneralPane.openMaruDialog()"/>
-		</vbox>
-	</groupbox>
-
-	<groupbox>
-		<caption class="setting-description" label="Be" />
-		<hbox align="start">
-			<grid style="min-height: auto;">
-				<columns>
-					<column />
-					<column width="200"/>
-				</columns>
-				<rows>
-					<row>
-						<label value="ID " style="text-align:right;"/>
-						<textbox preference="extensions.chaika.login.be.id"/>
-					</row>
-					<row>
-						<label value="Pass " style="text-align:right;"/>
-						<textbox type="password"
-							preference="extensions.chaika.login.be.password"
-							onsyncfrompreference="return gGeneralPane.setPasswordBox('Be')"
-							onsynctopreference="return gGeneralPane.setPasswordPref('Be', this.value)"/>
-					</row>
-				</rows>
-			</grid>
-		</hbox>
-	</groupbox>
-
-	<groupbox>
-		<caption class="setting-description" label="p2.2ch.net" />
-		<hbox align="start">
-			<grid style="min-height: auto;">
-				<columns>
-					<column />
-					<column width="200"/>
-				</columns>
-				<rows>
-					<row>
-						<label value="ID " style="text-align:right;"/>
-						<textbox preference="extensions.chaika.login.p2.id"/>
-					</row>
-					<row>
-						<label value="Pass " style="text-align:right;"/>
-						<textbox type="password"
-							preference="extensions.chaika.login.p2.password"
-							onsyncfrompreference="return gGeneralPane.setPasswordBox('p2')"
-							onsynctopreference="return gGeneralPane.setPasswordPref('p2', this.value)"/>
-					</row>
-				</rows>
-			</grid>
-		</hbox>
 	</groupbox>
 
 	<groupbox>
