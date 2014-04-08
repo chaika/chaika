@@ -58,6 +58,7 @@
 	<textbox id="messeageForm" value="" multiline="true" flex="1"/>
 
 	<hbox id="toolbox" align="center" pack="end">
+		<checkbox id="roninCheck" label="浪人" oncommand="FormPage.toggleRoninLogin()" />
 		<checkbox id="beCheck" label="Be" oncommand="FormPage.toggleBeLogin()"/>
 		<checkbox id="p2Check" label="p2" oncommand="FormPage.toggleP2Login()"/>
 		<toolbarbutton label="ツール" type="menu">

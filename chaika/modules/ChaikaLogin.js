@@ -240,6 +240,9 @@ var ChaikaRoninLogin = {
 
 	logout: function ChaikaRoninLogin_logout(){
 		ChaikaCore.pref.setChar("login.ronin.session_id", "");
+
+		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+		os.notifyObservers(null, "ChaikaRoninLogin:Logout", "OK");
 	},
 
 	isLoggedIn: function ChaikaRoninLogin_isLoggedIn(){

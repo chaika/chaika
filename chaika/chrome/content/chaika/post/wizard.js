@@ -135,6 +135,8 @@ function startup(){
 	}
 
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+	os.addObserver(FormPage.roninLoginObserver, "Chaika2chViewer:Auth", false);
+	os.addObserver(FormPage.roninLoginObserver, "ChaikaRoninLogin:Logout", false);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login", false);
 	os.addObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout", false);
 	os.addObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Login", false);
@@ -172,6 +174,8 @@ function shutdown(){
 
 	var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 	try{
+		os.removeObserver(FormPage.roninLoginObserver, "Chaika2chViewer:Auth");
+		os.removeObserver(FormPage.roninLoginObserver, "ChaikaRoninLogin:Logout");
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Login");
 		os.removeObserver(FormPage.beLoginObserver, "ChaikaBeLogin:Logout");
 		os.removeObserver(FormPage.p2LoginObserver, "ChaikaP2Login:Login");
@@ -317,6 +321,7 @@ var FormPage = {
 		this._mailForm = document.getElementById("mailForm");
 		this._sageCheck = document.getElementById("sageCheck");
 		this._messeageForm = document.getElementById("messeageForm");
+		this._roninCheck = document.getElementById("roninCheck");
 		this._beCheck = document.getElementById("beCheck");
 		this._p2Check = document.getElementById("p2Check");
 
@@ -335,9 +340,10 @@ var FormPage = {
 		//sage
 		this.sageCheck(true);
 
-		//Be, p2
+		//Ronin, Be, p2
+		this._roninCheck.checked = ChaikaRoninLogin.enabled;
 		this._beCheck.checked = ChaikaBeLogin.isLoggedIn();
-		this._p2Check.checked = ChaikaP2Login.isLoggedIn() && ChaikaP2Login.enabled;
+		this._p2Check.checked = ChaikaP2Login.enabled;
 
 		//Be自動ログイン
 		if(ChaikaCore.pref.getBool('post.auto_be_enable') && !this._beCheck.checked &&
@@ -488,6 +494,46 @@ var FormPage = {
 						.getService(Ci.nsIPrefBranch);
 		const COOKIE_BEHAVIOR_REJECT = 2;
 		return pref.getIntPref("network.cookie.cookieBehavior") != COOKIE_BEHAVIOR_REJECT;
+	},
+
+
+	toggleRoninLogin: function FormPage_toggleRoninLogin(){
+		if(FormPage._roninCheck.checked){
+			ChaikaRoninLogin.enabled = false;
+			FormPage._roninCheck.checked = false;
+
+			if(ChaikaRoninLogin.isLoggedIn()){
+				ChaikaRoninLogin.enabled = true;
+				FormPage._roninCheck.checked = true;
+			}else{
+				ChaikaRoninLogin.login();
+			}
+		}else{
+			ChaikaRoninLogin.enabled = false;
+			FormPage._roninCheck.checked = false;
+		}
+	},
+
+
+	roninLoginObserver: {
+		observe: function(aSubject, aTopic, aData){
+			if(aTopic == "Chaika2chViewer:Auth" && aData == "OK"){
+				ChaikaRoninLogin.enabled = true;
+				FormPage._roninCheck.checked = true;
+			}
+
+			if(aTopic == 'Chaika2chViewer:Auth' && aData == 'NG'){
+				alert("浪人へのログインに失敗しました。\n" +
+						"IDとパスワードを確認してください。");
+				ChaikaRoninLogin.enabled = false;
+				FormPage._roninCheck.checked = false;
+			}
+
+			if(aTopic == "ChaikaRoninLogin:Logout" && aData == "OK"){
+				ChaikaRoninLogin.enabled = false;
+				FormPage._roninCheck.checked = false;
+			}
+		}
 	},
 
 
