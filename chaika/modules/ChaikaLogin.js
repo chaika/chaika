@@ -53,6 +53,55 @@ function makeException(aResult, aMessage){
 
 
 /**
+ * Cookie 文字列をパースする
+ * @param {String} cookieStr
+ * @return {Object}
+ * @private
+ * @license MIT, GPL
+ * @copyright (c) 2012 Daniel Jordan (https://github.com/danjordan/cookie-parser)
+ */
+function parseCookie(cookieStr){
+	var attributes = ['name', 'value', 'expires', 'path', 'domain', 'secure', 'httponly', 'max-age'];
+	var splitter = /,\s(?=[a-zA-Z\-_]+=[a-zA-Z0-9\-_%\.])/g;
+
+	var cookies = [];
+	var cookie_array = cookieStr.split(splitter);
+
+	ChaikaCore.logger.debug(cookie_array);
+
+	cookie_array.forEach(function(e){
+		var cookie = {
+			options: {}
+		};
+		var params = e.split('; ');
+
+		params.forEach(function(param) {
+			param = param.split('=');
+			var key = param[0];
+			var _key = param[0].toLowerCase();
+			var value = param[1];
+
+			if (attributes.indexOf(_key) > 0) {
+				if (_key === 'expires') {
+					cookie.options[_key] = new Date(value.replace(/-/g, ' '));
+				} else {
+					cookie.options[_key] = value || true;
+				}
+			} else {
+				cookie.name = key;
+				cookie.value = value;
+			}
+		});
+
+		cookies.push(cookie);
+	});
+
+	return cookies;
+}
+
+
+
+/**
  * ひな形ログインオブジェクト
  * @abstract
  */
@@ -324,6 +373,14 @@ var ChaikaBeLogin = {
 	_loggedIn: false,
 
 
+	get cookieManager(){
+		if(!this._cookieManager)
+			this._cookieManager = Cc["@mozilla.org/cookiemanager;1"].getService(Ci.nsICookieManager2);
+
+		return this._cookieManager;
+	},
+
+
 	/**
 	 * ユーザーIDとパスワードを返す関数
 	 * @return {Object}  {String} .id ID
@@ -400,16 +457,23 @@ var ChaikaBeLogin = {
 		}
 	},
 
-
 	isLoggedIn: function ChaikaBeLogin_isLoggedIn(){
-		if(!this._loggedIn){
-			var cookieService = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
+		var mdmdExists = this.cookieManager.cookieExists({
+			host: ".2ch.net",
+			path: '/',
+			name: 'MDMD'
+		});
 
-			var cookie = cookieService.getCookieString(this._getLoginURI(), null);
-			if(cookie && cookie.indexOf("MDMD")!=-1 && cookie.indexOf("DMDM")!=-1){
-				this._loggedIn = true;
-			}
-		}
+		var dmdmExists = this.cookieManager.cookieExists({
+			host: ".2ch.net",
+			path: '/',
+			name: 'DMDM'
+		});
+
+		ChaikaCore.logger.debug('MDMD exists:' + mdmdExists + '; DMDM exists:' + dmdmExists);
+
+		//クッキーがあればログイン済みである
+		this._loggedIn = mdmdExists && dmdmExists;
 
 		return this._loggedIn;
 	},
@@ -418,52 +482,29 @@ var ChaikaBeLogin = {
 	login: function ChaikaBeLogin_login(){
 		this._loggedIn = false;
 
-		var httpReq = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
-				.createInstance(Ci.nsIXMLHttpRequest);
+		this._req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"]
+					.createInstance(Ci.nsIXMLHttpRequest);
 
-		httpReq.open("POST", this._getLoginURI().spec, true);
-
-		httpReq.onload = function(aEvent){
-			var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-			this.channel.contentCharset = "euc-jp";
-
-			var id = null;
-			var sessionID = null;
-			if((/DMDM=([^;]+)/m).test(this.responseText)){
-				id = RegExp.$1;
-			}
-			if((/MDMD=([^;]+)/m).test(this.responseText)){
-				sessionID = RegExp.$1;
-			}
-
-			if(id && sessionID){
-				var exp = new Date();
-				exp.setTime(exp.getTime() + 5 * 365 * 86400 * 1000);
-				ChaikaBeLogin._setCookie(id, sessionID, exp);
-				ChaikaBeLogin._loggedIn = true;
-
-				os.notifyObservers(null, "ChaikaBeLogin:Login", "OK");
-			}else{
-				ChaikaBeLogin.logout();
-				os.notifyObservers(null, "ChaikaBeLogin:Login", "NG");
-			}
-		}
+		this._req.open("POST", this._getLoginURI().spec, true);
+		this._req.addEventListener('load', this._onSuccess.bind(this), false);
 
 		var account = this.getLoginInfo();
 		var fromStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
 		var mail = "m=" + encodeURIComponent(account.id);
 		var pass = "p=" + encodeURIComponent(account.password);
-		var submit = "submit=%A5%ED%A5%B0%A5%A4%A5%F3";
+		var submit = "submit=%C5%D0%CF%BF";
 		fromStr.data = [mail, pass, submit].join("&");
 
-		httpReq.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-		httpReq.send(fromStr);
+		this._req.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+		this._req.send(fromStr);
 	},
 
 
 	logout: function ChaikaBeLogin_logout(){
-		this._setCookie("", "", new Date(2000, 0, 1));
+		this.cookieManager.remove(".2ch.net", 'MDMD', '/', false);
+		this.cookieManager.remove(".2ch.net", 'DMDM', '/', false);
 		this._loggedIn = false;
+
 		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 		os.notifyObservers(null, "ChaikaBeLogin:Logout", "OK");
 	},
@@ -476,17 +517,38 @@ var ChaikaBeLogin = {
 	},
 
 
-	_setCookie: function ChaikaBeLogin__setCookie(aID, aSessionID, aExpires){
-		var cookieService = Cc["@mozilla.org/cookieService;1"].getService(Ci.nsICookieService);
+	_onSuccess: function ChaikaBeLogin__onSuccess(){
+		//送られてきたクッキーを登録する
+		var cookieStr = this._req.getResponseHeader('Set-Cookie');
+		var cookies = parseCookie(cookieStr.replace(/\n/g, ', '));
 
-		var idCookie = "DMDM=" + aID
-				+ "; domain=.2ch.net; path=/; expires=" + aExpires.toUTCString();
-		var sessionIDCookie = "MDMD=" + aSessionID
-				+ "; domain=.2ch.net; path=/; expires=" + aExpires.toUTCString();
+		cookies.forEach(function(cookie){
+			if(cookie.options.value !== 'deleted' && cookie.options.domain){
+				this.cookieManager.add(
+					'.' + cookie.options.domain,
+					cookie.options.path,
+					cookie.name,
+					cookie.value,
+					false, false, false,
+					cookie.options.expires ?
+						cookie.options.expires.getTime() / 1000 :
+						( Date.now() / 1000 ) + ( 10 * 365 * 24 * 60 * 60 )
+				);
+			}
+		}, this);
 
-		cookieService.setCookieString(this._getLoginURI(), null, idCookie, null);
-		cookieService.setCookieString(this._getLoginURI(), null, sessionIDCookie, null);
-	}
+		if(this.isLoggedIn()){
+			ChaikaBeLogin._loggedIn = true;
+
+			let os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+			os.notifyObservers(null, "ChaikaBeLogin:Login", "OK");
+		}else{
+			ChaikaBeLogin.logout();
+
+			let os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+			os.notifyObservers(null, "ChaikaBeLogin:Login", "NG");
+		}
+	},
 
 };
 
@@ -686,7 +748,7 @@ var ChaikaP2Login = {
 		//一度ブラウザでログインしないとCookieを受け取れない問題への対策
 		//強制的に送られてきたCookieを追加する
 		var cookieStr = this._req.getResponseHeader('Set-Cookie');
-		var cookies = this._parseCookie(cookieStr.replace(/\n/g, ', '));
+		var cookies = parseCookie(cookieStr.replace(/\n/g, ', '));
 
 		cookies.forEach(function(cookie){
 			if(cookie.options.value !== 'deleted' && cookie.options.domain){
@@ -744,52 +806,5 @@ var ChaikaP2Login = {
 		}else{
 			return null;
 		}
-	},
-
-
-	/**
-	 * Cookie 文字列をパースする
-	 * @param {String} cookieStr
-	 * @return {Object}
-	 * @license MIT, GPL
-	 * @copyright (c) 2012 Daniel Jordan (https://github.com/danjordan/cookie-parser)
-	 */
-	_parseCookie: function(cookieStr){
-		var attributes = ['name', 'value', 'expires', 'path', 'domain', 'secure', 'httponly', 'max-age'];
-		var splitter = /,\s(?=[a-zA-Z\-_]+=[a-zA-Z0-9\-_%\.])/g;
-
-		var cookies = [];
-		var cookie_array = cookieStr.split(splitter);
-
-		ChaikaCore.logger.debug(cookie_array);
-
-		cookie_array.forEach(function(e){
-			var cookie = {
-				options: {}
-			};
-			var params = e.split('; ');
-
-			params.forEach(function(param) {
-				param = param.split('=');
-				var key = param[0];
-				var _key = param[0].toLowerCase();
-				var value = param[1];
-
-				if (attributes.indexOf(_key) > 0) {
-					if (_key === 'expires') {
-						cookie.options[_key] = new Date(value.replace(/-/g, ' '));
-					} else {
-						cookie.options[_key] = value || true;
-					}
-				} else {
-					cookie.name = key;
-					cookie.value = value;
-				}
-			});
-
-			cookies.push(cookie);
-		});
-
-		return cookies;
 	}
 };
