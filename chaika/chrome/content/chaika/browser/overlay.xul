@@ -5,12 +5,6 @@
 
 	<script type="application/javascript" src="chrome://chaika/content/browser/overlay.js"/>
 
-	<!-- Toolbar Button -->
-	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="chaika-toolbarbutton" tooltiptext="chaika" context="chaika-history-popup"
-			observes="viewChaikaSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
-	</toolbarpalette>
-
 	<!-- PopupSet -->
 	<popupset id="mainPopupSet">
 		<menupopup id="chaika-history-popup" tooltiptext=""
