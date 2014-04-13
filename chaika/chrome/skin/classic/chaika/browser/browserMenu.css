@@ -1,0 +1,29 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+/** Icons **/
+
+#chaika-toolbarbutton {
+ -moz-box-orient: horizontal !important;
+
+  list-style-image: url("chrome://chaika/skin/browser/toolbarbutton.png") !important;
+  -moz-image-region: rect(0px, 24px, 24px, 0px);
+}
+
+#chaika-toolbarbutton > .toolbarbutton-icon {
+  width: 16px;
+  height: 16px;
+}
+
+
+/** menuitem's display setting **/
+
+.chaika-browser-menu:not(.chaika-status-text-selected) .chaika-shown-when-text-selected,
+.chaika-browser-menu:not(.chaika-status-on-bbs-link) .chaika-shown-on-bbs-link,
+.chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs,
+.chaika-browser-menu:not(.chaika-status-on-chaika) .chaika-shown-on-chaika,
+.chaika-browser-menu:not(.chaika-status-on-thread) .chaika-shown-on-thread,
+.chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs-not-chaika,
+.chaika-browser-menu.chaika-status-on-chaika .chaika-shown-on-bbs-not-chaika{
+    visibility: collapse;
+    -moz-user-focus: ignore;
+}

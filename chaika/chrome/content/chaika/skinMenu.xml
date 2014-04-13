@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+
+<bindings id="skinMenuBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="skinMenuPopup" extends="chrome://global/content/bindings/popup.xml#popup">
+
+    <handlers>
+        <handler event="popupshowing" action="this._onPopupShowing(event)" />
+        <handler event="command" action="this._doCommand(event)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+            //読み込み時にメニューを構築しておかないと、
+            //設定画面のmenulistが初期状態で空になってしまう
+            this._initMenu();
+        ]]></constructor>
+
+        <method name="_onPopupShowing">
+            <parameter name="aEvent" />
+            <body><![CDATA[
+                this._initMenu();
+            ]]></body>
+        </method>
+
+        <method name="_doCommand">
+            <parameter name="aEvent" />
+            <body><![CDATA[
+                let targetElement = aEvent.originalTarget;
+                let anonymousID = targetElement.getAttribute("anonid");
+
+                switch(anonymousID){
+                    case 'open-skin-folder':
+                        this._openSkinFolder();
+
+                    default:
+                        this._setSkin(targetElement.getAttribute('value'));
+                }
+            ]]></body>
+        </method>
+
+
+        <method name="_initMenu">
+            <body><![CDATA[
+                this._destoryMenu();
+
+                var skinMenu = this.parentNode;
+
+                //デフォルトスキン
+                var defaultItem = skinMenu.appendItem('(Default)', '');
+                defaultItem.setAttribute('type', 'radio');
+
+                //セパレータ
+                var sep1 = document.createElement('menuseparator');
+                skinMenu.menupopup.appendChild(sep1);
+
+                //その他のスキン
+                var skinDir = this.ChaikaCore.getDataDir();
+                skinDir.appendRelativePath("skin");
+
+                if(skinDir.exists()){
+                    let entries = skinDir.directoryEntries
+                            .QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
+                    let entry;
+
+                    while(entry = entries.nextFile){
+                        if(entry.isDirectory()){
+                            let item = skinMenu.appendItem(entry.leafName, entry.leafName);
+                            item.setAttribute('type', 'radio');
+                        }
+                    }
+
+                    entries.close();
+                }
+
+                //セパレータ
+                var sep2 = document.createElement('menuseparator');
+                skinMenu.menupopup.appendChild(sep2);
+
+                //スキンフォルダを開く
+                var folderOpenItem = skinMenu.appendItem('スキンフォルダを開く...', '');
+                folderOpenItem.setAttribute('anonid', 'open-skin-folder');
+
+
+                //現在設定されているスキンを選択状態にする
+                var currentSkinName = this.ChaikaCore.pref.getUniChar('thread_skin');
+                var currentSkinItem = skinMenu.querySelector('menuitem[value="' + currentSkinName + '"]');
+                if(currentSkinItem){
+                    currentSkinItem.setAttribute('checked', 'true');
+                    skinMenu.selectedItem = currentSkinItem;
+                }
+            ]]></body>
+        </method>
+
+
+        <method name="_destoryMenu">
+            <body><![CDATA[
+                while(this.hasChildNodes()){
+                    this.removeChild(this.firstChild);
+                }
+            ]]></body>
+        </method>
+
+
+        <method name="_openSkinFolder">
+            <body><![CDATA[
+                var skinDir = this.ChaikaCore.getDataDir();
+                skinDir.appendRelativePath("skin");
+
+                this.ChaikaCore.io.revealDir(skinDir);
+            ]]></body>
+        </method>
+
+
+        <method name="_setSkin">
+            <parameter name="aSkinName" />
+            <body><![CDATA[
+                this.ChaikaCore.pref.setUniChar('thread_skin', aSkinName);
+
+                let os = Components.classes["@mozilla.org/observer-service;1"]
+                                    .getService(Components.interfaces.nsIObserverService);
+
+                os.notifyObservers(null, "chaika-skin-changed", aSkinName);
+            ]]></body>
+        </method>
+
+    </implementation>
+
+</binding>

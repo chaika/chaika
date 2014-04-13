@@ -53,7 +53,6 @@ var gThreadPane = {
 	_initialized: false,
 
 	startup: function(){
-		this.initThreadSkinList();
 		this.initThreadFontList();
 		this.initThreadAAFontList();
 		document.getElementById("fontPreview").value = FONT_PREVIEW;
@@ -61,49 +60,6 @@ var gThreadPane = {
 		this._initialized = true;
 		this.setFontPreviewBoxFont();
 		this.setAAFontPreviewBoxFont();
-	},
-
-	initThreadSkinList: function(){
-		var lstThreadSkinList = document.getElementById("lstThreadSkinList");
-
-		var menupopup = lstThreadSkinList.menupopup;
-		while(menupopup.firstChild){
-			menupopup.removeChild(menupopup.firstChild);
-		}
-
-			// 規定のスキン
-		lstThreadSkinList.appendItem("(Default)", "");
-
-		var skinDir = ChaikaCore.getDataDir();
-		skinDir.appendRelativePath("skin");
-		try{
-			if(!skinDir.exists()) skinDir.create(skinDir.DIRECTORY_TYPE, 0777);
-		}catch(ex){
-			return;
-		}
-
-		var entries = skinDir.directoryEntries
-				.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
-		while(true){
-			var entry = entries.nextFile;
-			if(!entry) break;
-			if(entry.isDirectory()){
-				lstThreadSkinList.appendItem(entry.leafName, entry.leafName);
-			}
-		}
-		entries.close();
-
-			// MenuList の Value と同じ MenuItem を選択
-		var menuItems = lstThreadSkinList.menupopup.childNodes;
-		for(var i=0; i<menuItems.length; i++){
-			if(menuItems[i].getAttribute("value") == lstThreadSkinList.value){
-				lstThreadSkinList.selectedIndex = i;
-			}
-		}
-			// 同じ MenuItem が無い場合は、デフォルトを選択
-		if(lstThreadSkinList.selectedIndex == -1){
-				lstThreadSkinList.selectedIndex = 0;
-		}
 	},
 
 	initThreadFontList: function(){
