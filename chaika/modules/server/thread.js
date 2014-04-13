@@ -40,6 +40,7 @@ EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
 
