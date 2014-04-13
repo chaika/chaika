@@ -21,6 +21,8 @@
 				onchange="setCcontainerDisabled(this.name, 'subprefs_show_preview', true)" />
 		<preference id="extensions.chaika.post.warn_fusianasan"
 				name="extensions.chaika.post.warn_fusianasan" type="bool" />
+		<preference id="extensions.chaika.post.warn_mistaken_posting"
+				name="extensions.chaika.post.warn_mistaken_posting" type="bool" />
 		<preference id="extensions.chaika.post.warn_be"
 				name="extensions.chaika.post.warn_be" type="bool" />
 		<preference id="extensions.chaika.post.warn_p2"
@@ -63,11 +65,14 @@
 
 				<vbox id="subprefs_show_preview" class="indent">
 					<checkbox label="fusianasanを警告する"
-						preference="extensions.chaika.post.warn_fusianasan" />
+							  preference="extensions.chaika.post.warn_fusianasan" />
+					<checkbox label="誤爆を警告する"
+							  tooltiptext="開いているスレッドと違うスレッドに書き込もうとした時に警告します."
+							  preference="extensions.chaika.post.warn_mistaken_posting" />
 					<checkbox label="Beが有効なときに警告する"
-						preference="extensions.chaika.post.warn_be" />
+							  preference="extensions.chaika.post.warn_be" />
 					<checkbox label="p2経由で書き込むときに警告する"
-						preference="extensions.chaika.post.warn_p2" />
+							  preference="extensions.chaika.post.warn_p2" />
 				</vbox>
 		</vbox>
 	</groupbox>

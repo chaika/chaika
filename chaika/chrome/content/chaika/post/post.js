@@ -138,6 +138,13 @@ Post.prototype = {
 			result.push('p2経由で書き込みを行います');
 		}
 
+		//誤爆警告
+		if(ChaikaCore.pref.getBool('post.warn_mistaken_posting') &&
+		   ChaikaCore.browser.getBrowserWindow().getBrowser()
+		   			.currentURI.spec.indexOf(this._thread.plainURL.spec) === -1){
+			result.push('誤爆の可能性があります');
+		}
+
 		// 文字化けチェック
 		var bbsUnicode = this._board.getSetting("BBS_UNICODE");
 		if(bbsUnicode && bbsUnicode!="pass"){
