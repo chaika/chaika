@@ -56,7 +56,7 @@ var gAccountsPane = {
                 account = ChaikaBeLogin.getLoginInfo();
                 break;
 
-            case 'P2':
+            case 'p2':
                 account = ChaikaP2Login.getLoginInfo();
                 break;
 
@@ -72,19 +72,21 @@ var gAccountsPane = {
      * 変更の反映処理等を効率的に行うためにダミーの設定項目(login.p2.idなど)を使用する
      */
     setPasswordPref: function(type, pass){
+        let id;
+
         switch(type){
             case 'Ronin':
-                let id = document.getElementById('extensions.chaika.login.ronin.id').value;
+                id = document.getElementById('extensions.chaika.login.ronin.id').value;
                 ChaikaRoninLogin.setLoginInfo(id, pass);
                 break;
 
             case 'Be':
-                let id = document.getElementById('extensions.chaika.login.be.id').value;
+                id = document.getElementById('extensions.chaika.login.be.id').value;
                 ChaikaBeLogin.setLoginInfo(id, pass);
                 break;
 
-            case 'P2':
-                let id = document.getElementById('extensions.chaika.login.p2.id').value;
+            case 'p2':
+                id = document.getElementById('extensions.chaika.login.p2.id').value;
                 ChaikaP2Login.setLoginInfo(id, pass);
                 break;
 
