@@ -240,6 +240,7 @@ ChaikaBrowserOverlay.toolbarButton = {
 		onLocationChange: function(aWebProgress, aRequest, aLocation){
 			setTimeout(function(){
 				document.getElementById('chaika-toolbarbutton').hidden =
+					aLocation.spec !== 'about:customizing' &&
 					!ChaikaBrowserOverlay.browserMenu._isBBS(aLocation.spec);
 			}, 0);
 		},
