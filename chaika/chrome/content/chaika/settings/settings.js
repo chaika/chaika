@@ -58,9 +58,9 @@ function shutdown(){
 }
 
 
-function setCcontainerDisabled(aPref, aCcontainerID, aEnabledValue){
+function setContainerDisabled(aPref, aContainerID, aEnabledValue){
 	var prefValue = document.getElementById(aPref).value;
-	var container = document.getElementById(aCcontainerID);
+	var container = document.getElementById(aContainerID);
 
 	container.disabled = (prefValue != aEnabledValue);
 

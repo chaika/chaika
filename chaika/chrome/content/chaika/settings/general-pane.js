@@ -38,9 +38,9 @@
 var gGeneralPane = {
 
 	startup: function(){
-		setCcontainerDisabled("extensions.chaika.appoint_data_dir",
+		setContainerDisabled("extensions.chaika.appoint_data_dir",
 				"boxDataDir", true);
-		setCcontainerDisabled("extensions.chaika.http_proxy_mode",
+		setContainerDisabled("extensions.chaika.http_proxy_mode",
 				"txtProxyValue", "2");
 	},
 

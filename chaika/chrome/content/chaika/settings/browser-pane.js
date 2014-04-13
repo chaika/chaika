@@ -37,7 +37,7 @@
 
 var gBrowserPane = {
 	startup: function(){
-		setCcontainerDisabled("extensions.chaika.browser.redirector.enabled",
+		setContainerDisabled("extensions.chaika.browser.redirector.enabled",
 				"redirectorSubBox", true);
 	}
 };

@@ -41,10 +41,10 @@
 
         <preference id="extensions.chaika.contextmenu.enabled"
                 name="extensions.chaika.contextmenu.enabled" type="bool"
-                onchange="setCcontainerDisabled(this.name, 'subprefs_contextmenu', true)"/>
+                onchange="setContainerDisabled(this.name, 'subprefs_contextmenu', true)"/>
         <preference id="extensions.chaika.contextmenu.show_only_on_bbs"
                 name="extensions.chaika.contextmenu.show_only_on_bbs" type="bool"
-                onchange="setCcontainerDisabled(this.name, 'subprefs_only_bbs', true)" />
+                onchange="setContainerDisabled(this.name, 'subprefs_only_bbs', true)" />
         <preference id="extensions.chaika.contextmenu.always_show_open_link"
                 name="extensions.chaika.contextmenu.always_show_open_link" type="bool" />
         <preference id="extensions.chaika.contextmenu.flattened"

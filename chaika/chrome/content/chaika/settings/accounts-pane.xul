@@ -25,7 +25,7 @@
     <groupbox>
         <caption class="setting-description" label="浪人 / ●" />
         <hbox align="start">
-            <grid style="min-height: auto;">
+            <grid>
                 <columns>
                     <column />
                     <column width="200"/>
@@ -50,7 +50,7 @@
     <groupbox>
         <caption class="setting-description" label="Be" />
         <hbox align="start">
-            <grid style="min-height: auto;">
+            <grid>
                 <columns>
                     <column />
                     <column width="200"/>
@@ -75,7 +75,7 @@
     <groupbox>
         <caption class="setting-description" label="p2.2ch.net" />
         <hbox align="start">
-            <grid style="min-height: auto;">
+            <grid>
                 <columns>
                     <column />
                     <column width="200"/>

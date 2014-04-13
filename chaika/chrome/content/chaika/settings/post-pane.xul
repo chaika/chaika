@@ -18,7 +18,7 @@
 				name="extensions.chaika.post.warn_when_close" type="bool" />
 		<preference id="extensions.chaika.post.show_preview"
 				name="extensions.chaika.post.show_preview" type="bool"
-				onchange="setCcontainerDisabled(this.name, 'subprefs_show_preview', true)" />
+				onchange="setContainerDisabled(this.name, 'subprefs_show_preview', true)" />
 		<preference id="extensions.chaika.post.warn_fusianasan"
 				name="extensions.chaika.post.warn_fusianasan" type="bool" />
 		<preference id="extensions.chaika.post.warn_mistaken_posting"
