@@ -553,39 +553,49 @@ ChaikaLogger.prototype = {
 
 
     /** @private */
-    _insertLog: function ChaikaLogger__insertLog(atype, aMessage){
+    _insertLog: function ChaikaLogger__insertLog(aType, ...args){
+        //スタックトレースの取得
         var stackName = "";
         var stackLine = "";
+
         if(Components.stack.caller.caller){
             stackName = Components.stack.caller.caller.name;
             stackLine = Components.stack.caller.caller.lineNumber;
         }
-        var message = "[" + stackName + ":" + stackLine + "] " + atype +  " " + aMessage;
+
+        //確実に文字列に直す
+        args = args.map(function(arg){
+            return arg.toString();
+        });
+
+        var message = "[" + stackName + ":" + stackLine + "] " + aType +  " " + args.join(', ');
         this._console.logStringMessage(message);
     },
 
 
-    debug: function ChaikaLogger_debug(aMessage){
+    debug: function ChaikaLogger_debug(...args){
         if(this._level < this.LEVEL_DEBUG) return;
 
-        this._insertLog("DEBUG", aMessage);
+        args.unshift('DEBUG');
+        this._insertLog.apply(this, args);
     },
-    info: function ChaikaLogger_info(aMessage){
+    info: function ChaikaLogger_info(...args){
         if(this._level < this.LEVEL_INFO) return;
 
-        this._insertLog("INFO", aMessage);
+        args.unshift('INFO');
+        this._insertLog.apply(this, args);
     },
-    warning: function ChaikaLogger_warning(aMessage){
+    warning: function ChaikaLogger_warning(...args){
         if(this._level < this.LEVEL_WARNING) return;
 
-        var message =  aMessage.message || aMessage.toString();
-        this._insertLog("WARNING", aMessage);
+        args.unshift('WARN');
+        this._insertLog.apply(this, args);
     },
-    error: function ChaikaLogger_error(aMessage){
+    error: function ChaikaLogger_error(...args){
         if(this._level < this.LEVEL_ERROR) return;
 
-        var message =  aMessage.message || aMessage.toString();
-        this._insertLog("ERROR", message);
+        args.unshift('ERROR');
+        this._insertLog.apply(this, args);
     }
 
 };
