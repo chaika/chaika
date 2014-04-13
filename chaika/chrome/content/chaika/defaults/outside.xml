@@ -10,7 +10,7 @@
 -->
 <bbsmenu>
 <category title="外部板">
-    <board title="chaika 公式サイト" url="http://chaika.xrea.jp/" type="5"/>
+    <board title="chaika 公式サイト" url="https://github.com/chaika/chaika" type="5"/>
     <category title="2ch Browser">
         <board title="Monazilla" url="http://www.monazilla.org/" type="5"/>
         <board title="Monazilla@JBBS" url="http://jbbs.shitaraba.net/computer/351/" type="3"/>
