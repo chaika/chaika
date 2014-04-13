@@ -23,6 +23,8 @@
 				name="extensions.chaika.post.warn_fusianasan" type="bool" />
 		<preference id="extensions.chaika.post.warn_mistaken_posting"
 				name="extensions.chaika.post.warn_mistaken_posting" type="bool" />
+		<preference id="extensions.chaika.post.emphasize_warnings"
+				name="extensions.chaika.post.emphasize_warnings" type="bool" />
 		<preference id="extensions.chaika.post.warn_be"
 				name="extensions.chaika.post.warn_be" type="bool" />
 		<preference id="extensions.chaika.post.warn_p2"
@@ -73,6 +75,8 @@
 							  preference="extensions.chaika.post.warn_be" />
 					<checkbox label="p2経由で書き込むときに警告する"
 							  preference="extensions.chaika.post.warn_p2" />
+					<checkbox label="警告を強調する"
+							  preference="extensions.chaika.post.emphasize_warnings" />
 				</vbox>
 		</vbox>
 	</groupbox>

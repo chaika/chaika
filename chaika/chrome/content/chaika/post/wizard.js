@@ -729,11 +729,20 @@ var PreviewPage = {
 		gWizard.canRewind = true;
 		gWizard.canAdvance = false;
 
-		var warningMessages = gPost.getWarningMessages();
+		let emphasizeWarnings = ChaikaCore.pref.getBool('post.emphasize_warnings');
+		let warningMessages = gPost.getWarningMessages();
+
 		if(warningMessages.length > 0){
+			let promptService = Cc["@mozilla.org/embedcomp/prompt-service;1"]
+									.getService(Ci.nsIPromptService);
+
 			Notification.removeAll(true);
 
 			warningMessages.forEach(function(warning){
+				if(emphasizeWarnings){
+					promptService.alert(window, 'chaika', warning);
+				}
+
 				Notification.warning(warning);
 			});
 		}
