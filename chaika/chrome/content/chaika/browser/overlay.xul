@@ -32,12 +32,27 @@
 	</broadcasterset>
 
 	<!-- Toolbar Button -->
-	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="chaika-toolbarbutton" class="toolbarbutton-1 chromeclass-toolbar-additional"
-				label="chaika" tooltiptext="chaika" type="menu">
-			<menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
-		</toolbarbutton>
-	</toolbarpalette>
+	<panelmultiview id="PanelUI-multiView">
+		<panelview id="PanelUI-chaika" flex="1">
+			<label value="chaika" class="panel-subview-header" />
+			<vbox class="panel-subview-body"
+				style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+		</panelview>
+	</panelmultiview>
+
+	<!--
+		<toolbarpalette id="BrowserToolbarPalette">
+			<toolbarbutton id="chaika-toolbarbutton"
+						   class="toolbarbutton-1 chromeclass-toolbar-additional"
+						   label="chaika"
+						   tooltiptext="chaika"
+						   cui-areatype="toolbar"
+						   type="menu-button">
+				<menupopup class="cui-widget-panel cui-widget-panelview PanelUI-subView"
+					style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+			</toolbarbutton>
+		</toolbarpalette>
+	-->
 
 	<!-- Browser Context Menu -->
 	<popup id="contentAreaContextMenu">

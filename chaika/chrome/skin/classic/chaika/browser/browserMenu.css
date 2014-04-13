@@ -3,15 +3,23 @@
 /** Icons **/
 
 #chaika-toolbarbutton {
- -moz-box-orient: horizontal !important;
-
   list-style-image: url("chrome://chaika/skin/browser/toolbarbutton.png") !important;
   -moz-image-region: rect(0px, 24px, 24px, 0px);
 }
 
-#chaika-toolbarbutton > .toolbarbutton-icon {
+#chaika-toolbarbutton > .toolbarbutton-icon{
   width: 16px;
   height: 16px;
+}
+
+#chaika-toolbarbutton[cui-areatype="menu-panel"] > .toolbarbutton-icon,
+toolbarpaletteitem[place="palette"] > #chaika-toolbarbutton > .toolbarbutton-icon{
+    width: 32px;
+    height: 32px;
+}
+
+.chaika-browser-menu :any(menuitem, menu){
+    color: black !important;
 }
 
 

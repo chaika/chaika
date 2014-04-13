@@ -215,6 +215,17 @@ ChaikaBrowserOverlay.toolbarButton = {
 		}
 
 		//初回起動時にボタンを追加する
+		CustomizableUI.createWidget({
+			id: 'chaika-toolbarbutton',
+			type: 'view',
+			viewId: 'PanelUI-chaika',
+			removable: true,
+			tooltiptext: 'chaika',
+			label: 'chaika',
+			defaultArea: CustomizableUI.AREA_NAVBAR
+		});
+
+		/*
 		if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool("browser.toolbarbutton.installed") &&
 		   !document.getElementById('chaika-toolbarbutton')){
 				let toolbar = document.getElementById("nav-bar");
@@ -225,6 +236,7 @@ ChaikaBrowserOverlay.toolbarButton = {
 
         		ChaikaBrowserOverlay.ChaikaCore.pref.setBool("browser.toolbarbutton.installed", true);
 		}
+		*/
 	},
 
 	stop: function toolbarButton_stop(){
