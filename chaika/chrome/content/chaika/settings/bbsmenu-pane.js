@@ -38,12 +38,12 @@
 
 var gBbsmenuPane = {
 
-	startup: function(){
-	},
+    startup: function(){
+    },
 
-	resetBbsmenuURL: function(){
-		var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
-		pref.value = pref.defaultValue;
-	}
+    resetBbsmenuURL: function(){
+        var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
+        pref.value = pref.defaultValue;
+    }
 
 };

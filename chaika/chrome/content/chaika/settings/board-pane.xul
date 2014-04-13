@@ -1,65 +1,65 @@
 <?xml version="1.0"?>
 <overlay id="boardPaneOverlay"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <prefpane id="paneBoard">
 
-	<preferences>
-		<preference id="extensions.chaika.board.auto_update"
-				name="extensions.chaika.board.auto_update" type="bool"/>
-		<preference id="extensions.chaika.board.tree_size"
-				name="extensions.chaika.board.tree_size" type="string"/>
-		<preference id="extensions.chaika.board.open_single_click"
-				name="extensions.chaika.board.open_single_click" type="bool"/>
-		<preference id="extensions.chaika.board.open_new_tab"
-				name="extensions.chaika.board.open_new_tab" type="bool"/>
-		<preference id="extensions.chaika.board.thread_view_limit"
-				name="extensions.chaika.board.thread_view_limit" type="int"/>
-	</preferences>
+    <preferences>
+        <preference id="extensions.chaika.board.auto_update"
+                name="extensions.chaika.board.auto_update" type="bool"/>
+        <preference id="extensions.chaika.board.tree_size"
+                name="extensions.chaika.board.tree_size" type="string"/>
+        <preference id="extensions.chaika.board.open_single_click"
+                name="extensions.chaika.board.open_single_click" type="bool"/>
+        <preference id="extensions.chaika.board.open_new_tab"
+                name="extensions.chaika.board.open_new_tab" type="bool"/>
+        <preference id="extensions.chaika.board.thread_view_limit"
+                name="extensions.chaika.board.thread_view_limit" type="int"/>
+    </preferences>
 
-	<groupbox>
-		<caption class="setting-description" label="自動更新" />
-		<vbox>
-			<checkbox label="スレッド一覧を開いたときに自動的に一覧を更新する"
-					preference="extensions.chaika.board.auto_update"/>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="自動更新" />
+        <vbox>
+            <checkbox label="スレッド一覧を開いたときに自動的に一覧を更新する"
+                    preference="extensions.chaika.board.auto_update"/>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label=" リスト" />
-		<vbox>
-			<hbox align="center" pack="start">
-				<label value="リストのテキスト"/>
-				<menulist preference="extensions.chaika.board.tree_size">
-					<menupopup>
-						<menuitem label="小" value="small"/>
-						<menuitem label="中" value="medium"/>
-						<menuitem label="大" value="big"/>
-					</menupopup>
-				</menulist>
-			</hbox>
-			<checkbox label="シングルクリックで開く"
-					preference="extensions.chaika.board.open_single_click"/>
-			<checkbox label="新しいタブで開く"
-					preference="extensions.chaika.board.open_new_tab"/>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label=" リスト" />
+        <vbox>
+            <hbox align="center" pack="start">
+                <label value="リストのテキスト"/>
+                <menulist preference="extensions.chaika.board.tree_size">
+                    <menupopup>
+                        <menuitem label="小" value="small"/>
+                        <menuitem label="中" value="medium"/>
+                        <menuitem label="大" value="big"/>
+                    </menupopup>
+                </menulist>
+            </hbox>
+            <checkbox label="シングルクリックで開く"
+                    preference="extensions.chaika.board.open_single_click"/>
+            <checkbox label="新しいタブで開く"
+                    preference="extensions.chaika.board.open_new_tab"/>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="スレッド表示の制限" />
-		<vbox align="start">
-			<menulist preference="extensions.chaika.board.thread_view_limit">
-				<menupopup>
-					<menuitem label="全件表示" value="0"/>
-					<menuitem label="最新  25件" value="25"/>
-					<menuitem label="最新  50件" value="50"/>
-					<menuitem label="最新 100件" value="100"/>
-					<menuitem label="最新 150件" value="150"/>
-				</menupopup>
-			</menulist>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="スレッド表示の制限" />
+        <vbox align="start">
+            <menulist preference="extensions.chaika.board.thread_view_limit">
+                <menupopup>
+                    <menuitem label="全件表示" value="0"/>
+                    <menuitem label="最新  25件" value="25"/>
+                    <menuitem label="最新  50件" value="50"/>
+                    <menuitem label="最新 100件" value="100"/>
+                    <menuitem label="最新 150件" value="150"/>
+                </menupopup>
+            </menulist>
+        </vbox>
+    </groupbox>
 
 </prefpane>
 

@@ -5,19 +5,19 @@
 <?xul-overlay href="chrome://chaika/content/post/aaPanel-overlay.xul"?>
 
 <wizard id="chaikaPostWizard" title="書き込みウィザード [chaika]" windowtype="chaika:postWizard"
-		onload="startup()" onunload="shutdown()"
-		onwizardcancel="return cancelCheck(event)" onwizardfinish="return finish();"
-		style="-moz-binding:url(chrome://chaika/content/post/wizard.xml#wizard)"
-		persist="screenX screenY width height"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        onload="startup()" onunload="shutdown()"
+        onwizardcancel="return cancelCheck(event)" onwizardfinish="return finish();"
+        style="-moz-binding:url(chrome://chaika/content/post/wizard.xml#wizard)"
+        persist="screenX screenY width height"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript" src="chrome://chaika/content/post/wizard.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/post.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/trip.js"/>
 
 <stack id="titleHeaderContainer">
-	<label id="titleHeader" crop="center" value=""/>
-	<notificationbox id="notification"/>
+    <label id="titleHeader" crop="center" value=""/>
+    <notificationbox id="notification"/>
 </stack>
 
 
@@ -26,86 +26,86 @@
 
 
 <wizardpage pageid="boardSettingPage" id="boardSettingPage"
-		label="板設定のダウンロード" description=""
-		onpageshow="BoardSettingPage.pageShow(event)">
+        label="板設定のダウンロード" description=""
+        onpageshow="BoardSettingPage.pageShow(event)">
 
-	<progressmeter id="settingDownloaderProgress" mode="undetermined"/>
+    <progressmeter id="settingDownloaderProgress" mode="undetermined"/>
 </wizardpage>
 
 
 <wizardpage pageid="formPage" id="formPage"
-		label="書き込みウィザード" description="マターリ"
-		onpageshow="FormPage.pageShow(event)"
-		onpageadvanced="return FormPage.pageAdvanced(event)">
+        label="書き込みウィザード" description="マターリ"
+        onpageshow="FormPage.pageShow(event)"
+        onpageadvanced="return FormPage.pageAdvanced(event)">
 
-	<hbox id="titleFormContainer" align="center" hidden="true">
-		<label control="titleForm" value="タイトル :"/>
-		<textbox id="titleForm" value="" flex="1"/>
-	</hbox>
+    <hbox id="titleFormContainer" align="center" hidden="true">
+        <label control="titleForm" value="タイトル :"/>
+        <textbox id="titleForm" value="" flex="1"/>
+    </hbox>
 
-	<hbox align="center">
-		<label control="nameForm" value="名前 :"/>
-		<textbox id="nameForm" value="" flex="3"
-				type="autocomplete" autocompletesearch="form-history" enablehistory="true"
-				autocompletesearchparam="chaika-post-name-history"/>
-		<label control="mailForm" value="メール :"/>
-		<textbox id="mailForm" value="" flex="1"
-				type="autocomplete" autocompletesearch="form-history" enablehistory="true"
-				autocompletesearchparam="chaika-post-mail-history"/>
-		<checkbox id="sageCheck" label="sage" persist="checked"
-				oncommand="FormPage.sageCheck()"/>
-	</hbox>
-	<textbox id="messeageForm" value="" multiline="true" flex="1"/>
+    <hbox align="center">
+        <label control="nameForm" value="名前 :"/>
+        <textbox id="nameForm" value="" flex="3"
+                type="autocomplete" autocompletesearch="form-history" enablehistory="true"
+                autocompletesearchparam="chaika-post-name-history"/>
+        <label control="mailForm" value="メール :"/>
+        <textbox id="mailForm" value="" flex="1"
+                type="autocomplete" autocompletesearch="form-history" enablehistory="true"
+                autocompletesearchparam="chaika-post-mail-history"/>
+        <checkbox id="sageCheck" label="sage" persist="checked"
+                oncommand="FormPage.sageCheck()"/>
+    </hbox>
+    <textbox id="messeageForm" value="" multiline="true" flex="1"/>
 
-	<hbox id="toolbox" align="center" pack="end">
-		<checkbox id="roninCheck" label="浪人" oncommand="FormPage.toggleRoninLogin()" />
-		<checkbox id="beCheck" label="Be" oncommand="FormPage.toggleBeLogin()"/>
-		<checkbox id="p2Check" label="p2" oncommand="FormPage.toggleP2Login()"/>
-		<toolbarbutton label="ツール" type="menu">
-			<menupopup position="before_end">
-				<menuitem id="insertAAMenu" label="AAの挿入"
-						oncommand="AAPanel.openPopup(this.parentNode.parentNode)"/>
-				<menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
-						type="checkbox" checked="false" persist="checked"
-						oncommand="FormPage.setUseAAFont()"/>
-				<menuseparator />
-				<menuitem id="alwaysRaisedCheck" label="常に最前面にする"
-							type="checkbox" checked="false" persist="checked"
-							oncommand="FormPage.setAlwaysRaised()" />
-			</menupopup>
-		</toolbarbutton>
-		<panel id="aaPanel" insertTextbox="messeageForm" position="before_end"/>
-	</hbox>
+    <hbox id="toolbox" align="center" pack="end">
+        <checkbox id="roninCheck" label="浪人" oncommand="FormPage.toggleRoninLogin()" />
+        <checkbox id="beCheck" label="Be" oncommand="FormPage.toggleBeLogin()"/>
+        <checkbox id="p2Check" label="p2" oncommand="FormPage.toggleP2Login()"/>
+        <toolbarbutton label="ツール" type="menu">
+            <menupopup position="before_end">
+                <menuitem id="insertAAMenu" label="AAの挿入"
+                        oncommand="AAPanel.openPopup(this.parentNode.parentNode)"/>
+                <menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
+                        type="checkbox" checked="false" persist="checked"
+                        oncommand="FormPage.setUseAAFont()"/>
+                <menuseparator />
+                <menuitem id="alwaysRaisedCheck" label="常に最前面にする"
+                            type="checkbox" checked="false" persist="checked"
+                            oncommand="FormPage.setAlwaysRaised()" />
+            </menupopup>
+        </toolbarbutton>
+        <panel id="aaPanel" insertTextbox="messeageForm" position="before_end"/>
+    </hbox>
 </wizardpage>
 
 
 <wizardpage  pageid="previewPage" id="previewPage"
-		label="プレビュー" description="次へ進むと実際に書き込みます"
-		onpageshow="PreviewPage.pageShow(event)"
-		onpageadvanced="return PreviewPage.pageAdvanced(event)"
-		onpagerewound="return PreviewPage.pageRewound(event)">
+        label="プレビュー" description="次へ進むと実際に書き込みます"
+        onpageshow="PreviewPage.pageShow(event)"
+        onpageadvanced="return PreviewPage.pageAdvanced(event)"
+        onpagerewound="return PreviewPage.pageRewound(event)">
 
-	<iframe id="previewFrame" src="chrome://chaika/content/post/preview.html" flex="1"
-			onload="event.stopPropagation()"/>
+    <iframe id="previewFrame" src="chrome://chaika/content/post/preview.html" flex="1"
+            onload="event.stopPropagation()"/>
 
 </wizardpage>
 
 
 <wizardpage  pageid="submitPage" id="submitPage"
-		label="書き込み" description="マターリ"
-		onpageshow="SubmitPage.pageShow(event)"
-		onpagerewound="return SubmitPage.pageRewound(event)">
+        label="書き込み" description="マターリ"
+        onpageshow="SubmitPage.pageShow(event)"
+        onpagerewound="return SubmitPage.pageRewound(event)">
 
-		<vbox flex="1">
-			<textbox id="response" multiline="true" readonly="true" flex="1"/>
-			<hbox align="center" style="padding:2px;">
-				<hbox flex="1">
-					<progressmeter id="submitProgress" mode="undetermined" flex="1"/>
-				</hbox>
-				<button id="reSubmitButton" disabled="true" label="再書き込み"
-						oncommand="SubmitPage.reSubmit()"/>
-			</hbox>
-		</vbox>
+        <vbox flex="1">
+            <textbox id="response" multiline="true" readonly="true" flex="1"/>
+            <hbox align="center" style="padding:2px;">
+                <hbox flex="1">
+                    <progressmeter id="submitProgress" mode="undetermined" flex="1"/>
+                </hbox>
+                <button id="reSubmitButton" disabled="true" label="再書き込み"
+                        oncommand="SubmitPage.reSubmit()"/>
+            </hbox>
+        </vbox>
 </wizardpage>
 
 </wizard>

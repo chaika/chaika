@@ -48,208 +48,208 @@ const Cr = Components.results;
 
 /** @ignore */
 function makeException(aResult){
-	var stack = Components.stack.caller.caller;
-	return new Components.Exception("exception", aResult, stack);
+    var stack = Components.stack.caller.caller;
+    return new Components.Exception("exception", aResult, stack);
 }
 
 
 /** @ignore */
 var UniConverter = {
 
-	_unicodeConverter: Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-			.createInstance(Ci.nsIScriptableUnicodeConverter),
+    _unicodeConverter: Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+            .createInstance(Ci.nsIScriptableUnicodeConverter),
 
-	toSJIS: function uniConverter_toSJIS(aString){
-		this._unicodeConverter.charset = "Shift_JIS";
-		return this._unicodeConverter.ConvertFromUnicode(aString);
-	},
+    toSJIS: function uniConverter_toSJIS(aString){
+        this._unicodeConverter.charset = "Shift_JIS";
+        return this._unicodeConverter.ConvertFromUnicode(aString);
+    },
 
-	fromSJIS: function uniConverter_fromSJIS(aString){
-		this._unicodeConverter.charset = "Shift_JIS";
-		return this._unicodeConverter.ConvertToUnicode(aString);
-	}
+    fromSJIS: function uniConverter_fromSJIS(aString){
+        this._unicodeConverter.charset = "Shift_JIS";
+        return this._unicodeConverter.ConvertToUnicode(aString);
+    }
 
 };
 
 
 var ChaikaAboneManager = {
 
-	ABONE_TYPE_NAME : 0,
-	ABONE_TYPE_MAIL : 1,
-	ABONE_TYPE_ID   : 2,
-	ABONE_TYPE_WORD : 3,
+    ABONE_TYPE_NAME : 0,
+    ABONE_TYPE_MAIL : 1,
+    ABONE_TYPE_ID   : 2,
+    ABONE_TYPE_WORD : 3,
 
-	/**
-	 * ブラウザ起動時のプロファイル読み込み後に一度だけ実行され、初期化処理を行う。
-	 * @private
-	 */
-	_startup: function ChaikaAboneManager__startup(){
-		this._loadAboneData();
-	},
-
-
-	/**
-	 * ブラウザ終了時に一度だけ実行され、終了処理を行う。
-	 * @private
-	 */
-	_quit: function ChaikaAboneManager__quit(){
-		this._saveAboneData();
-	},
+    /**
+     * ブラウザ起動時のプロファイル読み込み後に一度だけ実行され、初期化処理を行う。
+     * @private
+     */
+    _startup: function ChaikaAboneManager__startup(){
+        this._loadAboneData();
+    },
 
 
-	_loadAboneData: function ChaikaAboneManager__loadAboneData(){
-		this._aboneData = new Array();
-		this._aboneData["name"] = this._loadNgFile("NGnames.txt");
-		this._aboneData["mail"] = this._loadNgFile("NGaddrs.txt");
-		this._aboneData["id"]   = this._loadNgFile("NGid.txt");
-		this._aboneData["word"] = this._loadNgFile("NGwords.txt");
-	},
+    /**
+     * ブラウザ終了時に一度だけ実行され、終了処理を行う。
+     * @private
+     */
+    _quit: function ChaikaAboneManager__quit(){
+        this._saveAboneData();
+    },
 
 
-	_loadNgFile: function ChaikaAboneManager__loadNgFile(aNgFileName){
-		var ngFile = ChaikaCore.getDataDir();
-		ngFile.appendRelativePath(aNgFileName);
-		if(!ngFile.exists()) return new Array();
-
-		var contentLine = ChaikaCore.io.readData(ngFile).split("\n");
-		var resultArray = new Array();
-			// 空白行は読み込まない
-		for(let [i, line] in Iterator(contentLine)){
-			if(line) resultArray.push(line);
-		}
-		return resultArray;
-	},
+    _loadAboneData: function ChaikaAboneManager__loadAboneData(){
+        this._aboneData = new Array();
+        this._aboneData["name"] = this._loadNgFile("NGnames.txt");
+        this._aboneData["mail"] = this._loadNgFile("NGaddrs.txt");
+        this._aboneData["id"]   = this._loadNgFile("NGid.txt");
+        this._aboneData["word"] = this._loadNgFile("NGwords.txt");
+    },
 
 
-	_saveAboneData: function ChaikaAboneManager__saveAboneData(){
-		this._saveNgFile("NGnames.txt", this._aboneData["name"]);
-		this._saveNgFile("NGaddrs.txt", this._aboneData["mail"]);
-		this._saveNgFile("NGid.txt",    this._aboneData["id"]);
-		this._saveNgFile("NGwords.txt", this._aboneData["word"]);
-	},
+    _loadNgFile: function ChaikaAboneManager__loadNgFile(aNgFileName){
+        var ngFile = ChaikaCore.getDataDir();
+        ngFile.appendRelativePath(aNgFileName);
+        if(!ngFile.exists()) return new Array();
+
+        var contentLine = ChaikaCore.io.readData(ngFile).split("\n");
+        var resultArray = new Array();
+            // 空白行は読み込まない
+        for(let [i, line] in Iterator(contentLine)){
+            if(line) resultArray.push(line);
+        }
+        return resultArray;
+    },
 
 
-	_saveNgFile: function ChaikaAboneManager__saveNgFile(aNgFileName, aboneDataArray){
-		var ngFile = ChaikaCore.getDataDir();
-		ngFile.appendRelativePath(aNgFileName);
-		ChaikaCore.io.writeData(ngFile, aboneDataArray.join("\n"), false);
-	},
+    _saveAboneData: function ChaikaAboneManager__saveAboneData(){
+        this._saveNgFile("NGnames.txt", this._aboneData["name"]);
+        this._saveNgFile("NGaddrs.txt", this._aboneData["mail"]);
+        this._saveNgFile("NGid.txt",    this._aboneData["id"]);
+        this._saveNgFile("NGwords.txt", this._aboneData["word"]);
+    },
 
 
-	shouldAbone: function ChaikaAboneManager_shouldAbone(aName, aMail, aID, aMsg){
-		function checkFunc(aElement, aIndex, aArray){
-			return this.indexOf(aElement) != -1;
-		}
-		if(this._aboneData["name"].some(checkFunc, aName)) return true;
-		if(this._aboneData["mail"].some(checkFunc, aMail)) return true;
-		if(this._aboneData["id"].some(checkFunc, aID)) return true;
-		if(this._aboneData["word"].some(checkFunc, aMsg)) return true;
-
-		return false;
-	},
+    _saveNgFile: function ChaikaAboneManager__saveNgFile(aNgFileName, aboneDataArray){
+        var ngFile = ChaikaCore.getDataDir();
+        ngFile.appendRelativePath(aNgFileName);
+        ChaikaCore.io.writeData(ngFile, aboneDataArray.join("\n"), false);
+    },
 
 
-	getAboneData: function ChaikaAboneManager_getAboneData(aType){
-		var ngArray;
-		switch(aType){
-			case this.ABONE_TYPE_NAME:
-				ngArray = this._aboneData["name"];
-				break;
-			case this.ABONE_TYPE_MAIL:
-				ngArray = this._aboneData["mail"];
-				break;
-			case this.ABONE_TYPE_ID:
-				ngArray = this._aboneData["id"];
-				break;
-			case this.ABONE_TYPE_WORD:
-				ngArray = this._aboneData["word"];
-				break;
-			default:
-				return null;
-		}
+    shouldAbone: function ChaikaAboneManager_shouldAbone(aName, aMail, aID, aMsg){
+        function checkFunc(aElement, aIndex, aArray){
+            return this.indexOf(aElement) != -1;
+        }
+        if(this._aboneData["name"].some(checkFunc, aName)) return true;
+        if(this._aboneData["mail"].some(checkFunc, aMail)) return true;
+        if(this._aboneData["id"].some(checkFunc, aID)) return true;
+        if(this._aboneData["word"].some(checkFunc, aMsg)) return true;
 
-		var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-					.createInstance(Ci.nsIScriptableUnicodeConverter);
-		unicodeConverter.charset = "Shift_JIS";
-
-		var resultArray = ngArray.map(function testFunc(aElement, aIndex, aArray){
-				return unicodeConverter.ConvertToUnicode(aElement);
-		});
-		return resultArray;
-	},
+        return false;
+    },
 
 
-	addAbone: function ChaikaAboneManager_addAbone(aWord, aType){
-		var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-					.createInstance(Ci.nsIScriptableUnicodeConverter);
-		unicodeConverter.charset = "Shift_JIS";
+    getAboneData: function ChaikaAboneManager_getAboneData(aType){
+        var ngArray;
+        switch(aType){
+            case this.ABONE_TYPE_NAME:
+                ngArray = this._aboneData["name"];
+                break;
+            case this.ABONE_TYPE_MAIL:
+                ngArray = this._aboneData["mail"];
+                break;
+            case this.ABONE_TYPE_ID:
+                ngArray = this._aboneData["id"];
+                break;
+            case this.ABONE_TYPE_WORD:
+                ngArray = this._aboneData["word"];
+                break;
+            default:
+                return null;
+        }
 
-		var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
+        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                    .createInstance(Ci.nsIScriptableUnicodeConverter);
+        unicodeConverter.charset = "Shift_JIS";
 
-		var ngArray;
-		switch(aType){
-			case this.ABONE_TYPE_NAME:
-				ngArray = this._aboneData["name"];
-				break;
-			case this.ABONE_TYPE_MAIL:
-				ngArray = this._aboneData["mail"];
-				break;
-			case this.ABONE_TYPE_ID:
-				ngArray = this._aboneData["id"];
-				break;
-			case this.ABONE_TYPE_WORD:
-				ngArray = this._aboneData["word"];
-				break;
-			default:
-				return;
-		}
-
-			// 二重登録の禁止
-		if(ngArray.indexOf(sjisWord) != -1) return;
-
-		ngArray.push(sjisWord);
-
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
-		type.data = aType;
-
-		os.notifyObservers(type, "b2r-abone-data-add", aWord);
-	},
+        var resultArray = ngArray.map(function testFunc(aElement, aIndex, aArray){
+                return unicodeConverter.ConvertToUnicode(aElement);
+        });
+        return resultArray;
+    },
 
 
-	removeAbone: function ChaikaAboneManager_removeAbone(aWord, aType){
-		var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-					.createInstance(Ci.nsIScriptableUnicodeConverter);
-		unicodeConverter.charset = "Shift_JIS";
+    addAbone: function ChaikaAboneManager_addAbone(aWord, aType){
+        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                    .createInstance(Ci.nsIScriptableUnicodeConverter);
+        unicodeConverter.charset = "Shift_JIS";
 
-		var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
+        var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
 
-		var ngArray;
-		switch(aType){
-			case this.ABONE_TYPE_NAME:
-				ngArray = this._aboneData["name"];
-				break;
-			case this.ABONE_TYPE_MAIL:
-				ngArray = this._aboneData["mail"];
-				break;
-			case this.ABONE_TYPE_ID:
-				ngArray = this._aboneData["id"];
-				break;
-			case this.ABONE_TYPE_WORD:
-				ngArray = this._aboneData["word"];
-				break;
-			default:
-				return;
-		}
+        var ngArray;
+        switch(aType){
+            case this.ABONE_TYPE_NAME:
+                ngArray = this._aboneData["name"];
+                break;
+            case this.ABONE_TYPE_MAIL:
+                ngArray = this._aboneData["mail"];
+                break;
+            case this.ABONE_TYPE_ID:
+                ngArray = this._aboneData["id"];
+                break;
+            case this.ABONE_TYPE_WORD:
+                ngArray = this._aboneData["word"];
+                break;
+            default:
+                return;
+        }
 
-		var wordIndex = ngArray.indexOf(sjisWord);
-		if(wordIndex != -1) ngArray.splice(wordIndex, 1);
+            // 二重登録の禁止
+        if(ngArray.indexOf(sjisWord) != -1) return;
 
-		var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-		var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
-		type.data = aType;
-		os.notifyObservers(type, "b2r-abone-data-remove", aWord);
+        ngArray.push(sjisWord);
 
-	}
+        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+        var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+        type.data = aType;
+
+        os.notifyObservers(type, "b2r-abone-data-add", aWord);
+    },
+
+
+    removeAbone: function ChaikaAboneManager_removeAbone(aWord, aType){
+        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                    .createInstance(Ci.nsIScriptableUnicodeConverter);
+        unicodeConverter.charset = "Shift_JIS";
+
+        var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
+
+        var ngArray;
+        switch(aType){
+            case this.ABONE_TYPE_NAME:
+                ngArray = this._aboneData["name"];
+                break;
+            case this.ABONE_TYPE_MAIL:
+                ngArray = this._aboneData["mail"];
+                break;
+            case this.ABONE_TYPE_ID:
+                ngArray = this._aboneData["id"];
+                break;
+            case this.ABONE_TYPE_WORD:
+                ngArray = this._aboneData["word"];
+                break;
+            default:
+                return;
+        }
+
+        var wordIndex = ngArray.indexOf(sjisWord);
+        if(wordIndex != -1) ngArray.splice(wordIndex, 1);
+
+        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
+        var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+        type.data = aType;
+        os.notifyObservers(type, "b2r-abone-data-remove", aWord);
+
+    }
 
 };

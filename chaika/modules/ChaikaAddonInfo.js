@@ -46,12 +46,12 @@ const Cr = Components.results;
 
 var ChaikaAddonInfo = {
 
-	name: "chaika",
-	version: "1",
+    name: "chaika",
+    version: "1",
 
-	_init: function ChaikaAddonInfo_init(aAddon){
-		this.name = aAddon.name;
-		this.version = aAddon.version;
-	}
+    _init: function ChaikaAddonInfo_init(aAddon){
+        this.name = aAddon.name;
+        this.version = aAddon.version;
+    }
 
 };

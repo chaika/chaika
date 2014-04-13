@@ -1,9 +1,9 @@
-content	chaika	chrome/content/chaika/
-skin	chaika	classic/1.0	chrome/skin/classic/chaika/
-overlay	chrome://browser/content/browser.xul	chrome://chaika/content/browser/overlay.xul
-style	chrome://browser/content/browser.xul	chrome://chaika/skin/browser/browserMenu.css
-style	chrome://global/content/customizeToolbar.xul	chrome://chaika/skin/browser/browserMenu.css
-resource	chaika-modules	modules/
+content    chaika    chrome/content/chaika/
+skin    chaika    classic/1.0    chrome/skin/classic/chaika/
+overlay    chrome://browser/content/browser.xul    chrome://chaika/content/browser/overlay.xul
+style    chrome://browser/content/browser.xul    chrome://chaika/skin/browser/browserMenu.css
+style    chrome://global/content/customizeToolbar.xul    chrome://chaika/skin/browser/browserMenu.css
+resource    chaika-modules    modules/
 
 #Component registration
 interfaces components/chIChaikaService.xpt

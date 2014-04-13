@@ -1,97 +1,97 @@
 <?xml version="1.0"?>
 <overlay id="PostPaneOverlay"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <prefpane id="panePost">
 
-	<preferences>
-		<preference id="extensions.chaika.post.thread_reload"
-				name="extensions.chaika.post.thread_reload" type="bool"/>
-		<preference id="extensions.chaika.post.auto_finish"
-				name="extensions.chaika.post.auto_finish" type="bool"/>
-		<preference id="extensions.chaika.post.write_log.succeeded"
-				name="extensions.chaika.post.write_log.succeeded" type="bool"/>
-		<preference id="extensions.chaika.post.write_log.failed"
-				name="extensions.chaika.post.write_log.failed" type="bool"/>
-		<preference id="extensions.chaika.post.warn_when_close"
-				name="extensions.chaika.post.warn_when_close" type="bool" />
-		<preference id="extensions.chaika.post.show_preview"
-				name="extensions.chaika.post.show_preview" type="bool"
-				onchange="setContainerDisabled(this.name, 'subprefs_show_preview', true)" />
-		<preference id="extensions.chaika.post.warn_fusianasan"
-				name="extensions.chaika.post.warn_fusianasan" type="bool" />
-		<preference id="extensions.chaika.post.warn_mistaken_posting"
-				name="extensions.chaika.post.warn_mistaken_posting" type="bool" />
-		<preference id="extensions.chaika.post.emphasize_warnings"
-				name="extensions.chaika.post.emphasize_warnings" type="bool" />
-		<preference id="extensions.chaika.post.warn_be"
-				name="extensions.chaika.post.warn_be" type="bool" />
-		<preference id="extensions.chaika.post.warn_p2"
-				name="extensions.chaika.post.warn_p2" type="bool" />
-		<preference id="extensions.chaika.post.auto_be_enable"
-				name="extensions.chaika.post.auto_be_enable" type="bool" />
-		<preference id="extensions.chaika.post.auto_be_disable"
-				name="extensions.chaika.post.auto_be_disable" type="bool" />
-		<preference id="extensions.chaika.post.auto_p2_disable"
-				name="extensions.chaika.post.auto_p2_disable" type="bool" />
-	</preferences>
+    <preferences>
+        <preference id="extensions.chaika.post.thread_reload"
+                name="extensions.chaika.post.thread_reload" type="bool"/>
+        <preference id="extensions.chaika.post.auto_finish"
+                name="extensions.chaika.post.auto_finish" type="bool"/>
+        <preference id="extensions.chaika.post.write_log.succeeded"
+                name="extensions.chaika.post.write_log.succeeded" type="bool"/>
+        <preference id="extensions.chaika.post.write_log.failed"
+                name="extensions.chaika.post.write_log.failed" type="bool"/>
+        <preference id="extensions.chaika.post.warn_when_close"
+                name="extensions.chaika.post.warn_when_close" type="bool" />
+        <preference id="extensions.chaika.post.show_preview"
+                name="extensions.chaika.post.show_preview" type="bool"
+                onchange="setContainerDisabled(this.name, 'subprefs_show_preview', true)" />
+        <preference id="extensions.chaika.post.warn_fusianasan"
+                name="extensions.chaika.post.warn_fusianasan" type="bool" />
+        <preference id="extensions.chaika.post.warn_mistaken_posting"
+                name="extensions.chaika.post.warn_mistaken_posting" type="bool" />
+        <preference id="extensions.chaika.post.emphasize_warnings"
+                name="extensions.chaika.post.emphasize_warnings" type="bool" />
+        <preference id="extensions.chaika.post.warn_be"
+                name="extensions.chaika.post.warn_be" type="bool" />
+        <preference id="extensions.chaika.post.warn_p2"
+                name="extensions.chaika.post.warn_p2" type="bool" />
+        <preference id="extensions.chaika.post.auto_be_enable"
+                name="extensions.chaika.post.auto_be_enable" type="bool" />
+        <preference id="extensions.chaika.post.auto_be_disable"
+                name="extensions.chaika.post.auto_be_disable" type="bool" />
+        <preference id="extensions.chaika.post.auto_p2_disable"
+                name="extensions.chaika.post.auto_p2_disable" type="bool" />
+    </preferences>
 
-	<groupbox>
-		<caption class="setting-description" label="成功時の動作" />
-		<vbox>
-			<checkbox label="スレッドの再読み込み"
-					preference="extensions.chaika.post.thread_reload"/>
-			<checkbox label="ウィザードを自動的に閉じる"
-					preference="extensions.chaika.post.auto_finish"/>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="成功時の動作" />
+        <vbox>
+            <checkbox label="スレッドの再読み込み"
+                    preference="extensions.chaika.post.thread_reload"/>
+            <checkbox label="ウィザードを自動的に閉じる"
+                    preference="extensions.chaika.post.auto_finish"/>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="書き込みログ" />
-		<vbox>
-			<checkbox label="成功時に kakikomi.txt に保存する"
-					preference="extensions.chaika.post.write_log.succeeded"/>
-			<checkbox label="失敗時に kakikomi.txt に保存する"
-					preference="extensions.chaika.post.write_log.failed"/>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="書き込みログ" />
+        <vbox>
+            <checkbox label="成功時に kakikomi.txt に保存する"
+                    preference="extensions.chaika.post.write_log.succeeded"/>
+            <checkbox label="失敗時に kakikomi.txt に保存する"
+                    preference="extensions.chaika.post.write_log.failed"/>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="警告" />
-		<vbox>
-			<checkbox label="ウィザードを閉じるときに警告する"
-				preference="extensions.chaika.post.warn_when_close" />
-			<checkbox label="書き込む前にプレビューを表示する(推奨)"
-				preference="extensions.chaika.post.show_preview" />
+    <groupbox>
+        <caption class="setting-description" label="警告" />
+        <vbox>
+            <checkbox label="ウィザードを閉じるときに警告する"
+                preference="extensions.chaika.post.warn_when_close" />
+            <checkbox label="書き込む前にプレビューを表示する(推奨)"
+                preference="extensions.chaika.post.show_preview" />
 
-				<vbox id="subprefs_show_preview" class="indent">
-					<checkbox label="fusianasanを警告する"
-							  preference="extensions.chaika.post.warn_fusianasan" />
-					<checkbox label="誤爆を警告する"
-							  tooltiptext="開いているスレッドと違うスレッドに書き込もうとした時に警告します."
-							  preference="extensions.chaika.post.warn_mistaken_posting" />
-					<checkbox label="Beが有効なときに警告する"
-							  preference="extensions.chaika.post.warn_be" />
-					<checkbox label="p2経由で書き込むときに警告する"
-							  preference="extensions.chaika.post.warn_p2" />
-					<checkbox label="警告を強調する"
-							  preference="extensions.chaika.post.emphasize_warnings" />
-				</vbox>
-		</vbox>
-	</groupbox>
+                <vbox id="subprefs_show_preview" class="indent">
+                    <checkbox label="fusianasanを警告する"
+                              preference="extensions.chaika.post.warn_fusianasan" />
+                    <checkbox label="誤爆を警告する"
+                              tooltiptext="開いているスレッドと違うスレッドに書き込もうとした時に警告します."
+                              preference="extensions.chaika.post.warn_mistaken_posting" />
+                    <checkbox label="Beが有効なときに警告する"
+                              preference="extensions.chaika.post.warn_be" />
+                    <checkbox label="p2経由で書き込むときに警告する"
+                              preference="extensions.chaika.post.warn_p2" />
+                    <checkbox label="警告を強調する"
+                              preference="extensions.chaika.post.emphasize_warnings" />
+                </vbox>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="自動ログイン" />
-		<vbox>
-			<checkbox label="Be関連板に書き込む時に自動的にBeを有効にする"
-				preference="extensions.chaika.post.auto_be_enable" />
-			<checkbox label="書き込みが終わるごとにBeを無効にする"
-				preference="extensions.chaika.post.auto_be_disable" />
-			<checkbox label="書き込みが終わるごとにp2を無効にする"
-				preference="extensions.chaika.post.auto_p2_disable" />
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="自動ログイン" />
+        <vbox>
+            <checkbox label="Be関連板に書き込む時に自動的にBeを有効にする"
+                preference="extensions.chaika.post.auto_be_enable" />
+            <checkbox label="書き込みが終わるごとにBeを無効にする"
+                preference="extensions.chaika.post.auto_be_disable" />
+            <checkbox label="書き込みが終わるごとにp2を無効にする"
+                preference="extensions.chaika.post.auto_p2_disable" />
+        </vbox>
+    </groupbox>
 
 </prefpane>
 

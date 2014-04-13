@@ -39,34 +39,34 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
 var gIoService = Components.classes["@mozilla.org/network/io-service;1"]
-		.getService(Components.interfaces.nsIIOService);
+        .getService(Components.interfaces.nsIIOService);
 
 function startup(){
-	var paneID = window.location.hash.substring(1);
-	if(paneID){
-		var paneElement = document.getElementById(paneID);
-		if(paneElement && paneElement.localName=="prefpane"){
-			document.documentElement.showPane(paneElement);
-		}
-	}
+    var paneID = window.location.hash.substring(1);
+    if(paneID){
+        var paneElement = document.getElementById(paneID);
+        if(paneElement && paneElement.localName=="prefpane"){
+            document.documentElement.showPane(paneElement);
+        }
+    }
 
-	window.addEventListener('paneload', sizeToContent, false);
+    window.addEventListener('paneload', sizeToContent, false);
 }
 
 function shutdown(){
-	window.removeEventListener('paneload', sizeToContent, false);
+    window.removeEventListener('paneload', sizeToContent, false);
 }
 
 
 function setContainerDisabled(aPref, aContainerID, aEnabledValue){
-	var prefValue = document.getElementById(aPref).value;
-	var container = document.getElementById(aContainerID);
+    var prefValue = document.getElementById(aPref).value;
+    var container = document.getElementById(aContainerID);
 
-	container.disabled = (prefValue != aEnabledValue);
+    container.disabled = (prefValue != aEnabledValue);
 
-	var childNodes = container.getElementsByTagName("*");
-	for(let i=0; i<childNodes.length; i++){
-		var node = childNodes[i];
-		node.disabled = (prefValue != aEnabledValue);
-	}
+    var childNodes = container.getElementsByTagName("*");
+    for(let i=0; i<childNodes.length; i++){
+        var node = childNodes[i];
+        node.disabled = (prefValue != aEnabledValue);
+    }
 }

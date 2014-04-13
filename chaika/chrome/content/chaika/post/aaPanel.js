@@ -38,217 +38,217 @@
 
 var AAPanel = {
 
-	_initialized: false,
+    _initialized: false,
 
-	aaDirExists: function AAPanel_aaDirExists(){
-		var aaDir = ChaikaCore.getDataDir();
-		aaDir.appendRelativePath("AA");
-		return aaDir.exists();
-	},
+    aaDirExists: function AAPanel_aaDirExists(){
+        var aaDir = ChaikaCore.getDataDir();
+        aaDir.appendRelativePath("AA");
+        return aaDir.exists();
+    },
 
-	openPopup: function AAPanel_openPopup(aAnchor){
-		var aaPanel = document.getElementById("aaPanel");
-		aaPanel.openPopup(aAnchor);
-	},
+    openPopup: function AAPanel_openPopup(aAnchor){
+        var aaPanel = document.getElementById("aaPanel");
+        aaPanel.openPopup(aAnchor);
+    },
 
-	popupShowing: function AAPanel_popupShowing(aEvent){
-		if(!this._initialized){
-			this._aaRootDir = ChaikaCore.getDataDir();
-			this._aaRootDir.appendRelativePath("AA");
+    popupShowing: function AAPanel_popupShowing(aEvent){
+        if(!this._initialized){
+            this._aaRootDir = ChaikaCore.getDataDir();
+            this._aaRootDir.appendRelativePath("AA");
 
-			this._initDirTree();
-		}
-	},
+            this._initDirTree();
+        }
+    },
 
-	popupShown: function AAPanel_popupShown(aEvent){
-		if(!this._initialized){
-			var dirTree = document.getElementById("aaPanel-dirTree");
-			dirTree.focus();
-			dirTree.view.selection.select(0);
+    popupShown: function AAPanel_popupShown(aEvent){
+        if(!this._initialized){
+            var dirTree = document.getElementById("aaPanel-dirTree");
+            dirTree.focus();
+            dirTree.view.selection.select(0);
 
-			this._initialized = true;
-		}
-	},
+            this._initialized = true;
+        }
+    },
 
-	_initDirTree: function AAPanel__initDirTree(){
-		function appendSubDir(aParentNode, aCurrentDir){
-			var aaExtReg = /\.aa\.xml$/i;
-			var entries = aCurrentDir.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
-			while(true){
-				var entry = entries.nextFile;
-				if(!entry) break;
-				if(entry.isDirectory()){
-					var fileNode = aParentNode.ownerDocument.createElement("file");
-					fileNode.setAttribute("name", entry.leafName);
-					fileNode.setAttribute("path", entry.path);
-					aParentNode.appendChild(fileNode);
-					appendSubDir(fileNode, entry);
-				}else if(aaExtReg.test(entry.leafName)){
-					if(aParentNode.getAttribute("name") != entry.leafName.replace(aaExtReg, "")){
-						var fileNode = aParentNode.ownerDocument.createElement("file");
-						fileNode.setAttribute("name", entry.leafName.replace(aaExtReg, ""));
-						fileNode.setAttribute("path", entry.path);
-						aParentNode.appendChild(fileNode);
-					}
-				}
-			}
-			entries.close();
-		}
+    _initDirTree: function AAPanel__initDirTree(){
+        function appendSubDir(aParentNode, aCurrentDir){
+            var aaExtReg = /\.aa\.xml$/i;
+            var entries = aCurrentDir.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
+            while(true){
+                var entry = entries.nextFile;
+                if(!entry) break;
+                if(entry.isDirectory()){
+                    var fileNode = aParentNode.ownerDocument.createElement("file");
+                    fileNode.setAttribute("name", entry.leafName);
+                    fileNode.setAttribute("path", entry.path);
+                    aParentNode.appendChild(fileNode);
+                    appendSubDir(fileNode, entry);
+                }else if(aaExtReg.test(entry.leafName)){
+                    if(aParentNode.getAttribute("name") != entry.leafName.replace(aaExtReg, "")){
+                        var fileNode = aParentNode.ownerDocument.createElement("file");
+                        fileNode.setAttribute("name", entry.leafName.replace(aaExtReg, ""));
+                        fileNode.setAttribute("path", entry.path);
+                        aParentNode.appendChild(fileNode);
+                    }
+                }
+            }
+            entries.close();
+        }
 
-		var dirListDoc = (new DOMParser()).parseFromString("<root/>", "text/xml");
-		appendSubDir(dirListDoc.documentElement, this._aaRootDir);
+        var dirListDoc = (new DOMParser()).parseFromString("<root/>", "text/xml");
+        appendSubDir(dirListDoc.documentElement, this._aaRootDir);
 
-		var dirTree = document.getElementById("aaPanel-dirTree");
-		dirTree.builder.datasource = dirListDoc.documentElement;
-		dirTree.builder.rebuild();
-	},
-
-
-	dirTreeSelect: function AAPanel_dirTreeSelect(aEvent){
-		var dirTree = document.getElementById("aaPanel-dirTree");
-		var column = dirTree.columns.getFirstColumn();
-		var filePath = dirTree.view.getCellValue(dirTree.currentIndex, column);
-
-		var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
-		file.initWithPath(filePath);
-
-		this._initListTree(file);
-	},
+        var dirTree = document.getElementById("aaPanel-dirTree");
+        dirTree.builder.datasource = dirListDoc.documentElement;
+        dirTree.builder.rebuild();
+    },
 
 
-	_initListTree: function AAPanel__initListTree(aFile){
-		var listTree = document.getElementById("aaPanel-listTree");
+    dirTreeSelect: function AAPanel_dirTreeSelect(aEvent){
+        var dirTree = document.getElementById("aaPanel-dirTree");
+        var column = dirTree.columns.getFirstColumn();
+        var filePath = dirTree.view.getCellValue(dirTree.currentIndex, column);
 
-		var listTreeDoc, aaListXML;
+        var file = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsIFile);
+        file.initWithPath(filePath);
 
-		if(!aFile.isDirectory()){
-			aaListXML = ChaikaCore.io.readString(aFile, "UTF-8");
-			listTreeDoc = (new DOMParser()).parseFromString(aaListXML, "text/xml");
-		}else{
-			var defaultFile = aFile.clone();
-			defaultFile.appendRelativePath(aFile.leafName + ".aa.xml");
-			if(defaultFile.exists()){
-				aaListXML = ChaikaCore.io.readString(defaultFile, "UTF-8");
-				listTreeDoc = (new DOMParser()).parseFromString(aaListXML, "text/xml");
-			}else{
-				listTreeDoc = (new DOMParser()).parseFromString("<root/>", "text/xml")
-			}
-		}
-		listTree.builder.datasource = listTreeDoc.documentElement;
-		listTree.builder.rebuild();
-	},
+        this._initListTree(file);
+    },
 
 
-	_listTreeMouseOverLastIndex: -1,
+    _initListTree: function AAPanel__initListTree(aFile){
+        var listTree = document.getElementById("aaPanel-listTree");
 
-	listTreeMouseMove: function AAPanel_listTreeMouseMove(aEvent){
-		if(aEvent.originalTarget.localName != "treechildren") return;
+        var listTreeDoc, aaListXML;
 
-		var listTree = document.getElementById("aaPanel-listTree");
-		var row = {}
-		var obj = {};
-		listTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
-		if(row.value == -1) return;	// ツリーのアイテム以外
-		if(row.value == this._listTreeMouseOverLastIndex) return;
-
-		var column = listTree.columns.getFirstColumn();
-		var content = listTree.view.getCellValue(row.value, column).replace(/\t/g, "");
-		if(!content){
-			content = listTree.view.getCellText(row.value, column).replace(/\t/g, "");
-		}
-
-		this._drawThumbnail(content);
-
-		this._listTreeMouseOverLastIndex = row.value;
-	},
-
-
-	_drawThumbnail: function AAPanel__drawThumbnail(aContent){
-
-		const THUMBNAIL_SIZE = 160;
-		const FONT_SIZE = ChaikaCore.pref.getInt("thread_aa_font_size");
-		const LINE_HEIGHT = FONT_SIZE + ChaikaCore.pref.getInt("thread_aa_line_space");
-		const FONT_NAME = ChaikaCore.pref.getUniChar("thread_aa_font_name");
-
-		var canvas = document.getElementById("aaPanel-thumbnailCanvas");
-		var ctx = canvas.getContext("2d");
-
-		ctx.font = FONT_SIZE + "px \'" + FONT_NAME + "\'";
-
-		var aaLines = aContent.split("\n");
-
-		var aaHeight = LINE_HEIGHT * aaLines.length;
-		var aaWidth = 0;
-		for(var i=0; i<aaLines.length; i++){
-			var line = aaLines[i];
-			if(line.length == 0) continue;
-			var w = ctx.measureText(line).width;
-			if(w > aaWidth) aaWidth = w;
-		}
-
-		canvas.width = THUMBNAIL_SIZE;
-		canvas.height = THUMBNAIL_SIZE;
-
-		ctx.fillStyle = "#FFF";
-		ctx.clearRect(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
-		ctx.fillStyle = "#111";
-		ctx.strokeStyle = "#555";
-
-		var scale = 1;
-		var xSpacing = 0;
-		var ySpacing = 0;
-		if(aaWidth > aaHeight){
-				if(aaWidth > THUMBNAIL_SIZE){
-					var scale = THUMBNAIL_SIZE / aaWidth;
-					ySpacing = (THUMBNAIL_SIZE - (aaHeight * scale))/2
-				}else{
-					xSpacing = (THUMBNAIL_SIZE - aaWidth) / 2;
-					ySpacing = (THUMBNAIL_SIZE - aaHeight) / 2;
-				}
-		}else{
-				if(aaHeight > THUMBNAIL_SIZE){
-					var scale = THUMBNAIL_SIZE / aaHeight;
-					xSpacing = (THUMBNAIL_SIZE - (aaWidth * scale))/2
-				}else{
-					xSpacing = (THUMBNAIL_SIZE - aaWidth) / 2;
-					ySpacing = (THUMBNAIL_SIZE - aaHeight) / 2;
-				}
-		}
-
-		ctx.save();
-		ctx.scale(scale, scale);
-		for(var i=0; i<aaLines.length; i++){
-			line = aaLines[i];
-			var y = (FONT_SIZE * scale) + ySpacing + (i*LINE_HEIGHT);
-			ctx.fillText(line, xSpacing, y);
-			ctx.strokeText(line, xSpacing, y);
-		}
-		ctx.restore();
-	},
+        if(!aFile.isDirectory()){
+            aaListXML = ChaikaCore.io.readString(aFile, "UTF-8");
+            listTreeDoc = (new DOMParser()).parseFromString(aaListXML, "text/xml");
+        }else{
+            var defaultFile = aFile.clone();
+            defaultFile.appendRelativePath(aFile.leafName + ".aa.xml");
+            if(defaultFile.exists()){
+                aaListXML = ChaikaCore.io.readString(defaultFile, "UTF-8");
+                listTreeDoc = (new DOMParser()).parseFromString(aaListXML, "text/xml");
+            }else{
+                listTreeDoc = (new DOMParser()).parseFromString("<root/>", "text/xml")
+            }
+        }
+        listTree.builder.datasource = listTreeDoc.documentElement;
+        listTree.builder.rebuild();
+    },
 
 
-	listTreeSelect: function AAPanel_listTreeSelect(aEvent){
-		var aaPanel = document.getElementById("aaPanel");
+    _listTreeMouseOverLastIndex: -1,
 
-		var listTree = document.getElementById("aaPanel-listTree");
-		var row = {}
-		var obj = {};
-		listTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
-		if(row.value == -1) return;	// ツリーのアイテム以外
+    listTreeMouseMove: function AAPanel_listTreeMouseMove(aEvent){
+        if(aEvent.originalTarget.localName != "treechildren") return;
 
-		var column = listTree.columns.getFirstColumn();
-		var content = listTree.view.getCellValue(row.value, column).replace(/\t/g, "");
-		if(!content){
-			content = listTree.view.getCellText(row.value, column).replace(/\t/g, "");
-		}
+        var listTree = document.getElementById("aaPanel-listTree");
+        var row = {}
+        var obj = {};
+        listTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
+        if(row.value == -1) return;    // ツリーのアイテム以外
+        if(row.value == this._listTreeMouseOverLastIndex) return;
 
-		var insertTextbox = document.getElementById(aaPanel.getAttribute("insertTextbox"));
+        var column = listTree.columns.getFirstColumn();
+        var content = listTree.view.getCellValue(row.value, column).replace(/\t/g, "");
+        if(!content){
+            content = listTree.view.getCellText(row.value, column).replace(/\t/g, "");
+        }
 
-		var leftValue = insertTextbox.value.substring(0, insertTextbox.selectionStart);
-		var rightValue = insertTextbox.value.substring(insertTextbox.selectionEnd);
-		insertTextbox.value = leftValue + content + rightValue;
+        this._drawThumbnail(content);
 
-		aaPanel.hidePopup();
-	}
+        this._listTreeMouseOverLastIndex = row.value;
+    },
+
+
+    _drawThumbnail: function AAPanel__drawThumbnail(aContent){
+
+        const THUMBNAIL_SIZE = 160;
+        const FONT_SIZE = ChaikaCore.pref.getInt("thread_aa_font_size");
+        const LINE_HEIGHT = FONT_SIZE + ChaikaCore.pref.getInt("thread_aa_line_space");
+        const FONT_NAME = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+
+        var canvas = document.getElementById("aaPanel-thumbnailCanvas");
+        var ctx = canvas.getContext("2d");
+
+        ctx.font = FONT_SIZE + "px \'" + FONT_NAME + "\'";
+
+        var aaLines = aContent.split("\n");
+
+        var aaHeight = LINE_HEIGHT * aaLines.length;
+        var aaWidth = 0;
+        for(var i=0; i<aaLines.length; i++){
+            var line = aaLines[i];
+            if(line.length == 0) continue;
+            var w = ctx.measureText(line).width;
+            if(w > aaWidth) aaWidth = w;
+        }
+
+        canvas.width = THUMBNAIL_SIZE;
+        canvas.height = THUMBNAIL_SIZE;
+
+        ctx.fillStyle = "#FFF";
+        ctx.clearRect(0, 0, THUMBNAIL_SIZE, THUMBNAIL_SIZE);
+        ctx.fillStyle = "#111";
+        ctx.strokeStyle = "#555";
+
+        var scale = 1;
+        var xSpacing = 0;
+        var ySpacing = 0;
+        if(aaWidth > aaHeight){
+                if(aaWidth > THUMBNAIL_SIZE){
+                    var scale = THUMBNAIL_SIZE / aaWidth;
+                    ySpacing = (THUMBNAIL_SIZE - (aaHeight * scale))/2
+                }else{
+                    xSpacing = (THUMBNAIL_SIZE - aaWidth) / 2;
+                    ySpacing = (THUMBNAIL_SIZE - aaHeight) / 2;
+                }
+        }else{
+                if(aaHeight > THUMBNAIL_SIZE){
+                    var scale = THUMBNAIL_SIZE / aaHeight;
+                    xSpacing = (THUMBNAIL_SIZE - (aaWidth * scale))/2
+                }else{
+                    xSpacing = (THUMBNAIL_SIZE - aaWidth) / 2;
+                    ySpacing = (THUMBNAIL_SIZE - aaHeight) / 2;
+                }
+        }
+
+        ctx.save();
+        ctx.scale(scale, scale);
+        for(var i=0; i<aaLines.length; i++){
+            line = aaLines[i];
+            var y = (FONT_SIZE * scale) + ySpacing + (i*LINE_HEIGHT);
+            ctx.fillText(line, xSpacing, y);
+            ctx.strokeText(line, xSpacing, y);
+        }
+        ctx.restore();
+    },
+
+
+    listTreeSelect: function AAPanel_listTreeSelect(aEvent){
+        var aaPanel = document.getElementById("aaPanel");
+
+        var listTree = document.getElementById("aaPanel-listTree");
+        var row = {}
+        var obj = {};
+        listTree.treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, obj);
+        if(row.value == -1) return;    // ツリーのアイテム以外
+
+        var column = listTree.columns.getFirstColumn();
+        var content = listTree.view.getCellValue(row.value, column).replace(/\t/g, "");
+        if(!content){
+            content = listTree.view.getCellText(row.value, column).replace(/\t/g, "");
+        }
+
+        var insertTextbox = document.getElementById(aaPanel.getAttribute("insertTextbox"));
+
+        var leftValue = insertTextbox.value.substring(0, insertTextbox.selectionStart);
+        var rightValue = insertTextbox.value.substring(insertTextbox.selectionEnd);
+        insertTextbox.value = leftValue + content + rightValue;
+
+        aaPanel.hidePopup();
+    }
 
 };

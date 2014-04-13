@@ -1,89 +1,89 @@
 <?xml version="1.0"?>
 <overlay id="bbsmenuPaneOverlay"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <prefpane id="paneBrowser" onpaneload="gBrowserPane.startup()">
 
-	<preferences>
-		<preference id="extensions.chaika.browser.browsermenu.open_in_new_tab"
-				name="extensions.chaika.browser.browsermenu.open_in_new_tab" type="bool" />
-		<preference id="extensions.chaika.browser.browsermenu.disregard_url_limit"
-				name="extensions.chaika.browser.browsermenu.disregard_url_limit" type="bool" />
-		<preference id="extensions.chaika.browser.browsermenu.confirm_add_abone"
-				name="extensions.chaika.browser.browsermenu.confirm_add_abone" type="bool" />
-		<preference id="extensions.chaika.browser.browsermenu.reload_when_skin_changed"
-				name="extensions.chaika.browser.browsermenu.reload_when_skin_changed" type="bool"/>
-		<preference id="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar"
-				name="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" type="bool"/>
-		<preference id="extensions.chaika.browser.toolbarbutton.show_only_on_bbs"
-				name="extensions.chaika.browser.toolbarbutton.show_only_on_bbs" type="bool"/>
-		<preference id="extensions.chaika.browser.redirector.enabled"
-				name="extensions.chaika.browser.redirector.enabled" type="bool"
-				onchange="setContainerDisabled(this.name, 'redirectorSubBox', true)"/>
-		<preference id="extensions.chaika.thread_redirector.ask"
-				name="extensions.chaika.thread_redirector.ask" type="bool"/>
-		<preference id="extensions.chaika.browser.redirector.throw_bookmarks"
-				name="extensions.chaika.browser.redirector.throw_bookmarks" type="bool"/>
-		<preference id="extensions.chaika.browser.redirector.replace_view_limit"
-				name="extensions.chaika.browser.redirector.replace_view_limit" type="bool"/>
-		<preference id="extensions.chaika.tab_load_in_foreground"
-				name="extensions.chaika.tab_load_in_foreground" type="bool"/>
-	</preferences>
+    <preferences>
+        <preference id="extensions.chaika.browser.browsermenu.open_in_new_tab"
+                name="extensions.chaika.browser.browsermenu.open_in_new_tab" type="bool" />
+        <preference id="extensions.chaika.browser.browsermenu.disregard_url_limit"
+                name="extensions.chaika.browser.browsermenu.disregard_url_limit" type="bool" />
+        <preference id="extensions.chaika.browser.browsermenu.confirm_add_abone"
+                name="extensions.chaika.browser.browsermenu.confirm_add_abone" type="bool" />
+        <preference id="extensions.chaika.browser.browsermenu.reload_when_skin_changed"
+                name="extensions.chaika.browser.browsermenu.reload_when_skin_changed" type="bool"/>
+        <preference id="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar"
+                name="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" type="bool"/>
+        <preference id="extensions.chaika.browser.toolbarbutton.show_only_on_bbs"
+                name="extensions.chaika.browser.toolbarbutton.show_only_on_bbs" type="bool"/>
+        <preference id="extensions.chaika.browser.redirector.enabled"
+                name="extensions.chaika.browser.redirector.enabled" type="bool"
+                onchange="setContainerDisabled(this.name, 'redirectorSubBox', true)"/>
+        <preference id="extensions.chaika.thread_redirector.ask"
+                name="extensions.chaika.thread_redirector.ask" type="bool"/>
+        <preference id="extensions.chaika.browser.redirector.throw_bookmarks"
+                name="extensions.chaika.browser.redirector.throw_bookmarks" type="bool"/>
+        <preference id="extensions.chaika.browser.redirector.replace_view_limit"
+                name="extensions.chaika.browser.redirector.replace_view_limit" type="bool"/>
+        <preference id="extensions.chaika.tab_load_in_foreground"
+                name="extensions.chaika.tab_load_in_foreground" type="bool"/>
+    </preferences>
 
-	<script type="application/x-javascript; version=1.7"
-			src="chrome://chaika/content/settings/browser-pane.js"/>
+    <script type="application/x-javascript; version=1.7"
+            src="chrome://chaika/content/settings/browser-pane.js"/>
 
-	<groupbox>
-		<caption class="setting-description" label="chaika メニュー"
-				tooltiptext="ツールバーボタンおよびコンテキストメニューに共通の設定を行います." />
-		<vbox>
-			<checkbox label="左クリックで新しいタブに開く" tooltiptext="OFFの場合は中クリックで新しいタブに開くことができます."
-					preference="extensions.chaika.browser.browsermenu.open_in_new_tab" />
-			<checkbox label="URL の表示制限を書き換えて開く"
-					preference="extensions.chaika.browser.browsermenu.disregard_url_limit" />
-			<checkbox label="NGワードを直接登録せずにあぼーんマネージャを開く"
+    <groupbox>
+        <caption class="setting-description" label="chaika メニュー"
+                tooltiptext="ツールバーボタンおよびコンテキストメニューに共通の設定を行います." />
+        <vbox>
+            <checkbox label="左クリックで新しいタブに開く" tooltiptext="OFFの場合は中クリックで新しいタブに開くことができます."
+                    preference="extensions.chaika.browser.browsermenu.open_in_new_tab" />
+            <checkbox label="URL の表示制限を書き換えて開く"
+                    preference="extensions.chaika.browser.browsermenu.disregard_url_limit" />
+            <checkbox label="NGワードを直接登録せずにあぼーんマネージャを開く"
                     preference="extensions.chaika.browser.browsermenu.confirm_add_abone" />
             <checkbox label="chaika 上でスキンを変更した時に自動で再読み込みする"
                     preference="extensions.chaika.browser.browsermenu.reload_when_skin_changed" />
             <checkbox label="2ch 検索をサイドバーで行う"
                     preference="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" />
-		</vbox>
-	</groupbox>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="ツールバーボタン" />
-		<vbox>
-			<checkbox label="chaikaおよび掲示板上でのみ表示する *"
-					preference="extensions.chaika.browser.toolbarbutton.show_only_on_bbs" />
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="ツールバーボタン" />
+        <vbox>
+            <checkbox label="chaikaおよび掲示板上でのみ表示する *"
+                    preference="extensions.chaika.browser.toolbarbutton.show_only_on_bbs" />
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="タブ" />
-		<vbox>
-			<checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
-					preference="extensions.chaika.tab_load_in_foreground"/>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="タブ" />
+        <vbox>
+            <checkbox label="新しいタブを開いたとき、すぐにそのタブに切り替える"
+                    preference="extensions.chaika.tab_load_in_foreground"/>
+        </vbox>
+    </groupbox>
 
-	<groupbox>
-		<caption class="setting-description" label="スレッドリダイレクタ" />
-		<vbox>
-			<checkbox label="2ch スレッド URL を自動的に chaika で開く *"
-					preference="extensions.chaika.browser.redirector.enabled"/>
-			<vbox id="redirectorSubBox" class="indent">
-				<checkbox label="ブックマークやスレッド表示からはそのまま開く"
-						preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
-				<checkbox label="URL の表示制限を書き換えて開く"
-						preference="extensions.chaika.browser.redirector.replace_view_limit"/>
-			</vbox>
-		</vbox>
-	</groupbox>
+    <groupbox>
+        <caption class="setting-description" label="スレッドリダイレクタ" />
+        <vbox>
+            <checkbox label="2ch スレッド URL を自動的に chaika で開く *"
+                    preference="extensions.chaika.browser.redirector.enabled"/>
+            <vbox id="redirectorSubBox" class="indent">
+                <checkbox label="ブックマークやスレッド表示からはそのまま開く"
+                        preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
+                <checkbox label="URL の表示制限を書き換えて開く"
+                        preference="extensions.chaika.browser.redirector.replace_view_limit"/>
+            </vbox>
+        </vbox>
+    </groupbox>
 
-	<vbox style="margin:0.5em 0px 0px 0.5em">
-		<description>* 設定変更はブラウザ再起動後に反映されます</description>
-	</vbox>
+    <vbox style="margin:0.5em 0px 0px 0.5em">
+        <description>* 設定変更はブラウザ再起動後に反映されます</description>
+    </vbox>
 
 </prefpane>
 

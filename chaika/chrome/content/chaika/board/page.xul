@@ -4,9 +4,9 @@
 <?xml-stylesheet href="chrome://chaika/skin/board/page.css" type="text/css"?>
 
 <page id="chaikaBoardPage" onload="startup()" onunload="shutdown()"
-		onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-		xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
 <script type="application/javascript" src="chrome://chaika/content/board/page.js"/>
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
@@ -14,105 +14,105 @@
 <xhtml:link rel="shortcut icon" href="chrome://chaika/content/icon.png" style="display: none;" />
 
 <popupset>
-	<menupopup id="boardTreeContextMenu"
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-			onpopupshowing="return BoardTree.showContext(event)"/>
+    <menupopup id="boardTreeContextMenu"
+            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+            onpopupshowing="return BoardTree.showContext(event)"/>
 </popupset>
 
 
 <marbletoolbar id="toolbar" align="center">
-	<deck id="statusDeck" flex="1">
-		<hbox align="center" flex="1">
-			<label id="lblTitle" crop="end" value="" flex="1"/>
-		</hbox>
-		<hbox align="center" flex="1">
-			<label id="lblStatus" crop="end" value="" flex="1"/>
-		</hbox>
-	</deck>
+    <deck id="statusDeck" flex="1">
+        <hbox align="center" flex="1">
+            <label id="lblTitle" crop="end" value="" flex="1"/>
+        </hbox>
+        <hbox align="center" flex="1">
+            <label id="lblStatus" crop="end" value="" flex="1"/>
+        </hbox>
+    </deck>
 
-	<marbletextbox id="searchTextBox" value="" emptytext="フィルタ" type="search"
-			timeout="500" oncommand="BoardTree.initTree(true)"/>
-	<marblebuttongroup id="filterGroup" value="0" persist2="value">
-		<marblebutton label="すべて" value="0" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="TOP200" value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="既読" value="-2" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-		<marblebutton label="DAT落ち" value="-1" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
-	</marblebuttongroup>
+    <marbletextbox id="searchTextBox" value="" emptytext="フィルタ" type="search"
+            timeout="500" oncommand="BoardTree.initTree(true)"/>
+    <marblebuttongroup id="filterGroup" value="0" persist2="value">
+        <marblebutton label="すべて" value="0" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+        <marblebutton label="TOP200" value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+        <marblebutton label="既読" value="-2" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+        <marblebutton label="DAT落ち" value="-1" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
+    </marblebuttongroup>
 
-	<spacer width="3"/>
+    <spacer width="3"/>
 
-	<marblebutton label="ツール" type="menu">
-		<menupopup id="popTools" position="after_end">
-			<menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
-				onclick="if(event.button==1)showBrowser(true)"/>
-			<menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
-			<menuitem label="板情報の更新" oncommand="settingUpdate()"/>
-			<menuitem label="新規スレッド作成" oncommand="postNewThread()"/>
-			<menuseparator/>
-			<menuitem label="オプション..." oncommand="openSettings()"/>
-		</menupopup>
-	</marblebutton>
+    <marblebutton label="ツール" type="menu">
+        <menupopup id="popTools" position="after_end">
+            <menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
+                onclick="if(event.button==1)showBrowser(true)"/>
+            <menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
+            <menuitem label="板情報の更新" oncommand="settingUpdate()"/>
+            <menuitem label="新規スレッド作成" oncommand="postNewThread()"/>
+            <menuseparator/>
+            <menuitem label="オプション..." oncommand="openSettings()"/>
+        </menupopup>
+    </marblebutton>
 
-	<deck id="dckUpdate" selectedIndex="0">
-		<marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)"/>
-		<marblebutton id="MoveCheck"  label="確認" oncommand="boardMoveCheck(event)"/>
-		<marblebutton id="MoveNewURL" label="移動" oncommand="moveNewURL(event)"/>
-	</deck>
+    <deck id="dckUpdate" selectedIndex="0">
+        <marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)"/>
+        <marblebutton id="MoveCheck"  label="確認" oncommand="boardMoveCheck(event)"/>
+        <marblebutton id="MoveNewURL" label="移動" oncommand="moveNewURL(event)"/>
+    </deck>
 </marbletoolbar>
 
 
 <tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
-		onclick="BoardTree.click(event)" ondblclick="BoardTree.click(event)"
-		onkeypress="BoardTree.keyDown(event)"
-		ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
- 		onmousemove="BoardTree.mouseMove(event)"
- 		onmouseout="BoardTree.mouseOut(event)"
-		datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
-	<treecols>
-		<treecol id="boardTreeCol-status" label="!"        sort="?statusSort" style="width:3em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-number" label="No"       sort="?numberSort" style="width:3em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-title"  label="タイトル" sort="?title" flex="1" ignoreincolumnpicker="true"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-count"  label="レス"     sort="?countSort"  style="width:4em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-read"   label="既読"     sort="?readSort"   style="width:4em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-unread" label="未読"     sort="?unreadSort" style="width:4em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-force"   label="勢い"    sort="?forceSort"  style="width:4em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-		<splitter class="tree-splitter"/>
-		<treecol id="boardTreeCol-created" label="作成日"  sort="?createdSort" style="width:9em;"
-				class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
-	</treecols>
+        onclick="BoardTree.click(event)" ondblclick="BoardTree.click(event)"
+        onkeypress="BoardTree.keyDown(event)"
+        ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
+         onmousemove="BoardTree.mouseMove(event)"
+         onmouseout="BoardTree.mouseOut(event)"
+        datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
+    <treecols>
+        <treecol id="boardTreeCol-status" label="!"        sort="?statusSort" style="width:3em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-number" label="No"       sort="?numberSort" style="width:3em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-title"  label="タイトル" sort="?title" flex="1" ignoreincolumnpicker="true"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-count"  label="レス"     sort="?countSort"  style="width:4em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-read"   label="既読"     sort="?readSort"   style="width:4em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-unread" label="未読"     sort="?unreadSort" style="width:4em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-force"   label="勢い"    sort="?forceSort"  style="width:4em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <splitter class="tree-splitter"/>
+        <treecol id="boardTreeCol-created" label="作成日"  sort="?createdSort" style="width:9em;"
+                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+    </treecols>
 
-	<template>
-		<query expr="boarditem"/>
-		<action>
-			<treechildren flex="1">
-				<treeitem uri="?">
-					<treerow properties="s?status">
-						<treecell label=""         properties="s?status status"/>
-						<treecell label="?number"  properties="s?status number"/>
-						<treecell label="?title"   properties="s?status title" value="?url"/>
-						<treecell label="?count"   properties="s?status count"/>
-						<treecell label="?read"    properties="s?status read"/>
-						<treecell label="?unread"  properties="s?status unread"/>
-						<treecell label="?force"   properties="s?status force"/>
-						<treecell label="?created" properties="s?status created"/>
-					</treerow>
-				</treeitem> 
-			</treechildren>
-		</action>
-	</template>
+    <template>
+        <query expr="boarditem"/>
+        <action>
+            <treechildren flex="1">
+                <treeitem uri="?">
+                    <treerow properties="s?status">
+                        <treecell label=""         properties="s?status status"/>
+                        <treecell label="?number"  properties="s?status number"/>
+                        <treecell label="?title"   properties="s?status title" value="?url"/>
+                        <treecell label="?count"   properties="s?status count"/>
+                        <treecell label="?read"    properties="s?status read"/>
+                        <treecell label="?unread"  properties="s?status unread"/>
+                        <treecell label="?force"   properties="s?status force"/>
+                        <treecell label="?created" properties="s?status created"/>
+                    </treerow>
+                </treeitem> 
+            </treechildren>
+        </action>
+    </template>
 </tree>
 
 </page>

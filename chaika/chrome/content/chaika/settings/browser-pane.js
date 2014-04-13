@@ -36,8 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 var gBrowserPane = {
-	startup: function(){
-		setContainerDisabled("extensions.chaika.browser.redirector.enabled",
-				"redirectorSubBox", true);
-	}
+    startup: function(){
+        setContainerDisabled("extensions.chaika.browser.redirector.enabled",
+                "redirectorSubBox", true);
+    }
 };

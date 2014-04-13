@@ -1,365 +1,365 @@
 <?xml version="1.0"?>
 
 <bindings id="pageUtilsBindings"
-		xmlns="http://www.mozilla.org/xbl"
-		xmlns:xbl="http://www.mozilla.org/xbl"
-		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <binding id="itemContext" extends="chrome://global/content/bindings/popup.xml#popup">
-	<content>
-		<xul:arrowscrollbox class="popup-internal-box" flex="1" orient="vertical">
-			<xul:menuitem label="開く" anonid="open"/>
-			<xul:menuitem label="新しいタブで開く" anonid="openTab"/>
-			<xul:menuitem label="タブですべてを開く" anonid="openTabAll"/>
-			<xul:menuitem label="ブラウザで開く" anonid="openBrowser"/>
-			<xul:menuitem label="新しいブラウザタブで開く" anonid="openBrowserTab"/>
+    <content>
+        <xul:arrowscrollbox class="popup-internal-box" flex="1" orient="vertical">
+            <xul:menuitem label="開く" anonid="open"/>
+            <xul:menuitem label="新しいタブで開く" anonid="openTab"/>
+            <xul:menuitem label="タブですべてを開く" anonid="openTabAll"/>
+            <xul:menuitem label="ブラウザで開く" anonid="openBrowser"/>
+            <xul:menuitem label="新しいブラウザタブで開く" anonid="openBrowserTab"/>
 
-			<xul:menuseparator/>
+            <xul:menuseparator/>
 
-			<xul:menuitem label="タイトルのコピー" anonid="copyTitle" />
-			<xul:menuitem label="URL のコピー" anonid="copyURL"/>
-			<xul:menuitem label="URL とタイトルのコピー" anonid="copyTitleAndURL"/>
+            <xul:menuitem label="タイトルのコピー" anonid="copyTitle" />
+            <xul:menuitem label="URL のコピー" anonid="copyURL"/>
+            <xul:menuitem label="URL とタイトルのコピー" anonid="copyTitleAndURL"/>
 
-			<xul:menuseparator anonid="deleteLogSeparator"/>
+            <xul:menuseparator anonid="deleteLogSeparator"/>
 
-			<xul:menuitem label="ログの削除" anonid="deleteLog"/>
-		</xul:arrowscrollbox>
-	</content>
+            <xul:menuitem label="ログの削除" anonid="deleteLog"/>
+        </xul:arrowscrollbox>
+    </content>
 
-	<implementation>
-		<constructor><![CDATA[
-			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
-			Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
 
-			this.items = [];
-		]]></constructor>
+            this.items = [];
+        ]]></constructor>
 
-		<method name="_getMenuItem">
-			<parameter name="aAnonId"/>
-			<body><![CDATA[
-				return document.getAnonymousElementByAttribute(this, "anonid", aAnonId);
-			]]></body>
-		</method>
-	</implementation>
+        <method name="_getMenuItem">
+            <parameter name="aAnonId"/>
+            <body><![CDATA[
+                return document.getAnonymousElementByAttribute(this, "anonid", aAnonId);
+            ]]></body>
+        </method>
+    </implementation>
 
-	<handlers>
-		<handler event="popupshowing" phase="target"><![CDATA[
+    <handlers>
+        <handler event="popupshowing" phase="target"><![CDATA[
 
-			if(this.items.length == 0) return false;
+            if(this.items.length == 0) return false;
 
-			var itemType = this.items[0].itemType;
+            var itemType = this.items[0].itemType;
 
-				// items配列の内容がひとつだけなら
-				// 「タブですべてを開く」を隠す
-			this._getMenuItem("openTabAll").hidden = (this.items.length <= 1);
+                // items配列の内容がひとつだけなら
+                // 「タブですべてを開く」を隠す
+            this._getMenuItem("openTabAll").hidden = (this.items.length <= 1);
 
-				// itemType  が "thread" 以外なら 「ログの削除」を隠す
-			this._getMenuItem("deleteLogSeparator").hidden = (itemType != "thread");
-			this._getMenuItem("deleteLog").hidden = (itemType != "thread");
+                // itemType  が "thread" 以外なら 「ログの削除」を隠す
+            this._getMenuItem("deleteLogSeparator").hidden = (itemType != "thread");
+            this._getMenuItem("deleteLog").hidden = (itemType != "thread");
 
-				// itemType  が "page" なら「開く」「新しいタブで開く」を隠す
-			this._getMenuItem("open").hidden = (itemType == "page");
-			this._getMenuItem("openTab").hidden = (itemType == "page");
+                // itemType  が "page" なら「開く」「新しいタブで開く」を隠す
+            this._getMenuItem("open").hidden = (itemType == "page");
+            this._getMenuItem("openTab").hidden = (itemType == "page");
 
-			return true;
-		]]></handler>
+            return true;
+        ]]></handler>
 
-		<handler event="popuphidden" phase="target"><![CDATA[
-			this.items = [];
-		]]></handler>
+        <handler event="popuphidden" phase="target"><![CDATA[
+            this.items = [];
+        ]]></handler>
 
-		<!-- メニューアイテムの実行 -->
-		<handler event="command" phase="bubbling"><![CDATA[
-			var target = event.originalTarget;
-			if(target.localName != "menuitem") return;
+        <!-- メニューアイテムの実行 -->
+        <handler event="command" phase="bubbling"><![CDATA[
+            var target = event.originalTarget;
+            if(target.localName != "menuitem") return;
 
-			var firstItem = this.items[0];
-			var isBoard = (firstItem.itemType == "board");
-			var isPage = (firstItem.itemType == "page");
+            var firstItem = this.items[0];
+            var isBoard = (firstItem.itemType == "board");
+            var isPage = (firstItem.itemType == "page");
 
-			var osName = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
-			const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
+            var osName = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+            const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
 
-			switch(target.getAttribute("anonid")){
-				case "open":
-					if(isBoard){
-						this.ChaikaCore.browser.openBoard(firstItem.getURL(), false);
-					}else{
-						this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true);
-					}
-					break;
+            switch(target.getAttribute("anonid")){
+                case "open":
+                    if(isBoard){
+                        this.ChaikaCore.browser.openBoard(firstItem.getURL(), false);
+                    }else{
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true);
+                    }
+                    break;
 
-				case "openTab":
-					if(isBoard){
-						this.ChaikaCore.browser.openBoard(firstItem.getURL(), true);
-					}else{
-						this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true);
-					}
-					break;
+                case "openTab":
+                    if(isBoard){
+                        this.ChaikaCore.browser.openBoard(firstItem.getURL(), true);
+                    }else{
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true);
+                    }
+                    break;
 
-				case "openTabAll":
-					this.items.forEach(function(aElement, aIndex, aArray){
-						if(aElement.itemType == "board"){
-							this.ChaikaCore.browser.openBoard(aElement.getURL(), true);
-						}else{
-							this.ChaikaCore.browser.openThread(aElement.getURL(), true, true);
-						}
-					});
-					break;
+                case "openTabAll":
+                    this.items.forEach(function(aElement, aIndex, aArray){
+                        if(aElement.itemType == "board"){
+                            this.ChaikaCore.browser.openBoard(aElement.getURL(), true);
+                        }else{
+                            this.ChaikaCore.browser.openThread(aElement.getURL(), true, true);
+                        }
+                    });
+                    break;
 
-				case "openBrowser":
-					if(isBoard || isPage){
-						this.ChaikaCore.browser.openURL(firstItem.getURL(), false);
-					}else{
-						this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true, true);
-					}
-					break;
+                case "openBrowser":
+                    if(isBoard || isPage){
+                        this.ChaikaCore.browser.openURL(firstItem.getURL(), false);
+                    }else{
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true, true);
+                    }
+                    break;
 
-				case "openBrowserTab":
-					if(isBoard || isPage){
-						this.ChaikaCore.browser.openURL(firstItem.getURL(), true);
-					}else{
-						this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true, true);
-					}
-					break;
+                case "openBrowserTab":
+                    if(isBoard || isPage){
+                        this.ChaikaCore.browser.openURL(firstItem.getURL(), true);
+                    }else{
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true, true);
+                    }
+                    break;
 
-				case "copyTitle":
-					var titles = this.items.map(function(aElement, aIndex, aArray){
-						return aElement.title;
-					}).join(NEWLINE);
+                case "copyTitle":
+                    var titles = this.items.map(function(aElement, aIndex, aArray){
+                        return aElement.title;
+                    }).join(NEWLINE);
 
-					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-							.getService(Ci.nsIClipboardHelper);
-					clipboardHelper.copyString(titles);
-					break;
+                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Ci.nsIClipboardHelper);
+                    clipboardHelper.copyString(titles);
+                    break;
 
-				case "copyURL":
-					var urls = this.items.map(function(aElement, aIndex, aArray){
-						return aElement.urlSpec;
-					}).join(NEWLINE);
+                case "copyURL":
+                    var urls = this.items.map(function(aElement, aIndex, aArray){
+                        return aElement.urlSpec;
+                    }).join(NEWLINE);
 
-					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-							.getService(Ci.nsIClipboardHelper);
-					clipboardHelper.copyString(urls);
-					break;
+                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Ci.nsIClipboardHelper);
+                    clipboardHelper.copyString(urls);
+                    break;
 
-				case "copyTitleAndURL":
-					var urls = this.items.map(function(aElement, aIndex, aArray){
-						return aElement.title + NEWLINE + aElement.urlSpec;
-					}).join(NEWLINE);
+                case "copyTitleAndURL":
+                    var urls = this.items.map(function(aElement, aIndex, aArray){
+                        return aElement.title + NEWLINE + aElement.urlSpec;
+                    }).join(NEWLINE);
 
-					var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-							.getService(Ci.nsIClipboardHelper);
-					clipboardHelper.copyString(urls);
-					break;
+                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Ci.nsIClipboardHelper);
+                    clipboardHelper.copyString(urls);
+                    break;
 
-				case "deleteLog":
-					this.items.forEach(function(aElement, aIndex, aArray){
-						try{
-							(new this.ChaikaThread(aElement.getURL())).deleteThreadData();
-						}catch(ex){
-							this.ChaikaCore.logger.error(ex);
-						}
-					}, this);
+                case "deleteLog":
+                    this.items.forEach(function(aElement, aIndex, aArray){
+                        try{
+                            (new this.ChaikaThread(aElement.getURL())).deleteThreadData();
+                        }catch(ex){
+                            this.ChaikaCore.logger.error(ex);
+                        }
+                    }, this);
 
-					var os = Cc["@mozilla.org/observer-service;1"]
-								.getService(Ci.nsIObserverService);
-					var urls = this.items.map(function(aElement, aIndex, aArray){
-						return aElement.urlSpec;
-					}).join(",");
-					os.notifyObservers(null, "itemContext:deleteLog", urls);
-					break;
-			}
+                    var os = Cc["@mozilla.org/observer-service;1"]
+                                .getService(Ci.nsIObserverService);
+                    var urls = this.items.map(function(aElement, aIndex, aArray){
+                        return aElement.urlSpec;
+                    }).join(",");
+                    os.notifyObservers(null, "itemContext:deleteLog", urls);
+                    break;
+            }
 
-		]]></handler>
-	</handlers>	
+        ]]></handler>
+    </handlers>    
 </binding>
 
 <binding id="historyMenuPopup" extends="chrome://global/content/bindings/popup.xml#popup">
 
-	<implementation>
-		<constructor><![CDATA[
-			Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 
-			var tmp = {};
-			Components.utils.import("resource://gre/modules/XPCOMUtils.jsm", tmp);
+            var tmp = {};
+            Components.utils.import("resource://gre/modules/XPCOMUtils.jsm", tmp);
 
-			var self = this;
-			tmp.XPCOMUtils.defineLazyGetter(this, "_browserWindow", function(){
-				var browserWindow = self.ChaikaCore.browser.getBrowserWindow();
-				if(browserWindow && browserWindow.XULBrowserWindow){
-					return browserWindow.XULBrowserWindow;
-				}
-				return null;
-			});
-		]]></constructor>
+            var self = this;
+            tmp.XPCOMUtils.defineLazyGetter(this, "_browserWindow", function(){
+                var browserWindow = self.ChaikaCore.browser.getBrowserWindow();
+                if(browserWindow && browserWindow.XULBrowserWindow){
+                    return browserWindow.XULBrowserWindow;
+                }
+                return null;
+            });
+        ]]></constructor>
 
-		<method name="_setOverLink">
-			<parameter name="aLink"/>
-			<body><![CDATA[
-				if(this._browserWindow){
-					this._browserWindow.setOverLink(aLink, null);
-				}
-			]]></body>
-		</method>
+        <method name="_setOverLink">
+            <parameter name="aLink"/>
+            <body><![CDATA[
+                if(this._browserWindow){
+                    this._browserWindow.setOverLink(aLink, null);
+                }
+            ]]></body>
+        </method>
 
-	</implementation>
+    </implementation>
 
-	<handlers>
-		<handler event="popupshowing" phase="target"><![CDATA[
-			var historyMenuPopup = this;
-			var storage = this.ChaikaCore.storage;
-			var io = this.ChaikaCore.io;
+    <handlers>
+        <handler event="popupshowing" phase="target"><![CDATA[
+            var historyMenuPopup = this;
+            var storage = this.ChaikaCore.storage;
+            var io = this.ChaikaCore.io;
 
-			var lastVisitedStatement = storage.createStatement(
-					"SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
-			var visitCountStatement = storage.createStatement(
-					"SELECT title, url FROM history WHERE type=?1 ORDER BY visit_count DESC LIMIT ?2");
+            var lastVisitedStatement = storage.createStatement(
+                    "SELECT title, url FROM history WHERE type=?1 ORDER BY last_visited DESC LIMIT ?2");
+            var visitCountStatement = storage.createStatement(
+                    "SELECT title, url FROM history WHERE type=?1 ORDER BY visit_count DESC LIMIT ?2");
 
-			function createCategory(aCategoryTitle, aStatement, aItemType, aLimit){
-				var menu = document.createElement("menu");
-				var menupopup = document.createElement("menupopup");
-				menu.appendChild(menupopup);
+            function createCategory(aCategoryTitle, aStatement, aItemType, aLimit){
+                var menu = document.createElement("menu");
+                var menupopup = document.createElement("menupopup");
+                menu.appendChild(menupopup);
 
-				menu.setAttribute("label", aCategoryTitle);
+                menu.setAttribute("label", aCategoryTitle);
 
-				storage.beginTransaction();
-				try{
-					var historyType = (aItemType=="board") ? 0 : 1;
-					aStatement.bindInt32Parameter(0, historyType);
-					aStatement.bindInt32Parameter(1, aLimit);
-					while(aStatement.executeStep()){
-						var menuitem = document.createElement("menuitem");
-						menuitem.setAttribute("label", io.unescapeHTML(aStatement.getString(0)));
-						menuitem.setAttribute("value",  aStatement.getString(1));
-						menuitem.setAttribute("itemType",  aItemType);
-						menupopup.appendChild(menuitem);
-					}
-				}finally{
-					aStatement.reset();
-					storage.commitTransaction();
-				}
+                storage.beginTransaction();
+                try{
+                    var historyType = (aItemType=="board") ? 0 : 1;
+                    aStatement.bindInt32Parameter(0, historyType);
+                    aStatement.bindInt32Parameter(1, aLimit);
+                    while(aStatement.executeStep()){
+                        var menuitem = document.createElement("menuitem");
+                        menuitem.setAttribute("label", io.unescapeHTML(aStatement.getString(0)));
+                        menuitem.setAttribute("value",  aStatement.getString(1));
+                        menuitem.setAttribute("itemType",  aItemType);
+                        menupopup.appendChild(menuitem);
+                    }
+                }finally{
+                    aStatement.reset();
+                    storage.commitTransaction();
+                }
 
-				if(!menupopup.hasChildNodes()){
-					var emptyMenuitem = document.createElement("menuitem");
-					emptyMenuitem.setAttribute("label", "(なし)");
-					emptyMenuitem.setAttribute("disabled", "true");
-					menupopup.appendChild(emptyMenuitem);
-				}
+                if(!menupopup.hasChildNodes()){
+                    var emptyMenuitem = document.createElement("menuitem");
+                    emptyMenuitem.setAttribute("label", "(なし)");
+                    emptyMenuitem.setAttribute("disabled", "true");
+                    menupopup.appendChild(emptyMenuitem);
+                }
 
-				return menu;
-			}
+                return menu;
+            }
 
-			var boardMax = this.ChaikaCore.pref.getInt("historymenu.board_max");
-			if(boardMax > 30) boardMax = 30;
-			var threadMax = this.ChaikaCore.pref.getInt("historymenu.thread_max");
-			if(threadMax > 30) threadMax = 30;
+            var boardMax = this.ChaikaCore.pref.getInt("historymenu.board_max");
+            if(boardMax > 30) boardMax = 30;
+            var threadMax = this.ChaikaCore.pref.getInt("historymenu.thread_max");
+            if(threadMax > 30) threadMax = 30;
 
-			if(boardMax){
-				historyMenuPopup.appendChild(createCategory("最近アクセスした板",
-						lastVisitedStatement, "board", boardMax));
-				historyMenuPopup.appendChild(createCategory("アクセス回数の多い板",
-						visitCountStatement, "board", boardMax));
-			}
-			if(threadMax){
-				historyMenuPopup.appendChild(createCategory("最近アクセスしたスレッド",
-						lastVisitedStatement, "thread", threadMax));
-				historyMenuPopup.appendChild(createCategory("アクセス回数の多いスレッド",
-						visitCountStatement, "thread", threadMax));
-			}
+            if(boardMax){
+                historyMenuPopup.appendChild(createCategory("最近アクセスした板",
+                        lastVisitedStatement, "board", boardMax));
+                historyMenuPopup.appendChild(createCategory("アクセス回数の多い板",
+                        visitCountStatement, "board", boardMax));
+            }
+            if(threadMax){
+                historyMenuPopup.appendChild(createCategory("最近アクセスしたスレッド",
+                        lastVisitedStatement, "thread", threadMax));
+                historyMenuPopup.appendChild(createCategory("アクセス回数の多いスレッド",
+                        visitCountStatement, "thread", threadMax));
+            }
 
-			lastVisitedStatement.finalize();
-			visitCountStatement.finalize();
+            lastVisitedStatement.finalize();
+            visitCountStatement.finalize();
 
-			historyMenuPopup.appendChild(document.createElement("menuseparator"));
-			var historyMenuitem = document.createElement("menuitem");
-			historyMenuitem.setAttribute("label", "履歴の消去");
-			historyMenuitem.setAttribute("value", "clearHistory");
-			historyMenuPopup.appendChild(historyMenuitem);
-		]]></handler>
+            historyMenuPopup.appendChild(document.createElement("menuseparator"));
+            var historyMenuitem = document.createElement("menuitem");
+            historyMenuitem.setAttribute("label", "履歴の消去");
+            historyMenuitem.setAttribute("value", "clearHistory");
+            historyMenuPopup.appendChild(historyMenuitem);
+        ]]></handler>
 
-		<handler event="popuphidden" phase="target"><![CDATA[
-			while(this.hasChildNodes()){
-				this.removeChild(this.firstChild);
-			}
-		]]></handler>
+        <handler event="popuphidden" phase="target"><![CDATA[
+            while(this.hasChildNodes()){
+                this.removeChild(this.firstChild);
+            }
+        ]]></handler>
 
-		<!-- メニューアイテムの実行 -->
-		<handler event="command"><![CDATA[
-			var target = event.target;
-			if(target.localName != "menuitem" || !(target.value)) return;
+        <!-- メニューアイテムの実行 -->
+        <handler event="command"><![CDATA[
+            var target = event.target;
+            if(target.localName != "menuitem" || !(target.value)) return;
 
-				// 「履歴の消去」メニューアイテム
-			if(target.value == "clearHistory"){
-				this.ChaikaCore.history.clearHistory();;
-				return;
-			}
+                // 「履歴の消去」メニューアイテム
+            if(target.value == "clearHistory"){
+                this.ChaikaCore.history.clearHistory();;
+                return;
+            }
 
-			var itemType = target.getAttribute("itemType");
-			if(itemType){
-				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-							.getService(Components.interfaces.nsIIOService);
-				var url = ioService.newURI(target.value, null, null);
+            var itemType = target.getAttribute("itemType");
+            if(itemType){
+                var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+                            .getService(Components.interfaces.nsIIOService);
+                var url = ioService.newURI(target.value, null, null);
 
-					// Ctrl を押している場合は設定にかかわらずタブで開く
-				var boardAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
-				var threadAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("board.open_new_tab");
+                    // Ctrl を押している場合は設定にかかわらずタブで開く
+                var boardAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
+                var threadAddTab = event.ctrlKey || this.ChaikaCore.pref.getBool("board.open_new_tab");
 
-				if(itemType == "board"){
-					this.ChaikaCore.browser.openBoard(url, boardAddTab);
-				}else if(itemType == "thread"){
-					this.ChaikaCore.browser.openThread(url, threadAddTab, true);
-				}
-			}
-		]]></handler>
+                if(itemType == "board"){
+                    this.ChaikaCore.browser.openBoard(url, boardAddTab);
+                }else if(itemType == "thread"){
+                    this.ChaikaCore.browser.openThread(url, threadAddTab, true);
+                }
+            }
+        ]]></handler>
 
-		<!-- メニューアイテムのミドルクリック -->
-		<handler event="click" button="1"><![CDATA[
-			var target = event.target;
-			if(target.localName != "menuitem" || !(target.value)) return;
-			var itemType = target.getAttribute("itemType");
-			if(itemType){
-				var ioService = Components.classes["@mozilla.org/network/io-service;1"]
-							.getService(Components.interfaces.nsIIOService);
-				var url = ioService.newURI(target.value, null, null);
+        <!-- メニューアイテムのミドルクリック -->
+        <handler event="click" button="1"><![CDATA[
+            var target = event.target;
+            if(target.localName != "menuitem" || !(target.value)) return;
+            var itemType = target.getAttribute("itemType");
+            if(itemType){
+                var ioService = Components.classes["@mozilla.org/network/io-service;1"]
+                            .getService(Components.interfaces.nsIIOService);
+                var url = ioService.newURI(target.value, null, null);
 
-				if(itemType == "board"){
-					this.ChaikaCore.browser.openBoard(url, true);
-				}else if(itemType == "thread"){
-					this.ChaikaCore.browser.openThread(url, true, true);
-				}
+                if(itemType == "board"){
+                    this.ChaikaCore.browser.openBoard(url, true);
+                }else if(itemType == "thread"){
+                    this.ChaikaCore.browser.openThread(url, true, true);
+                }
 
-				this.hidePopup();
-			}
-		]]></handler>
+                this.hidePopup();
+            }
+        ]]></handler>
 
-		<!-- メニューアイテムの選択 -->
-		<handler event="DOMMenuItemActive"><![CDATA[
-			var target = event.target;
-			if(!target.hasAttribute("itemType")) return;
-			this._setOverLink(target.value);
-		]]></handler>
+        <!-- メニューアイテムの選択 -->
+        <handler event="DOMMenuItemActive"><![CDATA[
+            var target = event.target;
+            if(!target.hasAttribute("itemType")) return;
+            this._setOverLink(target.value);
+        ]]></handler>
 
-		<!-- メニューアイテムの選択解除 -->
-		<handler event="DOMMenuItemInactive"><![CDATA[
-			this._setOverLink("");
-		]]></handler>
+        <!-- メニューアイテムの選択解除 -->
+        <handler event="DOMMenuItemInactive"><![CDATA[
+            this._setOverLink("");
+        ]]></handler>
 
-		<!-- メニューアイテムの選択解除 -->
-		<handler event="contextmenu"><![CDATA[
-			var itemContext = document.getElementById(this.getAttribute("itemContext"));
-			if(!itemContext) return false;
+        <!-- メニューアイテムの選択解除 -->
+        <handler event="contextmenu"><![CDATA[
+            var itemContext = document.getElementById(this.getAttribute("itemContext"));
+            if(!itemContext) return false;
 
-			var target = event.target;
-			var itemType = target.getAttribute("itemType");
-			if(!itemType) return false;
+            var target = event.target;
+            var itemType = target.getAttribute("itemType");
+            if(!itemType) return false;
 
-			var urlItem = new ChaikaCore.ChaikaURLItem(target.label, target.value, itemType, 0);
+            var urlItem = new ChaikaCore.ChaikaURLItem(target.label, target.value, itemType, 0);
 
-			itemContext.items = [urlItem];
-			itemContext.openPopup(target, "after_start", 0, 0, true, false);
-		]]></handler>
-	</handlers>
+            itemContext.items = [urlItem];
+            itemContext.openPopup(target, "after_start", 0, 0, true, false);
+        ]]></handler>
+    </handlers>
 
 </binding>
 

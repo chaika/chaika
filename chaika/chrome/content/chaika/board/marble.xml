@@ -1,143 +1,143 @@
 <?xml version="1.0"?>
 
 <bindings id="marbleStyleBindings"
-		xmlns="http://www.mozilla.org/xbl"
-		xmlns:xbl="http://www.mozilla.org/xbl"
-		xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-		xmlns:svg="http://www.w3.org/2000/svg"
-		xmlns:html="http://www.w3.org/1999/xhtml">
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns:html="http://www.w3.org/1999/xhtml">
 
 <binding id="toolbar" extends="chrome://global/content/bindings/toolbar.xml#toolbar">
-	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
-	<content>
-		<xul:hbox class="children-box" xbl:inherits="align,dir,pack,orient"
-				align="center" pack="center" flex="1">
-			<children/>
-		</xul:hbox>
-	</content>
+    <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
+    <content>
+        <xul:hbox class="children-box" xbl:inherits="align,dir,pack,orient"
+                align="center" pack="center" flex="1">
+            <children/>
+        </xul:hbox>
+    </content>
 </binding>
 
 
 <binding id="button" extends="chrome://global/content/bindings/button.xml#button">
-	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
-	<content>
-		<children includes="observes|template|menupopup|tooltip"/>
-		<xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
-				align="center" pack="center" flex="1">
-			<children>
-				<xul:label class="marblebutton-label" xbl:inherits="value=label"/>
-			</children>
-		</xul:hbox>
-	</content>
+    <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
+    <content>
+        <children includes="observes|template|menupopup|tooltip"/>
+        <xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
+                align="center" pack="center" flex="1">
+            <children>
+                <xul:label class="marblebutton-label" xbl:inherits="value=label"/>
+            </children>
+        </xul:hbox>
+    </content>
 </binding>
 
 
 <binding id="menu-button" extends="chrome://global/content/bindings/button.xml#menu">
-	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
-	<content>
-		<children includes="observes|template|menupopup|tooltip"/>
-		<xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
-				align="center" pack="center" flex="1">
-			<children>
-				<xul:label class="marblebutton-label" xbl:inherits="value=label"/>
-			</children>
-		</xul:hbox>
-	</content>
+    <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
+    <content>
+        <children includes="observes|template|menupopup|tooltip"/>
+        <xul:hbox class="marblebutton-box" xbl:inherits="align,dir,pack,orient"
+                align="center" pack="center" flex="1">
+            <children>
+                <xul:label class="marblebutton-label" xbl:inherits="value=label"/>
+            </children>
+        </xul:hbox>
+    </content>
 </binding>
 
 
 <binding id="buttongroup">
-	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
+    <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
 
-	<content>
-		<xul:hbox class="buttongroup-box" xbl:inherits="align,dir,pack,orient"
-				align="center" pack="center" flex="1">
-			<children/>
-		</xul:hbox>
-	</content>
+    <content>
+        <xul:hbox class="buttongroup-box" xbl:inherits="align,dir,pack,orient"
+                align="center" pack="center" flex="1">
+            <children/>
+        </xul:hbox>
+    </content>
 
-	<implementation>
-		<constructor><![CDATA[
-			var group = "group-" + Date.now();
-			var nodes = this.childNodes;
-			for(var i=0; i<nodes.length; i++){
-				var node = nodes[i];
-				node.setAttribute("type", "radio");
-				node.setAttribute("group", group);
-				if(this.value == node.getAttribute("value")){
-					node.setAttribute("checked", "true");
-				}
-			}
-		]]></constructor>
+    <implementation>
+        <constructor><![CDATA[
+            var group = "group-" + Date.now();
+            var nodes = this.childNodes;
+            for(var i=0; i<nodes.length; i++){
+                var node = nodes[i];
+                node.setAttribute("type", "radio");
+                node.setAttribute("group", group);
+                if(this.value == node.getAttribute("value")){
+                    node.setAttribute("checked", "true");
+                }
+            }
+        ]]></constructor>
 
-		<property name="value"
-				onget="return this.getAttribute('value');"
-				onset="this.setAttribute('value', val); return val;"/>
+        <property name="value"
+                onget="return this.getAttribute('value');"
+                onset="this.setAttribute('value', val); return val;"/>
 
-		<method name="_fireEvent">
-			<parameter name="aEventName"/>
-			<parameter name="aTarget"/>
-			<body><![CDATA[
-				try{
-					var event = document.createEvent("Events");
-					event.initEvent(aEventName, true, true);
-					var cancel = !aTarget.dispatchEvent(event);
-					if(aTarget.hasAttribute("on" + aEventName)){
-						var fn = new Function ("event", aTarget.getAttribute("on" + aEventName));
-						var rv = fn.call(aTarget, event);
-						if (rv == false) cancel = true;
-					}
-					return !cancel;
-				}catch(ex){ 
-					Components.utils.reportError(ex);
-				}
-				return false;
-			]]></body>
-		</method>
-	</implementation>
+        <method name="_fireEvent">
+            <parameter name="aEventName"/>
+            <parameter name="aTarget"/>
+            <body><![CDATA[
+                try{
+                    var event = document.createEvent("Events");
+                    event.initEvent(aEventName, true, true);
+                    var cancel = !aTarget.dispatchEvent(event);
+                    if(aTarget.hasAttribute("on" + aEventName)){
+                        var fn = new Function ("event", aTarget.getAttribute("on" + aEventName));
+                        var rv = fn.call(aTarget, event);
+                        if (rv == false) cancel = true;
+                    }
+                    return !cancel;
+                }catch(ex){ 
+                    Components.utils.reportError(ex);
+                }
+                return false;
+            ]]></body>
+        </method>
+    </implementation>
 
-	<handlers>
-		<handler event="command"><![CDATA[
-			var target = event.target;
-			if(target.hasAttribute("group") && target.hasAttribute("value")){
-				this.value = target.getAttribute("value");
-			}
-		]]></handler>
+    <handlers>
+        <handler event="command"><![CDATA[
+            var target = event.target;
+            if(target.hasAttribute("group") && target.hasAttribute("value")){
+                this.value = target.getAttribute("value");
+            }
+        ]]></handler>
 
-		<handler event="DOMAttrModified" phase="target"><![CDATA[
-			if(event.attrName != "value") return;
-			var nodes = this.childNodes;
-			for(var i=0; i<nodes.length; i++){
-				var node = nodes[i];
-				if(this.value == node.getAttribute("value")){
-					node.checked = true;
-					this._fireEvent("change", this);
-				}
-			}
-		]]></handler>
-	</handlers>
+        <handler event="DOMAttrModified" phase="target"><![CDATA[
+            if(event.attrName != "value") return;
+            var nodes = this.childNodes;
+            for(var i=0; i<nodes.length; i++){
+                var node = nodes[i];
+                if(this.value == node.getAttribute("value")){
+                    node.checked = true;
+                    this._fireEvent("change", this);
+                }
+            }
+        ]]></handler>
+    </handlers>
 </binding>
 
 
  <binding id="textbox" extends="chrome://global/content/bindings/textbox.xml#textbox">
- 	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
+     <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
  </binding>
 
 
  <binding id="search-textbox" extends="chrome://global/content/bindings/textbox.xml#search-textbox">
- 	<resources>
-		<stylesheet src="chrome://chaika/skin/board/marble.css"/>
-	</resources>
+     <resources>
+        <stylesheet src="chrome://chaika/skin/board/marble.css"/>
+    </resources>
  </binding>
 
 
