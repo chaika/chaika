@@ -626,7 +626,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getBoolPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -634,7 +634,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setBoolPref(aPrefName, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -643,7 +643,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getIntPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -651,7 +651,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setIntPref(aPrefName, parseInt(aPrefValue));
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -660,7 +660,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getCharPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -668,7 +668,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setCharPref(aPrefName, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -677,7 +677,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -687,7 +687,7 @@ ChaikaPref.prototype = {
             sStr.data = aPrefValue;
             return this._branch.setComplexValue(aPrefName, Ci.nsISupportsString, sStr);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -696,7 +696,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getComplexValue(aPrefName, Ci.nsIFile);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -704,7 +704,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setComplexValue(aPrefName, Ci.nsIFile, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     }
