@@ -248,8 +248,15 @@ ChaikaImageViewURLReplace.prototype = {
         //Shift-JISで保存されている旧式のファイルであるということなので
         //Shift-JIS で再読込する
         if(data.indexOf("\uFFFD") !== -1){
-            ChaikaCore.logger.warning("The encoding of ImageViewURLReplace.dat is Shift-JIS. It is recommended to convert to UTF-8.");
+            ChaikaCore.logger.warning("The encoding of ImageViewURLReplace.dat is Shift-JIS. Try to convert to UTF-8.");
             data = ChaikaCore.io.readString(file, 'Shift-JIS');
+
+            //読み込みに成功していればUTF-8で保存し直す
+            if(data.indexOf("\uFFFD") === -1){
+                ChaikaCore.io.writeString(file, 'UTF-8', false, data);
+            }else{
+                ChaikaCore.logger.error('Fail in converting the encoding of ImageViewURLReplace.dat');
+            }
         }
 
         var lines = data.replace(/\r/g, "\n").split(/\n+/);
@@ -576,8 +583,15 @@ ChaikaNGFiles.prototype = {
         //Shift-JISで保存されている旧式のファイルであるということなので
         //Shift-JIS で再読込する
         if(data.indexOf("\uFFFD") !== -1){
-            ChaikaCore.logger.warning("The encoding of NGFiles.txt is Shift-JIS. It is recommended to convert to UTF-8.");
+            ChaikaCore.logger.warning("The encoding of NGFiles.txt is Shift-JIS. Try to convert to UTF-8.");
             data = ChaikaCore.io.readString(ngFile, 'Shift-JIS');
+
+            //読み込みに成功していればUTF-8で保存し直す
+            if(data.indexOf("\uFFFD") === -1){
+                ChaikaCore.io.writeString(ngFile, 'UTF-8', false, data);
+            }else{
+                ChaikaCore.logger.error('Fail in converting the encoding of NGFiles.txt');
+            }
         }
 
         var lines = data.replace(/\r/g, "\n").split(/\n+/);
