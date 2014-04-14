@@ -219,13 +219,8 @@ Post.prototype = {
 
 
     writeKakikomi: function Post_writeKakikomi(aNewThread){
-        var url;
-        if(aNewThread){
-            url = this._board.url.spec;
-        }else{
-            url = this._thread.plainURL.spec;
-        }
-
+        var url = aNewThread ? this._board.url.spec :
+                               this._thread.plainURL.spec;
         var nowDate = new Date();
         var week = "日月火水木金土";
         var date = nowDate.toLocaleFormat("%Y/%m/%d($WEEK$) %H:%M:%S")
@@ -245,7 +240,32 @@ Post.prototype = {
 
         var kakikomiFile = ChaikaCore.getDataDir();
         kakikomiFile.appendRelativePath("kakikomi.txt");
-        ChaikaCore.io.writeString(kakikomiFile, "Shift_JIS", true, kakikomi);
+
+        //すでに存在する kakikomi.txt のエンコーディングが
+        //Shift-JIS だった場合には, 自動的に UTF-8 へと変換する
+        if(kakikomiFile.exists()){
+            var encoding = 'UTF-8';
+            var data = ChaikaCore.io.readString(kakikomiFile);
+
+            //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
+            //Shift-JISで保存されているということなので
+            //Shift-JIS で再読込する
+            if(data.indexOf("\uFFFD") !== -1){
+                ChaikaCore.logger.warning("The encoding of kakikomi.txt is Shift-JIS. Try to convert to UTF-8.");
+                data = ChaikaCore.io.readString(kakikomiFile, 'Shift-JIS');
+
+                //読み込みに成功していればUTF-8で保存し直す
+                if(data.indexOf("\uFFFD") === -1){
+                    ChaikaCore.io.writeString(kakikomiFile, 'UTF-8', false, data);
+                }else{
+                    ChaikaCore.logger.error('Fail in converting the encoding of kakikomi.txt');
+                    encoding = 'Shift-JIS';
+                }
+            }
+        }
+
+        //ファイルへと書き込む
+        ChaikaCore.io.writeString(kakikomiFile, encoding, true, kakikomi);
     },
 
 
