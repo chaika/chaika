@@ -220,9 +220,7 @@ ChaikaImageViewURLReplace.prototype = {
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('imageViewURLReplace.enabled');
 
-        if(this.enabled){
-            this._loadFile();
-        }
+        this._loadFile();
     },
 
     quit: function(){
@@ -244,7 +242,17 @@ ChaikaImageViewURLReplace.prototype = {
             file = file.clone();
         }
 
-        var lines = ChaikaCore.io.readString(file, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
+        var data = ChaikaCore.io.readString(file);
+
+        //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
+        //Shift-JISで保存されている旧式のファイルであるということなので
+        //Shift-JIS で再読込する
+        if(data.indexOf("\uFFFD") !== -1){
+            ChaikaCore.logger.warning("The encoding of ImageViewURLReplace.dat is Shift-JIS. It is recommended to convert to UTF-8.");
+            data = ChaikaCore.io.readString(file, 'Shift-JIS');
+        }
+
+        var lines = data.replace(/\r/g, "\n").split(/\n+/);
         for(let i=0, l=lines.length; i<l; i++){
             let config = this._parseConfig(lines[i]);
             if(config){
