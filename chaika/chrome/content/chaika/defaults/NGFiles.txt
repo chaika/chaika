@@ -1,33 +1,45 @@
 #==============================================================================
-# �ǂݍ��݂��u���b�N����t�@�C�����n�b�V���l�Őݒ肷��t�@�C��
-# NGFiles.txt �̃T���v��
+# 読み込みをブロックするファイルをハッシュ値で設定するファイル
+# NGFiles.txt のサンプル
 #==============================================================================
 #
-# �� �t�@�C���̏��� (��{�I��Jane�݊��ł�)
+# ■ ファイルの書式 (基本的にJane互換です)
 #
-# �@ �����R�[�h�FShift_JIS
-# �@ ���s�R�[�h�F�ǂ�ł���
-# �@ �t�H�[�}�b�g�F[�n�b�V���l]=*[�t�@�C���̐���]
-# �@ �R�����g�F�s���� ; ' # // �̉��ꂩ
+# 　 文字コード：UTF-8
+# 　 改行コード：どれでも可
+# 　 フォーマット：[ハッシュ値]=*[ファイルの説明]
+# 　 コメント：行頭に ; ' # // の何れか
 #
-# �� ��
+# ■ 例
 #
-# �@ �n�b�V���l VJPH6HS5UHR5LQN1NPA92AB773 �̃t�@�C�����u���b�N����ꍇ:
-#       VJPH6HS5UHR5LQN1NPA92AB773=*�O��
+# 　 ハッシュ値 VJPH6HS5UHR5LQN1NPA92AB773 のファイルをブロックする場合:
+#       VJPH6HS5UHR5LQN1NPA92AB773=*グロ
 #
-# �@ ���n�b�V���l��MD5���X�N�����u�������Ǝ��̂��̂ł��B
-#     NGFiles.txt�ҏW�\�t�g�����g�����Ƃŋ��߂邱�Ƃ��ł��܂��B
+# 　 ※ハッシュ値はMD5をスクランブルした NGFiles.txt 独自のものです。
+#     NGFiles.txt 編集ソフト等を使うことで求めることができます。
+#     または, 以下のコードをブラウザーコンソールにて実行してください(行頭の「#」は削除してください)。
+# 
+#           var url = "ブロックしたい画像のURL";
+#           var obj = {};
+#           Components.utils.import("resource://chaika-modules/ChaikaHttpController.js", obj);
+#           var chc = obj.ChaikaHttpController;
+#           chc._startup();
+#           var md5 = chc.ngfiles._getMD5(Services.io.newURI(url, null, null));
+#           var hash = chc.ngfiles._getHash(md5);
+#           Services.console.logStringMessage("The hash of " + url + " is " + hash);
+#           chc._quit();
 #
-# �� ����
+# ■ 注意
 #
-# �@ NGFiles.txt �͎����I�@�\�ł��B
-# �@ �����t�@�C��������2��ǂ݂��ނ悤�ɂȂ�̂ŁA�ǂݍ��ݑ��x�����炩�ɒቺ���܂��B
-# �@ ���̂��߁A�Ƃ肠�����t�@�C���� URL �̖����� jpg, jpeg, png, gif, bmp
-# �@ �ŏI���t�@�C���݂̂��`�F�b�N���܂��B
-# �@ �܂��A�L���b�V������Ă���t�@�C���͍��̂Ƃ���u���b�N�ł��Ȃ��ł��B
+# 　 NGFiles.txt は実験的機能です。
+# 　 同じファイルを実質2回読みこむようになるので、読み込み速度が低下します。
+# 　 そのため、とりあえずファイルの URL の末尾が jpg, jpeg, png, gif, bmp
+# 　 で終わるファイルのみをチェックします。
+# 　 また、すでにキャッシュされているファイルは今のところブロックできないので、
+#      機能を有効にしたのちにキャッシュをすべて削除することを推奨します。
 #
-# �@ �u���b�N���ꂽ�ꍇ�A�u���E�U�ɂ͉摜�̑���� about:blank ���Ԃ���܂��B
-# �@ �܂�(�ߋ����O�擾���Ɠ��l��)�A���[�g�Ńu���b�N���ꂽ�|��\�����܂��B
+# 　 ブロックされた場合、ブラウザには画像の代わりに about:blank が返されます。
+# 　 また(過去ログ取得時と同様の)アラートでブロックされた旨を表示します。
 #
-# �@ �ȏ�̃��X�N�����m�̂����ŋ@�\��L���ɂ���ꍇ�́Aabout:config ���
-# �@ extensions.chaika.ngfiles.enabled �� true �ɕύX���ĉ������B
+# 　 以上のリスクを承知のうえで機能を有効にする場合は、about:config より
+# 　 extensions.chaika.ngfiles.enabled を true に変更して下さい。

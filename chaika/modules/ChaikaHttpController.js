@@ -539,9 +539,7 @@ ChaikaNGFiles.prototype = {
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('ngfiles.enabled');
 
-        if(this.enabled){
-            this._loadFile();
-        }
+        this._loadFile();
     },
 
     quit: function(){
@@ -564,7 +562,18 @@ ChaikaNGFiles.prototype = {
             ngFile = ngFile.clone();
         }
 
-        var lines = ChaikaCore.io.readString(ngFile, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
+        var data = ChaikaCore.io.readString(ngFile);
+
+        //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
+        //Shift-JISで保存されている旧式のファイルであるということなので
+        //Shift-JIS で再読込する
+        if(data.indexOf("\uFFFD") !== -1){
+            ChaikaCore.logger.warning("The encoding of NGFiles.txt is Shift-JIS. It is recommended to convert to UTF-8.");
+            data = ChaikaCore.io.readString(ngFile, 'Shift-JIS');
+        }
+
+        var lines = data.replace(/\r/g, "\n").split(/\n+/);
+
         for(let i=0, l=lines.length; i<l; i++){
             var data = lines[i].split(/=\*/);
 
@@ -683,8 +692,8 @@ ChaikaNGFiles.prototype = {
                 uri = uri.QueryInterface(Ci.nsIURL);
 
                 var alertStr = decodeURIComponent(escape(
-                    'NGFiles.txt に基づき' + uri.fileName + ' (' + hash + ') をブロックしました。'
-                ));
+                    'NGFiles.txt に基づき ' + uri.fileName + ' をブロックしました。\n説明: '
+                )) + this.ngData[i].description;
 
                 var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
                 alertsService.showAlertNotification("chrome://chaika/content/icon.png", "Chaika", alertStr, false, "", null);
