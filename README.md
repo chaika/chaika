@@ -14,7 +14,7 @@ For Users
 ---
 
 ### マニュアル・ヘルプ
-* [[オンラインヘルプ|Home]]
+* [オンラインヘルプ](https://github.com/chaika/chaika/wiki)
 * [FAQ(よくある質問)](http://bbs2ch.sourceforge.jp/?page=FAQ)
 
 ### コミュニティ
