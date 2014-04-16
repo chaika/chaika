@@ -405,6 +405,7 @@
 
                     case "find-next-thread":
                         this.findNextThread(addTab);
+                        break;
 
                     case "open-settings":
                         this.openSettings();
