@@ -246,11 +246,7 @@ var SearchBox = {
 
         //default: search.2ch.net
         //ToDo: 設定値に入れる
-        document.querySelector('menuitem[value="' + 'search.2ch.net' + '"]')
-                .setAttribute('checked', 'true');
-
-        let selectedPluginID = this.getSearchMode();
-        this._textbox.emptyText = ChaikaSearch.getPlugin(this.getSearchMode()).name;
+        this.setSearchMode('search.2ch.net');
     },
 
     /**
@@ -349,6 +345,16 @@ var SearchBox = {
 
         return selectedItem.getAttribute('value');
     },
+
+
+    /**
+     * 検索エンジンを指定する
+     * @param {String} aID 検索エンジンのID
+     */
+    setSearchMode: function(aID){
+        document.querySelector('menuitem[value="' + aID + '"]').setAttribute('checked', 'true');
+        this._textbox.emptyText = ChaikaSearch.getPlugin(aID).name;
+    }
 
 };
 

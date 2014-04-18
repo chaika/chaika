@@ -31,7 +31,8 @@
 
             <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
                 <xul:menupopup>
-                    <xul:menuitem label="find.2ch.net で検索" anonid="search-find-2ch" />
+                    <xul:vbox anonid="search-thread" />
+                    <xul:menuseparator anonid="search-thread-sep" />
                     <xul:menuitem label="板で検索" anonid="search-in-board" />
                     <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
                 </xul:menupopup>
@@ -92,7 +93,10 @@
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
+
+            this._createSearchMenu();
         ]]></constructor>
 
 
@@ -250,7 +254,27 @@
         </method>
 
 
-        <!-- Events -->
+        <method name="_createSearchMenu">
+            <body><![CDATA[
+                let searchMenu = document.getAnonymousElementByAttribute(this, "anonid", "search-thread");
+
+                let keys = Object.keys(this.ChaikaSearch.plugins);
+
+                for(let i = 0, iz = keys.length; i < iz; i++){
+                    let plugin = this.ChaikaSearch.plugins[keys[i]];
+
+                    //板名フィルタは除外する
+                    if(plugin.id === 'chaika.filter.board') continue;
+
+                    let menuitem = document.createElement('menuitem');
+
+                    menuitem.setAttribute('label', plugin.name + ' で検索');
+                    menuitem.setAttribute('anonid', plugin.id);
+
+                    searchMenu.appendChild(menuitem);
+                }
+            ]]></body>
+        </method>
 
 
         <method name="_onPopupshowing">
@@ -355,10 +379,6 @@
                         this.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%');
                         break;
 
-                    case 'search-find-2ch':
-                        this.searchFind2ch(selectedText, addTab);
-                        break;
-
                     case 'search-in-board':
                         this.searchInBoard(selectedText, addTab);
                         break;
@@ -409,6 +429,12 @@
                     case "open-settings":
                         this.openSettings();
                         break;
+
+                    default:
+                        //検索メニューかも
+                        if(targetElement.parentNode.getAttribute('anonid') === 'search-thread'){
+                            this.searchThread(anonymousID, selectedText, addTab);
+                        }
                 }
 
                 //中クリックの場合にポップアップが閉じないのに対処する
@@ -490,24 +516,29 @@
         <!--
         /**
          * 2ちゃんねる検索での検索結果を開く
+         * @param {String} 検索プラグインID
          * @param {String} aTerm 検索文字列
          * @param {Boolean} aAddTab 新しいタブで開くかどうか
          */
         -->
-        <method name="searchFind2ch">
+        <method name="searchThread">
+            <parameter name="aID" />
             <parameter name="aTerm" />
             <parameter name="aAddTab" />
             <body><![CDATA[
                 var sidebarMode = this.ChaikaCore.pref.getBool('browser.browsermenu.find_2ch_in_sidebar');
 
                 if(!sidebarMode){
-                    const QUERY_URL = 'http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=';
+                    let plugin = this.ChaikaSearch.getPlugin(aID);
+                    let term = aTerm;
 
-                    var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
-                    converter.charset = 'EUC-JP';
-                    aTerm = escape(converter.ConvertFromUnicode(aTerm));
+                    if(plugin.charset.toUpperCase() !== 'UTF-8'){
+                        let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
+                        converter.charset = plugin.charset;
+                        term = escape(converter.ConvertFromUnicode(aTerm));
+                    }
 
-                    var searchURI = Services.io.newURI(QUERY_URL + aTerm, null, null);
+                    let searchURI = Services.io.newURI(plugin.url.replace('%%TERM%%', term), null, null);
                     this.ChaikaCore.browser.openURL(searchURI, aAddTab);
                 }else{
                     const SIDEBAR_URL = 'chrome://chaika/content/bbsmenu/page.xul';
@@ -522,7 +553,7 @@
 
                             searchBox.focus();
                             searchBox.value = aTerm;
-                            sideWin.SearchBox.setSearchMode("find2ch");
+                            sideWin.SearchBox.setSearchMode(aID);
                             sideWin.SearchBox.search(aTerm);
 
                             sidebar.removeEventListener('DOMContentLoaded', _doSearch, false);
