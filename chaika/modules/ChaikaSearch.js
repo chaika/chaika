@@ -94,7 +94,7 @@ var ChaikaSearch = {
                 let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
                 let url = fph.getURLSpecFromActualFile(file);
 
-                ChaikaCore.logger.debug(namespace);
+                ChaikaCore.logger.debug('load search plugin:', file.leafName, namespace);
 
                 Services.scriptloader.loadSubScript(url, tmp, 'UTF-8');
 

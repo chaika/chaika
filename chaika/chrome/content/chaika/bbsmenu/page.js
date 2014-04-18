@@ -245,6 +245,11 @@ var SearchBox = {
 
         this._createMenu();
 
+        //default: search.2ch.net
+        //ToDo: 設定値に入れる
+        document.querySelector('menuitem[value="' + 'search.2ch.net' + '"]')
+                .setAttribute('checked', 'true');
+
         let selectedPluginID = this.getSearchMode();
         this._textbox.emptyText = ChaikaSearch.getPlugin(this.getSearchMode()).name;
     },
@@ -302,6 +307,7 @@ var SearchBox = {
             let boardItem = document.createElement('board');
             boardItem.setAttribute('title', board.title);
             boardItem.setAttribute('url', board.url || '');
+            boardItem.setAttribute('type', board.type || ChaikaBoard.BOARD_TYPE_PAGE);
 
             //板名フィルタの場合、threadsが空になるが、
             //それ以外の時は板はフォルダ扱いになる
@@ -340,11 +346,9 @@ var SearchBox = {
      */
     getSearchMode: function SearchBox_getSearchMode(){
         let popup = document.getElementById('searchModeMenu');
-        let selectedItem = popup.querySelector('menuitem:checked');
+        let selectedItem = popup.querySelector('[checked="true"]');
 
-        //default: search.2ch.net
-        //ToDo: 設定値に入れる
-        return selectedItem ? selectedItem.getAttribute('id') : 'search.2ch.net';
+        return selectedItem.getAttribute('value');
     },
 
 };

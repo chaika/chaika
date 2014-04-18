@@ -76,13 +76,14 @@ var Search2ch = {
 
     _onSuccess: function(){
         if(this._req.status !== 200 || !this._req.responseText){
-            return this._defer.reject('HTTP Status: ' + this._req.status);
+            return this._defer.reject('Unable to connect. Status:',
+                                      this._req.status, 'Response', this._req.responseText);
         }
 
         let json = JSON.parse(this._req.responseText);
 
         if(!json.success){
-            return this._defer.reject('Failed duo to an unknown reason.');
+            return this._defer.reject('Failed duo to server error.', this._req.responseText);
         }
 
         let boards = [];

@@ -1,7 +1,4 @@
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 
 try{
     //Firefox 25+
@@ -9,38 +6,6 @@ try{
 }catch(ex){
     //Firefox 24
     Components.utils.import("resource://gre/modules/commonjs/sdk/core/promise.js");
-}
-
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
 }
 
 
@@ -62,7 +27,8 @@ var BoardFilter = {
             "WHERE is_category=0 AND x_normalize(title) LIKE x_normalize(?1)"
         ].join("\n");
 
-        let statement = ChaikaCore.storage.createStatement(sql);
+        let storage = ChaikaCore.storage;
+        let statement = storage.createStatement(sql);
         let results = [];
 
         storage.beginTransaction();
@@ -87,10 +53,10 @@ var BoardFilter = {
         }finally{
             statement.reset();
             statement.finalize();
-            ChaikaCore.storage.commitTransaction();
+            storage.commitTransaction();
         }
 
-        setTimeout(function(){ this._defer.resolve(results); }, 0);
+        this._defer.resolve(results);
         return this._defer.promise;
     },
 
