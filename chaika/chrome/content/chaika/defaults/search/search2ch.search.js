@@ -52,7 +52,7 @@ var Search2ch = {
 
     charset: 'utf-8',
 
-    url: 'http://search.2ch.net/search?match=full?q=%%TERM%%',
+    url: 'http://search.2ch.net/search?match=full&q=%%TERM%%',
 
     search: function(term){
         this._defer = Promise.defer();
