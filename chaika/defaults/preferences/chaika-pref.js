@@ -77,7 +77,6 @@ pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 pref("extensions.chaika.bbsmenu.tree_size", "small");
 pref("extensions.chaika.bbsmenu.open_single_click", true);
 pref("extensions.chaika.bbsmenu.open_new_tab", false);
-pref("extensions.chaika.bbsmenu.find2ch.use_rss", true);
 
 pref("extensions.chaika.board.auto_update", false);
 pref("extensions.chaika.board.update_interval_limit", 45);
