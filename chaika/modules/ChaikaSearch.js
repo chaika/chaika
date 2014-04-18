@@ -53,6 +53,21 @@ var ChaikaSearch = {
     plugins: {},
 
 
+    getPlugin: function(id){
+        let keys = Object.keys(this.plugins);
+
+        for(let i = 0, iz = keys.length; i < iz; i++){
+            let plugin = this.plugins[keys[i]];
+
+            if(plugin.id === id){
+                return plugin;
+            }
+        }
+
+        return null;
+    },
+
+
     /** @private **/
     _startup: function(){
         this._loadSearchPlugins();
@@ -76,7 +91,12 @@ var ChaikaSearch = {
                 let tmp = {};
                 let namespace = this._getPluginNameSpace(file.leafName);
 
-                Services.scriptloader.loadSubScript(Services.io.getURLSpecFromFile(file), tmp, 'UTF-8');
+                let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
+                let url = fph.getURLSpecFromActualFile(file);
+
+                ChaikaCore.logger.debug(namespace);
+
+                Services.scriptloader.loadSubScript(url, tmp, 'UTF-8');
 
                 if(!tmp[namespace]){
                     ChaikaCore.logger.error('Unable to load a search plugin named "' + file.leafName + '" due to spec violation.');
@@ -95,7 +115,7 @@ var ChaikaSearch = {
      * なければ作成する
      */
     _getPluginFolder: function(){
-        let pluginFolder = ChaikaCore.getDataFolder();
+        let pluginFolder = ChaikaCore.getDataDir();
         pluginFolder.appendRelativePath('search');
 
         //フォルダがまだ存在しない場合には、
@@ -104,7 +124,7 @@ var ChaikaSearch = {
             let origPluginFolder = ChaikaCore.getDefaultsDir();
             origPluginFolder.appendRelativePath('search');
 
-            origPluginFolder.copyTo(ChaikaCore.getDataFolder(), null);
+            origPluginFolder.copyTo(ChaikaCore.getDataDir(), null);
         }
 
         return pluginFolder;
@@ -118,7 +138,7 @@ var ChaikaSearch = {
      */
     _getPluginNameSpace: function(fileName){
         //hogehoge.search.js -> Hogehoge
-        return fileName[0].toUpperCase() + fileName.match(/^.([^\.]+)/)[0];
+        return fileName[0].toUpperCase() + fileName.match(/^.([^\.]+)/)[1];
     },
 
 };
@@ -178,7 +198,8 @@ var ChaikaSearchPlugin = {
      *             threads: [
      *                 {
      *                      url: 'スレッドのURL',
-     *                      title: 'スレッドタイトル'
+     *                      title: 'スレッドタイトル',
+     *                      post: レス数
      *                 }, ...
      *             ]
      *         }, ...

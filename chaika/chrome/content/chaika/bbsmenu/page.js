@@ -37,6 +37,7 @@
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
@@ -240,53 +241,102 @@ var Notification = {
 var SearchBox = {
 
     init: function SearchBox_init(){
-        if(!this._textbox) this._textbox = document.getElementById("searchBox");
+        this._textbox = document.getElementById("searchBox");
 
-        switch(this.getSearchMode()){
-            case "find2ch":
-                this._textbox.emptyText = "2ch 検索";
-                break;
-            case "boardFilter":
-                this._textbox.emptyText = "フィルタ";
-                break;
+        this._createMenu();
+
+        let selectedPluginID = this.getSearchMode();
+        this._textbox.emptyText = ChaikaSearch.getPlugin(this.getSearchMode()).name;
+    },
+
+    /**
+     * 検索メニューを構築する
+     */
+    _createMenu: function(){
+        let popup = document.getElementById('searchModeMenu');
+
+        let keys = Object.keys(ChaikaSearch.plugins);
+
+        for(let i = 0, iz = keys.length; i < iz; i++){
+            let plugin = ChaikaSearch.plugins[keys[i]];
+            let menuitem = document.createElement('menuitem');
+
+            menuitem.setAttribute('label', plugin.name);
+            menuitem.setAttribute('value', plugin.id);
+            menuitem.setAttribute('type', 'radio');
+            menuitem.setAttribute('name', 'searchModeMenuitem');
+
+            menuitem.addEventListener('command', event => {
+                this._textbox.emptyText = event.target.getAttribute('label');
+            });
+
+            popup.appendChild(menuitem);
         }
     },
 
 
     search: function SearchBox_search(aSearchStr){
+        //空文字が入力された場合には検索モードを終了する
         if(!aSearchStr){
             Bbsmenu.initTree();
             return;
         }
 
-        switch(this.getSearchMode()){
-            case "find2ch":
-                Find2ch.search(aSearchStr);
-                break;
-            case "boardFilter":
-                Bbsmenu.filter(aSearchStr);
-                break;
-        }
+        //検索を実行する
+        Notification.removeAll();
+        Notification.info('検索中');
+
+        ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr).then(
+            (results) => {
+                Notification.removeAll();
+
+                let doc = document.implementation.createDocument(null, '', null);
+                let root = document.createElement('category');
+
+                results.forEach((board) => {
+                    let boardItem = document.createElement('board');
+                    boardItem.setAttribute('title', board.title);
+                    boardItem.setAttribute('isContainer', 'true');
+                    boardItem.setAttribute('isOpen', 'true');
+
+                    board.threads.forEach((thread) => {
+                        let threadItem = document.createElement('thread');
+                        threadItem.setAttribute('url', thread.url);
+                        threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
+                        threadItem.setAttribute('boardName', board.title);
+
+                        boardItem.appendChild(threadItem);
+                    });
+
+                    root.appendChild(boardItem);
+                });
+
+                doc.appendChild(root);
+
+                Tree.initTree(doc, MODE_FIND2CH);
+            },
+
+            (error) => {
+                Notification.removeAll();
+                Notification.warning('検索に失敗しました', 2500);
+                ChaikaCore.logger.error('Search failed:', error);
+            }
+        );
     },
 
 
+    /**
+     * 現在選択されている検索エンジンのIDを返す
+     * @return {String} 検索エンジンのID
+     */
     getSearchMode: function SearchBox_getSearchMode(){
-        return this._textbox.getAttribute("searchmode");
+        let popup = document.getElementById('searchModeMenu');
+        let selectedItem = popup.querySelector('menuitem:checked');
+
+        //default: search.2ch.net
+        //ToDo: 設定値に入れる
+        return selectedItem ? selectedItem.getAttribute('id') : 'search.2ch.net';
     },
-
-
-    setSearchMode: function SearchBox_setSearchMode(aValue){
-        this._textbox.setAttribute("searchmode", aValue);
-        this.init();
-        return aValue;
-    },
-
-
-    searchModeMenuShowing: function SearchBox_searchModeMenuShowing(aEvent){
-        var target = aEvent.target;
-        var element = target.getElementsByAttribute("value", SearchBox.getSearchMode())[0]
-        element.setAttribute("checked", "true");
-    }
 
 };
 

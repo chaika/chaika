@@ -67,6 +67,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
         ChaikaAboneManager._startup();
 
+        Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
+        ChaikaSearch._startup();
+
 
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");

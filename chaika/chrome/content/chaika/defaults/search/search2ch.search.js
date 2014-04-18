@@ -58,14 +58,15 @@ var Search2ch = {
 
         let TERM = encodeURIComponent(term);
 
-        this._req = new XMLHttpRequest();
-        this._req.addEventListener('error', this._onError, false);
-        this._req.addEventListener('load', this._onSuccess, false);
+        const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
+        this._req = XMLHttpRequest();
+        this._req.addEventListener('error', this._onError.bind(this), false);
+        this._req.addEventListener('load', this._onSuccess.bind(this), false);
         this._req.open("GET", 'http://search.2ch.net/search.json?site=all&match=full&size=30&q=' + TERM, true);
         this._req.overrideMimeType('application/json; charset=utf-8');
         this._req.send(null);
 
-        return this._defer;
+        return this._defer.promise;
     },
 
     _onError: function(){
@@ -85,7 +86,8 @@ var Search2ch = {
 
         let boards = [];
 
-        json.results.forEach(thread => {
+        json.results.forEach(result => {
+            let thread = result.source;
             let board = boards.find(board => board.title === thread.board);
 
             if(!board){
@@ -100,7 +102,8 @@ var Search2ch = {
             board.threads.push({
                 url: 'http://' + thread.server + '.' + thread.host + '/test/read.cgi/' +
                         thread.board + '/' + thread.thread_id + '/',
-                title: thread.title
+                title: thread.title,
+                post: thread.comment_count,
             });
         });
 
