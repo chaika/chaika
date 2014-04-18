@@ -194,12 +194,12 @@ var ChaikaSearchPlugin = {
      * @return {Promise} - 成功時: 以下のようなオブジェクトの配列を返す必要がある
      *     [
      *         {
-     *             title: '板名',
+     *             title: '板名', //@type {String}, @required
      *             threads: [
      *                 {
-     *                      url: 'スレッドのURL',
-     *                      title: 'スレッドタイトル',
-     *                      post: レス数
+     *                      url: 'スレッドのURL', //@type {String}, @required
+     *                      title: 'スレッドタイトル', //@type {String}, @required
+     *                      post: レス数, //@type {Number}, @optional
      *                 }, ...
      *             ]
      *         }, ...

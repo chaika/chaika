@@ -1,6 +1,7 @@
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 
 try{
     //Firefox 25+
@@ -88,11 +89,16 @@ var Search2ch = {
 
         json.results.forEach(result => {
             let thread = result.source;
-            let board = boards.find(board => board.title === thread.board);
+            let board = boards.find(board => board.id === thread.board);
 
             if(!board){
+                let boardURI = Services.io.newURI('http://' + thread.server + '.' +
+                                                  thread.host + '/' + thread.board + '/', null, null);
+                let boardObj = new ChaikaBoard(boardURI);
+
                 board = {
-                    title: thread.board,
+                    id: thread.board,  //news, morningcoffee など
+                    title: boardObj.getTitle(),  //ニュース速報, ソフトウェア など
                     threads: []
                 };
 

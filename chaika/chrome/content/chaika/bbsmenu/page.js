@@ -53,13 +53,13 @@ const MODE_FIND2CH = 2;
 var Page = {
 
     startup: function Page_startup(){
-        PrefObserver.start();
         var tree = document.getElementById("bookmarks-view");
         tree.collapsed = true;
         tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
 
         this.showViewFoxAge2chMenu();
         SearchBox.init();
+        PrefObserver.start();
 
         setTimeout(function(){ Page.delayStartup(); }, 0);
     },
@@ -286,42 +286,51 @@ var SearchBox = {
         Notification.removeAll();
         Notification.info('検索中');
 
-        ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr).then(
-            (results) => {
-                Notification.removeAll();
+        let promise = ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr);
 
-                let doc = document.implementation.createDocument(null, '', null);
-                let root = document.createElement('category');
+        promise.then(this._showResults, this._onError)
+               .then(null, this._onError);
+    },
 
-                results.forEach((board) => {
-                    let boardItem = document.createElement('board');
-                    boardItem.setAttribute('title', board.title);
-                    boardItem.setAttribute('isContainer', 'true');
-                    boardItem.setAttribute('isOpen', 'true');
+    _showResults: function(results){
+        Notification.removeAll();
 
-                    board.threads.forEach((thread) => {
-                        let threadItem = document.createElement('thread');
-                        threadItem.setAttribute('url', thread.url);
-                        threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
-                        threadItem.setAttribute('boardName', board.title);
+        let doc = document.implementation.createDocument(null, '', null);
+        let root = document.createElement('category');
 
-                        boardItem.appendChild(threadItem);
-                    });
+        results.forEach((board) => {
+            let boardItem = document.createElement('board');
+            boardItem.setAttribute('title', board.title);
+            boardItem.setAttribute('url', board.url || '');
 
-                    root.appendChild(boardItem);
+            //板名フィルタの場合、threadsが空になるが、
+            //それ以外の時は板はフォルダ扱いになる
+            if(board.threads){
+                boardItem.setAttribute('isContainer', 'true');
+                boardItem.setAttribute('isOpen', 'true');
+
+                board.threads.forEach((thread) => {
+                    let threadItem = document.createElement('thread');
+                    threadItem.setAttribute('url', thread.url);
+                    threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
+                    threadItem.setAttribute('boardName', board.title);
+
+                    boardItem.appendChild(threadItem);
                 });
-
-                doc.appendChild(root);
-
-                Tree.initTree(doc, MODE_FIND2CH);
-            },
-
-            (error) => {
-                Notification.removeAll();
-                Notification.warning('検索に失敗しました', 2500);
-                ChaikaCore.logger.error('Search failed:', error);
             }
-        );
+
+            root.appendChild(boardItem);
+        });
+
+        doc.appendChild(root);
+
+        Tree.initTree(doc, MODE_FIND2CH);
+    },
+
+    _onError: function(aError){
+        Notification.removeAll();
+        Notification.warning('検索に失敗しました', 2500);
+        ChaikaCore.logger.error('Search failed:', aError);
     },
 
 
@@ -394,13 +403,6 @@ var Bbsmenu = {
         var doc = this.getBbsmenuDoc();
         Tree.initTree(doc, MODE_BBSMENU);
     },
-
-
-    filter: function Bbsmenu_filter(aFilterStr){
-        var doc = this.getFilterDoc(aFilterStr);
-        Tree.initTree(doc, MODE_BBSMENU_FILTER);
-    },
-
 
     update: function Bbsmenu_update(aHtmlSource){
         var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
@@ -478,7 +480,6 @@ var Bbsmenu = {
 
     },
 
-
     getItemCount: function Bbsmenu_getItemCount(){
         var result = 0;
 
@@ -498,42 +499,6 @@ var Bbsmenu = {
         }
         return result;
     },
-
-
-    getFilterDoc: function Bbsmenu_getFilterDoc(aFilterStr){
-        var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
-
-
-        var storage = ChaikaCore.storage;
-        var sql = [
-            "SELECT title, url, path, board_type FROM bbsmenu",
-            "WHERE is_category=0 AND x_normalize(title) LIKE x_normalize(?1)"
-        ].join("\n");
-        var statement = storage.createStatement(sql);
-        storage.beginTransaction();
-        try{
-            statement.bindStringParameter(0, "%" + aFilterStr + "%");
-            while(statement.executeStep()){
-                var title      = statement.getString(0);
-                var url        = statement.getString(1);
-                var path       = statement.getString(2);
-                var boardType  = statement.getInt32(3);
-                var item = bbsmenuDoc.createElement("board");
-                item.setAttribute("title", title);
-                item.setAttribute("url", url);
-                item.setAttribute("type",  boardType);
-                bbsmenuDoc.documentElement.appendChild(item);
-            }
-        }catch(ex){
-            ChaikaCore.logger.error(ex);
-        }finally{
-            statement.reset();
-            statement.finalize();
-            storage.commitTransaction();
-        }
-        return bbsmenuDoc;
-    },
-
 
     getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
         var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
