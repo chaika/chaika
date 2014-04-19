@@ -46,7 +46,7 @@
                     preference="extensions.chaika.browser.browsermenu.confirm_add_abone" />
             <checkbox label="chaika 上でスキンを変更した時に自動で再読み込みする"
                     preference="extensions.chaika.browser.browsermenu.reload_when_skin_changed" />
-            <checkbox label="2ch 検索をサイドバーで行う"
+            <checkbox label="スレッド検索をサイドバーで行う"
                     preference="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" />
         </vbox>
     </groupbox>

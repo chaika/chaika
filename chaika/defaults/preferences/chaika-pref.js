@@ -71,13 +71,13 @@ pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 pref("extensions.chaika.historymenu.board_max", 6);
 pref("extensions.chaika.historymenu.thread_max", 6);
 
+pref('extensions.chaika.bbsmenu.search.default_engine_name', '00.search.2ch.net');
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 pref("extensions.chaika.bbsmenu.tree_size", "small");
 pref("extensions.chaika.bbsmenu.open_single_click", true);
 pref("extensions.chaika.bbsmenu.open_new_tab", false);
-pref("extensions.chaika.bbsmenu.find2ch.use_rss", true);
 
 pref("extensions.chaika.board.auto_update", false);
 pref("extensions.chaika.board.update_interval_limit", 45);

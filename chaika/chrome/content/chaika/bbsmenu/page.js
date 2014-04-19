@@ -37,6 +37,7 @@
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
@@ -45,20 +46,19 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 const MODE_BBSMENU = 0;
-const MODE_BBSMENU_FILTER = 1;
-const MODE_FIND2CH = 2;
+const MODE_SEARCH = 1;
 
 
 var Page = {
 
     startup: function Page_startup(){
-        PrefObserver.start();
         var tree = document.getElementById("bookmarks-view");
         tree.collapsed = true;
         tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
 
         this.showViewFoxAge2chMenu();
         SearchBox.init();
+        PrefObserver.start();
 
         setTimeout(function(){ Page.delayStartup(); }, 0);
     },
@@ -240,52 +240,116 @@ var Notification = {
 var SearchBox = {
 
     init: function SearchBox_init(){
-        if(!this._textbox) this._textbox = document.getElementById("searchBox");
+        this._textbox = document.getElementById("searchBox");
 
-        switch(this.getSearchMode()){
-            case "find2ch":
-                this._textbox.emptyText = "2ch 検索";
-                break;
-            case "boardFilter":
-                this._textbox.emptyText = "フィルタ";
-                break;
-        }
+        this._createMenu();
+        this.setSearchMode(ChaikaCore.pref.getChar('bbsmenu.search.default_engine_name'));
+    },
+
+    /**
+     * 検索メニューを構築する
+     */
+    _createMenu: function(){
+        let popup = document.getElementById('searchModeMenu');
+
+        ChaikaSearch.plugins.forEach(plugin => {
+            if(!plugin.search) return;
+
+            let menuitem = document.createElement('menuitem');
+
+            menuitem.setAttribute('label', plugin.name);
+            menuitem.setAttribute('value', plugin.id);
+            menuitem.setAttribute('type', 'radio');
+            menuitem.setAttribute('name', 'searchModeMenuitem');
+
+            menuitem.addEventListener('command', event => {
+                this._textbox.emptyText = event.target.getAttribute('label');
+            });
+
+            popup.appendChild(menuitem);
+        });
     },
 
 
     search: function SearchBox_search(aSearchStr){
+        //空文字が入力された場合には検索モードを終了する
         if(!aSearchStr){
             Bbsmenu.initTree();
             return;
         }
 
-        switch(this.getSearchMode()){
-            case "find2ch":
-                Find2ch.search(aSearchStr);
-                break;
-            case "boardFilter":
-                Bbsmenu.filter(aSearchStr);
-                break;
-        }
+        //検索を実行する
+        Notification.removeAll();
+        Notification.info('検索中');
+
+        let promise = ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr);
+
+        promise.then(this._showResults, this._onError)
+               .then(null, this._onError);
+    },
+
+    _showResults: function(results){
+        Notification.removeAll();
+
+        let doc = document.implementation.createDocument(null, '', null);
+        let root = document.createElement('category');
+
+        results.forEach((board) => {
+            let boardItem = document.createElement('board');
+            boardItem.setAttribute('title', board.title);
+            boardItem.setAttribute('url', board.url || '');
+            boardItem.setAttribute('type', board.type || ChaikaBoard.BOARD_TYPE_PAGE);
+
+            //板名フィルタの場合、threadsが空になるが、
+            //それ以外の時は板はフォルダ扱いになる
+            if(board.threads){
+                boardItem.setAttribute('isContainer', 'true');
+                boardItem.setAttribute('isOpen', 'true');
+
+                board.threads.forEach((thread) => {
+                    let threadItem = document.createElement('thread');
+                    threadItem.setAttribute('url', thread.url);
+                    threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
+                    threadItem.setAttribute('boardName', board.title);
+
+                    boardItem.appendChild(threadItem);
+                });
+            }
+
+            root.appendChild(boardItem);
+        });
+
+        doc.appendChild(root);
+
+        Tree.initTree(doc, MODE_SEARCH);
+    },
+
+    _onError: function(aError){
+        Notification.removeAll();
+        Notification.warning('検索に失敗しました', 2500);
+        ChaikaCore.logger.error('Search failed:', aError);
     },
 
 
+    /**
+     * 現在選択されている検索エンジンのIDを返す
+     * @return {String} 検索エンジンのID
+     */
     getSearchMode: function SearchBox_getSearchMode(){
-        return this._textbox.getAttribute("searchmode");
+        let popup = document.getElementById('searchModeMenu');
+        let selectedItem = popup.querySelector('[checked="true"]');
+
+        return selectedItem.getAttribute('value');
     },
 
 
-    setSearchMode: function SearchBox_setSearchMode(aValue){
-        this._textbox.setAttribute("searchmode", aValue);
-        this.init();
-        return aValue;
-    },
-
-
-    searchModeMenuShowing: function SearchBox_searchModeMenuShowing(aEvent){
-        var target = aEvent.target;
-        var element = target.getElementsByAttribute("value", SearchBox.getSearchMode())[0]
-        element.setAttribute("checked", "true");
+    /**
+     * 検索エンジンを指定する
+     * @param {String} aID 検索エンジンのID
+     */
+    setSearchMode: function(aID){
+        document.querySelector('menuitem[value="' + aID + '"]').setAttribute('checked', 'true');
+        this._textbox.emptyText = ChaikaSearch.getPlugin(aID).name;
     }
 
 };
@@ -344,13 +408,6 @@ var Bbsmenu = {
         var doc = this.getBbsmenuDoc();
         Tree.initTree(doc, MODE_BBSMENU);
     },
-
-
-    filter: function Bbsmenu_filter(aFilterStr){
-        var doc = this.getFilterDoc(aFilterStr);
-        Tree.initTree(doc, MODE_BBSMENU_FILTER);
-    },
-
 
     update: function Bbsmenu_update(aHtmlSource){
         var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
@@ -428,7 +485,6 @@ var Bbsmenu = {
 
     },
 
-
     getItemCount: function Bbsmenu_getItemCount(){
         var result = 0;
 
@@ -448,42 +504,6 @@ var Bbsmenu = {
         }
         return result;
     },
-
-
-    getFilterDoc: function Bbsmenu_getFilterDoc(aFilterStr){
-        var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
-
-
-        var storage = ChaikaCore.storage;
-        var sql = [
-            "SELECT title, url, path, board_type FROM bbsmenu",
-            "WHERE is_category=0 AND x_normalize(title) LIKE x_normalize(?1)"
-        ].join("\n");
-        var statement = storage.createStatement(sql);
-        storage.beginTransaction();
-        try{
-            statement.bindStringParameter(0, "%" + aFilterStr + "%");
-            while(statement.executeStep()){
-                var title      = statement.getString(0);
-                var url        = statement.getString(1);
-                var path       = statement.getString(2);
-                var boardType  = statement.getInt32(3);
-                var item = bbsmenuDoc.createElement("board");
-                item.setAttribute("title", title);
-                item.setAttribute("url", url);
-                item.setAttribute("type",  boardType);
-                bbsmenuDoc.documentElement.appendChild(item);
-            }
-        }catch(ex){
-            ChaikaCore.logger.error(ex);
-        }finally{
-            statement.reset();
-            statement.finalize();
-            storage.commitTransaction();
-        }
-        return bbsmenuDoc;
-    },
-
 
     getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
         var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
@@ -568,152 +588,6 @@ var Bbsmenu = {
     }
 
 };
-
-
-
-
-var Find2ch = {
-
-    _downloader: null,
-    _infoNode: null,
-
-    get isHTMLMode(){
-        return !ChaikaCore.pref.getBool('bbsmenu.find2ch.use_rss');
-    },
-
-    search: function Find2ch_search(aSearchStr){
-        const isHTML = this.isHTMLMode;
-        const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=" : 'http://find.2ch.net/rss.php/';
-        const ENCODE = isHTML ? 'euc-jp' : 'utf-8';
-        const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) :
-                                encodeURIComponent(ChaikaCore.io.escapeHTML(aSearchStr));
-
-        this._downloader = new XMLHttpRequest();
-        this._downloader.onerror = this.onError;
-        this._downloader.onreadystatechange = this.onReadyStateChange;
-        this._downloader.open("GET", QUERY_URL + QUERY, true);
-        this._downloader.overrideMimeType('text/plain; charset=' + ENCODE);
-        this._downloader.send(null);
-
-        Notification.removeAll();
-        this._infoNode = Notification.info("検索中");
-    },
-
-
-    onReadyStateChange: function Find2ch_onReadyStateChange(aEvent){
-        if(aEvent.target.readyState === 4 && aEvent.target.status === 200){
-            Find2ch.onStop(aEvent.target.responseText);
-        }
-    },
-
-    onStop: function Find2ch_onStop(aResponse){
-        if(aResponse){
-            if( (this.isHTMLMode && aResponse.indexOf('<html') !== -1) ||
-               aResponse.indexOf('<rdf:RDF') !== -1){
-                this.initTree(aResponse);
-            }
-        }
-
-        Notification.remove(this._infoNode);
-        this._downloader = null;
-        this._infoNode = null;
-    },
-
-
-    onError: function Find2ch_onError(aEvent){
-        Notification.critical("検索に失敗しました", 2500);
-        Notification.remove(this._infoNode);
-        this._downloader = null;
-        this._infoNode = null;
-    },
-
-
-    initTree: function Find2ch_initTree(aResponse){
-        var resultDoc = this.isHTMLMode ? this._convertDocFromHTML(aResponse) :
-                                          this._convertDocFromRSS(aResponse);
-        Tree.initTree(resultDoc, MODE_FIND2CH);
-    },
-
-    _convertDocFromRSS: function(aResponseStr){
-        var httpReq = new XMLHttpRequest();
-        httpReq.open("GET", "chrome://chaika/content/bbsmenu/find2ch.xsl", false);
-        httpReq.send(null);
-
-        var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
-                .createInstance(Ci.nsIDOMParser);
-        var xsltDoc = domParser.parseFromString(httpReq.responseText, "text/xml");
-        var findDoc = domParser.parseFromString(aResponseStr, "text/xml");
-
-        var xslt = new XSLTProcessor();
-        xslt.importStylesheet(xsltDoc);
-
-        return xslt.transformToDocument(findDoc);
-    },
-
-    _convertDocFromHTML: function(aResponseStr){
-        var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
-                .createInstance(Ci.nsIDOMParser);
-        var findDoc = domParser.parseFromString(aResponseStr, "text/html");
-
-        var resultDoc = document.implementation.createDocument(null, '', null);
-        var root = document.createElement('category');
-
-        var resultObj = {};  //key: board name, value: an array of threads
-
-        //最後のdtは広告
-        Array.slice(findDoc.querySelectorAll('.content_pane dt:not(:last-child)')).forEach(function(item){
-            var links = item.getElementsByTagName('a');
-
-            var thread = links[0];
-            var threadURI = thread.getAttribute('href').replace(/\d+-\d+$/, '');
-            var threadTitle = ChaikaCore.io.unescapeHTML(thread.textContent);
-
-            var post = thread.nextSibling.nodeValue.replace(/\D/g, '') || '0';
-            var boardTitle = links[1].textContent;
-
-            var threadItem = document.createElement('thread');
-            threadItem.setAttribute('url', threadURI);
-            threadItem.setAttribute('title', threadTitle + ' [' + post + ']');
-            threadItem.setAttribute('boardName', boardTitle);
-
-            if(!resultObj[boardTitle]){
-                resultObj[boardTitle] = [];
-            }
-            resultObj[boardTitle].push(threadItem);
-        });
-
-        for(let boardTitle in resultObj){
-            var boardItem = document.createElement('board');
-            boardItem.setAttribute('title', boardTitle);
-            boardItem.setAttribute('isContainer', 'true');
-            boardItem.setAttribute('isOpen', 'true');
-
-            resultObj[boardTitle].forEach(function(threadItem){
-                boardItem.appendChild(threadItem);
-            });
-
-            root.appendChild(boardItem);
-        }
-
-        resultDoc.appendChild(root);
-
-        return resultDoc;
-    },
-
-    _convertEncode: function(aStr, aEncode){
-        var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
-
-        try{
-            converter.charset = aEncode;
-            return converter.ConvertFromUnicode(aStr);
-        }catch(e){
-            return aStr;
-        }
-    }
-
-};
-
-
 
 
 var Tree = {

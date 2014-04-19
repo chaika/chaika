@@ -12,12 +12,7 @@
 <script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 
 <popupset>
-    <menupopup id="searchModeMenu" onpopupshowing="SearchBox.searchModeMenuShowing(event)">
-         <menuitem label="find.2ch.net で検索" value="find2ch"     type="radio" name="searchModeMenuItem"
-                 oncommand="SearchBox.setSearchMode('find2ch')"/>
-         <menuitem label="板名フィルタ"  value="boardFilter" type="radio" name="searchModeMenuItem"
-                 oncommand="SearchBox.setSearchMode('boardFilter')"/>
-    </menupopup>
+    <menupopup id="searchModeMenu" />
 
     <menupopup id="historyMenuContext"
             style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
@@ -29,12 +24,11 @@
 
 <hbox align="center">
     <textbox id="searchBox" value="" emptytext="" flex="1" type="search" timeout="2000"
-            searchmode="find2ch" persist="searchmode"
-            oncommand="if(this.value =='') SearchBox.search('')"
+            oncommand="if(this.value === '') SearchBox.search('')"
             onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
         <box><dropmarker popup="searchModeMenu" class="plain"/></box>
     </textbox>
-    
+
     <menubar id="mainMenubar" class="plain">
         <menu id="historyMenu" label="履歴" class="plain menu-iconic">
             <menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
