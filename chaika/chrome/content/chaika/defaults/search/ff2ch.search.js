@@ -15,6 +15,10 @@ var Ff2ch = {
 
     name: '2ch検索 (ff2ch.syoboi.jp)',
 
+    version: '1.0.0pre',
+
+    updateURL: '%%ChaikaDefaultsDir%%/search/ff2ch.search.js',
+
     charset: 'utf-8',
 
     url: 'http://ff2ch.syoboi.jp/?q=%%TERM%%',

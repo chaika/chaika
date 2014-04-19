@@ -15,6 +15,10 @@ var BoardFilter = {
 
     name: '板名フィルタ',
 
+    version: '1.0.0pre',
+
+    updateURL: '%%ChaikaDefaultsDir%%/search/boardFilter.search.js',
+
     charset: 'utf-8',
 
     url: null,

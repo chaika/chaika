@@ -18,6 +18,10 @@ var Search2ch = {
 
     name: '2ch検索 (search.2ch.net)',
 
+    version: '1.0.0pre',
+
+    updateURL: '%%ChaikaDefaultsDir%%/search/search2ch.search.js',
+
     charset: 'utf-8',
 
     url: 'http://search.2ch.net/search?match=full&q=%%TERM%%',

@@ -61,38 +61,82 @@ var ChaikaSearch = {
 
     /** @private **/
     _startup: function(){
-        this._loadSearchPlugins();
+        this._loadPlugins();
+        this._updatePlugins();
+    },
+
+
+    /**
+     * プラグインのアップデート処理を行う
+     */
+    _updatePlugins: function(){
+        let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
+        let pluginFolder = this._getPluginFolder();
+        let hasUpdate = false;
+
+        this.plugins.forEach(plugin => {
+            if(!plugin.version || !plugin.updateURL) return;
+
+            let updateURL = plugin.updateURL;
+
+            if(updateURL.contains('%%ChaikaDefaultsDir%%')){
+                let defaultsDir = ChaikaCore.getDefaultsDir();
+                let defaultsDirSpec = fph.getURLSpecFromActualFile(defaultsDir);
+
+                updateURL = updateURL.replace('%%ChaikaDefaultsDir%%', defaultsDirSpec);
+            }
+
+            let remotePlugin = this._loadPluginFromURL(updateURL);
+
+            if(Services.vc.compare(plugin.version, remotePlugin.version) < 0){
+                ChaikaCore.logger.debug(plugin.name, 'needs to be updated.',
+                                        'old:', plugin.version, 'new:', remotePlugin.version);
+
+                //いまのところ file:// スキーム以外は未対応
+                if(!updateURL.startsWith('file://')) return;
+
+                let fileName = updateURL.match(/[^\/]+$/)[0];
+                let oldFile = pluginFolder.clone();
+                let newFile = fph.getFileFromURLSpec(updateURL);
+
+                oldFile.appendRelativePath(fileName);
+                oldFile.remove(false);
+                newFile.copyTo(oldFile.parent, null);
+
+                ChaikaCore.logger.debug('Successfully updated.');
+                hasUpdate = true;
+            }
+        });
+
+        if(hasUpdate){
+            ChaikaCore.logger.debug('All search plugins are now up-to-date. Reload the plugins...');
+            this._loadPlugins();
+        }
     },
 
 
     /**
      * 検索プラグインを読み込む
      */
-    _loadSearchPlugins: function(){
+    _loadPlugins: function(){
         const pluginExtReg = /\.search\.js$/;
+        let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
 
         let pluginFolder = this._getPluginFolder();
         let files = pluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
+
+        this.plugins.length = 0;
 
         while(true){
             let file = files.nextFile;
             if(!file) break;
 
             if(!file.isDirectory() && pluginExtReg.test(file.leafName)){
-                let tmp = {};
-                let namespace = this._getPluginNameSpace(file.leafName);
-
-                let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
                 let url = fph.getURLSpecFromActualFile(file);
+                let plugin = this._loadPluginFromURL(url);
 
-                ChaikaCore.logger.debug('load search plugin:', file.leafName, namespace);
-
-                Services.scriptloader.loadSubScript(url, tmp, 'UTF-8');
-
-                if(!tmp[namespace]){
-                    ChaikaCore.logger.error('Unable to load a search plugin named "' + file.leafName + '" due to spec violation.');
-                }else{
-                    this.plugins.push(tmp[namespace]);
+                if(plugin){
+                    this.plugins.push(plugin);
                 }
             }
         }
@@ -100,6 +144,31 @@ var ChaikaSearch = {
         this.plugins.sort((a, b) => a.id > b.id);
 
         files.close();
+    },
+
+
+    /**
+     * 指定された URL からプラグインオブジェクトを読み込んで返す
+     * @param {String} aURL 読み込むプラグインの URL
+     * @returns {ChaikaSearchPlugin}
+     */
+    _loadPluginFromURL: function(aURL){
+        let tmp = {};
+        let fileName = aURL.match(/[^\/]+$/)[0];
+        let namespace = this._getPluginNameSpace(fileName);
+
+        ChaikaCore.logger.debug('Load search plugin:', aURL, namespace);
+
+        //URL の末尾にランダムな数値をつけることで、
+        //キャッシュされたファイルが返るのを防ぐ
+        Services.scriptloader.loadSubScript(aURL + '?' + Math.random(), tmp, 'UTF-8');
+
+        if(!tmp[namespace]){
+            ChaikaCore.logger.error('Unable to load a search plugin named "' + fileName + '" due to spec violation.');
+            return null;
+        }
+
+        return tmp[namespace];
     },
 
 
