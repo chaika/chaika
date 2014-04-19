@@ -259,8 +259,7 @@
                 let searchMenu = document.getAnonymousElementByAttribute(this, "anonid", "search-thread");
 
                 this.ChaikaSearch.plugins.forEach(plugin => {
-                    //板名フィルタは除外する
-                    if(plugin.id === 'chaika.filter.board') return;
+                    if(!plugin.url) return;
 
                     let menuitem = document.createElement('menuitem');
 

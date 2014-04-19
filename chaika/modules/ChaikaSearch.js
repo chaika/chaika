@@ -172,9 +172,12 @@ var ChaikaSearchPlugin = {
      * 主に検索結果のページを直接ブラウザで表示する場合に使用される
      * %%TERM%% がエンコード済み検索文字列に置き換えられる
      *   (エンコードは上記 charset プロパティに依る)
-     * @type {String}
+     *
+     * URL を開く必要がない場合, null を指定する (例: boardFilter.search.js)
+     *
+     * @type {?String}
      */
-    url: '',
+    url: null,
 
     /**
      * 検索を実行し、その結果を返す
@@ -183,6 +186,9 @@ var ChaikaSearchPlugin = {
      * Promise を使用する
      * 通信が成功した時にはその結果を resolve で返し、
      * 失敗した場合には reject によりその理由を返す
+     *
+     * 検索結果を取得する用途がない場合、null を指定する
+     *
      * @param {String} term 検索文字列 (エンコード済みでない)
      * @return {Promise} - 成功時: 以下のようなオブジェクトの配列を返す必要がある
      *     [

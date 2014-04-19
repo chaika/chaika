@@ -256,6 +256,8 @@ var SearchBox = {
         let popup = document.getElementById('searchModeMenu');
 
         ChaikaSearch.plugins.forEach(plugin => {
+            if(!plugin.search) return;
+
             let menuitem = document.createElement('menuitem');
 
             menuitem.setAttribute('label', plugin.name);
