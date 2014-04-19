@@ -37,6 +37,7 @@
                 switch(anonymousID){
                     case 'open-skin-folder':
                         this._openSkinFolder();
+                        break;
 
                     default:
                         this._setSkin(targetElement.getAttribute('value'));
