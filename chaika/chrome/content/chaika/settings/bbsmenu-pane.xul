@@ -6,24 +6,38 @@
 <prefpane id="paneBbsmenu" onpaneload="gBbsmenuPane.startup()">
 
     <preferences>
+        <preference id="extensions.chaika.bbsmenu.search.default_engine_name"
+                    name="extensions.chaika.bbsmenu.search.default_engine_name" type="string" />
         <preference id="extensions.chaika.historymenu.board_max"
-                name="extensions.chaika.historymenu.board_max" type="int"/>
+                    name="extensions.chaika.historymenu.board_max" type="int"/>
         <preference id="extensions.chaika.historymenu.thread_max"
-                name="extensions.chaika.historymenu.thread_max" type="int"/>
+                    name="extensions.chaika.historymenu.thread_max" type="int"/>
         <preference id="extensions.chaika.bbsmenu.toggle_open_container"
-                name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
+                    name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.tree_size"
-                name="extensions.chaika.bbsmenu.tree_size" type="string"/>
+                    name="extensions.chaika.bbsmenu.tree_size" type="string"/>
         <preference id="extensions.chaika.bbsmenu.open_single_click"
-                name="extensions.chaika.bbsmenu.open_single_click" type="bool"/>
+                    name="extensions.chaika.bbsmenu.open_single_click" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.open_new_tab"
-                name="extensions.chaika.bbsmenu.open_new_tab" type="bool"/>
+                    name="extensions.chaika.bbsmenu.open_new_tab" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.bbsmenu_html_url"
-                name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
+                    name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
             src="chrome://chaika/content/settings/bbsmenu-pane.js"/>
+
+
+    <groupbox>
+        <caption class="setting-description" label="検索ボックス" />
+        <vbox>
+            <hbox align="center" pack="start">
+                <label value="デフォルト検索エンジン:" />
+                <menulist id="searchEngineList"
+                          preference="extensions.chaika.bbsmenu.search.default_engine_name" />
+            </hbox>
+        </vbox>
+    </groupbox>
 
     <groupbox>
         <caption class="setting-description" label="履歴メニュー" />

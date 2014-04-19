@@ -243,10 +243,7 @@ var SearchBox = {
         this._textbox = document.getElementById("searchBox");
 
         this._createMenu();
-
-        //default: search.2ch.net
-        //ToDo: 設定値に入れる
-        this.setSearchMode('search.2ch.net');
+        this.setSearchMode(ChaikaCore.pref.getChar('bbsmenu.search.default_engine_name'));
     },
 
     /**

@@ -35,10 +35,34 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import('resource://chaika-modules/ChaikaSearch.js');
+
 
 var gBbsmenuPane = {
 
     startup: function(){
+        this._createEngineMenu();
+    },
+
+    _createEngineMenu: function(){
+        let menulist = document.getElementById('searchEngineList');
+        let menupopup = document.createElement('menupopup');
+
+        ChaikaSearch.plugins.forEach(plugin => {
+            if(!plugin.search) return;
+
+            let menuitem = document.createElement('menuitem');
+
+            menuitem.setAttribute('label', plugin.name);
+            menuitem.setAttribute('value', plugin.id);
+
+            menupopup.appendChild(menuitem);
+        });
+
+        menulist.appendChild(menupopup);
+
+        let selectedItem = document.querySelector('menuitem[value="' + menulist.value + '"]');
+        menulist.selectedItem = selectedItem;
     },
 
     resetBbsmenuURL: function(){

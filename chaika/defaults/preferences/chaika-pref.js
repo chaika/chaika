@@ -71,6 +71,7 @@ pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 pref("extensions.chaika.historymenu.board_max", 6);
 pref("extensions.chaika.historymenu.thread_max", 6);
 
+pref('extensions.chaika.bbsmenu.search.default_engine_name', 'search.2ch.net');
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
