@@ -11,7 +11,7 @@ try{
 
 var BoardFilter = {
 
-    id: 'chaika.filter.board',
+    id: '03.chaika.filter.board',
 
     name: '板名フィルタ',
 

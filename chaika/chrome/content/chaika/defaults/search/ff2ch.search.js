@@ -11,7 +11,7 @@ try{
 
 var Ff2ch = {
 
-    id: 'ff2ch.syoboi.jp',
+    id: '01.ff2ch.syoboi.jp',
 
     name: '2ch検索 (ff2ch.syoboi.jp)',
 

@@ -14,7 +14,7 @@ try{
 
 var Search2ch = {
 
-    id: 'search.2ch.net',
+    id: '00.search.2ch.net',
 
     name: '2ch検索 (search.2ch.net)',
 
