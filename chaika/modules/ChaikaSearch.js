@@ -48,23 +48,14 @@ const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
 var ChaikaSearch = {
 
     /**
-     * 検索プラグイン
+     * 検索プラグインオブジェクトが入る配列
+     * @type {Array.<ChaikaSearchPlugin>}
      */
-    plugins: {},
+    plugins: [],
 
 
     getPlugin: function(id){
-        let keys = Object.keys(this.plugins);
-
-        for(let i = 0, iz = keys.length; i < iz; i++){
-            let plugin = this.plugins[keys[i]];
-
-            if(plugin.id === id){
-                return plugin;
-            }
-        }
-
-        return null;
+        return this.plugins.find(plugin => plugin.id === id);
     },
 
 
@@ -101,10 +92,12 @@ var ChaikaSearch = {
                 if(!tmp[namespace]){
                     ChaikaCore.logger.error('Unable to load a search plugin named "' + file.leafName + '" due to spec violation.');
                 }else{
-                    this.plugins[namespace] = tmp[namespace];
+                    this.plugins.push(tmp[namespace]);
                 }
             }
         }
+
+        this.plugins.sort((a, b) => a.id > b.id);
 
         files.close();
     },

@@ -258,13 +258,9 @@
             <body><![CDATA[
                 let searchMenu = document.getAnonymousElementByAttribute(this, "anonid", "search-thread");
 
-                let keys = Object.keys(this.ChaikaSearch.plugins);
-
-                for(let i = 0, iz = keys.length; i < iz; i++){
-                    let plugin = this.ChaikaSearch.plugins[keys[i]];
-
+                this.ChaikaSearch.plugins.forEach(plugin => {
                     //板名フィルタは除外する
-                    if(plugin.id === 'chaika.filter.board') continue;
+                    if(plugin.id === 'chaika.filter.board') return;
 
                     let menuitem = document.createElement('menuitem');
 
@@ -272,7 +268,7 @@
                     menuitem.setAttribute('anonid', plugin.id);
 
                     searchMenu.appendChild(menuitem);
-                }
+                });
             ]]></body>
         </method>
 

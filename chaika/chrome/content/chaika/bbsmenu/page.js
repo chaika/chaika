@@ -255,10 +255,7 @@ var SearchBox = {
     _createMenu: function(){
         let popup = document.getElementById('searchModeMenu');
 
-        let keys = Object.keys(ChaikaSearch.plugins);
-
-        for(let i = 0, iz = keys.length; i < iz; i++){
-            let plugin = ChaikaSearch.plugins[keys[i]];
+        ChaikaSearch.plugins.forEach(plugin => {
             let menuitem = document.createElement('menuitem');
 
             menuitem.setAttribute('label', plugin.name);
@@ -271,7 +268,7 @@ var SearchBox = {
             });
 
             popup.appendChild(menuitem);
-        }
+        });
     },
 
 
