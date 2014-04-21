@@ -568,7 +568,7 @@ ChaikaLogger.prototype = {
             return arg.toString();
         });
 
-        var message = "[" + stackName + ":" + stackLine + "] " + aType +  " " + args.join(', ');
+        var message = "[" + stackName + ":" + stackLine + "] " + aType +  " " + args.join(' ');
         this._console.logStringMessage(message);
     },
 
