@@ -571,7 +571,7 @@ Thread2ch.prototype = {
 
         // Beアイコン処理
         if(this._showBeIcon && resMes.indexOf("sssp://")!=-1){
-            var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.gif)/g;
+            var regUrlLink = /sssp:\/\/img\.2ch\.net\/ico\/(\S+\.(?:gif|png))/g;
             resMes = resMes.replace(regUrlLink,
                         '<img src="http://img.2ch.net/ico/$1" class="beIcon" alt="">');
         }
