@@ -65,6 +65,12 @@ var gBbsmenuPane = {
         menulist.selectedItem = selectedItem;
     },
 
+    openSearchPluginDir: function(){
+        var pluginDir = ChaikaCore.getDataDir();
+        pluginDir.appendRelativePath("search");
+        ChaikaCore.io.revealDir(pluginDir);
+    },
+
     resetBbsmenuURL: function(){
         var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
         pref.value = pref.defaultValue;
