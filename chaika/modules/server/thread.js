@@ -577,8 +577,18 @@ Thread2ch.prototype = {
         }
 
         // レス本文中のIDを抽出
-        var regResID = /( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/!]+)/g;
-        resMes = resMes.replace(regResID, '$1<span class="resMesID" resID="$3"><span class="mesID_$3">$2$3</span></span>');
+        var regResID = /(?:(="[^"]*?)( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/!]+)([^"]*?")|( |[^A-Z]|[\x81-\x9f\xe0-\xfc][A-Z])(ID:)([0-9A-Za-z\+\/!]+))/g;
+        resMes = resMes.replace(regResID, (...args) => {
+            if(args[1]){
+                //タグの属性値中に含まれるIDは置換しない
+                return args[1] + args[2] + args[3] + args[4] + args[5];
+            }else{
+                // $6<span class="resMesID" resID="$8"><span class="mesID_$8">$7$8</span></span>
+                return args[6] + '<span class="resMesID" resID="' + args[8] +
+                        '"><span class="mesID_' + args[8] + '">' + args[7] + args[8] +
+                        '</span></span>';
+            }
+        });
 
 
         // スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
