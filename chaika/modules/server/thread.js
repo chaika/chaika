@@ -1419,9 +1419,14 @@ b2rThreadConverter.prototype = {
         var lineCount = aMessage.match(/<br\s*\/?>/g);
 
         if(lineCount && lineCount.length >= 3){
-            // \x81\x40 = 全角空白(Shift_JIS)
-            var spaceCount = aMessage.match(/(?: |\x81\x40|\.|\:|i|\|)/g);
-            if(spaceCount && (spaceCount.length / aMessage.length) >= 0.25){
+            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ￣
+            // \x81\x5e = ／, \x81_ = ＼, \x84\xaa = ━, \x81i = （, \x81j = ）
+            // 半角空白は、英文中に多く含まれるためカウントから外す
+            let aaSymbols = /(?:\x81\x40|\x81F|\x81b|\x84\xab|\x81P|\x81\x5e|\x81_|\x84\xaa|\x81i|\x81j|[^\x81-\xfc][_:;\|\/\\\(\)])/g;
+            let aaSymbolsCount = aMessage.match(aaSymbols);
+            let aaSymbolsRatio = aaSymbolsCount ? aaSymbolsCount.length / aMessage.length : 0;
+
+            if(aaSymbolsRatio >= 0.2){
                 return true;
             }
         }
@@ -1431,7 +1436,7 @@ b2rThreadConverter.prototype = {
         // refs.  AA（アスキーアート）簡易判定アルゴリズム - awef
         //        http://d.hatena.ne.jp/awef/20110412/1302605740
         // @license MIT License (Copyright (c) 2011 awef) (only the following one-line)
-        if(/(?:(?:\x81\x40) ){2,}(?!<br>|$)/i.test(aMessage)){
+        if(/(?:(?:\x81\x40) ){2,}(?!<br \/>|$)/i.test(aMessage)){
             return true;
         }
 
