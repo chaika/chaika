@@ -571,8 +571,8 @@ Thread2ch.prototype = {
 
         // Beアイコン, Emoticons 処理
         if(this._showBeIcon){
-            resMes = resMes.replace(/sssp:\/\/(\S+\.(?:gif|png))/g,
-                                    '<img src="http://$1" class="beIcon" alt="">');
+            resMes = resMes.replace(/sssp:\/\/img\.2ch\.net\/(\S+\.(?:gif|png))/g,
+                                    '<img src="http://img.2ch.net/$1" class="beIcon" alt="">');
         }
 
         // レス本文中のIDを抽出
