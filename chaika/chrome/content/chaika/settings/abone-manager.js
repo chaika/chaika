@@ -35,166 +35,304 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import('resource://gre/modules/Services.jsm');
+Components.utils.import('resource://chaika-modules/ChaikaCore.js');
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 var gAboneObserver = {
     observe: function(aSubject, aTopic, aData){
-        var aboneType;
+        let aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
+
         switch(aTopic){
             case "b2r-abone-data-add":
             case "b2r-abone-data-remove":
-                aboneType = aSubject.QueryInterface(Components.interfaces.nsISupportsPRInt32).data;
+                gAboneManager[aboneType].update(aData);
                 break;
+
             default:
                 return;
         }
-
-        var aboneListBox;
-        switch(aboneType){
-            case ChaikaAboneManager.ABONE_TYPE_NAME:
-                aboneListBox = document.getElementById("aboneNameListBox");
-                break;
-            case ChaikaAboneManager.ABONE_TYPE_MAIL:
-                aboneListBox = document.getElementById("aboneMailListBox");
-                break;
-            case ChaikaAboneManager.ABONE_TYPE_ID:
-                aboneListBox = document.getElementById("aboneIDListBox");
-                break;
-            case ChaikaAboneManager.ABONE_TYPE_WORD:
-                aboneListBox = document.getElementById("aboneWordListBox");
-                break;
-        }
-        var aboneData = ChaikaAboneManager.getAboneData(aboneType);
-        initList(aboneData, aboneListBox);
     }
 };
 
 
-function startup(){
-    var aboneNameListBox = document.getElementById("aboneNameListBox");
-    var aboneMailListBox = document.getElementById("aboneMailListBox");
-    var aboneIDListBox = document.getElementById("aboneIDListBox");
-    var aboneWordListBox = document.getElementById("aboneWordListBox");
+var gAboneManager = {
 
-    initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_NAME), aboneNameListBox);
-    initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_MAIL), aboneMailListBox);
-    initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_ID), aboneIDListBox);
-    initList(ChaikaAboneManager.getAboneData(ChaikaAboneManager.ABONE_TYPE_WORD), aboneWordListBox);
-
-    var os = Components.classes["@mozilla.org/observer-service;1"]
-                .getService(Components.interfaces.nsIObserverService);
-    os.addObserver(gAboneObserver, "b2r-abone-data-add", false);
-    os.addObserver(gAboneObserver, "b2r-abone-data-remove", false);
+    startup: function(){
+        this.name = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_NAME);
+        this.mail = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_MAIL);
+        this.id = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_ID);
+        this.word = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_WORD);
+        this.ex = new NGExAboneManagerView(ChaikaAboneManager.ABONE_TYPE_EX);
 
 
-    //右クリックあぼーんの時
-    if('arguments' in window && window.arguments.length > 0 && typeof window.arguments[0] === 'object'){
-        var ngData = window.arguments[0];
+        Services.obs.addObserver(gAboneObserver, "b2r-abone-data-add", false);
+        Services.obs.addObserver(gAboneObserver, "b2r-abone-data-remove", false);
 
-        //ngTypeから名前へ変換
-        var ngTypeName = '';
-        switch(ngData.ngType){
-            case 0:
-                ngTypeName = 'Name'; break;
 
-            case 1:
-                ngTypeName = 'Mail'; break;
+        //右クリックあぼーんの時
+        if('arguments' in window && window.arguments.length > 1){
+            let ngType = window.arguments[0];
+            let ngData = window.arguments[1];
 
-            case 2:
-                ngTypeName = 'ID'; break;
+            this[ngType].populateData(ngData);
+        }
+    },
 
-            case 3:
-                ngTypeName = 'Word'; break;
 
-            default:
-                ngTypeName = 'Name'; break;
+    shutdown: function(){
+        this.name.uninit();
+        this.mail.uninit();
+        this.id.uninit();
+        this.word.uninit();
+        this.ex.uninit();
+
+        Services.obs.removeObserver(gAboneObserver, "b2r-abone-data-add", false);
+        Services.obs.removeObserver(gAboneObserver, "b2r-abone-data-remove", false);
+    },
+
+}
+
+
+
+function AboneManagerView(aNGType){
+    this._init(aNGType);
+}
+
+AboneManagerView.prototype = {
+
+    _init: function(aNGType){
+        this._type = aNGType;
+        this._tab = document.getElementById('abone-' + this._type);
+        this._textbox = this._tab.querySelector('textbox');
+        this._listbox = this._tab.querySelector('listbox');
+
+        this._tab.querySelector('.button-add').addEventListener('command', this, false);
+        this._tab.querySelector('.button-remove').addEventListener('command', this, false);
+
+        this._initList();
+    },
+
+
+    _initList: function(){
+        let ngData = ChaikaAboneManager[this._type].getNgData();
+
+        while(this._listbox.getRowCount() > 0){
+            this._listbox.removeItemAt(0);
         }
 
-        //該当するタブを選択
-        var textbox = document.getElementById('abone' + ngTypeName + 'TextBox');
-        var tabpanel = textbox.parentNode.parentNode;
-        var tabbox = document.getElementById('aboneManagerTabBox');
-        tabbox.selectedPanel = tabpanel;
-        tabbox.selectedIndex = tabpanel.parentNode.selectedIndex;
+        ngData.forEach((aWord) => {
+            this._listbox.appendItem(aWord, aWord);
+        });
+    },
 
-        //テキストボックスにngWordを入れてフォーカスを当てる
-        textbox.value = ngData.ngWord;
+
+    uninit: function(){
+        this._tab.querySelector('.button-add').removeEventListener('command', this, false);
+        this._tab.querySelector('.button-remove').removeEventListener('command', this, false);
+    },
+
+
+    handleEvent: function(aEvent){
+        if(aEvent.type !== 'command') return;
+
+        switch(aEvent.originalTarget.className){
+            case 'button-add':
+                this.add();
+                break;
+
+            case 'button-remove':
+                this.remove();
+                break;
+
+            default:
+        }
+    },
+
+
+    /**
+     * あぼーんデータが更新された時に呼ばれる
+     * (オブザーバから通知された時に表示を更新する)
+     */
+    update: function(){
+        this._initList();
+    },
+
+
+    /**
+     * 指定されたデータを入力状態にする
+     */
+    populateData: function(aWord){
+        //タブを選択
+        let tabbox = document.getElementById('aboneManagerTabBox');
+        tabbox.selectedPanel = this._tab;
+        tabbox.selectedIndex = this._tab.parentNode.selectedIndex;
+
+        //テキストボックスにデータを入れてフォーカスを当てる
+        this._textbox.value = aWord;
         textbox.focus();
+    },
+
+
+    /**
+     * 入力欄に入力されているワードをNGデータに追加する
+     */
+    add: function(){
+        if(this._textbox.value){
+            ChaikaAboneManager[this._type].add(this._textbox.value);
+        }
+    },
+
+
+    /**
+     * 選択されているNGデータを削除する
+     */
+    remove: function(){
+        if(this._listbox.selectedIndex === -1) return;
+
+        ChaikaAboneManager[this._type].remove(this._listbox.selectedItem.value);
     }
+
+};
+
+
+
+function NGExAboneManagerView(aNGType){
+    AboneManagerView.apply(this, arguments);
 }
 
+NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
 
-function shutdown(){
-    var os = Components.classes["@mozilla.org/observer-service;1"]
-                .getService(Components.interfaces.nsIObserverService);
-    os.removeObserver(gAboneObserver, "b2r-abone-data-add", false);
-    os.removeObserver(gAboneObserver, "b2r-abone-data-remove", false);
+    _init: {
+        value: function(aNGType){
+            AboneManagerView.prototype._init.apply(this, arguments);
 
-}
+            this._listbox.addEventListener('select', this, false);
+            this._tab.querySelector('.button-save').addEventListener('command', this, false);
 
+            this._info = this._tab.querySelector('#abone-ex-info');
+            this._view = new NGExView(this._info);
 
-function accept(){
-}
-
-
-function initList(aAboneData, aListBox){
-    while(aListBox.getRowCount() > 0){
-        aListBox.removeItemAt(0);
-    }
-
-    for(let [i, value] in aAboneData){
-        if(!value) continue;
-        aListBox.appendItem(value, value);
-    }
-}
+            if(this._listbox.getRowCount() > 0){
+                setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
+            }else{
+                //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
+                //NGデータ編集欄を非表示にしておく
+                this._info.collapsed = true;
+            }
+        }
+    },
 
 
-function addAbone(aType){
-    var aboneWord;
-    var aboneListBox;
+    _initList: {
+        value: function(){
+            let ngData = ChaikaAboneManager[this._type].getNgData();
 
-    switch(aType){
-        case ChaikaAboneManager.ABONE_TYPE_NAME:
-            aboneWord = document.getElementById("aboneNameTextBox").value;
-            aboneListBox = document.getElementById("aboneNameListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_MAIL:
-            aboneWord = document.getElementById("aboneMailTextBox").value;
-            aboneListBox = document.getElementById("aboneMailListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_ID:
-            aboneWord = document.getElementById("aboneIDTextBox").value;
-            aboneListBox = document.getElementById("aboneIDListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_WORD:
-            aboneWord = document.getElementById("aboneWordTextBox").value;
-            aboneListBox = document.getElementById("aboneWordListBox");
-            break;
-    }
-    if(!aboneWord) return;
+            while(this._listbox.getRowCount() > 0){
+                this._listbox.removeItemAt(0);
+            }
 
-    ChaikaAboneManager.addAbone(aboneWord, aType);
-}
+            ngData.forEach((aNGData) => {
+                this._listbox.appendItem(JSON.parse(aNGData).title, aNGData);
+            });
+        }
+    },
 
 
-function removeAbone(aType){
-    var aboneListBox;
-    switch(aType){
-        case ChaikaAboneManager.ABONE_TYPE_NAME:
-            aboneListBox = document.getElementById("aboneNameListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_MAIL:
-            aboneListBox = document.getElementById("aboneMailListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_ID:
-            aboneListBox = document.getElementById("aboneIDListBox");
-            break;
-        case ChaikaAboneManager.ABONE_TYPE_WORD:
-            aboneListBox = document.getElementById("aboneWordListBox");
-            break;
-    }
-    if(aboneListBox.selectedIndex == -1) return;
-    var aboneWord = aboneListBox.selectedItem.value;
+    uninit: {
+        value: function(){
+            AboneManagerView.prototype.uninit.apply(this, arguments);
 
-    ChaikaAboneManager.removeAbone(aboneWord, aType);
-}
+            this._listbox.removeEventListener('select', this, false);
+            this._tab.querySelector('.button-save').removeEventListener('command', this, false);
+
+            this._view.uninit();
+        }
+    },
+
+
+    handleEvent: {
+        value: function(aEvent){
+            switch(aEvent.type){
+                case 'select':
+                    this.populateData(JSON.parse(this._listbox.selectedItem.value), true);
+                    break;
+
+                case 'command':
+                    switch(aEvent.originalTarget.className){
+                        case 'button-add':
+                            this.add();
+                            break;
+
+                        case 'button-remove':
+                            this.remove();
+                            break;
+
+                        case 'button-save':
+                            this.save();
+                            break;
+                    }
+                    break;
+            }
+        }
+    },
+
+
+    /**
+     * @param {String} updatedData 更新されたデータ (JSON)
+     */
+    update: {
+        value: function(updatedData){
+            this._initList();
+            this._listbox.value = updatedData;
+
+            if(this._listbox.selectedIndex === -1)
+                this._listbox.selectedIndex = 0;
+        }
+    },
+
+
+    /**
+     * @param {NGExData} aData 表示するデータ
+     * @param {Boolean} inContext ページ内表示かどうか
+     */
+    populateData: {
+        value: function(aData, inContext){
+            if(inContext){
+                this._info.collapsed = false;
+                this._view.populateData(aData);
+            }else{
+                this.add(aData);
+            }
+        },
+    },
+
+
+    /**
+     * @param {NGExData} [dataToPopulate] 予め入力しておくデータ
+     */
+    add: {
+        value: function(dataToPopulate){
+            window.openDialog('chrome://chaika/content/settings/abone-manager-ngex.xul',
+                              '', 'modal, resizable', dataToPopulate);
+        }
+    },
+
+
+    save: {
+        value: function(){
+            //削除する前にデータをとっておかないとデータが消えてしまう
+            //(削除すると先頭のデータが選択されるため)
+            let ngData = this._view.getNgData();
+
+            this.remove();
+            ChaikaAboneManager.ex.add(ngData);
+        }
+    },
+
+
+});
+
+NGExAboneManagerView.constructor = NGExAboneManagerView;

@@ -66,11 +66,11 @@ var ChaikaAboneManager = {
 
     /** あぼーんの種類を表す定数 */
 
-    ABONE_TYPE_NAME : 0,
-    ABONE_TYPE_MAIL : 1,
-    ABONE_TYPE_ID   : 2,
-    ABONE_TYPE_WORD : 3,
-    ABONE_TYPE_EX   : 4,
+    ABONE_TYPE_NAME : 'name',
+    ABONE_TYPE_MAIL : 'mail',
+    ABONE_TYPE_ID   : 'id',
+    ABONE_TYPE_WORD : 'word',
+    ABONE_TYPE_EX   : 'ex',
 
 
     /**
@@ -115,6 +115,8 @@ var ChaikaAboneManager = {
      * @return {Boolean}
      */
     shouldAbone: function ChaikaAboneManager_shouldAbone(aResData){
+        return false;
+
         return this.name.shouldAbone(aResData.name) ||
                this.mail.shouldAbone(aResData.mail) ||
                this.id.shouldAbone(aResData.id) ||
@@ -188,7 +190,7 @@ AboneData.prototype = {
         this._data.push(sjisWord);
 
         //通知する
-        let type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+        let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
         type.data = this._ngType;
 
         Services.obs.notifyObservers(type, "b2r-abone-data-add", aWord);
@@ -202,7 +204,7 @@ AboneData.prototype = {
             this._data.splice(index, 1);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
             type.data = this._ngType;
 
             Services.obs.notifyObservers(type, "b2r-abone-data-remove", aWord);
@@ -210,10 +212,6 @@ AboneData.prototype = {
     },
 
 };
-
-
-// NGEx で正規表現のデータがJSONから抜け落ちるのを防ぐ
-RegExp.prototype.toJSON = RegExp.prototype.toString;
 
 
 /**
@@ -259,7 +257,8 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             let target = aResData[aRule.target];
 
             if(aRule.regexp){
-                return aRule.query.test(target);
+                let regexp = new RegExp(aRule.query, aRule.ignoreCase ? 'i' : '');
+                return regexp.test(target);
             }else{
                 if(aRule.ignoreCase){
                     target = target.toLowerCase();
@@ -296,12 +295,8 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         value: function(aNGData){
             //データの補正
             aNGData.rules.forEach((rule) => {
-                if(rule.regexp){
-                    rule.query = new RegExp(rule.query, rule.ignoreCase ? 'i' : '');
-                }else{
-                    if(rule.ignoreCase){
-                        rule.query = rule.ruery.toLowerCase();
-                    }
+                if(!rule.regexp && rule.ignoreCase){
+                    rule.query = rule.query.toLowerCase();
                 }
             });
 
@@ -318,7 +313,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj.push(sjisJsonData);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
             type.data = this._ngType;
 
             Services.obs.notifyObservers(type, "b2r-abone-data-add", jsonData);
@@ -327,19 +322,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
     remove: {
         value: function(aNGData){
-            //データの補正
-            aNGData.rules.forEach((rule) => {
-                if(rule.regexp){
-                    rule.query = new RegExp(rule.query, rule.ignoreCase ? 'i' : '');
-                }else{
-                    if(rule.ignoreCase){
-                        rule.query = rule.ruery.toLowerCase();
-                    }
-                }
-            });
-
-            let jsonData = JSON.stringify(aNGData);
-            let sjisWord = UniConverter.toSJIS(jsonData);
+            let sjisWord = UniConverter.toSJIS(aNGData);
             let index = this._data.indexOf(sjisWord);
 
             if(index !== -1){
@@ -347,10 +330,10 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                 this._dataObj.splice(index, 1);
 
                 //通知する
-                let type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
+                let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
                 type.data = this._ngType;
 
-                Services.obs.notifyObservers(type, "b2r-abone-data-remove", jsonData);
+                Services.obs.notifyObservers(type, "b2r-abone-data-remove", aNGData);
             }
         }
     },
