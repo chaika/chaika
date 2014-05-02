@@ -1,3 +1,5 @@
+@charset 'utf-8';
+
 /* ***** ***** Animations ***** ***** */
 @keyframes fadeout{
     from{
@@ -146,7 +148,7 @@ h1 {
 }
 
 
-/* ***** ***** ƒŒƒX ***** ***** */
+/* ***** ***** ãƒ¬ã‚¹ ***** ***** */
 
 dl.resContainer {
     margin: 0.5em 15px 0.5em 15px;
@@ -189,7 +191,7 @@ span.resMesID {
     text-decoration: underline;
 }
 
-/* ***** ***** ‚ ‚Ú[‚ñ ƒŒƒX ***** ***** */
+/* ***** ***** ã‚ã¼ãƒ¼ã‚“ ãƒ¬ã‚¹ ***** ***** */
 
 dl[isAbone="true"] dd.resBody {
     line-height: 0;
@@ -222,7 +224,7 @@ dl[isAbone="true"] span.resHeaderAboneContent:after {
 }
 
 
-/* ***** ***** ƒ|ƒbƒvƒAƒbƒv ***** ***** */
+/* ***** ***** ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ— ***** ***** */
 div.popup {
     font-size: 0.8em;
     padding: 8px;

@@ -53,6 +53,7 @@ var ChaikaBrowserOverlay = {
 
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
+Components.utils.import('resource://chaika-modules/ChaikaAboneManager.js', ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBrowserOverlay);
 
 
@@ -267,28 +268,75 @@ ChaikaBrowserOverlay.aboneEvent = {
 
 
     observe: function aboneEvent_observe(aSubject, aTopic, aData){
-        var aboneType;
+        let aboneType,
+            legacyAboneType,  // b2r/chaika 1.6.3互換のあぼーんタイプ値
+            eventType;
 
         switch(aTopic){
             case "b2r-abone-data-add":
                 aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
+                eventType = 'chaika-abone-add';
+                break;
+
+            case 'b2r-abone-data-remove':
+                aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
+                eventType = 'chaika-abone-remove';
                 break;
 
             default:
                 return;
         }
 
-        for(var i = 0; i < gBrowser.mPanelContainer.childNodes.length; i++){
-            var currentURI = gBrowser.getBrowserAtIndex(i).currentURI;
-            if((currentURI.scheme=="http") && (currentURI.host=="127.0.0.1")){
-                var doc = gBrowser.getBrowserAtIndex(i).contentDocument;
-                var win = gBrowser.getBrowserAtIndex(i).contentWindow;
-                var sourceEvent = doc.createEvent("Events");
+
+        switch(aboneType){
+            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_NAME:
+                legacyAboneType = 0;
+                break;
+
+            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_MAIL:
+                legacyAboneType = 1;
+                break;
+
+            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_ID:
+                legacyAboneType = 2;
+                break;
+
+            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_WORD:
+                legacyAboneType = 3;
+                break;
+
+            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_EX:
+                legacyAboneType = 99;  //Chaika Abone Manager 互換
+                break;
+        }
+
+
+        //各タブに対して通知する
+        for(let i = 0, iz = gBrowser.mPanelContainer.childNodes.length; i < iz; i++){
+            let tabBrowser = gBrowser.getBrowserAtIndex(i);
+            let tabURI = tabBrowser.currentURI;
+
+            if(ChaikaBrowserOverlay.browserMenu._isChaika(tabURI)){
+                let win = tabBrowser.contentWindow;
+                let doc = tabBrowser.contentDocument;
+
+                let sourceEvent = doc.createEvent("Events");
                 sourceEvent.initEvent(aData, false, false);
-                var event = doc.createEvent('XULCommandEvents');
-                event.initCommandEvent("b2raboneadd", true, false, win, aboneType,
+
+                let event = doc.createEvent('XULCommandEvents');
+                event.initCommandEvent(eventType, true, false, win, aboneType,
                                         false, false, false, false, sourceEvent);
+
                 doc.dispatchEvent(event);
+
+                //chaika-abone-add については b2r/chaika 1.6.3 互換のイベントも発行する
+                if(eventType === 'chaika-abone-add'){
+                    let legacyEvent = doc.createEvent('XULCommandEvents');
+                    legacyEvent.initCommandEvent('b2raboneadd', true, false, win, legacyAboneType,
+                                                 false, false, false, false, sourceEvent);
+
+                    doc.dispatchEvent(event);
+                }
             }
         }
     }
