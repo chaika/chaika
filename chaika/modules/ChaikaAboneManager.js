@@ -230,11 +230,13 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
             //Shift-JISのまま読み込みたいので、readStringではなくreadDataを用いる
             //空白行を除いて読み込む
-            this._data = ChaikaCore.io.readData(this._ngFile)
-                                      .split('\n')
-                                      .filter((line) => !!line);
+            this._dataObj = ChaikaCore.io.readData(this._ngFile)
+                                         .split('\n')
+                                         .filter((line) => !!line)
+                                         .map((item) => JSON.parse(item))
+                                         .filter((item) => item.expire ? item.expire > Date.now() : true);
 
-            this._dataObj = this._data.map((item) => JSON.parse(item));
+            this._data = this._dataObj.map((item) => JSON.stringify(item));
         }
     },
 
