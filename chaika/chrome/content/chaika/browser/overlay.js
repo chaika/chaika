@@ -271,7 +271,7 @@ ChaikaBrowserOverlay.aboneEvent = {
 
         switch(aTopic){
             case "b2r-abone-data-add":
-                aboneType = aSubject.QueryInterface(Ci.nsISupportsPRInt32).data;
+                aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
                 break;
 
             default:

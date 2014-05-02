@@ -77,7 +77,7 @@ var gAboneManager = {
             let ngType = window.arguments[0];
             let ngData = window.arguments[1];
 
-            this[ngType].populateData(ngData);
+            setTimeout(() => { this[ngType].populateData(ngData) }, 0);
         }
     },
 
@@ -304,6 +304,12 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
                 this._info.collapsed = false;
                 this._view.populateData(aData);
             }else{
+                //タブを選択
+                let tabbox = document.getElementById('aboneManagerTabBox');
+                tabbox.selectedPanel = this._tab;
+                tabbox.selectedIndex = this._tab.parentNode.selectedIndex;
+
+                //追加ダイアログを表示する
                 this.add(aData);
             }
         },

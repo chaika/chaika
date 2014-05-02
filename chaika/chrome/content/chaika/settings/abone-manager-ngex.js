@@ -261,8 +261,8 @@ NGExView.prototype = {
         this._labelbox.value = ngData.title;
         this._root.querySelector('.match').value = ngData.match;
         this._root.querySelector('.target').value = ngData.target;
-        this._root.querySelector('.autoNGID').checked = ngData.autoNGID;
-        this._root.querySelector('.highlight').checked = ngData.highlight;
+        this._root.querySelector('.autoNGID').checked = !!ngData.autoNGID;
+        this._root.querySelector('.highlight').checked = !!ngData.highlight;
 
         this._root.querySelector('.hide-abone').value = ngData.hide + '';
         this._root.querySelector('.chain-abone').value = ngData.chain + '';
@@ -279,6 +279,8 @@ NGExView.prototype = {
             datepicker.date = expire.getDate();
             timepicker.hour = expire.getHours();
             timepicker.minute = expire.getMinutes();
+        }else{
+            this._root.querySelector('.set-expire').checked = false;
         }
 
 
@@ -290,7 +292,7 @@ NGExView.prototype = {
             node.querySelector('.rule-target').value = rule.target;
             node.querySelector('.rule-query').value = rule.query;
             node.querySelector('.rule-condition').value = rule.condition;
-            node.querySelector('.rule-regexp').checked = rule.regexp;
+            node.querySelector('.rule-regexp').checked = !!rule.regexp;
             node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
         });
 

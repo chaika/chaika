@@ -14,7 +14,8 @@
                     <xul:menuitem label="名前" anonid="abone-name" />
                     <xul:menuitem label="メール" anonid="abone-mail" />
                     <xul:menuitem label="ID" anonid="abone-id" />
-                    <xul:menuitem label="ワード" anonid="abone-word" />
+                    <xul:menuitem label="本文" anonid="abone-word" />
+                    <xul:menuitem label="NGEx" anonid="abone-ex" />
                     <xul:menuseparator />
                     <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
                 </xul:menupopup>
@@ -334,24 +335,28 @@
 
                 var disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
 
-                var selectedText = content.getSelection().toString();
+                var selectedText = content.getSelection();
 
 
                 switch(anonymousID){
                     case 'abone-name':
-                        this.addAbone(0, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selectedText);
                         break;
 
                     case 'abone-mail':
-                        this.addAbone(1, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selectedText);
                         break;
 
                     case 'abone-id':
-                        this.addAbone(2, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selectedText);
                         break;
 
                     case 'abone-word':
-                        this.addAbone(3, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selectedText);
+                        break;
+
+                    case 'abone-ex':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selectedText);
                         break;
 
                     case "open-abone-manager":
@@ -457,10 +462,30 @@
             <body><![CDATA[
                 var shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
 
-                if(shouldConfirm){
-                    this.openAboneManager({ ngType: ngType, ngWord: ngWord });
+                if(ngType !== this.ChaikaAboneManager.ABONE_TYPE_EX){
+                    if(shouldConfirm){
+                        this.openAboneManager(ngType, ngWord.toString());
+                    }else{
+                        this.ChaikaAboneManager[ngType].add(ngWord.toString());
+                    }
                 }else{
-                    this.ChaikaAboneManager.addAbone(ngWord, ngType);
+                    let ngData = {
+                        target: 'post',
+                        match: 'all',
+                        rules: [],
+                    };
+
+                    for(let i = 0, iz = ngWord.rangeCount; i < iz; i++){
+                        let range = ngWord.getRangeAt(i);
+
+                        ngData.rules.push({
+                            target: 'msg',
+                            query: range.toString(),
+                            condition: 'contains'
+                        });
+                    }
+
+                    this.openAboneManager(ngType, ngData);
                 }
             ]]></body>
         </method>
@@ -468,15 +493,18 @@
 
         <!--
         /**
-         * あぼーんマネージャを開く
-         * @param {String} aData あぼーんマネージャに送るデータ(右クリックあぼーんで使用)
+         * あぼーんマネージャを開く (引数は右クリックあぼーんで使用)
+         * @param {String} [ngType] NGデータの種類
+         * @param {String|NGExData} [ngWord] NGデータ
          */
         -->
         <method name="openAboneManager">
-            <parameter name="aData"/>
+            <parameter name="ngType" />
+            <parameter name="ngWord" />
             <body><![CDATA[
-                var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-                window.openDialog(aboneManagerURL, "_blank", "chrome, resizable, minimazable, toolbar", aData);
+                window.openDialog("chrome://chaika/content/settings/abone-manager.xul",
+                                  "_blank", "chrome, resizable, minimazable, toolbar",
+                                  ngType, ngWord);
             ]]></body>
         </method>
 
