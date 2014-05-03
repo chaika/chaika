@@ -191,7 +191,7 @@ AboneData.prototype = {
         let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
         type.data = this._ngType;
 
-        Services.obs.notifyObservers(type, "b2r-abone-data-add", aWord);
+        Services.obs.notifyObservers(type, "chaika-abone-data-add", aWord);
     },
 
     remove: function(aWord){
@@ -204,7 +204,7 @@ AboneData.prototype = {
             let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
             type.data = this._ngType;
 
-            Services.obs.notifyObservers(type, "b2r-abone-data-remove", aWord);
+            Services.obs.notifyObservers(type, "chaika-abone-data-remove", aWord);
         }
     },
 
@@ -321,7 +321,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
             type.data = this._ngType;
 
-            Services.obs.notifyObservers(type, "b2r-abone-data-add", jsonData);
+            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonData);
         }
     },
 
@@ -342,7 +342,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                 let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
                 type.data = this._ngType;
 
-                Services.obs.notifyObservers(type, "b2r-abone-data-remove", aNGData);
+                Services.obs.notifyObservers(type, "chaika-abone-data-remove", aNGData);
             }
         }
     },

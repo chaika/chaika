@@ -258,12 +258,12 @@ ChaikaBrowserOverlay.toolbarButton = {
 ChaikaBrowserOverlay.aboneEvent = {
 
     start: function aboneEvent_start(){
-        Services.obs.addObserver(this, "b2r-abone-data-add", false);
+        Services.obs.addObserver(this, "chaika-abone-data-add", false);
     },
 
 
     stop: function aboneEvent_stop(){
-        Services.obs.removeObserver(this, "b2r-abone-data-add", false);
+        Services.obs.removeObserver(this, "chaika-abone-data-add", false);
     },
 
 
@@ -273,12 +273,12 @@ ChaikaBrowserOverlay.aboneEvent = {
             eventType;
 
         switch(aTopic){
-            case "b2r-abone-data-add":
+            case "chaika-abone-data-add":
                 aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
                 eventType = 'chaika-abone-add';
                 break;
 
-            case 'b2r-abone-data-remove':
+            case 'chaika-abone-data-remove':
                 aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
                 eventType = 'chaika-abone-remove';
                 break;

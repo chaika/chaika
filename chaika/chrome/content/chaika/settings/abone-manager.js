@@ -46,8 +46,8 @@ var gAboneObserver = {
         let aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
 
         switch(aTopic){
-            case "b2r-abone-data-add":
-            case "b2r-abone-data-remove":
+            case "chaika-abone-data-add":
+            case "chaika-abone-data-remove":
                 gAboneManager[aboneType].update(aData);
                 break;
 
@@ -68,8 +68,8 @@ var gAboneManager = {
         this.ex = new NGExAboneManagerView(ChaikaAboneManager.ABONE_TYPE_EX);
 
 
-        Services.obs.addObserver(gAboneObserver, "b2r-abone-data-add", false);
-        Services.obs.addObserver(gAboneObserver, "b2r-abone-data-remove", false);
+        Services.obs.addObserver(gAboneObserver, "chaika-abone-data-add", false);
+        Services.obs.addObserver(gAboneObserver, "chaika-abone-data-remove", false);
 
 
         //右クリックあぼーんの時
@@ -89,8 +89,8 @@ var gAboneManager = {
         this.word.uninit();
         this.ex.uninit();
 
-        Services.obs.removeObserver(gAboneObserver, "b2r-abone-data-add", false);
-        Services.obs.removeObserver(gAboneObserver, "b2r-abone-data-remove", false);
+        Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-add", false);
+        Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-remove", false);
     },
 
 }
