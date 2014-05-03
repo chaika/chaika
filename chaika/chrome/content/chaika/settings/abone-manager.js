@@ -73,7 +73,9 @@ var gAboneManager = {
 
 
         //右クリックあぼーんの時
-        if('arguments' in window && window.arguments.length > 1){
+        if('arguments' in window && window.arguments.length > 1 &&
+           window.arguments[0] && window.arguments[1]){
+
             let ngType = window.arguments[0];
             let ngData = window.arguments[1];
 
