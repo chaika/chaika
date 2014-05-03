@@ -292,23 +292,25 @@ var AboneHandler = {
 
     startup: function(){
         document.addEventListener("chaika-abone-add", this, false);
+        document.addEventListener('chaika-abone-remove', this, false);
     },
 
     handleEvent: function(aEvent){
         var aboneType = aEvent.sourceEvent.type;
         var aboneWord = aEvent.sourceEvent.detail;
+        var aboneAdded = aEvent.type === 'chaika-abone-add';
 
-        console.log(aboneType, aboneWord);
+        console.log(aEvent.type, aboneAdded);
 
         if(aboneType === 'ex'){
-            this._exOnDemandAbone(aboneWord);
+            this._exOnDemandAbone(aboneWord, aboneAdded);
         }else{
-            this._simpleOnDemandAbone(aboneType, aboneWord);
+            this._simpleOnDemandAbone(aboneType, aboneWord, aboneAdded);
         }
     },
 
 
-    _simpleOnDemandAbone: function(ngType, ngWord){
+    _simpleOnDemandAbone: function(ngType, ngWord, aboneAdded){
         let className = "";
 
         switch(ngType){
@@ -339,17 +341,25 @@ var AboneHandler = {
                 let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
                 let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes)[0];
 
-                if($.attrs(aboneRes, 'isAbone') !== 'true'){
+                //NGワードが追加された場合
+                if(aboneAdded && $.attrs(aboneRes, 'isAbone') !== 'true'){
                     aboneRes.classList.add('collapsed');
                     $.attrs(aboneRes, { 'isAbone': 'true' });
                     $.attrs(aboneResHeader, { 'text': ngWord });
+                }
+
+                //NGワードが削除された場合
+                if(!aboneAdded && $.attrs(aboneRes, 'isAbone') === 'true'){
+                    aboneRes.classList.remove('collapsed');
+                    aboneRes.removeAttribute('isAbone');
+                    aboneResHeader.textContent = '';
                 }
             }
         }
     },
 
 
-    _exOnDemandAbone: function(ngData){
+    _exOnDemandAbone: function(ngData, aboneAdded){
         // we ignore NGEx on-demand abone for the time being,
         // because it is difficult to implement.
     }

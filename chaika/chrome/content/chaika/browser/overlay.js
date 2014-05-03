@@ -259,11 +259,13 @@ ChaikaBrowserOverlay.aboneEvent = {
 
     start: function aboneEvent_start(){
         Services.obs.addObserver(this, "chaika-abone-data-add", false);
+        Services.obs.addObserver(this, "chaika-abone-data-remove", false);
     },
 
 
     stop: function aboneEvent_stop(){
         Services.obs.removeObserver(this, "chaika-abone-data-add", false);
+        Services.obs.removeObserver(this, "chaika-abone-data-remove", false);
     },
 
 
