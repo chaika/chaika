@@ -218,8 +218,6 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
             if(this._listbox.getRowCount() > 0){
                 setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
             }else{
-                //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
-                //NGデータ編集欄を非表示にしておく
                 this._info.collapsed = true;
             }
         }
@@ -237,6 +235,12 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
             ngData.forEach((aNGData) => {
                 this._listbox.appendItem(JSON.parse(aNGData).title, aNGData);
             });
+
+            if(this._listbox.getRowCount() === 0 && this._info){
+                //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
+                //NGデータ編集欄を非表示にしておく
+                this._info.collapsed = true;
+            }
         }
     },
 
