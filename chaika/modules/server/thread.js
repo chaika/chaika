@@ -1449,6 +1449,8 @@ b2rThreadConverter.prototype = {
                 }
             }
 
+            let ngData = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(aNGData.title || aNGData));
+
             //タグを置換する
             return aRes
                     .replace(/(?:\r|\n|\t)/g, "")
@@ -1468,8 +1470,8 @@ b2rThreadConverter.prototype = {
                     .replace(/<BENUMBER\/>/g, aBeID)
                     .replace(/<BEBASEID\/>/g, aBeBaseID)
                     .replace(/<MESSAGE\/>/g, aMessage)
-                    .replace(/<NGDATA\/>/g, UniConverter.toSJIS(aNGData.title || aNGData))
-                    .replace(/<ABONEWORD\/>/g, UniConverter.toSJIS(aNGData.title || aNGData));  //Chaika Abone Helper 互換
+                    .replace(/<NGDATA\/>/g, ngData)
+                    .replace(/<ABONEWORD\/>/g, ngData);  //Chaika Abone Helper 互換
         };
     },
 
