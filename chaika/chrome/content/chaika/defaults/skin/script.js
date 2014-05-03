@@ -2,7 +2,7 @@
 var $ = {
 
     /**
-     * id ‚©‚ç—v‘f‚ğæ“¾
+     * id ã‹ã‚‰è¦ç´ ã‚’å–å¾—
      * @param {String} id ID
      * @return {Node}
      */
@@ -11,9 +11,9 @@ var $ = {
     },
 
     /**
-     * class ‚©‚ç—v‘f‚ğæ“¾
-     * @param {String} className class –¼
-     * @param {Node} [parent=document] e—v‘f
+     * class ã‹ã‚‰è¦ç´ ã‚’å–å¾—
+     * @param {String} className class å
+     * @param {Node} [parent=document] è¦ªè¦ç´ 
      * @return {NodeList}
      */
     klass: function(className, parent){
@@ -21,9 +21,9 @@ var $ = {
     },
 
     /**
-     * —v‘f–¼‚©‚ç—v‘f‚ğæ“¾
-     * @param {String} tagName —v‘f–¼
-     * @param {Node} [parent=document] e—v‘f
+     * è¦ç´ åã‹ã‚‰è¦ç´ ã‚’å–å¾—
+     * @param {String} tagName è¦ç´ å
+     * @param {Node} [parent=document] è¦ªè¦ç´ 
      * @return {NodeList}
      */
     tag: function(tagName, parent){
@@ -31,9 +31,9 @@ var $ = {
     },
 
     /**
-     * CSS Selector ‚©‚ç—v‘f‚ğæ“¾
-     * @param {String} selector ƒZƒŒƒNƒ^
-     * @param {Node} [parent=document] e—v‘f
+     * CSS Selector ã‹ã‚‰è¦ç´ ã‚’å–å¾—
+     * @param {String} selector ã‚»ãƒ¬ã‚¯ã‚¿
+     * @param {Node} [parent=document] è¦ªè¦ç´ 
      * @return {Node}
      */
     selector: function(selector, parent){
@@ -41,9 +41,9 @@ var $ = {
     },
 
     /**
-     * CSS Selector ‚©‚ç—v‘f‚ğæ“¾
-     * @param {String} selector ƒZƒŒƒNƒ^
-     * @param {Node} [parent=document] e—v‘f
+     * CSS Selector ã‹ã‚‰è¦ç´ ã‚’å–å¾—
+     * @param {String} selector ã‚»ãƒ¬ã‚¯ã‚¿
+     * @param {Node} [parent=document] è¦ªè¦ç´ 
      * @return {NodeList}
      */
     selectorAll: function(selector, parent){
@@ -51,9 +51,9 @@ var $ = {
     },
 
     /**
-     * class ‚©‚çe—v‘f‚ğæ“¾
-     * @param {String} className class –¼
-     * @param {Node} element ‹N“_‚Ì—v‘f
+     * class ã‹ã‚‰è¦ªè¦ç´ ã‚’å–å¾—
+     * @param {String} className class å
+     * @param {Node} element èµ·ç‚¹ã®è¦ç´ 
      * @return {Node}
      */
     parentByClass: function(className, element){
@@ -69,8 +69,8 @@ var $ = {
     },
 
     /**
-     * TextRectangle ‚ğæ“¾
-     * @param {Node} element ‘ÎÛ‚Ì—v‘f
+     * TextRectangle ã‚’å–å¾—
+     * @param {Node} element å¯¾è±¡ã®è¦ç´ 
      * @return {TextRectangle}
      */
     rect: function(element){
@@ -78,8 +78,8 @@ var $ = {
     },
 
     /**
-     * •\¦ó‘Ô‚É‚·‚é
-     * @param {Node} element ‘ÎÛ‚Ì—v‘f
+     * è¡¨ç¤ºçŠ¶æ…‹ã«ã™ã‚‹
+     * @param {Node} element å¯¾è±¡ã®è¦ç´ 
      * @return {Node}
      */
     show: function(element){
@@ -88,8 +88,8 @@ var $ = {
     },
 
     /**
-     * ”ñ•\¦‚É‚·‚é
-     * @param {Node} element ‘ÎÛ‚Ì—v‘f
+     * éè¡¨ç¤ºã«ã™ã‚‹
+     * @param {Node} element å¯¾è±¡ã®è¦ç´ 
      * @return {Node}
      */
     hide: function(element){
@@ -98,10 +98,10 @@ var $ = {
     },
 
     /**
-     * CSS ƒXƒ^ƒCƒ‹‚ğİ’è‚·‚é
-     * @param {Node} element ‘ÎÛ‚Ì—v‘f
+     * CSS ã‚¹ã‚¿ã‚¤ãƒ«ã‚’è¨­å®šã™ã‚‹
+     * @param {Node} element å¯¾è±¡ã®è¦ç´ 
      * @return {Node}
-     * @note ƒvƒƒpƒeƒB–¼‚ÍƒLƒƒƒƒ‹ƒP[ƒX‰»‚µ‚Ä‚ ‚é•K—v‚ ‚è
+     * @note ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£åã¯ã‚­ãƒ£ãƒ¡ãƒ«ã‚±ãƒ¼ã‚¹åŒ–ã—ã¦ã‚ã‚‹å¿…è¦ã‚ã‚Š
      */
     css: function(element, cssList){
         for(let property in cssList){
@@ -111,11 +111,11 @@ var $ = {
     },
 
     /**
-     * ƒm[ƒh‚ğ¶¬‚·‚é
-     * ˆÈ‰º‚Ì nodeList ‚É‚æ‚è¶¬‚·‚éƒm[ƒh‚ğw’è‚·‚é
-     * @param {Object} nodeList ƒL[‚É—v‘f–¼A’l‚É‘®«‚ğ‚à‚ÂƒIƒuƒWƒFƒNƒg ‘®«‚Ìw’è•û–@‚Í $.attrs ‚É€‚¸‚é
-     * @return {Node|DocumentFragment} ‚à‚µÅãˆÊ‚ª‚P‚Â‚Ìƒm[ƒh‚©‚ç‚È‚éê‡‚Í‚»‚Ìƒm[ƒh‚ª,
-     *                                 •¡”‚Ìƒm[ƒh‚Ìê‡‚Í DocumentFragment ‚ª•Ô‚é
+     * ãƒãƒ¼ãƒ‰ã‚’ç”Ÿæˆã™ã‚‹
+     * ä»¥ä¸‹ã® nodeList ã«ã‚ˆã‚Šç”Ÿæˆã™ã‚‹ãƒãƒ¼ãƒ‰ã‚’æŒ‡å®šã™ã‚‹
+     * @param {Object} nodeList ã‚­ãƒ¼ã«è¦ç´ åã€å€¤ã«å±æ€§ã‚’ã‚‚ã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ å±æ€§ã®æŒ‡å®šæ–¹æ³•ã¯ $.attrs ã«æº–ãšã‚‹
+     * @return {Node|DocumentFragment} ã‚‚ã—æœ€ä¸Šä½ãŒï¼‘ã¤ã®ãƒãƒ¼ãƒ‰ã‹ã‚‰ãªã‚‹å ´åˆã¯ãã®ãƒãƒ¼ãƒ‰ãŒ,
+     *                                 è¤‡æ•°ã®ãƒãƒ¼ãƒ‰ã®å ´åˆã¯ DocumentFragment ãŒè¿”ã‚‹
      * @example { 'div': { id: 'hoge', children: { 'span': text: 'fuga' } } }
      *         -> <div id="hoge"><span>fuga</span></div>
      * @see $.attrs
@@ -137,14 +137,14 @@ var $ = {
     },
 
     /**
-     * —v‘f‚É‘®«‚ğw’è‚·‚éA‚à‚µ‚­‚Í‘®«’l‚ğæ“¾‚·‚é
-     * @param {Node} element ‘ÎÛ‚Ì—v‘f
-     * @param {Object|String} ‘®«
-     *     String ‚ª“n‚³‚ê‚½ê‡‚Í‚»‚Ì‘®«‚Ì’l‚ğ•Ô‚·
-     *     ƒL[‚É‘®«–¼A’l‚É‘®«’l‚ğ‚ÂƒnƒbƒVƒ…‚ª“n‚³‚ê‚½ê‡‚ÍA‚»‚ê‚ç‚Ì’l‚ğ‚Ü‚Æ‚ß‚Äİ’è‚·‚é
-     *     “Áê‚È‘®«–¼‚Æ‚µ‚Ä children, text ‚ª‚ ‚é
-     *         {nodeList|Node} children w’è‚³‚ê‚½—v‘f‚ğq—v‘f‚Æ‚µ‚Ä’Ç‰Á‚·‚é $.node ‚Ì nodeList Œ`®‚Å‚àw’è‰Â”\
-     *         {String} text w’è‚³‚ê‚½ƒeƒLƒXƒg‚ğq—v‘f‚Æ‚µ‚Ä’Ç‰Á‚·‚é children ‚Æ‹¤‚Éw’è‚³‚ê‚½ê‡‚Ì‹““®‚Í–¢’è‹`
+     * è¦ç´ ã«å±æ€§ã‚’æŒ‡å®šã™ã‚‹ã€ã‚‚ã—ãã¯å±æ€§å€¤ã‚’å–å¾—ã™ã‚‹
+     * @param {Node} element å¯¾è±¡ã®è¦ç´ 
+     * @param {Object|String} å±æ€§
+     *     String ãŒæ¸¡ã•ã‚ŒãŸå ´åˆã¯ãã®å±æ€§ã®å€¤ã‚’è¿”ã™
+     *     ã‚­ãƒ¼ã«å±æ€§åã€å€¤ã«å±æ€§å€¤ã‚’æŒã¤ãƒãƒƒã‚·ãƒ¥ãŒæ¸¡ã•ã‚ŒãŸå ´åˆã¯ã€ãã‚Œã‚‰ã®å€¤ã‚’ã¾ã¨ã‚ã¦è¨­å®šã™ã‚‹
+     *     ç‰¹æ®Šãªå±æ€§åã¨ã—ã¦ children, text ãŒã‚ã‚‹
+     *         {nodeList|Node} children æŒ‡å®šã•ã‚ŒãŸè¦ç´ ã‚’å­è¦ç´ ã¨ã—ã¦è¿½åŠ ã™ã‚‹ $.node ã® nodeList å½¢å¼ã§ã‚‚æŒ‡å®šå¯èƒ½
+     *         {String} text æŒ‡å®šã•ã‚ŒãŸãƒ†ã‚­ã‚¹ãƒˆã‚’å­è¦ç´ ã¨ã—ã¦è¿½åŠ ã™ã‚‹ children ã¨å…±ã«æŒ‡å®šã•ã‚ŒãŸå ´åˆã®æŒ™å‹•ã¯æœªå®šç¾©
      * @return {Node|String}
      * @see $.node
      */
@@ -171,14 +171,13 @@ var $ = {
     },
 
     /**
-     * ŠÈˆÕƒeƒ“ƒvƒŒ[ƒg‚©‚ç•¶š—ñ‚ğ¶¬
-     * @param {String} template ƒeƒ“ƒvƒŒ[ƒg ’uŠ·‚·‚éêŠ‚ğ @@ ‚Åw’è‚·‚é
-     * @param {String} args ‰Â•Ïˆø” ƒeƒ“ƒvƒŒ[ƒg•¶š—ñ‚Ì @@ ‚ğ‰‚ß‚©‚ç‡‚É’uŠ·‚·‚é
+     * ç°¡æ˜“ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆã‹ã‚‰æ–‡å­—åˆ—ã‚’ç”Ÿæˆ
+     * @param {String} template ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆ ç½®æ›ã™ã‚‹å ´æ‰€ã‚’ @@ ã§æŒ‡å®šã™ã‚‹
+     * @param {String} args å¯å¤‰å¼•æ•° ãƒ†ãƒ³ãƒ—ãƒ¬ãƒ¼ãƒˆæ–‡å­—åˆ—ã® @@ ã‚’åˆã‚ã‹ã‚‰é †ã«ç½®æ›ã™ã‚‹
      * @example $.template('@@ is a @@.', 'This', 'pen') //=> This is a pen.
-     * @return {String} ’uŠ·Œã‚Ì•¶š—ñ
+     * @return {String} ç½®æ›å¾Œã®æ–‡å­—åˆ—
      */
-    template: function(){
-        var args = Array.slice(arguments);
+    template: function(...args){
         var template = args.shift();
         var count = 0;
 
@@ -246,7 +245,7 @@ var Effects = {
 
 
 function init(){
-    //V’…ˆÊ’u‚Ü‚ÅƒXƒNƒ[ƒ‹
+    //æ–°ç€ä½ç½®ã¾ã§ã‚¹ã‚¯ãƒ­ãƒ¼ãƒ«
     if(!location.hash){
         var newMark = $.id("newMark");
         var pageTitle = $.id("pageTitle");
@@ -283,23 +282,7 @@ var ResCollapse = {
 
         if(!isAbone) return;
 
-        if($.attrs(resContainer, 'collapsed') === 'true'){
-            if(isAbone){
-                $.show($.selector('.resHeaderContent', target));
-                $.hide($.selector('.resHeaderAboneContent', target));
-            }
-
-            Effects.slidedown($.tag('dd', resContainer)[0]);
-            $.attrs(resContainer, { "collapsed": "false" });
-        }else{
-            if(isAbone){
-                $.hide($.selector('.resHeaderContent', target));
-                $.show($.selector('.resHeaderAboneContent', target));
-            }
-
-            Effects.slideup($.tag('dd', resContainer)[0]);
-            $.attrs(resContainer, { "collapsed": "true" });
-        }
+        resContainer.classList.toggle('collapsed');
     }
 
 };
@@ -308,39 +291,59 @@ var ResCollapse = {
 var AboneHandler = {
 
     startup: function(){
-        document.addEventListener("b2raboneadd", this, false);
+        document.addEventListener("chaika-abone-add", this, false);
     },
 
     handleEvent: function(aEvent){
         var aboneType = aEvent.detail;
         var aboneWord = aEvent.sourceEvent.type;
-        var className = "";
 
-        switch(aboneType){
-            case 0:    // ChaikaAboneManager.ABONE_TYPE_NAME
+        if(aboneType === 'ex'){
+            this._exOnDemandAbone(aboneWord);
+        }else{
+            this._simpleOnDemandAbone(aboneType, aboneWord);
+        }
+    },
+
+
+    _simpleOnDemandAbone: function(ngType, ngWord){
+        let className = "";
+
+        switch(ngType){
+            case 'name':    // ChaikaAboneManager.ABONE_TYPE_NAME
                 className = "resName";
                 break;
-            case 1:    // ChaikaAboneManager.ABONE_TYPE_MAIL
+
+            case 'mail':    // ChaikaAboneManager.ABONE_TYPE_MAIL
                 className = "resMail";
                 break;
-            case 2:    // ChaikaAboneManager.ABONE_TYPE_ID
+
+            case 'id':    // ChaikaAboneManager.ABONE_TYPE_ID
                 className = "resID";
                 break;
-            case 3:    // ChaikaAboneManager.ABONE_TYPE_WORD
+
+            case 'word':    // ChaikaAboneManager.ABONE_TYPE_WORD
                 className = "resBody";
                 break;
+
             default:
                 return;
         }
 
-        var aboneCandidates = $.klass(className);
+        let aboneCandidates = $.klass(className);
 
         for(let i=0, l=aboneCandidates.length; i<l; i++){
-            if(aboneCandidates[i].textContent.indexOf(aboneWord) !== -1){
+            if(aboneCandidates[i].textContent.contains(aboneWord)){
                 let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
                 $.attrs(aboneRes, { 'isAbone': 'true', 'collapsed': 'true' });
             }
         }
+    },
+
+
+    _exOnDemandAbone: function(ngData){
+        // we ignore NGEx on-demand abone for the time being,
+        // because it is difficult to implement.
     }
 
 };
@@ -359,27 +362,36 @@ var Popup = {
         var target = aEvent.originalTarget;
         if(!(target instanceof HTMLElement)) return;
 
-        var className = target.className;
-        if(className == "") return;
+        //Beãƒªãƒ³ã‚¯
+        if(target.href && target.href.contains('be.2ch')){
+            target = target.parentNode;
+        }
 
-
-        if(className.substring(0,6) == "mesID_"){
+        //æœ¬æ–‡ä¸­ã®IDãƒªãƒ³ã‚¯
+        if(target.className.startsWith("mesID_")){
             Popup.ID.mouseover.call(target, aEvent);
             return;
         }
 
-        switch(className){
+        switch(target.className){
             case "resPointer":
                 Popup.Res.mouseover.call(target, aEvent);
                 break;
+
             case "resID":
             case "resMesID":
+            case 'resIP':
+            case 'resHost':
+            case 'resBeID':
                 Popup.ID.mouseover.call(target, aEvent);
                 break;
+
             case "outLink":
                 Popup.Image.mouseover.call(target, aEvent);
                 break;
 
+            default:
+                break;
         }
     },
 
@@ -457,10 +469,10 @@ Popup.Res = {
 
         var startRes = 0;
         var endRes = 0;
-        if(this.textContent.match(/>>?(\d{1,4})-(\d{1,4})/)){
+        if(this.textContent.match(/>>?(Â¥d{1,4})-(Â¥d{1,4})/)){
             startRes = parseInt(RegExp.$1);
             endRes = parseInt(RegExp.$2);
-        }else if(this.textContent.match(/>>?(\d{1,4})/)){
+        }else if(this.textContent.match(/>>?(Â¥d{1,4})/)){
             startRes = parseInt(RegExp.$1);
         }
 
@@ -473,13 +485,13 @@ Popup.Res = {
     createContent: function(aStart, aEnd){
         var resNodes;
 
-        if(aStart < aEnd){ // •¡”ƒ|ƒbƒvƒAƒbƒv
+        if(aStart < aEnd){ // è¤‡æ•°ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
             if(aStart < 1) aStart = 1;
             if(aEnd > 1001) aEnd = 1001;
 
             const POPUP_LIMIT = 20;
 
-            //POPUP_LIMIT ‚æ‚è‘½‚¢‚ÍÈ—ª‚·‚é
+            //POPUP_LIMIT ã‚ˆã‚Šå¤šã„æ™‚ã¯çœç•¥ã™ã‚‹
             let tmpStart = aStart;
             let omitRes = 0;
             if((aEnd - aStart) > POPUP_LIMIT){
@@ -496,10 +508,10 @@ Popup.Res = {
             }
 
             if(resNodes.length > 0 && omitRes > 0){
-                resNodes.appendChild($.node({ 'p': { text: omitRes + 'ŒÈ—ª' } }));
+                resNodes.appendChild($.node({ 'p': { text: omitRes + 'ä»¶çœç•¥' } }));
             }
 
-        }else{ // ’Êíƒ|ƒbƒvƒAƒbƒv
+        }else{ // é€šå¸¸ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—
             resNodes = $.id('res' + aStart).cloneNode(true);
             resNodes.removeAttribute('id');
         }
@@ -515,28 +527,28 @@ Popup.ID = {
     mouseover: function(aEvent){
         var resID = $.attrs(this, 'resID');
 
-        //ƒŒƒX–{•¶’†‚ÌID: ƒŠƒ“ƒN‚Ì‰Â”\«‚ª‚ ‚é‚Ì‚Å’²‚×‚é
-        if(!resID && this.className){
-            resID = this.className.match(/mesID_([^\s]+)/);
-            if(resID){
-                resID = resID[1];
-            }else{
-                return;
-            }
+        //ãƒ¬ã‚¹æœ¬æ–‡ä¸­ã®ID: ãƒªãƒ³ã‚¯ã®å ´åˆã«ã¯ã€resIDå±æ€§ãŒå­˜åœ¨ã—ãªã„ãŸã‚
+        //classåã‹ã‚‰IDã‚’å–å¾—ã™ã‚‹
+        if(!resID && this.className.match(/mesID_([^\s]+)/)){
+            resID = RegExp.$1;
         }
 
-        var resNumber = $.attrs(this, 'resNumber');
+        if(!resID) return;
 
-        var sameIDReses = Array.slice($.selectorAll("dl[resID='" + resID + "']"));
+
+        //åŒã˜IDã‚’æŒã¤ãƒ¬ã‚¹ã‚’å–å¾—ã™ã‚‹
+        var sameIDReses = Array.slice($.selectorAll(".resHeaderContent > [resID='" + resID + "']"));
+
+        //è‡ªåˆ†è‡ªèº«ã‚’é™¤ã
+        var resNumber = $.attrs(this, 'resNumber');  //è‡ªåˆ†è‡ªèº«ã®ãƒ¬ã‚¹ç•ªå·
+        sameIDReses = sameIDReses.filter((resHeader) => $.attrs(resHeader, 'resNumber') !== resNumber)
+                                 .map((resHeader) => $.parentByClass('resContainer', resHeader));
+
+        //ãƒãƒƒãƒ—ã‚¢ãƒƒãƒ—ã‚’ä½œæˆ
         var popupContent;
 
-        //©•ª©g‚ğœ‚­
-        sameIDReses = sameIDReses.filter(function(res){
-            return $.attrs($.klass('resID', res)[0], 'resNumber') !== resNumber;
-        });
-
         if(sameIDReses.length == 0){
-            popupContent = $.node({ 'p': { text: '‚±‚ÌƒŒƒX‚Ì‚İ' }});
+            popupContent = $.node({ 'p': { text: 'ã“ã®ãƒ¬ã‚¹ã®ã¿' }});
         }else{
             let fragment = document.createDocumentFragment();
 
@@ -558,7 +570,7 @@ Popup.Image = {
 
     mouseover: function(aEvent){
         var imageURL = this.href;
-        if(!(/\.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
+        if(!(/Â¥.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
 
         var image = $.node({img: { 'class': 'small', 'src': imageURL }});
 

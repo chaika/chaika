@@ -1,3 +1,5 @@
+@charset 'utf-8';
+
 /* ***** ***** Animations ***** ***** */
 @keyframes fadeout{
     from{
@@ -146,83 +148,131 @@ h1 {
 }
 
 
-/* ***** ***** ÉåÉX ***** ***** */
+/* ***** ***** „É¨„Çπ ***** ***** */
 
-dl.resContainer {
+.resContainer {
     margin: 0.5em 15px 0.5em 15px;
 }
 
-dt.resHeader {
+.resHeader {
     background-color: transparent;
     padding: 2px 4px;
     font-size: 0.8em;
     color: #777;
 }
 
-dd.resBody {
+.resBody {
     margin: 0 0 20px 0;
     padding: 12px 35px 12px 25px;
 }
 
-span.resNumber {
+.resNumber {
     font-weight: bold;
     color: #111;
 }
 
-dl.resNew span.resNumber {
+.resNew .resNumber {
     color: #E63;
 }
 
-span.resName {
+.resName {
     font-weight: bold;
     font-size: 1.1em;
     color: #369;
 }
 
-span.resSystem {
+.resSystem {
     font-weight: normal;
     color: #477;
 }
 
-span.resID,
-span.resMesID {
+.resMail:before{
+    content: "[";
+}
+
+.resMail:after{
+    content: "]";
+}
+
+.resID,
+.resMesID {
     text-decoration: underline;
 }
 
-/* ***** ***** Ç†Ç⁄Å[ÇÒ ÉåÉX ***** ***** */
-
-dl[isAbone="true"] dd.resBody {
-    line-height: 0;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    opacity: 0;
+.resID:not(:empty):before{
+    content: "ID:";
 }
 
-dl[isAbone="true"][collapsed="false"] dd.resBody{
-    line-height: 1.5;
-    margin: 0 0 20px 0;
-    padding: 12px 35px 12px 25px;
-    opacity: 1.0;
+.resIP:not(:empty):before{
+    content: "Áô∫‰ø°ÂÖÉ:";
 }
 
-dl[isAbone="true"] span.resHeaderContent {
+.resHost:not(:empty):before{
+    content: "HOST:";
+}
+
+.resBeID:not(:empty):before{
+    content: "Be:";
+}
+
+
+/* ***** ***** „ÅÇ„Åº„Éº„Çì „É¨„Çπ ***** ***** */
+
+.collapsed .resHeaderContent,
+.collapsed .resBody{
     display: none;
 }
 
-dl[isAbone="true"] dd.resBody * {
-    color: #888;
-}
-
-dl[isAbone="true"] span.resHeaderAboneContent:after {
+.collapsed .resHeaderAboneContent:before {
     content: "ABONE";
+    display: inline-block;
+    padding-right: 1em;
     font-weight: bold;
     color: #369;
     font-size: 1.1em;
 }
 
+.collapsed .resHeaderAboneContent{
+    color: #888;
+    font-size: 90%;
+}
 
-/* ***** ***** É|ÉbÉvÉAÉbÉv ***** ***** */
+
+[isAbone="true"]:not(.collapsed) .resHeaderContent{
+    display: inline;
+}
+
+[isAbone="true"]:not(.collapsed) .resBody{
+    display: block;
+    margin: 0 0 20px 0;
+    padding: 12px 35px 12px 25px;
+}
+
+[isAbone="true"]:not(.collapsed) .resHeaderAboneContent{
+    display: none;
+}
+
+
+/* ***** ***** „Éè„Ç§„É©„Ç§„Éà„É¨„Çπ ***** ***** */
+.resDateImportant{
+    color: red;
+}
+
+[isAbone="false"] .resHeaderAboneContent:not(:empty):before{
+    content: "(";
+}
+
+[isAbone="false"] .resHeaderAboneContent:not(:empty):after{
+    content: ")";
+}
+
+[isAbone="false"] .resHeaderAboneContent{
+    color: #888;
+    font-size: 90%;
+}
+
+
+/* ***** ***** „Éù„ÉÉ„Éó„Ç¢„ÉÉ„Éó ***** ***** */
 div.popup {
     font-size: 0.8em;
     padding: 8px;

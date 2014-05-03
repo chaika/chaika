@@ -183,9 +183,12 @@ Thread2ch.prototype = {
         this._serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
         this._parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
 
-        this._chainAboneNumbers = new Array();
-        this._disableAbone = aThreadURL.query.indexOf('chaika_disable_abone=1') !== -1;
+        this._chainAboneNumbers = [];
+        this._chainHideAboneNumbers = [];
+
+        this._disableAbone = aThreadURL.query.contains('chaika_disable_abone=1');
         this._enableChainAbone = !this._disableAbone && ChaikaCore.pref.getBool("thread_chain_abone");
+        this._enableHideAbone = !this._disableAbone && ChaikaCore.pref.getBool('thread_hide_abone');
         this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
 
         // HTML ヘッダを送信したら true になる
@@ -389,6 +392,9 @@ Thread2ch.prototype = {
         //実体参照を元に戻す
         sanitizedStr = sanitizedStr.replace(" &amp;# ", "&#", "g");
 
+        // <br /> をもとに戻す
+        sanitizedStr = sanitizedStr.replace('<br />', '<br>', 'g');
+
         return sanitizedStr;
     },
 
@@ -402,9 +408,15 @@ Thread2ch.prototype = {
         var resMail = "";
         var resDate = "BROKEN";
         var resID = "";
-        var resBeID = "";
-        var resMes    = "";
+        var resBeID = 0;
+        var resBeBaseID = 0;
+        var resBeLink = "";
+        var resIP = "";
+        var resHost = "";
+        var resMes = "";
         var isAbone = false;
+        var ngData = '';  // あぼーんされる原因となったNGデータ
+
 
         if(resArray.length > 3){
             resName = resArray[0]; //.replace(/<\/?b>|/g, "");
@@ -419,8 +431,8 @@ Thread2ch.prototype = {
                             .replace("<b>", "</span>", "g");
 
         //日付中のHTMLを除去
-        if(resDate.indexOf("<") != -1){
-            resDate    = this.htmlToText(resDate);
+        if(resDate.contains("<")){
+            resDate = this.htmlToText(resDate);
         }
 
         //sanitize HTML special characters
@@ -430,34 +442,109 @@ Thread2ch.prototype = {
         resMail = this.sanitizeHTML(resMail);
         resMes = this.sanitizeHTML(resMes);
 
+
         // resDate を DATE と BeID に分割
-        if(resDate.indexOf("BE:")!=-1 && resDate.match(/(.+)BE:([^ ]+)/)){
+        if(resDate.contains('BE:') && resDate.match(/(.+)BE:([^ ]+)/)){
             resDate = RegExp.$1;
-            resBeID = RegExp.$2;
+            resBeLink = RegExp.$2;
+        }
+
+        // resDate を DATE と 発信元 に分割
+        // \x94\xad \x90\x4d \x8c\xb3 = 発信元
+        if(resDate.contains('\x94\xad\x90\x4d\x8c\xb3:') &&
+           resDate.match(/(.+)\x94\xad\x90\x4d\x8c\xb3:([\d\.]+)/)){
+            resDate = RegExp.$1;
+            resIP = RegExp.$2;
+        }
+
+        // resDate を DATE と HOST に分割
+        if(resDate.contains('HOST:') && resDate.match(/(.+)HOST:([^ ]+)/)){
+            resDate = RegExp.$1;
+            resHost = RegExp.$2;
         }
 
         // resDate を DATE と ID に分割
-        if(resDate.indexOf("ID:")!=-1 && resDate.match(/(.+)ID:([^ ]+)/)){
+        if(resDate.contains('ID:') && resDate.match(/(.+)ID:([^ ]+)/)){
             resDate = RegExp.$1;
             resID = RegExp.$2;
         }
 
-        //BeIDのリンク処理
-        if(resBeID){
-            var regBeID = /^(\d+)/;
-            if(resBeID.match(regBeID)){
-                var idInfoUrl = "http://be.2ch.net/test/p.php?i=" + RegExp.$1 +
-                        "&u=d:" + this.thread.url.resolve("./") + aNumber;
-                resBeID = resBeID.replace(regBeID, String("$1").link(idInfoUrl));
-            }
+
+        if(resBeLink){
+            resBeID = resBeLink.match(/^\d+/)[0] - 0;
+
+            //BeIDのリンク処理
+            resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID +
+                        "&u=d:" + this.thread.url.resolve("./") + aNumber + "'>" + resBeID + '</a>';
+
+            // Be基礎番号を取得
+            // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
+            // let centesimalBeNumber = Math.floor(resBeID / 100);
+            // let deciBeNumber = Math.floor(resBeID / 10);
+            // resBeBaseID = ( centesimalBeNumber + deciBeNumber % 10 - resBeID % 10 - 5 ) /
+            //                                ( (deciBeNumber % 10) * (resBeID % 10) * 3 );
+            //
+            // Be 2.0 では基礎番号は廃止されたので、BeID をそのまま用いることにする
+            // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
+            resBeBaseID = resBeID;
         }
 
         //あぼーん処理
-        if(!this._disableAbone && ChaikaAboneManager.shouldAbone(resName, resMail, resID, resMes)){
-            this._chainAboneNumbers.push(aNumber);
-            isAbone = true;
-            if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
-                return "";
+        if(!this._disableAbone){
+            let aboneResult = ChaikaAboneManager.shouldAbone({
+                name: UniConverter.fromSJIS(resName),
+                mail: UniConverter.fromSJIS(resMail),
+                id: resID,
+                msg: UniConverter.fromSJIS(resMes),
+                date: resDate,
+                ip: resIP,
+                host: resHost,
+                be: resBeID + '',
+                baseBe: resBeBaseID + '',
+                title: this.thread.title,
+                thread_url: this.thread.plainURL.spec,
+                board_url: this.thread.boardURL.spec,
+                isThread: false
+            });
+
+            if(aboneResult){
+                let enableChain = aboneResult.chain === true ||
+                                  aboneResult.chain === undefined && this._enableChainAbone;
+                let enableHide = aNumber !== -1 && (
+                                    aboneResult.hide === true ||
+                                    aboneResult.hide === undefined && this._enableHideAbone
+                                 );
+
+                isAbone = true;
+                ngData = aboneResult;
+
+                //連鎖あぼーん (親)
+                if(enableChain){
+                    this._chainAboneNumbers.push(aNumber);
+
+                    if(enableHide){
+                        this._chainHideAboneNumbers.push(aNumber);
+                    }
+                }
+
+                //自動NGID
+                if(aboneResult.autoNGID && resID && !resID.startsWith('???')){
+                    ChaikaAboneManager.ex.add({
+                        title: 'NGID: ' + resID + ' (Auto NGID: ' + this.thread.title + ' >>' + aNumber + ')',
+                        target: 'post',
+                        match: 'all',
+                        rules: [{
+                            target: 'id',
+                            query: resID,
+                            condition: 'equals'
+                        }]
+                    });
+                }
+
+                //透明あぼーん
+                if(enableHide){
+                    return '';
+                }
             }
         }
 
@@ -472,19 +559,20 @@ Thread2ch.prototype = {
         // レス番リンク処理 & 連鎖あぼーんの判定
         // \x81\x84 = ＞
         var regResPointer = /(?:<a>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
-        var enableChainAbone = this._enableChainAbone;
-        var chainAboneNumbers = this._chainAboneNumbers;
         var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
         var shouldChainAbone = false;
-        resMes = resMes.replace(regResPointer, function(aStr, ancMark, ancStr, aOffset, aS){
-            //必要なときにのみアンカーの詳細解析を行う
+        var shouldChainHideAbone = false;
+        var chainAboneParent;
+        resMes = resMes.replace(regResPointer, (aStr, ancMark, ancStr, aOffset, aS) => {
+            let enableChainAbone = this._chainAboneNumbers.length > 0;
+            let ancNums = [];
+
+            //アンカーの詳細解析を行う
             if(enableChainAbone || fixInvalidAnchor){
                 //アンカー番号解析
                 //アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
                 //最大500個に制限する
-                var ancNums = [];
-
-                ancStr.replace(/(?:\s+|<\/a>)/g, '').split(',').forEach(function(ancNumRange){
+                ancStr.replace(/(?:\s+|<\/a>)/g, '').split(',').forEach((ancNumRange) => {
                     if(ancNumRange && !isNaN(ancNumRange)){
                         //範囲指定がないとき
                         if(ancNums.length < 500){
@@ -515,23 +603,28 @@ Thread2ch.prototype = {
             }
 
 
-            //連鎖あぼーんの判定
+            //連鎖あぼーん (子) の判定
             if(enableChainAbone){
                 let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
 
-                shouldChainAbone = shouldChainAbone || ancNumsFlattened.some(function(ancNum){
-                    return chainAboneNumbers.indexOf(ancNum) !== -1;
+                chainAboneParent = ancNumsFlattened.find((ancNum) => {
+                    shouldChainAbone = shouldChainAbone ||
+                                       this._chainAboneNumbers.indexOf(ancNum) !== -1;
+                    shouldChainHideAbone = shouldChainHideAbone ||
+                                           this._chainHideAboneNumbers.indexOf(ancNum) !== -1;
+
+                    return shouldChainAbone;
                 });
             }
 
 
-            //リンク処理
+            //アンカーリンク処理
             if(!fixInvalidAnchor){
                 return '<a href="#res' + parseInt(ancStr) + '" class="resPointer">' + ancMark + ancStr + '</a>';
             }else{
                 let links = [];
 
-                ancNums.forEach(function(ancNum){
+                ancNums.forEach((ancNum) => {
                     if(ancNum instanceof Array){
                         links.push('<a href="#res' + ancNum[0] + '" class="resPointer">&gt;&gt;' +
                                     ancNum[0] + '-' + ancNum[ancNum.length-1] + '</a>');
@@ -540,19 +633,25 @@ Thread2ch.prototype = {
                     }
                 });
 
-                return links.join(' ');
+                return links.join('&nbsp;');
             }
         });
 
-        //連鎖あぼーん処理
+
+        //連鎖あぼーん (子) 処理
         if(shouldChainAbone){
             this._chainAboneNumbers.push(aNumber);
             isAbone = true;
-
-            if(aNumber > 1 && ChaikaCore.pref.getBool("thread_hide_abone")){
-                return "";
-            }
+            ngData = 'Chain Abone: >>' + chainAboneParent;
         }
+
+
+        //連鎖透明あぼーん (子) 処理
+        if(shouldChainHideAbone){
+            this._chainHideAboneNumbers.push(aNumber);
+            return '';
+        }
+
 
         // 通常リンク処理
         if(resMes.indexOf("ttp")!=-1){
@@ -601,9 +700,9 @@ Thread2ch.prototype = {
             this._handler.response.flush();
         }
 
-        var response = this.converter.getResponse(aNew, aNumber, resName, resMail,
-                                resMailName, resDate, resID, resBeID, resMes, isAbone);
-        return response;
+
+        return this.converter.getResponse(aNew, aNumber, resName, resMail, resMailName, resDate,
+                                          resID, resIP, resHost, resBeLink, resBeID, resBeBaseID, resMes, isAbone, ngData);
     },
 
 
@@ -1340,7 +1439,9 @@ b2rThreadConverter.prototype = {
     },
 
     toFunction: function(aRes){
-        return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor, aBeID, aMessage){
+        return function(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor,
+                        aIP, aHost, aBeLink, aBeID, aBeBaseID, aMessage, aNGData){
+
             //置換文字列で特殊な意味を持つ$をエスケープする
             for(let i=0, l=arguments.length; i<l; i++){
                 if(typeof arguments[i] === 'string'){
@@ -1361,41 +1462,68 @@ b2rThreadConverter.prototype = {
                     .replace(/<ID\/>/g, aID)
                     .replace(/<IDCOLOR\/>/g, resIDColor)
                     .replace(/<IDBACKGROUNDCOLOR\/>/g, resIDBgColor)
-                    .replace(/<BEID\/>/g, aBeID)
-                    .replace(/<MESSAGE\/>/g, aMessage);
+                    .replace(/<IP\/>/g, aIP)
+                    .replace(/<HOST\/>/g, aHost)
+                    .replace(/<BEID\/>/g, aBeLink)  //スキンタグの <BEID/> は正確には BeLink である
+                    .replace(/<BENUMBER\/>/g, aBeID)
+                    .replace(/<BEBASEID\/>/g, aBeBaseID)
+                    .replace(/<MESSAGE\/>/g, aMessage)
+                    .replace(/<NGDATA\/>/g, UniConverter.toSJIS(aNGData.title || aNGData))
+                    .replace(/<ABONEWORD\/>/g, UniConverter.toSJIS(aNGData.title || aNGData));  //Chaika Abone Helper 互換
         };
     },
 
-    getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID, aBeID, aMessage, aIsAbone){
-
-        if(aIsAbone && !(this._tmpGetNGNewRes && this._tmpGetNGRes)){
-            aName = aMail = aMailName = aDate = aMessage = "ABONE";
-            aID = aBeID = "";
-        }
-
+    getResponse: function(aNew, aNumber, aName, aMail, aMailName, aDate, aID,
+                          aIP, aHost, aBeLink, aBeID, aBeBaseID, aMessage, aIsAbone, aNGData){
 
         var template = aNew ? this._tmpNewRes : this._tmpRes;
 
-        if(template.indexOf('<ID/>') === -1){
+        if(aIP && !template.contains('<IP/>')){
+            aDate = aDate + " \x94\xad\x90\x4d\x8c\xb3:" + aIP;
+        }
+
+        if(aHost && !template.contains('<HOST/>')){
+            aDate = aDate + " HOST:" + aHost;
+        }
+
+        if(aID && !template.contains('<ID/>')){
             aDate = aDate + " ID:" + aID;
         }
 
-        if(template.indexOf('<BEID/>') === -1){
-            aDate = aDate + " Be:" + aBeID;
+        if(aBeLink && !template.contains('<BEID/>')){
+            aDate = aDate + " Be:" + aBeLink;
         }
 
-        var resIDColor = (template.indexOf('<IDCOLOR/>') !== -1) ?
-                this._id2Color.getColor(aID, false) : "inherit";
+        //ハイライトレス
+        if(aIsAbone && aNGData.highlight){
+            aIsAbone = !aIsAbone;
+            aMessage = '<span class="highlightedRes">' + aMessage + '</span>';
 
-        var resIDBgColor = (template.indexOf('<IDBACKGROUNDCOLOR/>') !== -1) ?
-                this._id2Color.getColor(aID, true) : "inherit";
+            //chaikaAboneEx 互換
+            aDate = '<span class="resDateImportant">' + aDate + '</span>';
+            aName = '<span class="resNameImportant">' + aName + '</span>';
+        }
 
+        //あぼーんレス
+        if(aIsAbone && !(this._tmpGetNGNewRes && this._tmpGetNGRes)){
+            aName = aMail = aMailName = aDate = aMessage = "ABONE";
+            aID = aBeID = aIP = aHost = "";
+        }
+
+        var resIDColor = template.contains('<IDCOLOR/>') ?
+                            this._id2Color.getColor(aID, false) : "inherit";
+
+        var resIDBgColor = template.contains('<IDBACKGROUNDCOLOR/>') ?
+                                this._id2Color.getColor(aID, true) : "inherit";
+
+        //AAレス
         if(this.isAA(aMessage)){
             aMessage = '<span class="aaRes">' + aMessage + '</span>';
         }
 
 
         var resFunc;
+
         if(aIsAbone && this._tmpGetNGNewRes && this._tmpGetNGRes){
             if(aNew){
                 resFunc = this._tmpGetNGNewRes;
@@ -1410,12 +1538,12 @@ b2rThreadConverter.prototype = {
             }
         }
 
-        return resFunc(aNumber, aName, aMail, aMailName, aDate, aID,
-                        resIDColor, resIDBgColor, aBeID, aMessage);
+        return resFunc(aNumber, aName, aMail, aMailName, aDate, aID, resIDColor, resIDBgColor,
+                       aIP, aHost, aBeLink, aBeID, aBeBaseID, aMessage, aNGData);
     },
 
     isAA: function(aMessage) {
-        var lineCount = aMessage.match(/<br\s*\/?>/g);
+        var lineCount = aMessage.match(/<br>/g);
 
         if(lineCount && lineCount.length >= 3){
             // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ￣

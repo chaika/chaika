@@ -38,53 +38,33 @@
 
 EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
-
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-
-
-/** @ignore */
-function makeException(aResult){
-    var stack = Components.stack.caller.caller;
-    return new Components.Exception("exception", aResult, stack);
-}
-
-
-/** @ignore */
-var UniConverter = {
-
-    _unicodeConverter: Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-            .createInstance(Ci.nsIScriptableUnicodeConverter),
-
-    toSJIS: function uniConverter_toSJIS(aString){
-        this._unicodeConverter.charset = "Shift_JIS";
-        return this._unicodeConverter.ConvertFromUnicode(aString);
-    },
-
-    fromSJIS: function uniConverter_fromSJIS(aString){
-        this._unicodeConverter.charset = "Shift_JIS";
-        return this._unicodeConverter.ConvertToUnicode(aString);
-    }
-
-};
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 
 var ChaikaAboneManager = {
 
-    ABONE_TYPE_NAME : 0,
-    ABONE_TYPE_MAIL : 1,
-    ABONE_TYPE_ID   : 2,
-    ABONE_TYPE_WORD : 3,
+    /** あぼーんの種類を表す定数 */
+
+    ABONE_TYPE_NAME : 'name',
+    ABONE_TYPE_MAIL : 'mail',
+    ABONE_TYPE_ID   : 'id',
+    ABONE_TYPE_WORD : 'word',
+    ABONE_TYPE_EX   : 'ex',
+
 
     /**
      * ブラウザ起動時のプロファイル読み込み後に一度だけ実行され、初期化処理を行う。
      * @private
      */
     _startup: function ChaikaAboneManager__startup(){
-        this._loadAboneData();
+        this.name = new AboneData(this.ABONE_TYPE_NAME, 'NGnames.txt');
+        this.mail = new AboneData(this.ABONE_TYPE_MAIL, 'NGaddrs.txt');
+        this.id = new AboneData(this.ABONE_TYPE_ID, 'NGid.txt');
+        this.word = new AboneData(this.ABONE_TYPE_WORD, 'NGwords.txt');
+        this.ex = new NGExAboneData(this.ABONE_TYPE_EX, 'NGEx.txt');
     },
 
 
@@ -93,163 +73,313 @@ var ChaikaAboneManager = {
      * @private
      */
     _quit: function ChaikaAboneManager__quit(){
-        this._saveAboneData();
+        this.name.uninit();
+        this.mail.uninit();
+        this.id.uninit();
+        this.word.uninit();
+        this.ex.uninit();
     },
 
 
-    _loadAboneData: function ChaikaAboneManager__loadAboneData(){
-        this._aboneData = new Array();
-        this._aboneData["name"] = this._loadNgFile("NGnames.txt");
-        this._aboneData["mail"] = this._loadNgFile("NGaddrs.txt");
-        this._aboneData["id"]   = this._loadNgFile("NGid.txt");
-        this._aboneData["word"] = this._loadNgFile("NGwords.txt");
+    /**
+     * あぼーんするべきかどうかを調べる
+     * @param {Object} aResData レスのデータ
+     * @param {String} aResData.name 名前
+     * @param {String} aResData.mail メール
+     * @param {String} aResData.id ID
+     * @param {String} aResData.msg 本文
+     * @param {String} aResData.date 書き込み日時
+     * @param {String} aResData.ip IPアドレス
+     * @param {String} aResData.host ホスト
+     * @param {String} aResData.be BeID
+     * @param {String} aResData.baseBe Be基礎番号
+     * @param {String} aResData.title スレッドタイトル
+     * @param {String} aResData.thread_url スレッドURL
+     * @param {String} aResData.board_url 板URL
+     * @param {Boolean} aResData.isThread スレッドあぼーんの処理なら真
+     * @return {NGData} ヒットしたNGデータが返る. ヒットしない場合は undefined が返る.
+     */
+    shouldAbone: function ChaikaAboneManager_shouldAbone(aResData){
+        return !aResData.isThread && this.name.shouldAbone(aResData.name) ||
+               !aResData.isThread && this.mail.shouldAbone(aResData.mail) ||
+               !aResData.isThread && this.id.shouldAbone(aResData.id) ||
+               !aResData.isThread && this.word.shouldAbone(aResData.msg) ||
+               this.ex.shouldAbone(aResData);
     },
-
-
-    _loadNgFile: function ChaikaAboneManager__loadNgFile(aNgFileName){
-        var ngFile = ChaikaCore.getDataDir();
-        ngFile.appendRelativePath(aNgFileName);
-        if(!ngFile.exists()) return new Array();
-
-        var contentLine = ChaikaCore.io.readData(ngFile).split("\n");
-        var resultArray = new Array();
-            // 空白行は読み込まない
-        for(let [i, line] in Iterator(contentLine)){
-            if(line) resultArray.push(line);
-        }
-        return resultArray;
-    },
-
-
-    _saveAboneData: function ChaikaAboneManager__saveAboneData(){
-        this._saveNgFile("NGnames.txt", this._aboneData["name"]);
-        this._saveNgFile("NGaddrs.txt", this._aboneData["mail"]);
-        this._saveNgFile("NGid.txt",    this._aboneData["id"]);
-        this._saveNgFile("NGwords.txt", this._aboneData["word"]);
-    },
-
-
-    _saveNgFile: function ChaikaAboneManager__saveNgFile(aNgFileName, aboneDataArray){
-        var ngFile = ChaikaCore.getDataDir();
-        ngFile.appendRelativePath(aNgFileName);
-        ChaikaCore.io.writeData(ngFile, aboneDataArray.join("\n"), false);
-    },
-
-
-    shouldAbone: function ChaikaAboneManager_shouldAbone(aName, aMail, aID, aMsg){
-        function checkFunc(aElement, aIndex, aArray){
-            return this.indexOf(aElement) != -1;
-        }
-        if(this._aboneData["name"].some(checkFunc, aName)) return true;
-        if(this._aboneData["mail"].some(checkFunc, aMail)) return true;
-        if(this._aboneData["id"].some(checkFunc, aID)) return true;
-        if(this._aboneData["word"].some(checkFunc, aMsg)) return true;
-
-        return false;
-    },
-
-
-    getAboneData: function ChaikaAboneManager_getAboneData(aType){
-        var ngArray;
-        switch(aType){
-            case this.ABONE_TYPE_NAME:
-                ngArray = this._aboneData["name"];
-                break;
-            case this.ABONE_TYPE_MAIL:
-                ngArray = this._aboneData["mail"];
-                break;
-            case this.ABONE_TYPE_ID:
-                ngArray = this._aboneData["id"];
-                break;
-            case this.ABONE_TYPE_WORD:
-                ngArray = this._aboneData["word"];
-                break;
-            default:
-                return null;
-        }
-
-        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-        unicodeConverter.charset = "Shift_JIS";
-
-        var resultArray = ngArray.map(function testFunc(aElement, aIndex, aArray){
-                return unicodeConverter.ConvertToUnicode(aElement);
-        });
-        return resultArray;
-    },
-
-
-    addAbone: function ChaikaAboneManager_addAbone(aWord, aType){
-        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-        unicodeConverter.charset = "Shift_JIS";
-
-        var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
-
-        var ngArray;
-        switch(aType){
-            case this.ABONE_TYPE_NAME:
-                ngArray = this._aboneData["name"];
-                break;
-            case this.ABONE_TYPE_MAIL:
-                ngArray = this._aboneData["mail"];
-                break;
-            case this.ABONE_TYPE_ID:
-                ngArray = this._aboneData["id"];
-                break;
-            case this.ABONE_TYPE_WORD:
-                ngArray = this._aboneData["word"];
-                break;
-            default:
-                return;
-        }
-
-            // 二重登録の禁止
-        if(ngArray.indexOf(sjisWord) != -1) return;
-
-        ngArray.push(sjisWord);
-
-        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
-        type.data = aType;
-
-        os.notifyObservers(type, "b2r-abone-data-add", aWord);
-    },
-
-
-    removeAbone: function ChaikaAboneManager_removeAbone(aWord, aType){
-        var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-        unicodeConverter.charset = "Shift_JIS";
-
-        var sjisWord = unicodeConverter.ConvertFromUnicode(aWord);
-
-        var ngArray;
-        switch(aType){
-            case this.ABONE_TYPE_NAME:
-                ngArray = this._aboneData["name"];
-                break;
-            case this.ABONE_TYPE_MAIL:
-                ngArray = this._aboneData["mail"];
-                break;
-            case this.ABONE_TYPE_ID:
-                ngArray = this._aboneData["id"];
-                break;
-            case this.ABONE_TYPE_WORD:
-                ngArray = this._aboneData["word"];
-                break;
-            default:
-                return;
-        }
-
-        var wordIndex = ngArray.indexOf(sjisWord);
-        if(wordIndex != -1) ngArray.splice(wordIndex, 1);
-
-        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        var type = Cc["@mozilla.org/supports-PRInt32;1"].createInstance(Ci.nsISupportsPRInt32);
-        type.data = aType;
-        os.notifyObservers(type, "b2r-abone-data-remove", aWord);
-
-    }
 
 };
+
+
+
+/**
+ * あぼーんデータ
+ */
+function AboneData(aNgType, aFileName){
+    this._init(aNgType, aFileName);
+}
+
+AboneData.prototype = {
+
+    _init: function(aNgType, aFileName){
+        this._ngType = aNgType;
+
+        this._ngFile = ChaikaCore.getDataDir();
+        this._ngFile.appendRelativePath(aFileName);
+
+        this._loadNgData();
+    },
+
+
+    uninit: function(){
+        this._saveNgData();
+    },
+
+
+    _loadNgData: function(){
+        if(!this._ngFile.exists())
+            return this._data = [];
+
+        //空白行を除いて読み込む
+        this._data = ChaikaCore.io.readString(this._ngFile);
+
+        //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
+        //Shift-JISで保存されている旧式のファイルであるということなので
+        //Shift-JIS で再読込する
+        if(this._data.contains("\uFFFD")){
+            ChaikaCore.logger.warning("The encoding of " + this._ngFile.leafName +
+                                      " is Shift-JIS. Try to convert to UTF-8.");
+
+            this._data = ChaikaCore.io.readString(this._ngFile, 'Shift-JIS');
+
+            //読み込みに成功していればUTF-8で保存し直す
+            if(!this._data.contains("\uFFFD")){
+                ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data);
+            }else{
+                ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
+            }
+        }
+
+        this._data = this._data.split('\n')
+                               .filter((line) => !!line);
+    },
+
+
+    _saveNgData: function(){
+        ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data.join("\n"));
+    },
+
+
+    shouldAbone: function(aResData){
+        return aResData && this._data.find((ngData) => aResData.contains(ngData));
+    },
+
+
+    getNgData: function(){
+        return this._data;
+    },
+
+
+    add: function(aWord){
+        //2重登録を防ぐ
+        if(this._data.indexOf(aWord) !== -1){
+            return;
+        }
+
+        this._data.push(aWord);
+
+        //通知する
+        let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+        type.data = this._ngType;
+
+        Services.obs.notifyObservers(type, "b2r-abone-data-add", aWord);
+    },
+
+    remove: function(aWord){
+        let index = this._data.indexOf(aWord);
+
+        if(index !== -1){
+            this._data.splice(index, 1);
+
+            //通知する
+            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+            type.data = this._ngType;
+
+            Services.obs.notifyObservers(type, "b2r-abone-data-remove", aWord);
+        }
+    },
+
+};
+
+
+/**
+ * あぼーんデータ (NGEx)
+ */
+function NGExAboneData(aNgType, aFileName){
+    AboneData.apply(this, arguments);
+}
+
+NGExAboneData.prototype = Object.create(AboneData.prototype, {
+
+    _loadNgData: {
+        value: function(){
+            AboneData.prototype._loadNgData.apply(this, arguments);
+
+            //有効期限切れのものを削除する
+            this._dataObj = this._data.map((item) => JSON.parse(item))
+                                      .filter((item) => item.expire ? item.expire > Date.now() : true);
+
+            this._data = this._dataObj.map((item) => JSON.stringify(item));
+        }
+    },
+
+
+    shouldAbone: {
+        value: function(aResData){
+            return this._dataObj.find((ngData) => {
+                if((ngData.target === 'post' && aResData.isThread) ||
+                   (ngData.target === 'thread' && !aResData.isThread)){
+                    return false;
+                }
+
+                if(ngData.match === 'all')
+                    return ngData.rules.every((rule) => this._matchRule(rule, aResData));
+
+                else if(ngData.match === 'any')
+                    return ngData.rules.some((rule) => this._matchRule(rule, aResData));
+            });
+        }
+    },
+
+
+    _matchRule: {
+        value: function(aRule, aResData){
+            let target = aResData[aRule.target];
+
+            if(!target){
+                return false;
+            }
+
+            if(aRule.regexp){
+                let regexp = new RegExp(aRule.query, aRule.ignoreCase ? 'i' : '');
+                return regexp.test(target);
+            }else{
+                if(aRule.ignoreCase){
+                    target = target.toLowerCase();
+                }
+
+                switch(aRule.condition){
+                    case 'contains':
+                        return target.contains(aRule.query);
+
+                    case 'notContain':
+                        return !target.contains(aRule.query);
+
+                    case 'equals':
+                        return target === aRule.query;
+
+                    case 'notEqual':
+                        return target !== aRule.query;
+
+                    case 'startsWith':
+                        return target.startsWith(aRule.query);
+
+                    case 'endsWith':
+                        return target.endsWith(aRule.query);
+
+                    default:
+                        return false;
+                }
+            }
+        }
+    },
+
+
+    /**
+     * 指定したデータを追加する
+     * @param {NGExData} aNGData
+     */
+    add: {
+        value: function(aNGData){
+            //データの補正
+            aNGData.rules.forEach((rule) => {
+                if(!rule.regexp && rule.ignoreCase){
+                    rule.query = rule.query.toLowerCase();
+                }
+            });
+
+            let jsonData = JSON.stringify(aNGData);
+
+            //2重登録を防ぐ
+            if(this._data.indexOf(jsonData) !== -1){
+                return;
+            }
+
+            this._data.push(jsonData);
+            this._dataObj.push(aNGData);
+
+            //通知する
+            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+            type.data = this._ngType;
+
+            Services.obs.notifyObservers(type, "b2r-abone-data-add", jsonData);
+        }
+    },
+
+
+    /**
+     * 指定したデータを削除する
+     * @param {String} aNGData 削除するデータ (JSON)
+     */
+    remove: {
+        value: function(aNGData){
+            let index = this._data.indexOf(aNGData);
+
+            if(index !== -1){
+                this._data.splice(index, 1);
+                this._dataObj.splice(index, 1);
+
+                //通知する
+                let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+                type.data = this._ngType;
+
+                Services.obs.notifyObservers(type, "b2r-abone-data-remove", aNGData);
+            }
+        }
+    },
+
+});
+
+NGExAboneData.constructor = NGExAboneData;
+
+
+//Polyfill for Firefox 24
+//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+        enumerable: false,
+        configurable: true,
+        writable: true,
+        value: function(predicate) {
+            if (this == null) {
+                throw new TypeError('Array.prototype.find called on null or undefined');
+            }
+            if (typeof predicate !== 'function') {
+                throw new TypeError('predicate must be a function');
+            }
+            var list = Object(this);
+            var length = list.length >>> 0;
+            var thisArg = arguments[1];
+            var value;
+
+            for (var i = 0; i < length; i++) {
+                if (i in list) {
+                    value = list[i];
+                    if (predicate.call(thisArg, value, i, list)) {
+                        return value;
+                    }
+                }
+            }
+            return undefined;
+        }
+    });
+}

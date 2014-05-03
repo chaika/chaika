@@ -1,40 +1,48 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 tabpanels {
-  -moz-appearance: none !important;
-  border-style: none !important;
-  margin: 0px !important;
+    -moz-appearance: none !important;
+    border-style: none !important;
+    margin: 0px !important;
 }
 
 tabs {
-  padding: 0px 8px 0px 8px !important;
-  border-style: none !important;
-  border-bottom: 1px solid #999 !important;
-  background-color: #FFF !important;
+    padding: 0px 8px 0px 8px !important;
+    border-style: none !important;
+    border-bottom: 1px solid #999 !important;
+    background-color: #FFF !important;
 }
 
 .tabs-left,
 .tabs-right {
-  border-style: none !important;
+    border-style: none !important;
 }
 
 tab {
-  -moz-appearance: none !important;
-  border-style: none !important;
-  border-radius: 0px !important;
-  margin: 0px !important;
-  padding: 5px 10px !important;
-  background-color: #FFF !important;
+    -moz-appearance: none !important;
+    border-style: none !important;
+    border-radius: 0px !important;
+    margin: 0px !important;
+    padding: 5px 10px !important;
+    background-color: #FFF !important;
 }
 
 tab:hover {
-  background-color: #E0E8F6 !important;
-  color: black;
+    background-color: #E0E8F6 !important;
+    color: black;
 }
 
 tab[selected="true"] {
-  -moz-user-focus: normal;
-  padding: 5px 10px !important;
-  background-color: #C1D2EE !important;
-  color: black !important;
+    -moz-user-focus: normal;
+    padding: 5px 10px !important;
+    background-color: #C1D2EE !important;
+    color: black !important;
+}
+
+.template{
+    display: none;
+}
+
+.fixed-height{
+    overflow: auto;
 }
