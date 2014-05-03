@@ -175,11 +175,13 @@ var BoardTree = {
 
     select: function BoardTree_select(aEvent){
         var currentIndex = this.tree.currentIndex;
-        if(currentIndex == -1) return;
+        if(currentIndex === -1) return;
 
         var titleColumn = this.tree.columns.getNamedColumn("boardTree-title");
+        var title = this.tree.view.getCellText(currentIndex, titleColumn);
         var id = this.tree.view.getCellValue(currentIndex, titleColumn);
 
+        document.getElementById('boardTitle').value = title;
         ThreadTree.initTree(id);
     },
 

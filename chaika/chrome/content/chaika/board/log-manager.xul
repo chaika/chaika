@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/content/board/marble.css" type="text/css"?>
 
 <page id="chaikaLogManager" title="ログマネージャ [chaika]"
         onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
@@ -24,11 +25,15 @@
 
 </popupset>
 
-<toolbox>
-    <toolbar>
-        <toolbarbutton id="vacuumButton" label="データベースの最適化" oncommand="vacuum()"/>
-    </toolbar>
-</toolbox>
+<marbletoolbar>
+    <deck flex="1">
+        <hbox align="center" flex="1">
+            <label id="boardTitle" crop="end" value=""
+                   style="font-size: 12px; font-weight: bold; color: #F6F6F6;" />
+            <marblebutton id="vacuumButton" label="データベースの最適化" oncommand="vacuum()"/>
+        </hbox>
+    </deck>
+</marbletoolbar>
 
 <hbox flex="1">
     <tree id="boardTree" class="plain" width="160" seltype="single" hidecolumnpicker="true"
