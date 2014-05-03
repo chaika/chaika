@@ -295,8 +295,10 @@ var AboneHandler = {
     },
 
     handleEvent: function(aEvent){
-        var aboneType = aEvent.detail;
-        var aboneWord = aEvent.sourceEvent.type;
+        var aboneType = aEvent.sourceEvent.type;
+        var aboneWord = aEvent.sourceEvent.detail;
+
+        console.log(aboneType, aboneWord);
 
         if(aboneType === 'ex'){
             this._exOnDemandAbone(aboneWord);
@@ -333,9 +335,15 @@ var AboneHandler = {
         let aboneCandidates = $.klass(className);
 
         for(let i=0, l=aboneCandidates.length; i<l; i++){
-            if(aboneCandidates[i].textContent.contains(aboneWord)){
+            if(aboneCandidates[i].textContent.contains(ngWord)){
                 let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
-                $.attrs(aboneRes, { 'isAbone': 'true', 'collapsed': 'true' });
+                let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes)[0];
+
+                if($.attrs(aboneRes, 'isAbone') !== 'true'){
+                    aboneRes.classList.add('collapsed');
+                    $.attrs(aboneRes, { 'isAbone': 'true' });
+                    $.attrs(aboneResHeader, { 'text': ngWord });
+                }
             }
         }
     },

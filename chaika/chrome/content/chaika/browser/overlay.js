@@ -320,20 +320,23 @@ ChaikaBrowserOverlay.aboneEvent = {
                 let win = tabBrowser.contentWindow;
                 let doc = tabBrowser.contentDocument;
 
-                let sourceEvent = doc.createEvent("Events");
-                sourceEvent.initEvent(aData, false, false);
+                let sourceEvent = doc.createEvent("CustomEvent");
+                sourceEvent.initCustomEvent(aboneType, false, false, aData);
 
                 let event = doc.createEvent('XULCommandEvents');
-                event.initCommandEvent(eventType, true, false, win, aboneType,
+                event.initCommandEvent(eventType, true, false, win, null,
                                         false, false, false, false, sourceEvent);
 
                 doc.dispatchEvent(event);
 
                 //chaika-abone-add については b2r/chaika 1.6.3 互換のイベントも発行する
                 if(eventType === 'chaika-abone-add'){
+                    let legacySourceEvent = doc.createEvent('Events');
+                    legacySourceEvent.initEvent(aData, false, false);
+
                     let legacyEvent = doc.createEvent('XULCommandEvents');
                     legacyEvent.initCommandEvent('b2raboneadd', true, false, win, legacyAboneType,
-                                                 false, false, false, false, sourceEvent);
+                                                 false, false, false, false, legacySourceEvent);
 
                     doc.dispatchEvent(event);
                 }
