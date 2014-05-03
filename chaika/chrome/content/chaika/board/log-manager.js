@@ -36,6 +36,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
@@ -384,7 +385,7 @@ var ThreadTree = {
     },
 
 
-        // nsDragAndDrop Observer
+    // nsDragAndDrop Observer
     onDragStart: function BoardTree_onDragStart(aEvent, aTransferData, aDragAction){
         var itemIndex = this.getClickItemIndex(aEvent);
         if(itemIndex == -1) return;
@@ -394,6 +395,17 @@ var ThreadTree = {
         aTransferData.data = new TransferData();
         aTransferData.data.addDataForFlavour("text/x-moz-url", item.urlSpec + "\n" + item.title);
         aTransferData.data.addDataForFlavour("text/unicode", item.urlSpec);
+    },
+
+
+    onDblclick: function(aEvent){
+        let itemIndex = this.getClickItemIndex(aEvent);
+        if(itemIndex === -1) return;
+
+        var item = this._getItem(itemIndex);
+
+        ChaikaCore.browser.openThread(Services.io.newURI(item.urlSpec, null, null),
+                                      true, true, false, true);
     }
 
 };
