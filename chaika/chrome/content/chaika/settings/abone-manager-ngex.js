@@ -77,7 +77,7 @@ NGExView.prototype = {
         this._root.addEventListener('command', this, true);
         this._root.addEventListener('change', this, true);
 
-        this.toggleAutoNaming();
+        this.setAutoNaming(true);
         this.insertRule();
     },
 
@@ -194,6 +194,15 @@ NGExView.prototype = {
     },
 
 
+    setAutoNaming: function(enable){
+        let checkbox = this._root.querySelector('.auto-naming');
+
+        checkbox.checked =
+        this._enableAutoNaming =
+        this._labelbox.disabled = enable;
+    },
+
+
     setLabel: function(){
         this._labelbox.value = this.getLabelText();
     },
@@ -296,6 +305,16 @@ NGExView.prototype = {
             node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
         });
 
+
+        //自動ネーミングと設定されているラベルが一致したら
+        //自動ネーミングが有効だと判断する
+        if(ngData.title === this.getLabelText()){
+            this.setAutoNaming(true);
+        }else{
+            this.setAutoNaming(false);
+        }
+
+        //もし有効ならラベルをセットする
         if(this._enableAutoNaming){
             this.setLabel();
         }
