@@ -282,23 +282,7 @@ var ResCollapse = {
 
         if(!isAbone) return;
 
-        if($.attrs(resContainer, 'collapsed') === 'true'){
-            if(isAbone){
-                $.show($.selector('.resHeaderContent', target));
-                $.hide($.selector('.resHeaderAboneContent', target));
-            }
-
-            Effects.slidedown($.tag('dd', resContainer)[0]);
-            $.attrs(resContainer, { "collapsed": "false" });
-        }else{
-            if(isAbone){
-                $.hide($.selector('.resHeaderContent', target));
-                $.show($.selector('.resHeaderAboneContent', target));
-            }
-
-            Effects.slideup($.tag('dd', resContainer)[0]);
-            $.attrs(resContainer, { "collapsed": "true" });
-        }
+        resContainer.classList.toggle('collapsed');
     }
 
 };
@@ -378,27 +362,36 @@ var Popup = {
         var target = aEvent.originalTarget;
         if(!(target instanceof HTMLElement)) return;
 
-        var className = target.className;
-        if(className == "") return;
+        //Beリンク
+        if(target.href && target.href.contains('be.2ch')){
+            target = target.parentNode;
+        }
 
-
-        if(className.substring(0,6) == "mesID_"){
+        //本文中のIDリンク
+        if(target.className.startsWith("mesID_")){
             Popup.ID.mouseover.call(target, aEvent);
             return;
         }
 
-        switch(className){
+        switch(target.className){
             case "resPointer":
                 Popup.Res.mouseover.call(target, aEvent);
                 break;
+
             case "resID":
             case "resMesID":
+            case 'resIP':
+            case 'resHost':
+            case 'resBeID':
                 Popup.ID.mouseover.call(target, aEvent);
                 break;
+
             case "outLink":
                 Popup.Image.mouseover.call(target, aEvent);
                 break;
 
+            default:
+                break;
         }
     },
 
@@ -534,25 +527,25 @@ Popup.ID = {
     mouseover: function(aEvent){
         var resID = $.attrs(this, 'resID');
 
-        //レス本文中のID: リンクの可能性があるので調べる
-        if(!resID && this.className){
-            resID = this.className.match(/mesID_([^¥s]+)/);
-            if(resID){
-                resID = resID[1];
-            }else{
-                return;
-            }
+        //レス本文中のID: リンクの場合には、resID属性が存在しないため
+        //class名からIDを取得する
+        if(!resID && this.className.match(/mesID_([^\s]+)/)){
+            resID = RegExp.$1;
         }
 
-        var resNumber = $.attrs(this, 'resNumber');
+        if(!resID) return;
 
-        var sameIDReses = Array.slice($.selectorAll("dl[resID='" + resID + "']"));
-        var popupContent;
+
+        //同じIDを持つレスを取得する
+        var sameIDReses = Array.slice($.selectorAll(".resHeaderContent > [resID='" + resID + "']"));
 
         //自分自身を除く
-        sameIDReses = sameIDReses.filter(function(res){
-            return $.attrs($.klass('resID', res)[0], 'resNumber') !== resNumber;
-        });
+        var resNumber = $.attrs(this, 'resNumber');  //自分自身のレス番号
+        sameIDReses = sameIDReses.filter((resHeader) => $.attrs(resHeader, 'resNumber') !== resNumber)
+                                 .map((resHeader) => $.parentByClass('resContainer', resHeader));
+
+        //ポップアップを作成
+        var popupContent;
 
         if(sameIDReses.length == 0){
             popupContent = $.node({ 'p': { text: 'このレスのみ' }});

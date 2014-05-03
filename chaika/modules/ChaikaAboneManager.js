@@ -43,24 +43,6 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-/** @ignore */
-var UniConverter = {
-
-    _unicodeConverter: Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-            .createInstance(Ci.nsIScriptableUnicodeConverter),
-
-    toSJIS: function uniConverter_toSJIS(aString){
-        this._unicodeConverter.charset = "Shift_JIS";
-        return this._unicodeConverter.ConvertFromUnicode(aString);
-    },
-
-    fromSJIS: function uniConverter_fromSJIS(aString){
-        this._unicodeConverter.charset = "Shift_JIS";
-        return this._unicodeConverter.ConvertToUnicode(aString);
-    }
-
-};
-
 
 var ChaikaAboneManager = {
 
@@ -110,13 +92,13 @@ var ChaikaAboneManager = {
      * @param {String} aResData.ip IPアドレス
      * @param {String} aResData.host ホスト
      * @param {String} aResData.be BeID
-     * @param {Number} aResData.baseBe Be基礎番号
-     * @param {ChaikaThread} aResData.thread スレッド
+     * @param {String} aResData.baseBe Be基礎番号
+     * @param {String} aResData.title スレッドタイトル
+     * @param {String} aResData.thread_url スレッドURL
+     * @param {String} aResData.board_url 板URL
      * @return {Boolean}
      */
     shouldAbone: function ChaikaAboneManager_shouldAbone(aResData){
-        return false;
-
         return this.name.shouldAbone(aResData.name) ||
                this.mail.shouldAbone(aResData.mail) ||
                this.id.shouldAbone(aResData.id) ||
@@ -156,38 +138,53 @@ AboneData.prototype = {
         if(!this._ngFile.exists())
             return this._data = [];
 
-        //Shift-JISのまま読み込みたいので、readStringではなくreadDataを用いる
         //空白行を除いて読み込む
-        this._data = ChaikaCore.io.readData(this._ngFile)
-                                  .split('\n')
-                                  .filter((line) => !!line);
+        this._data = ChaikaCore.io.readString(this._ngFile);
+
+        //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
+        //Shift-JISで保存されている旧式のファイルであるということなので
+        //Shift-JIS で再読込する
+        if(this._data.contains("\uFFFD")){
+            ChaikaCore.logger.warning("The encoding of " + this._ngFile.leafName +
+                                      " is Shift-JIS. Try to convert to UTF-8.");
+
+            this._data = ChaikaCore.io.readString(this._ngFile, 'Shift-JIS');
+
+            //読み込みに成功していればUTF-8で保存し直す
+            if(!this._data.contains("\uFFFD")){
+                ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data);
+            }else{
+                ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
+            }
+        }
+
+        this._data = this._data.split('\n')
+                               .filter((line) => !!line);
     },
 
 
     _saveNgData: function(){
-        ChaikaCore.io.writeData(this._ngFile, this._data.join("\n"), false);
+        ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data.join("\n"));
     },
 
 
     shouldAbone: function(aResData){
-        return this._data.some((ngData) => aResData.contains(ngData));
+        return this._data.find((ngData) => aResData.contains(ngData));
     },
 
 
     getNgData: function(){
-        return this._data.map((item) => UniConverter.fromSJIS(item));
+        return this._data;
     },
 
 
     add: function(aWord){
-        let sjisWord = UniConverter.toSJIS(aWord);
-
         //2重登録を防ぐ
-        if(this._data.indexOf(sjisWord) !== -1){
+        if(this._data.indexOf(aWord) !== -1){
             return;
         }
 
-        this._data.push(sjisWord);
+        this._data.push(aWord);
 
         //通知する
         let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
@@ -197,8 +194,7 @@ AboneData.prototype = {
     },
 
     remove: function(aWord){
-        let sjisWord = UniConverter.toSJIS(aWord);
-        let index = this._data.indexOf(sjisWord);
+        let index = this._data.indexOf(aWord);
 
         if(index !== -1){
             this._data.splice(index, 1);
@@ -225,16 +221,11 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
     _loadNgData: {
         value: function(){
-            if(!this._ngFile.exists())
-                return this._data = [];
+            AboneData.prototype._loadNgData.apply(this, arguments);
 
-            //Shift-JISのまま読み込みたいので、readStringではなくreadDataを用いる
-            //空白行を除いて読み込む
-            this._dataObj = ChaikaCore.io.readData(this._ngFile)
-                                         .split('\n')
-                                         .filter((line) => !!line)
-                                         .map((item) => JSON.parse(item))
-                                         .filter((item) => item.expire ? item.expire > Date.now() : true);
+            //有効期限切れのものを削除する
+            this._dataObj = this._data.map((item) => JSON.parse(item))
+                                      .filter((item) => item.expire ? item.expire > Date.now() : true);
 
             this._data = this._dataObj.map((item) => JSON.stringify(item));
         }
@@ -243,7 +234,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
     shouldAbone: {
         value: function(aResData){
-            return this._dataObj.some((ngData) => {
+            return this._dataObj.find((ngData) => {
                 if(ngData.match === 'all')
                     return ngData.rules.every((rule) => this._matchRule(rule, aResData));
 
@@ -293,6 +284,10 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     },
 
 
+    /**
+     * 指定したデータを追加する
+     * @param {NGExData} aNGData
+     */
     add: {
         value: function(aNGData){
             //データの補正
@@ -303,16 +298,14 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             });
 
             let jsonData = JSON.stringify(aNGData);
-            let sjisWord = UniConverter.toSJIS(jsonData);
-            let sjisJsonData = JSON.parse(sjisWord);
 
             //2重登録を防ぐ
-            if(this._data.indexOf(sjisWord) !== -1){
+            if(this._data.indexOf(jsonData) !== -1){
                 return;
             }
 
-            this._data.push(sjisWord);
-            this._dataObj.push(sjisJsonData);
+            this._data.push(jsonData);
+            this._dataObj.push(aNGData);
 
             //通知する
             let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
@@ -322,10 +315,14 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         }
     },
 
+
+    /**
+     * 指定したデータを削除する
+     * @param {String} aNGData 削除するデータ (JSON)
+     */
     remove: {
         value: function(aNGData){
-            let sjisWord = UniConverter.toSJIS(aNGData);
-            let index = this._data.indexOf(sjisWord);
+            let index = this._data.indexOf(aNGData);
 
             if(index !== -1){
                 this._data.splice(index, 1);
@@ -345,3 +342,34 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 NGExAboneData.constructor = NGExAboneData;
 
 
+//Polyfill for Firefox 24
+//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
+if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+        enumerable: false,
+        configurable: true,
+        writable: true,
+        value: function(predicate) {
+            if (this == null) {
+                throw new TypeError('Array.prototype.find called on null or undefined');
+            }
+            if (typeof predicate !== 'function') {
+                throw new TypeError('predicate must be a function');
+            }
+            var list = Object(this);
+            var length = list.length >>> 0;
+            var thisArg = arguments[1];
+            var value;
+
+            for (var i = 0; i < length; i++) {
+                if (i in list) {
+                    value = list[i];
+                    if (predicate.call(thisArg, value, i, list)) {
+                        return value;
+                    }
+                }
+            }
+            return undefined;
+        }
+    });
+}
