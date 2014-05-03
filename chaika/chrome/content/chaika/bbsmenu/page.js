@@ -35,6 +35,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
@@ -89,10 +90,7 @@ var Page = {
 
 
     openLogManager: function Page_openLogManager(){
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var logManagerURL = ioService.newURI("chaika://log-manager/", null, null);
-
-        ChaikaCore.browser.openURL(logManagerURL, true);
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://log-manager/", null, null), true);
     },
 
 
@@ -103,18 +101,17 @@ var Page = {
 
 
     openSupport: function Page_openSupport(){
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var supportURL = ioService.newURI("chaika://support/", null, null);
-
-        ChaikaCore.browser.openURL(supportURL, true);
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://support/", null, null), true);
     },
 
 
     openReleaseNotes: function Page_openReleaseNotes(){
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var releasenotesURL = ioService.newURI("chaika://releasenotes/", null, null);
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://releasenotes/", null, null), true);
+    },
 
-        ChaikaCore.browser.openURL(releasenotesURL, true);
+
+    openOnlineHelp: function(){
+        ChaikaCore.browser.openURL(Services.io.newURI("https://github.com/chaika/chaika/wiki", null, null), true);
     },
 
 
