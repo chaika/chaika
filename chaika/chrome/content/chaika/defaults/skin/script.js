@@ -300,8 +300,6 @@ var AboneHandler = {
         var aboneWord = aEvent.sourceEvent.detail;
         var aboneAdded = aEvent.type === 'chaika-abone-add';
 
-        console.log(aEvent.type, aboneAdded);
-
         if(aboneType === 'ex'){
             this._exOnDemandAbone(aboneWord, aboneAdded);
         }else{
