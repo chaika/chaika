@@ -503,7 +503,8 @@ Thread2ch.prototype = {
                 baseBe: resBeBaseID + '',
                 title: this.thread.title,
                 thread_url: this.thread.plainURL.spec,
-                board_url: this.thread.boardURL.spec
+                board_url: this.thread.boardURL.spec,
+                isThread: false
             });
 
             if(aboneResult){

@@ -39,6 +39,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -259,6 +260,38 @@ var BoardTree = {
             var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
             gBoard.refresh(filterLimit);
         }
+
+
+        //スレッドあぼーん処理
+        var enableHideAbone = ChaikaCore.pref.getBool('thread_hide_abone');
+        var threads = gBoard.itemsDoc.documentElement.getElementsByTagName('boarditem');
+
+        for(let i = 0, iz = threads.length; i < iz; i++){
+            let thread = threads[i];
+
+            //透明あぼーんの影響で最後の方は参照できなくなる
+            if(!thread) continue;
+
+            let aboneResult = ChaikaAboneManager.shouldAbone({
+                title: thread.getAttribute('title'),
+                date: thread.getAttribute('created'),
+                thread_url: thread.getAttribute('url'),
+                board_url: gBoard.url,
+                isThread: true
+            });
+
+            if(aboneResult){
+                if(aboneResult.hide === true ||
+                   aboneResult.hide === undefined && enableHideAbone){
+                    thread.parentNode.removeChild(thread);
+                    i--;
+                    iz--;
+                }else{
+                    thread.setAttribute('title', '***** ABONE ***** (' + aboneResult.title + ')');
+                }
+            }
+        }
+
 
         this.tree.builder.datasource = gBoard.itemsDoc.documentElement;
         this.tree.builder.rebuild();

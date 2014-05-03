@@ -96,13 +96,14 @@ var ChaikaAboneManager = {
      * @param {String} aResData.title スレッドタイトル
      * @param {String} aResData.thread_url スレッドURL
      * @param {String} aResData.board_url 板URL
-     * @return {Boolean}
+     * @param {Boolean} aResData.isThread スレッドあぼーんの処理なら真
+     * @return {NGData} ヒットしたNGデータが返る. ヒットしない場合は undefined が返る.
      */
     shouldAbone: function ChaikaAboneManager_shouldAbone(aResData){
-        return this.name.shouldAbone(aResData.name) ||
-               this.mail.shouldAbone(aResData.mail) ||
-               this.id.shouldAbone(aResData.id) ||
-               this.word.shouldAbone(aResData.msg) ||
+        return !aResData.isThread && this.name.shouldAbone(aResData.name) ||
+               !aResData.isThread && this.mail.shouldAbone(aResData.mail) ||
+               !aResData.isThread && this.id.shouldAbone(aResData.id) ||
+               !aResData.isThread && this.word.shouldAbone(aResData.msg) ||
                this.ex.shouldAbone(aResData);
     },
 
@@ -169,7 +170,7 @@ AboneData.prototype = {
 
 
     shouldAbone: function(aResData){
-        return this._data.find((ngData) => aResData.contains(ngData));
+        return aResData && this._data.find((ngData) => aResData.contains(ngData));
     },
 
 
@@ -235,6 +236,11 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     shouldAbone: {
         value: function(aResData){
             return this._dataObj.find((ngData) => {
+                if((ngData.target === 'post' && aResData.isThread) ||
+                   (ngData.target === 'thread' && !aResData.isThread)){
+                    return false;
+                }
+
                 if(ngData.match === 'all')
                     return ngData.rules.every((rule) => this._matchRule(rule, aResData));
 
@@ -248,6 +254,10 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     _matchRule: {
         value: function(aRule, aResData){
             let target = aResData[aRule.target];
+
+            if(!target){
+                return false;
+            }
 
             if(aRule.regexp){
                 let regexp = new RegExp(aRule.query, aRule.ignoreCase ? 'i' : '');
