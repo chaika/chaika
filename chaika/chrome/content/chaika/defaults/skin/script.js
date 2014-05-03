@@ -469,12 +469,15 @@ Popup.Res = {
 
         var startRes = 0;
         var endRes = 0;
-        if(this.textContent.match(/>>?(¥d{1,4})-(¥d{1,4})/)){
+
+        if(this.textContent.match(/>>?(\d{1,4})-(\d{1,4})/)){
             startRes = parseInt(RegExp.$1);
             endRes = parseInt(RegExp.$2);
-        }else if(this.textContent.match(/>>?(¥d{1,4})/)){
+        }else if(this.textContent.match(/>>?(\d{1,4})/)){
             startRes = parseInt(RegExp.$1);
         }
+
+        console.log(this, startRes, endRes);
 
         var popupContent = Popup.Res.createContent(startRes, endRes);
 
@@ -570,7 +573,7 @@ Popup.Image = {
 
     mouseover: function(aEvent){
         var imageURL = this.href;
-        if(!(/¥.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
+        if(!(/\.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
 
         var image = $.node({img: { 'class': 'small', 'src': imageURL }});
 
