@@ -477,8 +477,6 @@ Popup.Res = {
             startRes = parseInt(RegExp.$1);
         }
 
-        console.log(this, startRes, endRes);
-
         var popupContent = Popup.Res.createContent(startRes, endRes);
 
         this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "ResPopup"); }, Popup.POPUP_DELAY);
