@@ -48,7 +48,7 @@
                     <menupopup>
                         <menuitem label="リリースノート" oncommand="Page.openReleaseNotes()"/>
                         <menuitem label="トラブルシューティング情報" oncommand="Page.openSupport()"/>
-                        <menuitem label="オンラインヘルプ" oncommand="Page.openOnlineManual()"/>
+                        <menuitem label="オンラインヘルプ" oncommand="Page.openOnlineHelp()"/>
                     </menupopup>
                 </menu>
                 <menuseparator/>
