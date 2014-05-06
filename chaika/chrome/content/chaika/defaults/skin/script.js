@@ -498,23 +498,19 @@ var Popup = {
             return;
         }
 
-
         //今マウスが乗っているポップアップ要素
-        let hoveringPopup = $.parentByClass('popup', aEvent.relatedTarget);
-
-        //relatedTarget 自身が popup の場合はそれが hoveringPopup である
-        if(aEvent.relatedTarget.classList.contains('popup')){
-            hoveringPopup = aEvent.relatedTarget;
-        }
+        let hoveredPopup = aEvent.relatedTarget.classList.contains('popup') ?
+                           aEvent.relatedTarget :
+                           $.parentByClass('popup', aEvent.relatedTarget);
 
 
-        //自分自身が hovering の時は消さない
-        if(hoveringPopup && $.attrs(this, 'id') === $.attrs(hoveringPopup, 'id')){
+        //自分自身が hovered の時は消さない
+        if(hoveredPopup && $.attrs(this, 'id') === $.attrs(hoveredPopup, 'id')){
             return;
         }
 
-        //親ポップアップ -> 子ポップアップへの遷移
-        if(hoveringPopup && hoveringPopup.dataset.parent === $.attrs(this, 'id') ||
+        //親ポップアップ -> 子ポップアップへの遷移のときに親ポップアップを消さない
+        if(hoveredPopup && hoveredPopup.dataset.parent === $.attrs(this, 'id') ||
            aEvent.relatedTarget && aEvent.relatedTarget.dataset.parent === $.attrs(this, 'id')){
             return;
         }
@@ -531,7 +527,7 @@ var Popup = {
             popup = $.id(popup.dataset.parent);
 
             //今マウスが乗っているところまできたら終了
-            if(hoveringPopup && $.attrs(popup, 'id') === $.attrs(hoveringPopup, 'id')){
+            if(hoveredPopup && $.attrs(popup, 'id') === $.attrs(hoveredPopup, 'id')){
                 break;
             }
 
