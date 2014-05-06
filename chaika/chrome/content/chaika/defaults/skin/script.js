@@ -708,19 +708,25 @@ Popup.Image = {
         var imageURL = this.href;
         if(!(/\.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
 
-        var image = $.node({img: { 'class': 'small', 'src': imageURL }});
+        var image = $.node({ img: { 'class': 'small', 'src': imageURL }});
+
+        image.addEventListener('load', function(){
+            this.parentNode.classList.remove('loading');
+        }, false);
+
+        image.addEventListener('error', function(){
+            this.parentNode.classList.add('error');
+        }, false);
 
         image.addEventListener('click', function(){
             this.classList.toggle('small');
         }, false);
 
-        image.addEventListener('error', function(){
-            this.parentNode.classList.add('loadError');
-        }, false);
+        var popupContent = $.node({ 'div': { 'class': 'loading', children: image }});
 
-        var popupContent = $.node({ 'div': { children: image }});
-
-        this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "imagePopup"); }, Popup.POPUP_DELAY);
+        this._popupTimeout = setTimeout(() => {
+            Popup.showPopupDelay(aEvent, popupContent, "imagePopup");
+        }, Popup.POPUP_DELAY);
     }
 
 };

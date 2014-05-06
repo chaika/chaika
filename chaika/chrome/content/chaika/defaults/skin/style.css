@@ -313,10 +313,19 @@ h1 {
     max-width: none;
 }
 
-img.small {
-    width: 200px;
+.small {
+    width: 300px;
 }
 
-.loadError:after {
+.loading{
+    width: 300px;
+    height: 225px;
+}
+
+.error > img {
+    display: none;
+}
+
+.error:after{
     content: "Load Error";
 }
