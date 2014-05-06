@@ -474,8 +474,7 @@ Thread2ch.prototype = {
             resBeID = resBeLink.match(/^\d+/)[0] - 0;
 
             //BeIDのリンク処理
-            resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID +
-                        "&u=d:" + this.thread.url.resolve("./") + aNumber + "'>" + resBeID + '</a>';
+            resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
 
             // Be基礎番号を取得
             // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
