@@ -445,33 +445,99 @@ var Popup = {
         document.body.appendChild(popupNode);
 
 
-        var winPageRight = window.innerWidth;
-        var winPageBottom = window.innerHeight + window.scrollY;
-        var x = winPageRight - aEvent.pageX;
-        var y = winPageBottom - aEvent.pageY;
+        //ポップアップの位置を決定する
+        let bodyRect = $.rect(document.body);
+        let baseRect = $.rect(aEvent.originalTarget);
+        let popupRect = $.rect(popupNode);
 
-        popupNode.style.left = (aEvent.pageX - 25) + "px";
+        let top = window.scrollY + baseRect.bottom;
+        let left = window.scrollX + baseRect.left;
 
-        if(y > 0){
-            popupNode.style.top = aEvent.pageY + "px";
-        }else{
-            popupNode.style.top = (winPageBottom - $.rect(popupNode).height - 5) + "px";
+        $.css(popupNode, {
+            top: top + 'px',
+            left: left + 'px'
+        });
+
+        //ウィンドウを突き出ないようにする補正
+        //右端
+        if(left + popupRect.width > window.scrollX + window.innerWidth){
+            $.css(popupNode, {
+                left: (window.scrollX + window.innerWidth - popupRect.width) + 'px'
+            });
         }
 
-        popupNode.addEventListener('mouseenter', function(aEvent){
-            var parent = $.parentByClass('popup', aEvent.relatedTarget);
-            this._parentID = parent ? $.attrs(parent, 'id') : null;
-        }, false);
+        //下端
+        if(top + popupRect.height > window.scrollY + window.innerHeight){
+            $.css(popupNode, {
+                top: (window.scrollY + window.innerHeight - popupRect.height) + 'px'
+            });
+        }
 
-        popupNode.addEventListener('mouseleave', function(aEvent){
-            var parent = $.parentByClass('popup', aEvent.relatedTarget);
-            if(parent && this._parentID !== $.attrs(parent, 'id')){
-                return;
+
+        //親ポップアップがある場合は記録する
+        var parent = aEvent.relatedTarget.classList.contains('popup') ?
+                     aEvent.relatedTarget :
+                     $.parentByClass('popup', aEvent.relatedTarget);
+
+        if(parent){
+            popupNode.dataset.parent = $.attrs(parent, 'id');
+        }
+
+        //ポップアップからマウスが出た場合はそのポップアップを消去する
+        popupNode.addEventListener('mouseleave', this._fadeout, false);
+
+        //ポップアップを出したけどそのポップアップに
+        //乗らないでマウスアウトした時は, そのポップアップを消去する
+        aEvent.originalTarget.addEventListener('mouseleave', this._fadeout.bind(popupNode), false);
+    },
+
+
+    _fadeout: function(aEvent){
+        //コンテキストメニューなどHTML要素外へマウスが移動した場合
+        if(!aEvent.relatedTarget){
+            return;
+        }
+
+
+        //今マウスが乗っているポップアップ要素
+        let hoveringPopup = $.parentByClass('popup', aEvent.relatedTarget);
+
+        //relatedTarget 自身が popup の場合はそれが hoveringPopup である
+        if(aEvent.relatedTarget.classList.contains('popup')){
+            hoveringPopup = aEvent.relatedTarget;
+        }
+
+
+        //自分自身が hovering の時は消さない
+        if(hoveringPopup && $.attrs(this, 'id') === $.attrs(hoveringPopup, 'id')){
+            return;
+        }
+
+        //親ポップアップ -> 子ポップアップへの遷移
+        if(hoveringPopup && hoveringPopup.dataset.parent === $.attrs(this, 'id') ||
+           aEvent.relatedTarget && aEvent.relatedTarget.dataset.parent === $.attrs(this, 'id')){
+            return;
+        }
+
+
+        //対象ポップアップを消去
+        Effects.fadeout(this, { remove: true });
+
+        //消されたポップアップと現在マウスが乗っているポップアップ(またはその他の要素)
+        //までの間にあるポップアップを消去する
+        let popup = this;
+
+        while(popup.dataset.parent){
+            popup = $.id(popup.dataset.parent);
+
+            //今マウスが乗っているところまできたら終了
+            if(hoveringPopup && $.attrs(popup, 'id') === $.attrs(hoveringPopup, 'id')){
+                break;
             }
 
-            Effects.fadeout(this, { remove: true });
-        }, false);
-    }
+            Effects.fadeout(popup, { remove: true });
+        }
+    },
 
 };
 

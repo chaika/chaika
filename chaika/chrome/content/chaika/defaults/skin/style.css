@@ -273,7 +273,7 @@ h1 {
 
 
 /* ***** ***** ポップアップ ***** ***** */
-div.popup {
+.popup {
     font-size: 0.8em;
     padding: 8px;
     border-radius: 8px;
@@ -282,7 +282,7 @@ div.popup {
     position: absolute;
 }
 
-div.popupInner {
+.popupInner {
     min-width: 18em;
     min-height: 3em;
     max-height: 25em;
@@ -290,34 +290,33 @@ div.popupInner {
     overflow: auto;
 }
 
-div.popup dl.resContainer {
-    margin: 1px;
-}
-
-
-div.popup *,
-div.popup span.resHeaderAboneContent:after {
+.popup *{
     color: #EEE;
 }
 
 
-img.small {
-    width: 200px;
+/* レスポップアップ */
+.popupInner > .resContainer {
+    margin: 1px;
+}
+
+.popupInner > .aaRes{
+    white-space: pre !important;
 }
 
 
-div.loadError:after {
-    content: "Load Error";
-}
-
-
-div.imagePopup {
+/* 画像ポップアップ */
+.imagePopup {
     min-width: 100px;
     min-height: 0;
     max-height: none;
     max-width: none;
 }
 
-.popup .aaRes{
-    white-space: pre !important;
+img.small {
+    width: 200px;
+}
+
+.loadError:after {
+    content: "Load Error";
 }
