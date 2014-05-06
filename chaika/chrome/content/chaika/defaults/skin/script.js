@@ -367,7 +367,7 @@ var AboneHandler = {
 
 var Popup = {
 
-    POPUP_DELAY: 250,
+    POPUP_DELAY: 150,
 
     startup: function(){
         document.addEventListener('mouseover', this.mouseover, false);
@@ -554,47 +554,103 @@ Popup.Res = {
             startRes = parseInt(RegExp.$1);
         }
 
-        var popupContent = Popup.Res.createContent(startRes, endRes);
-
-        this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "ResPopup"); }, Popup.POPUP_DELAY);
+        Popup.Res.createContent(startRes, endRes).then((popupContent) => {
+            this._popupTimeout = setTimeout(() => {
+                Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
+            }, Popup.POPUP_DELAY);
+        }).catch((error) => { console.log(error); });
     },
 
 
     createContent: function(aStart, aEnd){
-        var resNodes;
+        const POPUP_LIMIT = 20;
 
-        if(aStart < aEnd){ // 複数ポップアップ
-            if(aStart < 1) aStart = 1;
-            if(aEnd > 1001) aEnd = 1001;
+        //単独ポップアップ
+        if(aStart > aEnd) aEnd = aStart;
 
-            const POPUP_LIMIT = 20;
+        //枠外補正
+        if(aStart < 1) aStart = 1;
+        if(aEnd > 1001) aEnd = 1001;
 
-            //POPUP_LIMIT より多い時は省略する
-            let tmpStart = aStart;
-            let omitRes = 0;
-            if((aEnd - aStart) > POPUP_LIMIT){
-                aStart = aEnd - POPUP_LIMIT;
-                omitRes = aStart - tmpStart;
-            }
+        //POPUP_LIMIT より多い時は省略する
+        let tmpStart = aStart;
+        let omitRes = 0;
+        if((aEnd - aStart) > POPUP_LIMIT){
+            aStart = aEnd - POPUP_LIMIT;
+            omitRes = aStart - tmpStart;
+        }
 
-            resNodes = document.createDocumentFragment();
+        var resNodes = document.createDocumentFragment();
 
-            for(let i = aStart; i<=aEnd; i++){
-                let resNode = $.id('res' + i).cloneNode(true);
+        var promise = new Promise((resolve, reject) => {
+            this._fetchResNodes(aStart, aEnd).then((posts) => {
+                resNodes.appendChild(posts);
+
+                if(resNodes.length > 0 && omitRes > 0){
+                    resNodes.appendChild($.node({ 'p': { text: omitRes + '件省略' } }));
+                }
+
+                resolve(resNodes);
+            });
+        });
+
+        return promise;
+    },
+
+
+    _fetchResNodes: function(aStart, aEnd){
+        var promise = new Promise((resolve, reject) => {
+            let resNodes = document.createDocumentFragment();
+
+            //表示域内にある場合はそこから取ってくる
+            for(var i = aStart; i <= aEnd; i++){
+                let resNode = $.id('res' + i);
+                if(!resNode) break;
+
+                resNode = resNode.cloneNode(true);
                 resNode.removeAttribute('id');
                 resNodes.appendChild(resNode);
             }
 
-            if(resNodes.length > 0 && omitRes > 0){
-                resNodes.appendChild($.node({ 'p': { text: omitRes + '件省略' } }));
+            //すべて域内だった場合はこれで終了
+            if(i > aEnd){
+                return resolve(resNodes);
+            }else{
+                aStart = i;
             }
 
-        }else{ // 通常ポップアップ
-            resNodes = $.id('res' + aStart).cloneNode(true);
-            resNodes.removeAttribute('id');
-        }
 
-        return resNodes;
+            //域外のレスが含まれている場合は、その部分をAjaxで取ってくる
+            let req = new XMLHttpRequest();
+
+            req.addEventListener('load', (event) => {
+
+                if(req.status !== 200 || !req.responseText){
+                    console.error('Unable to connect.');
+                    reject(req.status);
+                }
+
+                let root = document.createElement('div');
+                root.innerHTML = req.responseText;
+
+                let nodes = root.querySelectorAll('.resContainer');
+
+                Array.slice(nodes).forEach((res) => {
+                    let node = res.cloneNode(true);
+
+                    node.removeAttribute('id');
+                    resNodes.appendChild(node);
+                });
+
+                return resolve(resNodes);
+            }, false);
+
+            req.open('GET', SERVER_URL + EXACT_URL + aStart + "-" + aEnd + "n", true);
+            req.overrideMimeType('text/html; charset=Shift_JIS');
+            req.send(null);
+        });
+
+        return promise;
     }
 
 };
