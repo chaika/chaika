@@ -603,20 +603,22 @@ Popup.Res = {
             let resNodes = document.createDocumentFragment();
 
             //表示域内にある場合はそこから取ってくる
-            for(var i = aStart; i <= aEnd; i++){
+            //通常, 表示域外にある可能性が高いのは, アンカ範囲のうち先頭部分であるから,
+            //後ろから順に取得していくことにする
+            for(var i = aEnd; i >= aStart; i--){
                 let resNode = $.id('res' + i);
                 if(!resNode) break;
 
                 resNode = resNode.cloneNode(true);
                 resNode.removeAttribute('id');
-                resNodes.appendChild(resNode);
+                resNodes.insertBefore(resNode, resNodes.firstChild);
             }
 
             //すべて域内だった場合はこれで終了
-            if(i > aEnd){
+            if(i < aStart){
                 return resolve(resNodes);
             }else{
-                aStart = i;
+                aEnd = i;
             }
 
 
@@ -635,11 +637,11 @@ Popup.Res = {
 
                 let nodes = root.querySelectorAll('.resContainer');
 
-                Array.slice(nodes).forEach((res) => {
+                Array.slice(nodes).reverse().forEach((res) => {
                     let node = res.cloneNode(true);
 
                     node.removeAttribute('id');
-                    resNodes.appendChild(node);
+                    resNodes.insertBefore(node, resNodes.firstChild);
                 });
 
                 return resolve(resNodes);
