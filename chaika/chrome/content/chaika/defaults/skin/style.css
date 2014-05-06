@@ -204,7 +204,7 @@ h1 {
 }
 
 .resIP:not(:empty):before{
-    content: "発信元:";
+    content: "\767a\4fe1\5143\3a";
 }
 
 .resHost:not(:empty):before{
