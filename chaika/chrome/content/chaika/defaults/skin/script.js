@@ -510,8 +510,7 @@ var Popup = {
         }
 
         //親ポップアップ -> 子ポップアップへの遷移のときに親ポップアップを消さない
-        if(hoveredPopup && hoveredPopup.dataset.parent === $.attrs(this, 'id') ||
-           aEvent.relatedTarget && aEvent.relatedTarget.dataset.parent === $.attrs(this, 'id')){
+        if(hoveredPopup && hoveredPopup.dataset.parent === $.attrs(this, 'id')){
             return;
         }
 
