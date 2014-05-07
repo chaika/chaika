@@ -255,10 +255,54 @@ function init(){
         }
     }
 
+    ResInfo.startup();
     ResCollapse.startup();
     AboneHandler.startup();
     Popup.startup();
 }
+
+
+/**
+ * 全レスを走査しないと得られない情報を扱う
+ */
+var ResInfo = {
+
+    startup: function(){
+        // ID別の発言数を数えるためのテーブル
+        // key: ID, value: 回数
+        let idTable = {};
+
+        let resNodes = Array.slice($.klass('resContainer'));
+
+        resNodes.forEach((resNode) => {
+            // ID別発言数
+            let id = $.attrs(resNode, 'resID');
+            let idNode = $.klass('resID', resNode)[0];
+
+            if(!(id in idTable)){
+                idTable[id] = 0;
+            }
+
+            idTable[id]++;
+            idNode.dataset.idPostsIndex = idTable[id];
+        });
+
+        // ID別総発言数を表示する
+        for(let id in idTable){
+            if(typeof idTable[id] !== 'number') continue;
+
+            let idNodes = $.selectorAll('.resID[resID="' + id + '"]');
+            if(!idNodes) continue;
+
+            Array.slice(idNodes).forEach((idNode) => {
+                idNode.dataset.idPostsAll = idTable[id];
+            });
+        }
+
+    }
+
+};
+
 
 
 var ResCollapse = {

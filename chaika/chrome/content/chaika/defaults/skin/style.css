@@ -215,6 +215,10 @@ h1 {
     content: "Be:";
 }
 
+.resID[data-id-posts-all]:not([data-id-posts-all="1"]):after{
+    content: " (" attr(data-id-posts-index) "/" attr(data-id-posts-all) ")";
+}
+
 
 /* ***** ***** あぼーん レス ***** ***** */
 
