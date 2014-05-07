@@ -285,6 +285,43 @@ var ResInfo = {
 
             idTable[id]++;
             idNode.dataset.idPostsIndex = idTable[id];
+
+
+            //逆参照
+            let anchors = resNode.textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
+
+            if(anchors){
+                anchors.forEach((anchor) => {
+                    let [startRes, endRes] = anchor.split('-');
+
+                    startRes = startRes.substring(2) - 0;
+                    endRes = endRes ? endRes - 0 : startRes;
+
+                    if(startRes < 1) startRes = 1;
+                    if(endRes > 1001) endRes = 1001;
+
+                    for(let i = startRes; i <= endRes; i++){
+                        let refNode = $.id('res' + i);
+
+                        //範囲外レスはスキップ
+                        if(!refNode) continue;
+
+                        let refNumber = $.klass('resNumber', refNode)[0];
+
+                        if(!refNumber.dataset.referred){
+                            refNumber.dataset.referred = resNode.id;
+                        }else{
+                            refNumber.dataset.referred += ',' + resNode.id;
+                        }
+
+                        if(!refNumber.dataset.referredNum){
+                            refNumber.dataset.referredNum = 1;
+                        }else{
+                            refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
+                        }
+                    }
+                });
+            }
         });
 
         // ID別総発言数を表示する
@@ -436,6 +473,10 @@ var Popup = {
         switch(target.className){
             case "resPointer":
                 Popup.Res.mouseover.call(target, aEvent);
+                break;
+
+            case 'resNumber':
+                Popup.RefRes.mouseover.call(target, aEvent);
                 break;
 
             case "resID":
@@ -697,6 +738,37 @@ Popup.Res = {
         });
 
         return promise;
+    }
+
+};
+
+
+Popup.RefRes = {
+
+    mouseover: function(aEvent){
+        if(this._popupTimeout){
+            clearTimeout(this._popupTimeout);
+        }
+
+        //逆参照がなかったら終了
+        if(!this.dataset.referred) return;
+
+        let popupContent = document.createDocumentFragment();
+
+        this.dataset.referred.split(',').forEach((refID) => {
+            let resNode = $.id(refID);
+
+            if(resNode){
+                resNode = resNode.cloneNode(true);
+                resNode.removeAttribute('id');
+
+                popupContent.appendChild(resNode);
+            }
+        });
+
+        this._popupTimeout = setTimeout(() => {
+            Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
+        }, Popup.POPUP_DELAY);
     }
 
 };

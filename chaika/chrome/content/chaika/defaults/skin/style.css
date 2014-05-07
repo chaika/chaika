@@ -175,6 +175,12 @@ h1 {
     color: #E63;
 }
 
+.resNumber[data-referred]:after{
+    content: "(" attr(data-referred-num) ")";
+    font-weight: normal;
+    font-size: 90%;
+}
+
 .resName {
     font-weight: bold;
     font-size: 1.1em;
