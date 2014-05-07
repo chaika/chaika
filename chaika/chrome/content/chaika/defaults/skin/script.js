@@ -706,13 +706,9 @@ Popup.Image = {
 
     mouseover: function(aEvent){
         var imageURL = this.href;
-        if(!(/\.(?:gif|jpe?g|png)$/i).test(imageURL)) return;
+        if(!(/\.(?:gif|jpe?g|png|svg|bmp)$/i).test(imageURL)) return;
 
         var image = $.node({ img: { 'class': 'small', 'src': imageURL }});
-
-        image.addEventListener('load', function(){
-            this.parentNode.classList.remove('loading');
-        }, false);
 
         image.addEventListener('error', function(){
             this.parentNode.classList.add('error');
@@ -722,7 +718,7 @@ Popup.Image = {
             this.classList.toggle('small');
         }, false);
 
-        var popupContent = $.node({ 'div': { 'class': 'loading', children: image }});
+        var popupContent = $.node({ 'div': { children: image }});
 
         this._popupTimeout = setTimeout(() => {
             Popup.showPopupDelay(aEvent, popupContent, "imagePopup");
