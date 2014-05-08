@@ -510,10 +510,10 @@ var Popup = {
     },
 
 
-    showPopupDelay: function(aEvent, aPopupContent, aAddClassName){
-        if(aPopupContent.length == 0) return;
+    showPopup: function(aEvent, aPopupContent, aAddClassName){
+        if(aPopupContent.length === 0) return;
 
-        if(aEvent.relatedTarget && aEvent.relatedTarget.className == "popup"){
+        if(aEvent.relatedTarget && aEvent.relatedTarget.className === "popup"){
             return;
         }
 
@@ -577,6 +577,17 @@ var Popup = {
     },
 
 
+    showPopupDelay: function(aEvent, aPopupContent, aAddClassName, aDelay){
+        if(this._popupTimeout){
+            clearTimeout(this._popupTimeout);
+        }
+
+        setTimeout(() => {
+            this.showPopup(aEvent, aPopupContent, aAddClassName);
+        }, aDelay || this.POPUP_DELAY);
+    },
+
+
     _fadeout: function(aEvent){
         //コンテキストメニューなどHTML要素外へマウスが移動した場合
         if(!aEvent.relatedTarget){
@@ -625,10 +636,6 @@ var Popup = {
 Popup.Res = {
 
     mouseover: function(aEvent){
-        if(this._popupTimeout){
-            clearTimeout(this._popupTimeout);
-        }
-
         var startRes = 0;
         var endRes = 0;
 
@@ -640,9 +647,7 @@ Popup.Res = {
         }
 
         Popup.Res.createContent(startRes, endRes).then((popupContent) => {
-            this._popupTimeout = setTimeout(() => {
-                Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
-            }, Popup.POPUP_DELAY);
+            Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
         }).catch((error) => { console.log(error); });
     },
 
@@ -746,10 +751,6 @@ Popup.Res = {
 Popup.RefRes = {
 
     mouseover: function(aEvent){
-        if(this._popupTimeout){
-            clearTimeout(this._popupTimeout);
-        }
-
         //逆参照がなかったら終了
         if(!this.dataset.referred) return;
 
@@ -766,9 +767,7 @@ Popup.RefRes = {
             }
         });
 
-        this._popupTimeout = setTimeout(() => {
-            Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
-        }, Popup.POPUP_DELAY);
+        Popup.showPopupDelay(aEvent, popupContent, "RefResPopup");
     }
 
 };
@@ -813,7 +812,7 @@ Popup.ID = {
             popupContent = fragment;
         }
 
-        this._popupTimeout = setTimeout(function(){ Popup.showPopupDelay(aEvent, popupContent, "IDPopup"); }, Popup.POPUP_DELAY);
+        Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
     }
 };
 
@@ -836,11 +835,10 @@ Popup.Image = {
 
         var popupContent = $.node({ 'div': { children: image }});
 
-        this._popupTimeout = setTimeout(() => {
-            Popup.showPopupDelay(aEvent, popupContent, "imagePopup");
-        }, Popup.POPUP_DELAY);
+        Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
     }
 
 };
+
 
 window.addEventListener('DOMContentLoaded', init, false);
