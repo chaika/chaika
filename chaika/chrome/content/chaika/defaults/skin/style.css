@@ -316,7 +316,7 @@ h1 {
 
 
 /* 画像ポップアップ */
-.imagePopup {
+.ImagePopup {
     min-width: 100px;
     min-height: 0;
     max-height: none;
