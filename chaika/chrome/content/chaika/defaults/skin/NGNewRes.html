@@ -1,17 +1,20 @@
-<dl id="res<PLAINNUMBER/>" class="resContainer resNew collapsed" 
-        resID="<ID/>" isAbone="true">
-    <dt class="resHeader">
-        <span class="resNumber"><PLAINNUMBER/> </span>
+<article id="res<PLAINNUMBER/>"
+         class="resContainer resNew collapsed"
+         data-id="<ID/>"
+         data-number="<PLAINNUMBER/>"
+         data-aboned="true">
+    <h2 class="resHeader">
+        <span class="resNumber"><PLAINNUMBER/></span>
         <span class="resHeaderContent">
             <span class="resName"><NAME/></span>
             <span class="resMail"><MAIL/></span>
             <span class="resDate"><DATE/></span>
-            <span class="resID" resID="<ID/>" resNumber="<PLAINNUMBER/>"><ID/></span>
-            <span class="resIP" resID="<IP/>" resNumber="<PLAINNUMBER/>"><IP/></span>
-            <span class="resHost" resID="<HOST/>" resNumber="<PLAINNUMBER/>"><HOST/></span>
-            <span class="resBeID" resID="<BEBASEID/>" resNumber="<PLAINNUMBER/>"><BEID/></span>
+            <span class="resID" data-id="<ID/>"><ID/></span>
+            <span class="resIP" data-id="<IP/>"><IP/></span>
+            <span class="resHost" data-id="<HOST/>"><HOST/></span>
+            <span class="resBeID" data-id="<BEBASEID/>"><BEID/></span>
         </span>
         <span class="resHeaderAboneContent"><NGDATA/></span>
-    </dt>
-    <dd class="resBody"><MESSAGE/></dd>
-</dl>
+    </h2>
+    <p class="resBody"><MESSAGE/></p>
+</article>

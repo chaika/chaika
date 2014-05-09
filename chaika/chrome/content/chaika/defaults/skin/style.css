@@ -60,7 +60,7 @@ body {
     margin: 4.5em 0 0 0;
 }
 
-h1 {
+#pageTitle {
     position: fixed;
     border-bottom: 1px solid #222;
     top: 0;
@@ -111,6 +111,7 @@ h1 {
     border: 1px solid #555;
     display: none;
 }
+
 #navMenu:hover > li > ul{
     display: block;
 }
@@ -139,7 +140,7 @@ h1 {
     text-align: center;
 }
 
-#status span {
+#status > span {
     padding: 6px 24px;
     font-size: 0.7em;
     border: 1px solid #BBB;
@@ -158,6 +159,7 @@ h1 {
     background-color: transparent;
     padding: 2px 4px;
     font-size: 0.8em;
+    font-weight: normal;
     color: #777;
 }
 
@@ -228,6 +230,7 @@ h1 {
 
 /* ***** ***** あぼーん レス ***** ***** */
 
+/** 折りたたみ時 **/
 .collapsed .resHeaderContent,
 .collapsed .resBody{
     display: none;
@@ -247,18 +250,18 @@ h1 {
     font-size: 90%;
 }
 
-
-[isAbone="true"]:not(.collapsed) .resHeaderContent{
+/** 展開時 **/
+[data-aboned="true"]:not(.collapsed) .resHeaderContent{
     display: inline;
 }
 
-[isAbone="true"]:not(.collapsed) .resBody{
+[data-aboned="true"]:not(.collapsed) .resBody{
     display: block;
     margin: 0 0 20px 0;
     padding: 12px 35px 12px 25px;
 }
 
-[isAbone="true"]:not(.collapsed) .resHeaderAboneContent{
+[data-aboned="true"]:not(.collapsed) .resHeaderAboneContent{
     display: none;
 }
 
@@ -268,15 +271,15 @@ h1 {
     color: red;
 }
 
-[isAbone="false"] .resHeaderAboneContent:not(:empty):before{
+[data-aboned="false"] .resHeaderAboneContent:not(:empty):before{
     content: "(";
 }
 
-[isAbone="false"] .resHeaderAboneContent:not(:empty):after{
+[data-aboned="false"] .resHeaderAboneContent:not(:empty):after{
     content: ")";
 }
 
-[isAbone="false"] .resHeaderAboneContent{
+[data-aboned="false"] .resHeaderAboneContent{
     color: #888;
     font-size: 90%;
 }
@@ -300,8 +303,9 @@ h1 {
     overflow: auto;
 }
 
-.popup *{
-    color: #EEE;
+.popup *,
+.popup .resHeaderAboneContent:before{
+    color: #EEE !important;
 }
 
 

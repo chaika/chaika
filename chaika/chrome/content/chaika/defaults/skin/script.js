@@ -14,20 +14,21 @@ var $ = {
      * class から要素を取得
      * @param {String} className class 名
      * @param {Node} [parent=document] 親要素
-     * @return {NodeList}
+     * @return {Array.<Node>|Node}
      */
     klass: function(className, parent){
-        return (parent || document).getElementsByClassName(className);
+        let result = (parent || document).getElementsByClassName(className);
+        return result.length > 1 ? Array.slice(result) : result[0];
     },
 
     /**
      * 要素名から要素を取得
      * @param {String} tagName 要素名
      * @param {Node} [parent=document] 親要素
-     * @return {NodeList}
+     * @return {Array.<Node>}
      */
     tag: function(tagName, parent){
-        return (parent || document).getElementsByTagName(tagName);
+        return Array.slice((parent || document).getElementsByTagName(tagName));
     },
 
     /**
@@ -44,10 +45,10 @@ var $ = {
      * CSS Selector から要素を取得
      * @param {String} selector セレクタ
      * @param {Node} [parent=document] 親要素
-     * @return {NodeList}
+     * @return {Array.<Node>}
      */
     selectorAll: function(selector, parent){
-        return (parent || document).querySelectorAll(selector);
+        return Array.slice((parent || document).querySelectorAll(selector));
     },
 
     /**
@@ -272,12 +273,12 @@ var ResInfo = {
         // key: ID, value: 回数
         let idTable = {};
 
-        let resNodes = Array.slice($.klass('resContainer'));
+        let resNodes = $.klass('resContainer');
 
         resNodes.forEach((resNode) => {
             // ID別発言数
-            let id = $.attrs(resNode, 'resID');
-            let idNode = $.klass('resID', resNode)[0];
+            let id = resNode.dataset.id;
+            let idNode = $.klass('resID', resNode);
 
             if(!(id in idTable)){
                 idTable[id] = 0;
@@ -306,7 +307,7 @@ var ResInfo = {
                         //範囲外レスはスキップ
                         if(!refNode) continue;
 
-                        let refNumber = $.klass('resNumber', refNode)[0];
+                        let refNumber = $.klass('resNumber', refNode);
 
                         if(!refNumber.dataset.referred){
                             refNumber.dataset.referred = resNode.id;
@@ -328,10 +329,10 @@ var ResInfo = {
         for(let id in idTable){
             if(typeof idTable[id] !== 'number') continue;
 
-            let idNodes = $.selectorAll('.resID[resID="' + id + '"]');
+            let idNodes = $.selectorAll('.resID[data-id="' + id + '"]');
             if(!idNodes) continue;
 
-            Array.slice(idNodes).forEach((idNode) => {
+            idNodes.forEach((idNode) => {
                 idNode.dataset.idPostsAll = idTable[id];
             });
         }
@@ -351,6 +352,8 @@ var ResCollapse = {
 
     toggleCollapse: function(aEvent){
         var target = aEvent.originalTarget;
+
+        //HTML外要素の場合
         if(!(target instanceof HTMLElement)) return;
 
         if(target.className !== "resHeader"){
@@ -359,9 +362,9 @@ var ResCollapse = {
         }
 
         var resContainer = target.parentNode;
-        var isAbone = $.attrs(resContainer, 'isAbone') === "true";
 
-        if(!isAbone) return;
+        //あぼーんレスでなかった場合は終了
+        if(resContainer.dataset.aboned !== 'true') return;
 
         resContainer.classList.toggle('collapsed');
     }
@@ -418,19 +421,19 @@ var AboneHandler = {
         for(let i=0, l=aboneCandidates.length; i<l; i++){
             if(aboneCandidates[i].textContent.contains(ngWord)){
                 let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
-                let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes)[0];
+                let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes);
 
                 //NGワードが追加された場合
-                if(aboneAdded && $.attrs(aboneRes, 'isAbone') !== 'true'){
+                if(aboneAdded && aboneRes.dataset.aboned !== 'true'){
                     aboneRes.classList.add('collapsed');
-                    $.attrs(aboneRes, { 'isAbone': 'true' });
+                    aboneRes.dataset.aboned = 'true';
                     $.attrs(aboneResHeader, { 'text': ngWord });
                 }
 
                 //NGワードが削除された場合
-                if(!aboneAdded && $.attrs(aboneRes, 'isAbone') === 'true'){
+                if(!aboneAdded && aboneRes.dataset.aboned === 'true'){
                     aboneRes.classList.remove('collapsed');
-                    aboneRes.removeAttribute('isAbone');
+                    aboneRes.dataset.aboned = 'false';
                     aboneResHeader.textContent = '';
                 }
             }
@@ -725,9 +728,7 @@ Popup.Res = {
                 let root = document.createElement('div');
                 root.innerHTML = req.responseText;
 
-                let nodes = root.querySelectorAll('.resContainer');
-
-                Array.slice(nodes).reverse().forEach((res) => {
+                $.klass('resContainer', root).reverse().forEach((res) => {
                     let node = res.cloneNode(true);
 
                     node.removeAttribute('id');
@@ -776,7 +777,7 @@ Popup.RefRes = {
 Popup.ID = {
 
     mouseover: function(aEvent){
-        var resID = $.attrs(this, 'resID');
+        var resID = this.dataset.id;
 
         //レス本文中のID: リンクの場合には、resID属性が存在しないため
         //class名からIDを取得する
@@ -787,13 +788,11 @@ Popup.ID = {
         if(!resID) return;
 
 
-        //同じIDを持つレスを取得する
-        var sameIDReses = Array.slice($.selectorAll(".resHeaderContent > [resID='" + resID + "']"));
+        //自分自身を除く, 同じIDを持つレスを取得する
+        var selfNumber = $.parentByClass('resContainer', this).dataset.number;
+        var selector = ".resContainer[data-id='" + resID + "']:not([data-number='" + selfNumber + "'])";
+        var sameIDReses = $.selectorAll(selector);
 
-        //自分自身を除く
-        var resNumber = $.attrs(this, 'resNumber');  //自分自身のレス番号
-        sameIDReses = sameIDReses.filter((resHeader) => $.attrs(resHeader, 'resNumber') !== resNumber)
-                                 .map((resHeader) => $.parentByClass('resContainer', resHeader));
 
         //ポップアップを作成
         var popupContent;
@@ -841,4 +840,4 @@ Popup.Image = {
 };
 
 
-window.addEventListener('DOMContentLoaded', init, false);
+init();
