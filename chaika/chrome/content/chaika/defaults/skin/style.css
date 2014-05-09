@@ -338,3 +338,32 @@ body {
 .error:after{
     content: "Load Error";
 }
+
+
+/** 設定画面 **/
+#settings{
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
+#settings:target{
+    display: block;
+}
+
+#settings-buttonset{
+    text-align: right;
+}
+
+#settings input{
+    color: black !important;
+}
+
+label{
+    display: block;
+}
+
+fieldset{
+    margin-bottom: 1em;
+}

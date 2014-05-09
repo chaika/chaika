@@ -172,6 +172,52 @@ var $ = {
     },
 
     /**
+     * フォームの値を取得する
+     * @param {Node} formElement 値を取得したい要素
+     * @return {String|Boolean}
+     */
+    getValue: function(formElement){
+        let value;
+
+        switch(formElement.type){
+            case 'text':
+                value = formElement.value;
+                break;
+
+            case 'checkbox':
+                value = formElement.checked;
+                break;
+
+            default:
+                value = formElement.value;
+                break;
+        }
+
+        return value;
+    },
+
+    /**
+     * フォーム要素に値を設定する
+     * @param {Node} formElement 設定先
+     * @param {String|Boolean} aValue 設定値
+     */
+    setValue: function(formElement, aValue){
+        switch(formElement.type){
+            case 'text':
+                formElement.value = aValue;
+                break;
+
+            case 'checkbox':
+                formElement.checked = aValue;
+                break;
+
+            default:
+                formElement.value = aValue;
+                break;
+        }
+    },
+
+    /**
      * 簡易テンプレートから文字列を生成
      * @param {String} template テンプレート 置換する場所を @@ で指定する
      * @param {String} args 可変引数 テンプレート文字列の @@ を初めから順に置換する
@@ -243,8 +289,6 @@ var Effects = {
 };
 
 
-
-
 function init(){
     //新着位置までスクロール
     if(!location.hash){
@@ -256,10 +300,95 @@ function init(){
         }
     }
 
+    Prefs.startup();
     ResInfo.startup();
     ResCollapse.startup();
     AboneHandler.startup();
     Popup.startup();
+}
+
+
+
+/**
+ * 設定項目を扱う
+ */
+var Prefs = {
+
+    defaultValue: {
+
+        'pref-enable-referred-count': true,
+
+        'pref-enable-posts-count': true,
+
+        'pref-delay-popup': true,
+        'pref-max-posts-in-popup': 20,
+
+    },
+
+
+    startup: function(){
+        this._loadPrefs();
+
+        $.id('settings').addEventListener('change', this._onPrefChanged.bind(this), false);
+        $.id('settings').addEventListener('blur', this._onPrefChanged.bind(this), false);
+    },
+
+
+    /**
+     * スクロール位置を保持したままダイアログを閉じる
+     */
+    close: function(){
+        let scrollX = window.scrollX;
+        let scrollY = window.scrollY;
+
+        location.hash = "";
+        window.scrollTo(scrollX, scrollY);
+    },
+
+
+    /**
+     * 設定項目を取得する
+     * localStorage.getItem へのシンタックスシュガー
+     */
+    get: function(key){
+        let value = JSON.parse(localStorage.getItem(key));
+
+        if(value === null){
+            value = this.defaultValue[key];
+        }
+
+        return value;
+    },
+
+
+    /**
+     * 設定項目を設定する
+     * localStorage.setItem へのシンタックスシュガー
+     */
+    set: function(key, value){
+        localStorage.setItem(key, JSON.stringify(value));
+    },
+
+
+    _loadPrefs: function(){
+        let prefNodes = $.selectorAll('[id^="pref-"]');
+
+        prefNodes.forEach((prefNode) => {
+            let key = prefNode.id;
+            let value = this.get(key);
+
+            $.setValue(prefNode, value);
+        });
+    },
+
+
+    _onPrefChanged: function(aEvent){
+        let target = aEvent.originalTarget;
+        let key = target.id;
+        let value = $.getValue(target);
+
+        this.set(key, value);
+    }
 }
 
 
@@ -269,6 +398,12 @@ function init(){
 var ResInfo = {
 
     startup: function(){
+        let enableRefCount = Prefs.get('pref-enable-referred-count');
+        let enablePostsCount = Prefs.get('pref-enable-posts-count');
+
+        //全レス操作を必要とする設定が有効でない場合にはなにもしない
+        if(!enableRefCount && !enablePostsCount) return;
+
         // ID別の発言数を数えるためのテーブル
         // key: ID, value: 回数
         let idTable = {};
@@ -277,66 +412,71 @@ var ResInfo = {
 
         resNodes.forEach((resNode) => {
             // ID別発言数
-            let id = resNode.dataset.id;
-            let idNode = $.klass('resID', resNode);
+            if(enablePostsCount){
+                let id = resNode.dataset.id;
+                let idNode = $.klass('resID', resNode);
 
-            if(!(id in idTable)){
-                idTable[id] = 0;
+                if(!(id in idTable)){
+                    idTable[id] = 0;
+                }
+
+                idTable[id]++;
+                idNode.dataset.idPostsIndex = idTable[id];
             }
-
-            idTable[id]++;
-            idNode.dataset.idPostsIndex = idTable[id];
 
 
             //逆参照
-            let anchors = resNode.textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
+            if(enableRefCount){
+                let anchors = resNode.textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
 
-            if(anchors){
-                anchors.forEach((anchor) => {
-                    let [startRes, endRes] = anchor.split('-');
+                if(anchors){
+                    anchors.forEach((anchor) => {
+                        let [startRes, endRes] = anchor.split('-');
 
-                    startRes = startRes.substring(2) - 0;
-                    endRes = endRes ? endRes - 0 : startRes;
+                        startRes = startRes.substring(2) - 0;
+                        endRes = endRes ? endRes - 0 : startRes;
 
-                    if(startRes < 1) startRes = 1;
-                    if(endRes > 1001) endRes = 1001;
+                        if(startRes < 1) startRes = 1;
+                        if(endRes > 1001) endRes = 1001;
 
-                    for(let i = startRes; i <= endRes; i++){
-                        let refNode = $.id('res' + i);
+                        for(let i = startRes; i <= endRes; i++){
+                            let refNode = $.id('res' + i);
 
-                        //範囲外レスはスキップ
-                        if(!refNode) continue;
+                            //範囲外レスはスキップ
+                            if(!refNode) continue;
 
-                        let refNumber = $.klass('resNumber', refNode);
+                            let refNumber = $.klass('resNumber', refNode);
 
-                        if(!refNumber.dataset.referred){
-                            refNumber.dataset.referred = resNode.id;
-                        }else{
-                            refNumber.dataset.referred += ',' + resNode.id;
+                            if(!refNumber.dataset.referred){
+                                refNumber.dataset.referred = resNode.id;
+                            }else{
+                                refNumber.dataset.referred += ',' + resNode.id;
+                            }
+
+                            if(!refNumber.dataset.referredNum){
+                                refNumber.dataset.referredNum = 1;
+                            }else{
+                                refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
+                            }
                         }
-
-                        if(!refNumber.dataset.referredNum){
-                            refNumber.dataset.referredNum = 1;
-                        }else{
-                            refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
-                        }
-                    }
-                });
+                    });
+                }
             }
         });
 
         // ID別総発言数を表示する
-        for(let id in idTable){
-            if(typeof idTable[id] !== 'number') continue;
+        if(enablePostsCount){
+            for(let id in idTable){
+                if(typeof idTable[id] !== 'number') continue;
 
-            let idNodes = $.selectorAll('.resID[data-id="' + id + '"]');
-            if(!idNodes) continue;
+                let idNodes = $.selectorAll('.resID[data-id="' + id + '"]');
+                if(!idNodes) continue;
 
-            idNodes.forEach((idNode) => {
-                idNode.dataset.idPostsAll = idTable[id];
-            });
+                idNodes.forEach((idNode) => {
+                    idNode.dataset.idPostsAll = idTable[id];
+                });
+            }
         }
-
     }
 
 };
@@ -451,7 +591,7 @@ var AboneHandler = {
 
 var Popup = {
 
-    POPUP_DELAY: 150,
+    POPUP_DELAY: 250,
 
     startup: function(){
         document.addEventListener('mouseover', this.mouseover, false);
@@ -542,7 +682,7 @@ var Popup = {
         let left = window.scrollX + baseRect.left;
 
         $.css(popupNode, {
-            top: top + 'px',
+            top: (top-1) + 'px',
             left: left + 'px'
         });
 
@@ -650,13 +790,16 @@ Popup.Res = {
         }
 
         Popup.Res.createContent(startRes, endRes).then((popupContent) => {
-            Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
+            if(Prefs.get('pref-enable-delay-popup'))
+                Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
+            else
+                Popup.showPopup(aEvent, popupContent, "ResPopup");
         }).catch((error) => { console.log(error); });
     },
 
 
     createContent: function(aStart, aEnd){
-        const POPUP_LIMIT = 20;
+        const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
         //単独ポップアップ
         if(aStart > aEnd) aEnd = aStart;
@@ -668,7 +811,7 @@ Popup.Res = {
         //POPUP_LIMIT より多い時は省略する
         let tmpStart = aStart;
         let omitRes = 0;
-        if((aEnd - aStart) > POPUP_LIMIT){
+        if(POPUP_LIMIT && (aEnd - aStart) > POPUP_LIMIT){
             aStart = aEnd - POPUP_LIMIT;
             omitRes = aStart - tmpStart;
         }
@@ -768,7 +911,10 @@ Popup.RefRes = {
             }
         });
 
-        Popup.showPopupDelay(aEvent, popupContent, "RefResPopup");
+        if(Prefs.get('pref-enable-delay-popup'))
+            Popup.showPopupDelay(aEvent, popupContent, "RefResPopup");
+        else
+            Popup.showPopup(aEvent, popupContent, "RefResPopup");
     }
 
 };
@@ -811,7 +957,10 @@ Popup.ID = {
             popupContent = fragment;
         }
 
-        Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
+        if(Prefs.get('pref-enable-delay-popup'))
+            Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
+        else
+            Popup.showPopup(aEvent, popupContent, "IDPopup");
     }
 };
 
@@ -834,7 +983,10 @@ Popup.Image = {
 
         var popupContent = $.node({ 'div': { children: image }});
 
-        Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
+        if(Prefs.get('pref-enable-delay-popup'))
+            Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
+        else
+            Popup.showPopup(aEvent, popupContent, "ImagePopup");
     }
 
 };
