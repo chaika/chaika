@@ -471,7 +471,9 @@ Thread2ch.prototype = {
 
 
         if(resBeLink){
-            resBeID = resBeLink.match(/^\d+/)[0] - 0;
+            // 2ch Be の不具合により BeID が数値でなくなる場合があるので,
+            // 正規表現にマッチしない可能性も考慮する必要がある
+            resBeID = resBeLink.match(/^\d+/) ? RegExp.$0 - 0 : -1;
 
             //BeIDのリンク処理
             resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
@@ -487,6 +489,7 @@ Thread2ch.prototype = {
             // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
             resBeBaseID = resBeID;
         }
+
 
         //あぼーん処理
         if(!this._disableAbone){
