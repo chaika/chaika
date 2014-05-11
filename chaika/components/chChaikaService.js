@@ -70,6 +70,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
         ChaikaRoninLogin._startup();
 
+        Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+        Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+
 
         var scope = {};
         Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);
