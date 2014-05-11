@@ -414,6 +414,9 @@ var ResInfo = {
             // ID別発言数
             if(enablePostsCount){
                 let id = resNode.dataset.id;
+
+                if(!id || id.startsWith('???')) return;
+
                 let idNode = $.klass('resID', resNode);
 
                 if(!(id in idTable)){
@@ -931,7 +934,8 @@ Popup.ID = {
             resID = RegExp.$1;
         }
 
-        if(!resID) return;
+
+        if(!resID || resID.startsWith('???')) return;
 
 
         //自分自身を除く, 同じIDを持つレスを取得する
