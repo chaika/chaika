@@ -14,11 +14,12 @@ var $ = {
      * class から要素を取得
      * @param {String} className class 名
      * @param {Node} [parent=document] 親要素
+     * @param {Boolean} [noExtract=false] 要素が1つの時にも展開しない
      * @return {Array.<Node>|Node}
      */
-    klass: function(className, parent){
+    klass: function(className, parent, noExtract){
         let result = (parent || document).getElementsByClassName(className);
-        return result.length > 1 ? Array.slice(result) : result[0];
+        return noExtract || result.length > 1 ? Array.slice(result) : result[0];
     },
 
     /**
@@ -408,7 +409,7 @@ var ResInfo = {
         // key: ID, value: 回数
         let idTable = {};
 
-        let resNodes = $.klass('resContainer');
+        let resNodes = $.klass('resContainer', document, true);
 
         resNodes.forEach((resNode) => {
             // ID別発言数
@@ -822,15 +823,36 @@ Popup.Res = {
         var resNodes = document.createDocumentFragment();
 
         var promise = new Promise((resolve, reject) => {
-            this._fetchResNodes(aStart, aEnd).then((posts) => {
-                resNodes.appendChild(posts);
+            this._fetchResNodes(aStart, aEnd).then(
+                (posts) => {
+                    resNodes.appendChild(posts);
 
-                if(resNodes.length > 0 && omitRes > 0){
-                    resNodes.appendChild($.node({ 'p': { text: omitRes + '件省略' } }));
+                    if(resNodes.length > 0 && omitRes > 0){
+                        resNodes.appendChild($.node({ 'p': { text: omitRes + '件省略' } }));
+                    }
+
+                    resolve(resNodes);
+                },
+
+                (data) => {
+                    let posts = data[0];
+                    let failedRangeEnd = data[1];
+
+                    resNodes.appendChild(
+                        $.node({ 'p': {
+                            text: '>>' + aStart + '-' + failedRangeEnd + ' の取得中にエラーが発生しました'
+                        }})
+                    );
+
+                    resNodes.appendChild(posts);
+
+                    if(resNodes.length > 0 && omitRes > 0){
+                        resNodes.appendChild($.node({ 'p': { text: omitRes + '件省略' } }));
+                    }
+
+                    resolve(resNodes);
                 }
-
-                resolve(resNodes);
-            });
+            );
         });
 
         return promise;
@@ -867,14 +889,26 @@ Popup.Res = {
             req.addEventListener('load', (event) => {
 
                 if(req.status !== 200 || !req.responseText){
-                    console.error('Unable to connect.');
-                    reject(req.status);
+                    console.error('Fail in getting >>' + aStart + '-' + aEnd, 'status:', req.status);
+                    return reject([resNodes, aEnd]);
                 }
 
-                let root = document.createElement('div');
-                root.innerHTML = req.responseText;
+                let root = (new DOMParser()).parseFromString(req.responseText, 'text/html');
 
-                $.klass('resContainer', root).reverse().forEach((res) => {
+                // Parser Error
+                if(root.documentElement.nodeName.toUpperCase() === 'PARSERERROR'){
+                    console.error('Parser Error.', req.responseText);
+                    return reject([resNodes, aEnd]);
+                }
+
+                let gotPosts = $.klass('resContainer', root, true);
+
+                if(!gotPosts || gotPosts.length === 0){
+                    console.error('Odd response.', req.responseText);
+                    return reject([resNodes, aEnd]);
+                }
+
+                gotPosts.reverse().forEach((res) => {
                     let node = res.cloneNode(true);
 
                     node.removeAttribute('id');
