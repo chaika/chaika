@@ -55,9 +55,6 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaCore.js");
         ChaikaCore._startup();
 
-        Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
-        ChaikaRoninLogin._startup();
-
         Components.utils.import("resource://chaika-modules/ChaikaServer.js");
         ChaikaServer._startup();
 
@@ -70,9 +67,8 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
         ChaikaSearch._startup();
 
-
-        Components.utils.import("resource://chaika-modules/ChaikaThread.js");
-        Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+        Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
+        ChaikaRoninLogin._startup();
 
 
         var scope = {};

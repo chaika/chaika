@@ -37,11 +37,6 @@
 
 
 EXPORTED_SYMBOLS = ["ChaikaAddonInfo"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
 
 
 var ChaikaAddonInfo = {

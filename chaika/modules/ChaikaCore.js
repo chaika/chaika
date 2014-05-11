@@ -40,6 +40,7 @@ EXPORTED_SYMBOLS = ["ChaikaCore"];
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
 
 
 const Ci = Components.interfaces;
@@ -364,25 +365,16 @@ var ChaikaCore = {
      * @return {String}
      */
     getUserAgent: function ChaikaCore_getUserAgent(){
-        if(!this._userAgent){
-            try{
+        if(!this._userAgent || this._userAgent.contains('chaika/1;')){
+            let appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
+            let httpProtocolHandler = Cc["@mozilla.org/network/protocol;1?name=http"]
+                                        .getService(Ci.nsIHttpProtocolHandler);
 
-                var scope = {};
-                Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js", scope);
+            let extName = ChaikaAddonInfo.name + "/" + ChaikaAddonInfo.version;
+            let oscpu = httpProtocolHandler.oscpu;
+            let appName = appInfo.name + "/" + appInfo.version;
 
-                var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
-                var httpProtocolHandler = Cc["@mozilla.org/network/protocol;1?name=http"]
-                        .getService(Ci.nsIHttpProtocolHandler);
-
-                var extName = scope.ChaikaAddonInfo.name + "/" + scope.ChaikaAddonInfo.version;
-                var oscpu = httpProtocolHandler.oscpu;
-                var appName = appInfo.name + "/" + appInfo.version;
-
-                this._userAgent = "Monazilla/1.00 (" + extName + "; " + oscpu + "; " + appName + ")";
-            }catch(ex){
-                this.logger.error(ex);
-                this._userAgent = this.pref.getChar("exception_useragent");
-            }
+            this._userAgent = "Monazilla/1.00 (" + extName + "; " + oscpu + "; " + appName + ")";
         }
 
         return this._userAgent;
