@@ -11,6 +11,7 @@
         persist="screenX screenY width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+<script type="application/javascript" src="chrome://chaika/content/promise.min.js" />
 <script type="application/javascript" src="chrome://chaika/content/post/wizard.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/post.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/trip.js"/>
@@ -63,6 +64,13 @@
         <checkbox id="p2Check" label="p2" oncommand="FormPage.toggleP2Login()"/>
         <toolbarbutton label="ツール" type="menu">
             <menupopup position="before_end">
+                <menuitem id="insertBugReportTemplate"
+                          label="不具合報告テンプレートの挿入"
+                          oncommand="FormPage.insertBugReportTemplate(false);" />
+                <menuitem id="insertDetailedBugReportTemplate"
+                          label="不具合報告テンプレート(詳細)の挿入"
+                          oncommand="FormPage.insertBugReportTemplate(true);" />
+                <menuseparator />
                 <menuitem id="insertAAMenu" label="AAの挿入"
                         oncommand="AAPanel.openPopup(this.parentNode.parentNode)"/>
                 <menuitem id="useAAFontCheck" label="AA 用フォントを利用する"

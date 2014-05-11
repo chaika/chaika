@@ -37,6 +37,7 @@
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/FormHistory.jsm");
+Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
@@ -683,6 +684,106 @@ var FormPage = {
             fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
         }
         this._messeageForm.style.font = fontStyle;
+    },
+
+
+    insertBugReportTemplate: function(detailed){
+        let template = '';
+
+        let userAgent = ChaikaCore.getUserAgent();
+        let skinName = ChaikaCore.pref.getUniChar("thread_skin") || "(Default)";
+        let relatedAddons = this._fetchRelatedAddonsList();
+
+        relatedAddons.then((addonList) => {
+            template += "【ユーザーエージェント】" + userAgent + '\n';
+            template += "【使用スキン】" + skinName + '\n';
+            template += "【関連アドオン】\n" +
+                        (addonList.length > 0 ? addonList.join('\n') :
+                                               '(なし)')
+                        + '\n\n';
+
+            if(detailed){
+                let changedPrefs = this._getChangedPrefList();
+                template += '【変更した設定値】\n' + changedPrefs.join('\n') + '\n\n';
+            }
+
+            template += '【不具合の内容・再現手順】\n';
+
+            this._messeageForm.value += template;
+        });
+    },
+
+
+    _fetchRelatedAddonsList: function(){
+        let relatedAddonReg = /(?:2ch|chaika)/i;
+
+        let list = new Promise((resolve, reject) => {
+            AddonManager.getAllAddons((aAddons) => {
+
+                let relatedAddonList = [];
+
+                aAddons.forEach((aAddon) => {
+                    if(relatedAddonReg.test(aAddon.name) && aAddon.name !== 'chaika'){
+                        let addonInfo = aAddon.name + ' ' + aAddon.version;
+
+                        if(aAddon.userDisabled){
+                            addonInfo += ' (無効)';
+                        }
+
+                        relatedAddonList.push(addonInfo);
+                    }
+                });
+
+                resolve(relatedAddonList);
+            });
+        });
+
+        return list;
+    },
+
+
+    _getChangedPrefList: function(){
+        var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+        var branch = prefService.getBranch("extensions.chaika.");
+        var list = [];
+
+        function getPrefValue(aPrefName){
+            let prefType = branch.getPrefType(aPrefName);
+            let value = "";
+
+            switch(prefType){
+                case Ci.nsIPrefBranch.PREF_STRING:
+                    value = ChaikaCore.pref.getUniChar(aPrefName);
+                    break;
+
+                case Ci.nsIPrefBranch.PREF_INT:
+                    value = ChaikaCore.pref.getInt(aPrefName);
+                    break;
+
+                case Ci.nsIPrefBranch.PREF_BOOL:
+                    value = ChaikaCore.pref.getBool(aPrefName);
+                    break;
+
+                default:
+                    value = "(INVALID)";
+                    break;
+            }
+            return value;
+        }
+
+        var prefNames = branch.getChildList("", {}).sort();
+
+        prefNames.forEach((prefName) => {
+            if(!branch.prefHasUserValue(prefName)){
+                return;
+            }
+
+            if(prefName.startsWith('login.')) return;
+
+            list.push(prefName + ': ' + getPrefValue(prefName));
+        });
+
+        return list;
     },
 
 
