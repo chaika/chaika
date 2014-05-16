@@ -321,6 +321,7 @@ var Prefs = {
 
         'pref-enable-posts-count': true,
 
+        'pref-include-self-post': false,
         'pref-delay-popup': true,
         'pref-max-posts-in-popup': 20,
 
@@ -970,9 +971,11 @@ Popup.ID = {
         if(!resID || resID.startsWith('???')) return;
 
 
-        //自分自身を除く, 同じIDを持つレスを取得する
+        //同じIDを持つレスを取得する
         var selfNumber = $.parentByClass('resContainer', this).dataset.number;
-        var selector = ".resContainer[data-id='" + resID + "']:not([data-number='" + selfNumber + "'])";
+        var selector = Prefs.get('pref-include-self-post') ?
+                ".resContainer[data-id='" + resID + "']" :
+                ".resContainer[data-id='" + resID + "']:not([data-number='" + selfNumber + "'])";
         var sameIDReses = $.selectorAll(selector);
 
 
