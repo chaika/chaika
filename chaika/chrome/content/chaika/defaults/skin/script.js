@@ -390,7 +390,7 @@ var Prefs = {
 
         this.set(key, value);
     }
-}
+};
 
 
 /**
@@ -647,8 +647,7 @@ var Popup = {
         var target = aEvent.originalTarget;
         if(!(target instanceof HTMLElement)) return;
 
-        var className = target.className;
-        if(className == "") return;
+        if(target.className === "") return;
 
         if(target._popupTimeout){
             clearTimeout(target._popupTimeout);
@@ -678,7 +677,6 @@ var Popup = {
 
 
         //ポップアップの位置を決定する
-        let bodyRect = $.rect(document.body);
         let baseRect = $.rect(aEvent.originalTarget);
         let popupRect = $.rect(popupNode);
 
@@ -981,7 +979,7 @@ Popup.ID = {
         //ポップアップを作成
         var popupContent;
 
-        if(sameIDReses.length == 0){
+        if(sameIDReses.length === 0){
             popupContent = $.node({ 'p': { text: 'このレスのみ' }});
         }else{
             let fragment = document.createDocumentFragment();
