@@ -322,6 +322,7 @@ var Prefs = {
         'pref-enable-posts-count': true,
 
         'pref-include-self-post': false,
+        'pref-disable-single-id-popup': false,
         'pref-delay-popup': true,
         'pref-max-posts-in-popup': 20,
 
@@ -976,25 +977,22 @@ Popup.ID = {
         var selector = Prefs.get('pref-include-self-post') ?
                 ".resContainer[data-id='" + resID + "']" :
                 ".resContainer[data-id='" + resID + "']:not([data-number='" + selfNumber + "'])";
-        var sameIDReses = $.selectorAll(selector);
+        var sameIDPosts = $.selectorAll(selector);
 
+
+        if(!sameIDPosts.length && Prefs.get('pref-disable-single-id-popup')) return;
 
         //ポップアップを作成
-        var popupContent;
+        var popupContent = sameIDPosts.length ? document.createDocumentFragment() :
+                                                $.node({ 'p': { text: 'このレスのみ' }});
 
-        if(sameIDReses.length === 0){
-            popupContent = $.node({ 'p': { text: 'このレスのみ' }});
-        }else{
-            let fragment = document.createDocumentFragment();
+        sameIDPosts.forEach((post) => {
+            let postNode = post.cloneNode(true);
 
-            for(let i=0, l=sameIDReses.length; i<l; i++){
-                let resNode = sameIDReses[i].cloneNode(true);
-                resNode.removeAttribute('id');
-                fragment.appendChild(resNode);
-            }
+            postNode.removeAttribute('id');
+            popupContent.appendChild(postNode);
+        });
 
-            popupContent = fragment;
-        }
 
         if(Prefs.get('pref-enable-delay-popup'))
             Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
