@@ -507,7 +507,7 @@ Thread2ch.prototype = {
         if(resBeLink){
             // 2ch Be の不具合により BeID が数値でなくなる場合があるので,
             // 正規表現にマッチしない可能性も考慮する必要がある
-            resBeID = resBeLink.match(/^\d+/) ? RegExp.$0 - 0 : -1;
+            resBeID = resBeLink.match(/^\d+/) ? RegExp.lastMatch - 0 : -1;
 
             //BeIDのリンク処理
             resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
