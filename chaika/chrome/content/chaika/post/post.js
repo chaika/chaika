@@ -139,7 +139,8 @@ Post.prototype = {
         }
 
         //誤爆警告
-        if(ChaikaCore.pref.getBool('post.warn_mistaken_posting') &&
+        if(this._thread &&
+           ChaikaCore.pref.getBool('post.warn_mistaken_posting') &&
            ChaikaCore.browser.getBrowserWindow().getBrowser()
                        .currentURI.spec.indexOf(this._thread.plainURL.spec) === -1){
             result.push('誤爆の可能性があります');
