@@ -727,10 +727,7 @@
                 url = this._getPlainURL(url);
 
                 if(url){
-                    //スレッドリダイレクタを回避
-                    url = Services.io.newURI(url.spec + '?chaika_force_browser=1', null, null);
-
-                    this.ChaikaCore.browser.openURL(url, aAddTab);
+                    this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
                 }
             ]]></body>
         </method>

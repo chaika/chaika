@@ -751,6 +751,7 @@ ChaikaBrowser.prototype = {
 
         var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
         var threadURL = aThreadURL;
+
         try{
             if((/^\d{9,10}$/).test(threadURL.fileName)){
                 threadURL = ioService.newURI(threadURL.spec + "/", null, null);
@@ -760,7 +761,8 @@ ChaikaBrowser.prototype = {
                 // スレッド表示数の制限
             if(aReplaceViewLimit){
                 var threadViewLimit = ChaikaCore.pref.getInt("board.thread_view_limit");
-                if(threadViewLimit == 0){
+
+                if(threadViewLimit === 0){
                     threadURL = ioService.newURI("./", null, threadURL);
                 }else{
                     threadURL = ioService.newURI("./l" + threadViewLimit, null, threadURL);
@@ -774,6 +776,9 @@ ChaikaBrowser.prototype = {
         if(!aOpenBrowser){
             threadURL = ioService.newURI("/thread/" + threadURL.spec,
                         null, ChaikaCore.getServerURL());
+        }else if(ChaikaCore.pref.getBool("browser.redirector.enabled")){
+            // スレッドリダイレクタを回避
+            threadURL = ioService.newURI(threadURL.spec + '?chaika_force_browser=1', null, null);
         }
 
         return threadURL.QueryInterface(Ci.nsIURL);
