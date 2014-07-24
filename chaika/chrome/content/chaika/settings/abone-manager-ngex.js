@@ -282,7 +282,7 @@ NGExView.prototype = {
 
 
     populateData: function(ngData){
-        this._labelbox.value = ngData.title;
+        this._labelbox.value = ngData.title || '';
         this._root.querySelector('.match').value = ngData.match;
         this._root.querySelector('.target').value = ngData.target;
         this._root.querySelector('.autoNGID').checked = !!ngData.autoNGID;
