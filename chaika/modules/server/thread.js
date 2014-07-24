@@ -624,6 +624,11 @@ Thread2ch.prototype = {
                         ancStart = parseInt(ancStart);
                         ancEnd = parseInt(ancEnd);
 
+                        if(ancStart > ancEnd){
+                            [ancStart, ancEnd] = [ancEnd, ancStart];
+                        }
+
+
                         if(0 < ancStart && 0 < ancEnd && ancNums.length < 500){
                             //最大の範囲を500に制限する
                             if((ancEnd - ancStart + 1) > 500){
