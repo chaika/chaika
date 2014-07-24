@@ -569,6 +569,7 @@ Thread2ch.prototype = {
                         title: 'NGID: ' + resID + ' (Auto NGID: ' + this.thread.title + ' >>' + aNumber + ')',
                         target: 'post',
                         match: 'all',
+                        expire: Date.now() + 24 * 60 * 60 * 1000,
                         rules: [{
                             target: 'id',
                             query: resID,
