@@ -335,12 +335,7 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
 
     save: {
         value: function(){
-            //削除する前にデータをとっておかないとデータが消えてしまう
-            //(削除すると先頭のデータが選択されるため)
-            let ngData = this._view.getNgData();
-
-            this.remove();
-            ChaikaAboneManager.ex.add(ngData);
+            ChaikaAboneManager.ex.change(this._listbox.selectedItem.value, this._view.getNgData());
         }
     },
 

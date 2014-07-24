@@ -347,6 +347,44 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         }
     },
 
+
+    /**
+     * 指定したデータを変更する
+     * @param {String} oldData 変更するデータ
+     * @param {NGExData} newData 変更後のデータ
+     */
+    change: {
+        value: function(oldData, newData){
+            //データの補正
+            newData.rules.forEach((rule) => {
+                if(!rule.regexp && rule.ignoreCase){
+                    rule.query = rule.query.toLowerCase();
+                }
+            });
+
+            jsonNewData = JSON.stringify(newData);
+
+
+            let index = this._data.indexOf(oldData);
+
+            if(index === -1){
+                return;
+            }
+
+
+            this._data[index] = jsonNewData;
+            this._dataObj[index] = newData;
+
+
+            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+            type.data = this._ngType;
+
+
+            Services.obs.notifyObservers(type, "chaika-abone-data-remove", oldData);
+            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonNewData);
+        }
+    },
+
 });
 
 NGExAboneData.constructor = NGExAboneData;
