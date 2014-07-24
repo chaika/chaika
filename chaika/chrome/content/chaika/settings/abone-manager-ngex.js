@@ -135,7 +135,6 @@ NGExView.prototype = {
         }else{
             rules.classList.remove('fixed-height');
             rules.style.height = 'auto';
-            window.sizeToContent();
         }
 
 
