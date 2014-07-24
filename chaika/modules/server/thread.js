@@ -565,11 +565,14 @@ Thread2ch.prototype = {
 
                 //自動NGID
                 if(aboneResult.autoNGID && resID && !resID.startsWith('???')){
+                    let now = new Date();
+                    let expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+
                     ChaikaAboneManager.ex.add({
                         title: 'NGID: ' + resID + ' (Auto NGID: ' + this.thread.title + ' >>' + aNumber + ')',
                         target: 'post',
                         match: 'all',
-                        expire: Date.now() + 24 * 60 * 60 * 1000,
+                        expire: expire.getTime(),
                         rules: [{
                             target: 'id',
                             query: resID,
