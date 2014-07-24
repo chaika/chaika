@@ -122,6 +122,7 @@ NGExView.prototype = {
     adjustWindowSize: function(){
         let rules = this._root.querySelector('.rules');
 
+
         //ディスプレイ高さの7.5割以上の高さになったら、
         //そこでウィンドウサイズを大きくするのはやめて、
         //かわりにルール表示部にスクロールバーを表示する
@@ -132,20 +133,35 @@ NGExView.prototype = {
                 rules.classList.add('fixed-height');
                 rules.style.height = Math.floor(rules.clientHeight) + 'px';
             }
-        }else{
+        }
+
+
+        //ルール表示部の下部にまだ余裕がある場合には、
+        //ルール表示部の固定高さ表示を解除する
+        let lastRule = rules.querySelector('.rule:last-child');
+        let rulesBottomMargin = rules.getBoundingClientRect().bottom -
+                                lastRule.getBoundingClientRect().bottom;
+
+        if(rulesBottomMargin > 0){
             rules.classList.remove('fixed-height');
             rules.style.height = 'auto';
         }
 
 
-        //content のサイズが小さくなった場合に
-        //sizeToContent が正しく働かない問題に対処
-        let bottomMargin = document.documentElement.getBoundingClientRect().bottom -
+        //条件を削除するなどして content のサイズが小さくなった場合に
+        //ウィンドウ下部の空白部分が広がってしまう問題に対処する
+        let windowBottomMargin = document.documentElement.getBoundingClientRect().bottom -
                            this._root.getBoundingClientRect().bottom;
 
-        if(bottomMargin > 0){
-            window.resizeBy(0, -bottomMargin);
+        if(windowBottomMargin > 0){
+            window.resizeBy(0, -windowBottomMargin);
         }
+
+
+        //条件を追加したときにウィンドウサイズが広がらず、
+        //下部が見切れてしまう問題に対処する
+        //ウィンドウの再描画がうまく行われないことが原因？
+        window.resizeBy(0, 0);
     },
 
 
