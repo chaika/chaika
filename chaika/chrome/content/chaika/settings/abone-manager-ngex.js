@@ -370,9 +370,10 @@ NGExView.prototype = {
         });
 
 
+        //タイトルが設定されていないか、
         //自動ネーミングと設定されているラベルが一致したら
         //自動ネーミングが有効だと判断する
-        if(ngData.title === this.getLabelText()){
+        if(!ngData.title || ngData.title === this.getLabelText()){
             this.setAutoNaming(true);
         }else{
             this.setAutoNaming(false);
@@ -384,4 +385,4 @@ NGExView.prototype = {
         }
     },
 
-}
+};
