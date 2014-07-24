@@ -644,16 +644,29 @@ Thread2ch.prototype = {
 
 
             //連鎖あぼーん (子) の判定
-            if(enableChainAbone){
+            //
+            //すでにこのレスが連鎖透明あぼーんの対象であることが分かっている場合には、
+            //それ以上調べる必要はないのでチェックを飛ばす
+            //一方、連鎖あぼーんの対象かどうかわからない or
+            //連鎖あぼーんの対象だが、連鎖透明あぼーんの対象かはわからない
+            //という場合には、連鎖透明あぼーんまで発展する可能性があるから
+            //引き続き調べる必要がある
+            if(enableChainAbone && !shouldChainHideAbone){
                 let ancNumsFlattened = Array.prototype.concat.apply([], ancNums);
 
-                chainAboneParent = ancNumsFlattened.find((ancNum) => {
-                    shouldChainAbone = shouldChainAbone ||
-                                       this._chainAboneNumbers.indexOf(ancNum) !== -1;
-                    shouldChainHideAbone = shouldChainHideAbone ||
-                                           this._chainHideAboneNumbers.indexOf(ancNum) !== -1;
+                ancNumsFlattened.some((ancNum) => {
+                    if(!shouldChainAbone){
+                        if(this._chainAboneNumbers.indexOf(ancNum) !== -1){
+                            shouldChainAbone = true;
+                            chainAboneParent = ancNum;
+                        }
+                    }
 
-                    return shouldChainAbone;
+                    if(shouldChainAbone){
+                        shouldChainHideAbone = this._chainHideAboneNumbers.indexOf(ancNum) !== -1;
+                    }
+
+                    return shouldChainHideAbone;
                 });
             }
 
