@@ -418,16 +418,15 @@ var ResInfo = {
             if(enablePostsCount){
                 let id = resNode.dataset.id;
 
-                if(!id || id.startsWith('???')) return;
+                if(id && !(id.startsWith('???'))){
+                    if(!(id in idTable)){
+                        idTable[id] = 1;
+                    }else{
+                        idTable[id]++;
+                    }
 
-                let idNode = $.klass('resID', resNode);
-
-                if(!(id in idTable)){
-                    idTable[id] = 0;
+                    $.klass('resID', resNode).dataset.idPostsIndex = idTable[id];
                 }
-
-                idTable[id]++;
-                idNode.dataset.idPostsIndex = idTable[id];
             }
 
 
