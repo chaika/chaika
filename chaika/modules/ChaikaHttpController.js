@@ -435,12 +435,6 @@ ChaikaImageViewURLReplace.prototype = {
      */
     apply: function ChaikaIvur_apply(aHttpChannel){
         var url = aHttpChannel.URI.spec;
-
-        if(!url.startsWith('chaika://ivur/')) return;
-
-        url = url.replace('chaika://ivur/', '')
-                 .replace('?dummy_ext=.jpg', '');
-
         var ivurObj = this._replaceMap[url];
 
         if(!ivurObj) return;
