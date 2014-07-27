@@ -203,7 +203,10 @@ body {
 }
 
 .resID,
-.resMesID {
+.resMesID,
+.resIP,
+.resHost,
+.resBeID {
     text-decoration: underline;
 }
 
@@ -223,7 +226,7 @@ body {
     content: "Be:";
 }
 
-.resID[data-id-posts-all]:not([data-id-posts-all="1"]):after{
+.resHeaderContent[data-id-posts-all]:not([data-id-posts-all="1"]):after{
     content: " (" attr(data-id-posts-index) "/" attr(data-id-posts-all) ")";
 }
 

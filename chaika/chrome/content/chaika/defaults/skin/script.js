@@ -425,7 +425,7 @@ var ResInfo = {
                         idTable[id]++;
                     }
 
-                    $.klass('resID', resNode).dataset.idPostsIndex = idTable[id];
+                    $.klass('resHeaderContent', resNode).dataset.idPostsIndex = idTable[id];
                 }
             }
 
@@ -474,7 +474,7 @@ var ResInfo = {
             for(let id in idTable){
                 if(typeof idTable[id] !== 'number') continue;
 
-                let idNodes = $.selectorAll('.resID[data-id*="' + id + '"]');
+                let idNodes = $.selectorAll('.resContainer[data-id*="' + id + '"] > .resHeader > .resHeaderContent');
                 if(!idNodes) continue;
 
                 idNodes.forEach((idNode) => {
