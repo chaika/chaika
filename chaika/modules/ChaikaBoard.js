@@ -71,7 +71,7 @@ function ChaikaBoard(aBoardURL){
     if(!(aBoardURL instanceof Ci.nsIURL)){
         throw makeException(Cr.NS_ERROR_INVALID_POINTER);
     }
-    if(aBoardURL.scheme.indexOf("http") != 0){
+    if(!aBoardURL.scheme.startsWith("http")){
         throw makeException(Cr.NS_ERROR_INVALID_ARG);
     }
 
@@ -143,17 +143,22 @@ ChaikaBoard.prototype = {
      * @return {String}
      */
     getTitle: function ChaikaBoard_getTitle(){
-        return this.getSetting("BBS_TITLE") || this.getMachiTitle() || this.getPageTitle() || this.url.spec;
+        return this.getSetting("BBS_TITLE") ||
+               this._getMachiTitle() ||
+               this._getBoardTitle() ||
+               this._fetchPageTitle() ||
+               this.url.spec;
     },
 
 
-    getMachiTitle: function(){
-        if(this.type != ChaikaBoard.BOARD_TYPE_MACHI) return null;
+    _getMachiTitle: function(){
+        if(this.type !== ChaikaBoard.BOARD_TYPE_MACHI) return null;
 
         var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
                 .getService(Ci.nsIStringBundleService);
         var statusBundle = strBundleService.createBundle(
                 "resource://chaika-modules/machiBoardTitle.properties");
+
         try{
             return statusBundle.GetStringFromName(this.id);
         }catch(ex){
@@ -165,33 +170,76 @@ ChaikaBoard.prototype = {
 
 
     /**
+     * 板名のキャッシュから板名を取得する
+     */
+    _getBoardTitle: function(){
+        try{
+            let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
+            let file = ChaikaCore.getDataDir();
+            file.appendRelativePath('boardTitle.properties');
+
+            let urlSpec = fph.getURLSpecFromActualFile(file);
+            let sbs = Cc["@mozilla.org/intl/stringbundle;1"].getService(Ci.nsIStringBundleService);
+
+            sbs.flushBundles();
+
+            let sb = sbs.createBundle(urlSpec);
+
+            return sb.GetStringFromName(this.id);
+
+        }catch(ex){
+            ChaikaCore.logger.info(ex);
+        }
+
+        return null;
+    },
+
+
+    /**
      * 板のページタイトルをAjaxで取得する
      * @param {String} [encoding=UTF-8] ページのエンコーディング
      * @return {String} ページタイトル 取得できない場合はnullが返る
      */
-    getPageTitle: function(encoding){
+    _fetchPageTitle: function(encoding){
         try{
             var req = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(Ci.nsIXMLHttpRequest);
-            req.open('GET', this.url.spec, false);
+            req.open('GET', this.url.spec, true);
             req.channel.contentCharset = encoding || 'UTF-8';
+
+            req.addEventListener('load', function(){
+                if(req.status === 200 && req.responseText){
+                    let text = req.responseText;
+
+                    //エンコーディングが違っていたらやり直す
+                    let trueEncoding = text.match(/charset=['"]?(.*?)['"]?\s*\/?\s*>/i);
+
+                    if(!encoding && trueEncoding && trueEncoding[1].toUpperCase() !== 'UTF-8'){
+                        req.removeEventListener('load', arguments.callee, false);
+                        req.abort();
+
+                        return this._fetchPageTitle(trueEncoding[1]);
+                    }
+
+
+                    let title = text.match(/<title>(.*)<\/title>/i);
+
+                    if(title){
+                        title = title[1];
+
+                        let file = ChaikaCore.getDataDir();
+                        file.appendRelativePath('boardTitle.properties');
+
+                        ChaikaCore.io.writeString(file, 'UTF-8', true, this.id + ' = ' + title + '\n');
+                        ChaikaCore.logger.debug('Fetched Title:', title);
+                    }
+                }
+            }.bind(this), false);
+
             req.send(null);
 
-            if(req.status === 200 && req.responseText){
-                let text = req.responseText;
-
-                //エンコーディングが違っていたらやり直す
-                let trueEncoding = text.match(/charset="?(.*?)"?\s*\/?\s*>/i);
-                if(!encoding && trueEncoding && trueEncoding[1].toUpperCase() != 'UTF-8'){
-                    return this.getPageTitle(trueEncoding[1]);
-                }
-
-                return text.match(/<title>(.*)<\/title>/i)[1];
-            }
         }catch(ex){
             ChaikaCore.logger.error(ex);
         }
-
-        return null;
     },
 
 
