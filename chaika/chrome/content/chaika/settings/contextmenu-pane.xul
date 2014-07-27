@@ -64,16 +64,14 @@
                     <checkbox label="スキン" preference="extensions.chaika.contextmenu.skin.enabled" />
                     <checkbox label="このスレッドに書き込む" preference="extensions.chaika.contextmenu.write.enabled" />
                     <checkbox label="このスレッドのログを削除" preference="extensions.chaika.contextmenu.delete-log.enabled" />
-                </vbox>
-                <vbox>
                     <checkbox label="chaika で開く" preference="extensions.chaika.contextmenu.view-in-chaika.enabled" />
                     <checkbox label="ブラウザで開く" preference="extensions.chaika.contextmenu.view-in-browser.enabled" />
+                </vbox>
+                <vbox>
                     <checkbox label="リンク先を chaika で開く" preference="extensions.chaika.contextmenu.open-link-in-chaika.enabled" />
                     <checkbox label="リンク先をブラウザで開く" preference="extensions.chaika.contextmenu.open-link-in-browser.enabled" />
                     <checkbox label="すべてのレスを表示" preference="extensions.chaika.contextmenu.change-limit-all.enabled" />
                     <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.change-limit-l50.enabled" />
-                </vbox>
-                <vbox>
                     <checkbox label="スレッド一覧を開く" preference="extensions.chaika.contextmenu.go-to-board.enabled" />
                     <checkbox label="次スレを検索する" preference="extensions.chaika.contextmenu.find-next-thread.enabled" />
                     <checkbox label="サイドバーを表示" preference="extensions.chaika.contextmenu.toggle-sidebar.enabled" />

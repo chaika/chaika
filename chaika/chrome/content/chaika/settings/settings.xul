@@ -4,8 +4,11 @@
 <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
 <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css" type="text/css"?>
 
-<prefwindow id="BrowserPreferences" title="設定 [chaika]" windowtype="chaika:settings"
-            onload="startup()" onunload="shutdown()"
+<prefwindow id="BrowserPreferences"
+            title="設定 [chaika]"
+            windowtype="chaika:settings"
+            onload="startup()"
+            onunload="shutdown()"
             xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <prefpane id="paneGeneral"     label="全般"              flex="1" src="chrome://chaika/content/settings/general-pane.xul" />
