@@ -36,6 +36,8 @@
  * ***** END LICENSE BLOCK ***** */
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import('resource://chaika-modules/ChaikaHttpController.js');
 
 
 const Ci = Components.interfaces;
@@ -58,15 +60,19 @@ chProtocolHandler.prototype = {
     _getCommandChannel: function chProtocolHandler__getCommandChannel(aURI){
         var content = aURI.spec;
         var stream = Cc["@mozilla.org/io/string-input-stream;1"]
-                .createInstance(Ci.nsIStringInputStream);
+                        .createInstance(Ci.nsIStringInputStream);
+
         stream.setData(content, content.length);
+
         var channel = Cc["@mozilla.org/network/input-stream-channel;1"]
-                .createInstance(Ci.nsIInputStreamChannel)
-                .QueryInterface(Ci.nsIChannel);
+                        .createInstance(Ci.nsIInputStreamChannel)
+                        .QueryInterface(Ci.nsIChannel);
+
         channel.setURI(aURI);
         channel.contentStream = stream;
         channel.contentType = "application/x-chaika-command";
         channel.contentCharset = "UTF-8";
+
         return channel;
     },
 
@@ -86,8 +92,10 @@ chProtocolHandler.prototype = {
 
     newURI: function chProtocolHandler_newURI(aSpec, aCharset, aBaseURI){
         var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
+
         uri.init(Ci.nsIStandardURL.URLTYPE_STANDARD, -1, aSpec, aCharset, aBaseURI);
         uri.QueryInterface(Ci.nsIURL);
+
         return uri;
     },
 
@@ -96,21 +104,31 @@ chProtocolHandler.prototype = {
         var channel;
 
         switch(aURI.host){
+
             case "bbsmenu":
                 channel = this._getRedirectChannel("chrome://chaika/content/bbsmenu/page.xul");
                 break;
+
             case "board":
                 channel = this._getRedirectChannel("chrome://chaika/content/board/page.xul");
                 break;
+
             case "log-manager":
                 channel = this._getRedirectChannel("chrome://chaika/content/board/log-manager.xul");
                 break;
+
             case "support":
                 channel = this._getRedirectChannel("chrome://chaika/content/support.xhtml");
                 break;
+
             case "releasenotes":
                 channel = this._getRedirectChannel("chrome://chaika/content/releasenotes.html");
                 break;
+
+            case 'ivur':
+                channel = this._getRedirectChannel(ChaikaHttpController.ivur.getRedirectURI(aURI));
+                break;
+
             default:
                 channel = this._getCommandChannel(aURI);
                 break;
@@ -187,7 +205,6 @@ b2rProtocolHandler.constructor = b2rProtocolHandler;
 
 
 function chContentHandler(){
-    Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 }
 
 chContentHandler.prototype = {
