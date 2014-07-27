@@ -1040,248 +1040,264 @@ Thread2ch.prototype = {
 function ThreadJbbs(){
 }
 
-ThreadJbbs.prototype = {
-    datDownload: function(){
-        var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "rawmode.cgi");
-        this._aboneChecked = true;
-        this._threadAbone = false;
-        this._deltaMode = false;
+ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
 
-        // 差分GET
-        // したらばの場合、差分取得でも206ではなく200が返るので
-        // こちらで記録しておかないといけない
-        if(this.thread.datFile.exists() && this.thread.lineCount){
-            this._deltaMode = true;
-            datURLSpec += (this.thread.lineCount + 1) + "-";
+    datDownload: {
+        value: function(){
+            var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "rawmode.cgi");
+            this._aboneChecked = true;
+            this._threadAbone = false;
+            this._deltaMode = false;
+
+            // 差分GET
+            // したらばの場合、差分取得でも206ではなく200が返るので
+            // こちらで記録しておかないといけない
+            if(this.thread.datFile.exists() && this.thread.lineCount){
+                this._deltaMode = true;
+                datURLSpec += (this.thread.lineCount + 1) + "-";
+            }
+
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
+
+            this.httpChannel = ChaikaCore.getHttpChannel(datURL);
+            this.httpChannel.requestMethod = "GET";
+            this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
+            this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
+
+            this.httpChannel.asyncOpen(this, null);
         }
-
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
-
-        this.httpChannel = ChaikaCore.getHttpChannel(datURL);
-        this.httpChannel.requestMethod = "GET";
-        this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
-        this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
-
-        this.httpChannel.asyncOpen(this, null);
     },
 
-    datLineParse: function(aLine, aNumber, aNew){
-        if(!aLine) return "";
+    datLineParse: {
+        value: function(aLine, aNumber, aNew){
+            if(!aLine) return "";
 
-        // EUC-JP から SJIS へ変換
-        var line = UniConverter.fromEUC(aLine);
-        line = UniConverter.toSJIS(line);
+            // EUC-JP から SJIS へ変換
+            var line = UniConverter.fromEUC(aLine);
+            line = UniConverter.toSJIS(line);
 
-        //2ch互換へと変換
-        var resArray = line.split("<>");
-        var resName = "";
-        var resMail = "";
-        var resDate = "";
-        var resID = "";
-        var resMes  = "";
-        var threadTitle = '';
+            //2ch互換へと変換
+            var resArray = line.split("<>");
+            var resName = "";
+            var resMail = "";
+            var resDate = "";
+            var resID = "";
+            var resMes  = "";
+            var threadTitle = '';
 
-        if(resArray.length > 5){
-            resName = resArray[1].replace(/<\/?b>|/g, "");
-            resMail = resArray[2];
-            resDate = resArray[3];
-            resMes = resArray[4];
-            threadTitle = resArray[5];
-            resID = resArray[6];
+            if(resArray.length > 5){
+                resName = resArray[1].replace(/<\/?b>|/g, "");
+                resMail = resArray[2];
+                resDate = resArray[3];
+                resMes = resArray[4];
+                threadTitle = resArray[5];
+                resID = resArray[6];
+            }
+
+            line = [
+                resName,
+                resMail,
+                resDate + ' ID:' + resID,
+                resMes,
+                threadTitle
+            ].join('<>');
+
+            return Thread2ch.prototype.datLineParse.apply(this, [line, aNumber, aNew]);
         }
-
-        line = [
-            resName,
-            resMail,
-            resDate + ' ID:' + resID,
-            resMes,
-            threadTitle
-        ].join('<>');
-
-        var superClass = Thread2ch.prototype.datLineParse;
-        return superClass.apply(this, [line, aNumber, aNew]);
     },
 
-    onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
-        if(!this._opened) return;
+    onDataAvailable: {
+        value: function (aRequest, aContext, aInputStream, aOffset, aCount){
+            if(!this._opened) return;
 
-        aRequest.QueryInterface(Ci.nsIHttpChannel);
+            aRequest.QueryInterface(Ci.nsIHttpChannel);
 
-        var httpStatus = aRequest.responseStatus;
+            var httpStatus = aRequest.responseStatus;
 
-        // あぼーん発生の場合
-        if(httpStatus == 416){
-            this._threadAbone = true;
-            return;
-        }
-
-        // 新着がない場合は終了
-        if(!(httpStatus == 200 || httpStatus == 206)) return;
-        if(aCount == 0) return;
-
-        this._bInputStream.setInputStream(aInputStream);
-
-        // 206でもあぼーん発生の場合があるので、
-        // データ全体の先頭の1byteを調べる
-        // ついでに受信したデータを読み込む
-        var availableData = "";
-        if(!this._aboneChecked && httpStatus == 206){
-            var firstChar = this._bInputStream.readBytes(1);
-            availableData = this._bInputStream.readBytes(aCount - 1);
-
-            //もし改行でなければあぼーん発生ということ
-            if(firstChar.charCodeAt(0) != 10){
+            // あぼーん発生の場合
+            if(httpStatus == 416){
                 this._threadAbone = true;
+                return;
             }
-        }else{
-            availableData = this._bInputStream.readBytes(aCount);
-        }
-        this._aboneChecked = true;
+
+            // 新着がない場合は終了
+            if(!(httpStatus == 200 || httpStatus == 206)) return;
+            if(aCount == 0) return;
+
+            this._bInputStream.setInputStream(aInputStream);
+
+            // 206でもあぼーん発生の場合があるので、
+            // データ全体の先頭の1byteを調べる
+            // ついでに受信したデータを読み込む
+            var availableData = "";
+            if(!this._aboneChecked && httpStatus == 206){
+                var firstChar = this._bInputStream.readBytes(1);
+                availableData = this._bInputStream.readBytes(aCount - 1);
+
+                //もし改行でなければあぼーん発生ということ
+                if(firstChar.charCodeAt(0) != 10){
+                    this._threadAbone = true;
+                }
+            }else{
+                availableData = this._bInputStream.readBytes(aCount);
+            }
+            this._aboneChecked = true;
 
 
-        // NULL 文字を変換
-        availableData = availableData.replace(/\x00/g, "*");
+            // NULL 文字を変換
+            availableData = availableData.replace(/\x00/g, "*");
 
-        //前回のバッファと結合し先頭のレス断片を解消する
-        availableData = this._dataBuffer + availableData;
+            //前回のバッファと結合し先頭のレス断片を解消する
+            availableData = this._dataBuffer + availableData;
 
-        //受信したデータをレスごとに分割
-        var _lines = availableData.split("\n");
+            //受信したデータをレスごとに分割
+            var _lines = availableData.split("\n");
 
-        //最後にレス断片が付いている場合にはそれをバッファに追加する
-        this._dataBuffer = _lines.pop();
+            //最後にレス断片が付いている場合にはそれをバッファに追加する
+            this._dataBuffer = _lines.pop();
 
-        //もしレス断片しかない場合にはここで終了
-        if(!_lines.length){
-            return;
-        }
+            //もしレス断片しかない場合にはここで終了
+            if(!_lines.length){
+                return;
+            }
 
 
-        //datを2ch互換に変換する
-        let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
-        let lines = [];  //空白挿入後のdatLines
+            //datを2ch互換に変換する
+            let lineCount = parseInt(_lines[0].match(/^(\d+)<>/));
+            let lines = [];  //空白挿入後のdatLines
 
-        // サーバ側で透明あぼーんがある場合そこに空白行を挿入する
-        for(let i=0, l=_lines.length; i<l; i++){
-            let line = _lines[i];
-            let resNum = parseInt(line.match(/^(\d+)<>/));
+            // サーバ側で透明あぼーんがある場合そこに空白行を挿入する
+            for(let i=0, l=_lines.length; i<l; i++){
+                let line = _lines[i];
+                let resNum = parseInt(line.match(/^(\d+)<>/));
 
-            //透明あぼーんの分だけ空行を挿入
-            while(lineCount < resNum){
+                //透明あぼーんの分だけ空行を挿入
+                while(lineCount < resNum){
+                    lineCount++;
+                    lines.push('');
+                }
+
                 lineCount++;
-                lines.push('');
+                lines.push(line);
             }
 
-            lineCount++;
-            lines.push(line);
-        }
 
-
-        //差分取得の場合は受信したデータの中に既読レスは含まれない
-        if(this._readLogCount && (httpStatus == 206 || this._deltaMode)){
-            this._readLogCount = 0;
-        }
-
-        //新着レスのみからなる変換済みデータを作成
-        var newResLines = "";      //新着レスの生データ
-        var newResHTMLLines = "";  //新着レスの変換済みデータ
-        for(let i=0, l=lines.length; i<l; i++){
-            //既読部分は飛ばす
-            if(this._readLogCount > 0){
-                this._readLogCount--;
-                continue;
+            //差分取得の場合は受信したデータの中に既読レスは含まれない
+            if(this._readLogCount && (httpStatus == 206 || this._deltaMode)){
+                this._readLogCount = 0;
             }
 
-            newResLines += ( lines[i] + '\n' );
-            newResHTMLLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+            //新着レスのみからなる変換済みデータを作成
+            var newResLines = "";      //新着レスの生データ
+            var newResHTMLLines = "";  //新着レスの変換済みデータ
+            for(let i=0, l=lines.length; i<l; i++){
+                //既読部分は飛ばす
+                if(this._readLogCount > 0){
+                    this._readLogCount--;
+                    continue;
+                }
+
+                newResLines += ( lines[i] + '\n' );
+                newResHTMLLines += ( this.datLineParse(lines[i], ++this.thread.lineCount, true) + '\n' );
+            }
+
+            //データをブラウザに書き出す
+            this.write(newResHTMLLines);
+
+            //新着レスを保存用配列に追加
+            this._data.push(newResLines);
         }
-
-        //データをブラウザに書き出す
-        this.write(newResHTMLLines);
-
-        //新着レスを保存用配列に追加
-        this._data.push(newResLines);
     },
 
-    onStopRequest: function(aRequest, aContext, aStatus){
-        if(!this._opened) return;
+    onStopRequest: {
+        value: function(aRequest, aContext, aStatus){
+            if(!this._opened) return;
 
-        aRequest.QueryInterface(Ci.nsIHttpChannel);
-        var httpStatus = aRequest.responseStatus;
-        var jbbsError = "";
-        try{
-            jbbsError = aRequest.getResponseHeader("ERROR");
-        }catch(ex){}
+            aRequest.QueryInterface(Ci.nsIHttpChannel);
+            var httpStatus = aRequest.responseStatus;
+            var jbbsError = "";
+            try{
+                jbbsError = aRequest.getResponseHeader("ERROR");
+            }catch(ex){}
 
 
-        switch(jbbsError){
-            case "BBS NOT FOUND":
-            case "KEY NOT FOUND":
-            case "THREAD NOT FOUND":
-                this.write(this.converter.getFooter(999));
-                this.close();
-                return;
-            case "STORAGE IN":
-                this.write(this.converter.getFooter("dat_down"));
-                this.close();
-                return;
+            switch(jbbsError){
+                case "BBS NOT FOUND":
+                case "KEY NOT FOUND":
+                case "THREAD NOT FOUND":
+                    this.write(this.converter.getFooter(999));
+                    this.close();
+                    return;
+                case "STORAGE IN":
+                    this.write(this.converter.getFooter("dat_down"));
+                    this.close();
+                    return;
+            }
+
+            if(httpStatus == 200 || httpStatus == 206){
+                this.datSave(this._data.join(""));
+            }
+            this.write(this.converter.getFooter("ok"));
+            this.close();
+            this._data = null;
         }
-
-        if(httpStatus == 200 || httpStatus == 206){
-            this.datSave(this._data.join(""));
-        }
-        this.write(this.converter.getFooter("ok"));
-        this.close();
-        this._data = null;
     }
-};
+});
 
-ThreadJbbs.prototype.__proto__ = Thread2ch.prototype;
+ThreadJbbs.constructor = ThreadJbbs;
+
 
 
 // ***** ***** ***** ***** ***** ThreadMachi ***** ***** ***** ***** *****
 function ThreadMachi(){
 }
 
-ThreadMachi.prototype = {
-    datDownload: function(){
-        var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi");
-        this._aboneChecked = true;
-        this._threadAbone = false;
-        this._deltaMode = false;
+ThreadMachi.prototype = Object.create(Thread2ch.prototype, {
+    datDownload: {
+        value: function(){
+            var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi");
+            this._aboneChecked = true;
+            this._threadAbone = false;
+            this._deltaMode = false;
 
-        // 差分GET
-        if(this.thread.datFile.exists() && this.thread.lineCount){
-            this._deltaMode = true;
-            datURLSpec += (this.thread.lineCount + 1) + "-";
+            // 差分GET
+            if(this.thread.datFile.exists() && this.thread.lineCount){
+                this._deltaMode = true;
+                datURLSpec += (this.thread.lineCount + 1) + "-";
+            }
+
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
+
+            this.httpChannel = ChaikaCore.getHttpChannel(datURL);
+            this.httpChannel.requestMethod = "GET";
+            this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
+            this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
+
+            this.httpChannel.asyncOpen(this, null);
         }
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var datURL = ioService.newURI(datURLSpec, null, null).QueryInterface(Ci.nsIURL);
-
-        this.httpChannel = ChaikaCore.getHttpChannel(datURL);
-        this.httpChannel.requestMethod = "GET";
-        this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
-        this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
-
-        this.httpChannel.asyncOpen(this, null);
     },
 
-    datLineParse: function(aLine, aNumber, aNew){
-        if(!aLine) return "";
-        var resArray = aLine.split("<>");
-        var trueNumber = parseInt(resArray.shift());
-        var superClass = Thread2ch.prototype.datLineParse;
-        return superClass.apply(this, [resArray.join("<>"), trueNumber, aNew]);
+    datLineParse: {
+        value: function(aLine, aNumber, aNew){
+            if(!aLine) return "";
+
+            var resArray = aLine.split("<>");
+            var trueNumber = parseInt(resArray.shift());
+
+            return Thread2ch.prototype.datLineParse.apply(this, [resArray.join("<>"), trueNumber, aNew]);
+        }
     },
 
-    onDataAvailable: function (aRequest, aContext, aInputStream, aOffset, aCount){
-        return ThreadJbbs.prototype.onDataAvailable.apply(this, arguments);
+    onDataAvailable: {
+        value: function (aRequest, aContext, aInputStream, aOffset, aCount){
+            return ThreadJbbs.prototype.onDataAvailable.apply(this, arguments);
+        }
     }
-};
+});
 
-ThreadMachi.prototype.__proto__ = Thread2ch.prototype;
-
+ThreadMachi.constructor = ThreadMachi;
 
 
 

@@ -138,39 +138,51 @@ chProtocolHandler.prototype = {
 function b2rProtocolHandler(){
 }
 
-b2rProtocolHandler.prototype = {
+b2rProtocolHandler.prototype = Object.create(chProtocolHandler.prototype, {
 
     // ********** ********* implements nsIProtocolHandler ********* **********
 
-    scheme: "bbs2ch",
+    scheme: {
+        value: "bbs2ch"
+    },
 
 
-    newURI: function chProtocolHandler_newURI(aSpec, aCharset, aBaseURI){
-        aSpec = aSpec.replace("bbs2ch:board:", "bbs2ch:board/")
-                    .replace("bbs2ch:post:", "bbs2ch:post/")
-                    .replace("bbs2ch:", "chaika://");
+    newURI: {
+        value: function chProtocolHandler_newURI(aSpec, aCharset, aBaseURI){
+            aSpec = aSpec.replace("bbs2ch:board:", "bbs2ch:board/")
+                        .replace("bbs2ch:post:", "bbs2ch:post/")
+                        .replace("bbs2ch:", "chaika://");
 
-        var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
-        uri.init(Ci.nsIStandardURL.URLTYPE_STANDARD, -1, aSpec, aCharset, null);
-        uri.QueryInterface(Ci.nsIURL);
-        return uri;
+            var uri = Cc["@mozilla.org/network/standard-url;1"].createInstance(Ci.nsIStandardURL);
+            uri.init(Ci.nsIStandardURL.URLTYPE_STANDARD, -1, aSpec, aCharset, null);
+            uri.QueryInterface(Ci.nsIURL);
+
+            return uri;
+        }
     },
 
 
     // ********** ********* XPCOMUtils Component Registration ********** **********
 
-    classDescription: "b2rProtocolHandler js component",
-    contractID: "@mozilla.org/network/protocol;1?name=bbs2ch",
-    classID: Components.ID("{9c30cf1f-eb30-4870-a12a-15c1414bd299}"),
-    QueryInterface: XPCOMUtils.generateQI([
-        Ci.nsIProtocolHandler,
-        Ci.nsISupports
-    ])
+    classDescription: {
+        value: "b2rProtocolHandler js component"
+    },
 
-};
+    contractID: {
+        value: "@mozilla.org/network/protocol;1?name=bbs2ch"
+    },
 
-b2rProtocolHandler.prototype.__proto__ = chProtocolHandler.prototype;
+    classID: {
+        value: Components.ID("{9c30cf1f-eb30-4870-a12a-15c1414bd299}")
+    },
 
+    QueryInterface: {
+        value: XPCOMUtils.generateQI([Ci.nsIProtocolHandler, Ci.nsISupports])
+    }
+
+});
+
+b2rProtocolHandler.constructor = b2rProtocolHandler;
 
 
 
@@ -184,7 +196,7 @@ chContentHandler.prototype = {
 
     handleContent: function chContentHandler_handleContent(aContentType, aWindowContext, aRequest){
         var url = aRequest.originalURI;
-        if(url.scheme != "chaika") return;
+        if(url.scheme !== "chaika") return;
 
         if(!(url instanceof Ci.nsIURL)){
             ChaikaCore.logger.error(url.spec);
@@ -208,7 +220,7 @@ chContentHandler.prototype = {
             return;
         }
 
-        if(contextHost != "" && ChaikaCore.getServerURL().hostPort != contextHost){
+        if(contextHost && ChaikaCore.getServerURL().hostPort !== contextHost){
             // 内部サーバ外から呼ばれたなら終了
             ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
             return;
@@ -219,6 +231,7 @@ chContentHandler.prototype = {
             case "post": // 書き込みウィザード
                 this._openPostWizard(url.filePath.substring(1));
                 break;
+
             default:
                 ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
                 break;
@@ -231,10 +244,10 @@ chContentHandler.prototype = {
                 .createInstance(Ci.nsISupportsString);
         argString.data = aThreadURLSpec;
 
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         var winWatcher = Cc["@mozilla.org/embedcomp/window-watcher;1"]
                 .getService(Ci.nsIWindowWatcher);
         var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
+
         winWatcher.openWindow(null, postWizardURLSpec,
                 "_blank", "chrome, resizable, minimizable, dialog", argString);
     },

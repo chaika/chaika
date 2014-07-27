@@ -61,52 +61,59 @@ Post.prototype = {
         var convertedName = this._convert(this.name, this.charset, true, false);
         var convertedMail = this._convert(this.mail, this.charset, true, false);
 
-            // 本文の未記入チェック
-        if(convertedMessage == ""){
+        // 本文の未記入チェック
+        if(convertedMessage === ""){
             result.push("本文が空です");
         }
 
-            // 本文の改行チェック
-        var bbsLineNumber = this._board.getSetting("BBS_LINE_NUMBER");
-        if(bbsLineNumber && convertedMessage != ""){
-            bbsLineNumber = parseInt(bbsLineNumber) * 2;
-            var lineCount = convertedMessage.split("\n").length;
-            if(lineCount > bbsLineNumber){
+
+        // 本文の改行チェック
+        var bbsLineNumber = parseInt(this._board.getSetting("BBS_LINE_NUMBER"));
+
+        if(bbsLineNumber && convertedMessage !== ""){
+            let lineCount = convertedMessage.split("\n").length;
+
+            if(lineCount > bbsLineNumber * 2){
                 result.push("本文に改行が多すぎます (" + lineCount + "/" + bbsLineNumber + ")");
             }
         }
 
-            // 本文の長さチェック
+
+        // 本文の長さチェック
         var bbsMessageCount = parseInt(this._board.getSetting("BBS_MESSAGE_COUNT"));
-        if(bbsMessageCount && convertedMessage != ""){
-            var length = convertedMessage.length;
-            if(length > bbsMessageCount){
+
+        if(bbsMessageCount && convertedMessage !== ""){
+            if(convertedMessage.length > bbsMessageCount){
                 result.push("本文が長すぎます (" + length + "/" + bbsMessageCount + ")");
             }
         }
 
-            // 名前の未記入チェック
-        if(this._board.getSetting("NANASHI_CHECK") == "1" && convertedName == ""){
+
+        // 名前の未記入チェック
+        if(this._board.getSetting("NANASHI_CHECK") === "1" && convertedName === ""){
             result.push("名前が空です");
         }
 
-            // 名前の長さチェック
+
+        // 名前の長さチェック
         var bbsNameCount = parseInt(this._board.getSetting("BBS_NAME_COUNT"));
-        if(bbsNameCount && convertedName != ""){
-            var length = convertedName.length;
-            if(length > bbsNameCount){
+
+        if(bbsNameCount && convertedName !== ""){
+            if(convertedName.length > bbsNameCount){
                 result.push("名前が長すぎます (" + length + "/" + bbsNameCount + ")");
             }
         }
 
-            // メールの長さチェック
+
+        // メールの長さチェック
         var bbsMailCount = parseInt(this._board.getSetting("BBS_MAIL_COUNT"));
-        if(bbsMailCount && convertedMail != ""){
-            var length = convertedMail.length;
-            if(length > bbsMailCount){
+
+        if(bbsMailCount && convertedMail !== ""){
+            if(convertedMail.length > bbsMailCount){
                 result.push("メールが長すぎます (" + length + "/" + bbsMailCount + ")");
             }
         }
+
 
         return result;
     },
@@ -168,7 +175,7 @@ Post.prototype = {
 
         var board = this._board;
         function getSetting(aSettingName){
-            return board.getSetting(aSettingName)
+            return board.getSetting(aSettingName);
         }
 
         function convertEntity(aStr){
@@ -192,26 +199,34 @@ Post.prototype = {
 
 
         var name = convertEntity(this.name || getSetting("BBS_NONAME_NAME") || "");
-        name = name.replace("◆", "◇");
+        name = name.replace("◆", "◇", "g");
 
-            // トリップ変換
+
+        // トリップ変換
         var tripPos = name.indexOf("#");
-        if(tripPos != -1){
+
+        if(tripPos !== -1){
             var tripKey = name.substring(tripPos);
 
             var uniConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter)
+                    .createInstance(Ci.nsIScriptableUnicodeConverter);
             uniConverter.charset = gPost.charset;
-            tripKey = uniConverter.convertToByteArray(tripKey, {}).map(
-                function(aElement, aIndex, aArray){
-                    return String.fromCharCode(aElement);
-                }
-            ).join("");
+
+            tripKey = uniConverter.convertToByteArray(tripKey, {}).map((charCode) => {
+                    return String.fromCharCode(charCode);
+            }).join("");
 
             var trip = Trip.getTrip(tripKey);
-            name = [name.substring(0, tripPos),
-                        " <span class='resSystem'>", "◆", trip, "</span>"].join("");
+
+            name = [
+                name.substring(0, tripPos),
+                " <span class='resSystem'>",
+                "◆",
+                trip,
+                "</span>"
+            ].join("");
         }
+
         preview["name"] = name;
 
 
@@ -244,8 +259,9 @@ Post.prototype = {
 
         //すでに存在する kakikomi.txt のエンコーディングが
         //Shift-JIS だった場合には, 自動的に UTF-8 へと変換する
+        var encoding = 'UTF-8';
+
         if(kakikomiFile.exists()){
-            var encoding = 'UTF-8';
             var data = ChaikaCore.io.readString(kakikomiFile);
 
             //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
@@ -343,7 +359,7 @@ Post.prototype = {
 
     onHttpStop: function Post_onHttpStop(aHttpRequest, aData, aHeaders, aStatus, aSucceeded){
         var uniConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                .createInstance(Ci.nsIScriptableUnicodeConverter)
+                .createInstance(Ci.nsIScriptableUnicodeConverter);
         uniConverter.charset = this.charset;
         var responseData = uniConverter.ConvertToUnicode(aData);
 
@@ -367,7 +383,7 @@ Post.prototype = {
                 doc.documentElement.appendChild(fragment);
 
                 var inputNodes = doc.getElementsByTagName("input");
-                var additionalData = new Array();
+                var additionalData = [];
                 var ignoreInputs = ["submit", "subject", "bbs", "key", "time", "MESSAGE", "FROM", "mail"];
 
                 for(let [i, input] in Iterator(inputNodes)){
@@ -423,7 +439,7 @@ Post.prototype = {
                     }
                 }
                     // 文字実体参照にない文字は数値文字参照化
-                return "&#" + aElement.charCodeAt(0) + ";"
+                return "&#" + aElement.charCodeAt(0) + ";";
             }
             return aElement;
         });
@@ -450,39 +466,42 @@ function PostJBBS(aThread, aBoard){
     this._board = aBoard;
 }
 
-PostJBBS.prototype = {
+PostJBBS.prototype = Object.create(Post.prototype, {
 
-    charset: "euc-jp",
+    charset: {
+		value: "euc-jp"
+    },
 
-    submit: function PostJBBS_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var postRUISpec = this._thread.plainURL.spec.replace("read.cgi", "write.cgi");
-        var postURI = ioService.newURI(postRUISpec, null, null);
+    submit: {
+		value: function PostJBBS_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var postRUISpec = this._thread.plainURL.spec.replace("read.cgi", "write.cgi");
+            var postURI = ioService.newURI(postRUISpec, null, null);
 
-        this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
 
+            var postData = [];
+            postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
+            postData.push("DIR="    + this._board.url.directory.split("/")[1]);
+            postData.push("BBS="    + this._board.url.directory.split("/")[2]);
+            postData.push("KEY="    + this._thread.datID);
+            postData.push("TIME="   + Math.ceil(Date.now() / 1000));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+            postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
 
-        var postData = [];
-        postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
-        postData.push("DIR="    + this._board.url.directory.split("/")[1]);
-        postData.push("BBS="    + this._board.url.directory.split("/")[2]);
-        postData.push("KEY="    + this._thread.datID);
-        postData.push("TIME="   + Math.ceil(Date.now() / 1000));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
-        postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
 
-        if(additionalData){
-            postData = postData.concat(additionalData);
+            this._httpRequest.post(postData.join("&"));
         }
-
-        this._httpRequest.post(postData.join("&"));
-
     }
 
-};
-PostJBBS.prototype.__proto__ = Post.prototype;
+});
+
+PostJBBS.constructor = PostJBBS;
 
 
 
@@ -491,48 +510,52 @@ function PostMachi(aThread, aBoard){
     this._board = aBoard;
 }
 
-PostMachi.prototype = {
+PostMachi.prototype = Object.create(Post.prototype, {
 
-    charset: "Shift_JIS",
-
-
-    submit: function PostMachi_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var postRUISpec = this._thread.plainURL.spec.replace("read.cgi", "write.cgi");
-        var postURI = ioService.newURI("../bbs/write.cgi", null, this._board.url);
-
-        this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
-
-
-        var postData = [];
-        postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
-        postData.push("BBS="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
-        postData.push("KEY="    + this._thread.datID);
-        postData.push("TIME="   + Math.ceil(Date.now() / 1000));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
-        postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
-
-        if(additionalData){
-            postData = postData.concat(additionalData);
-        }
-
-        this._httpRequest.post(postData.join("&"));
-
+    charset: {
+		value: "Shift_JIS"
     },
 
 
-    responseCheck: function Post_responseCheck(aResponseData, aResponseStatus){
-        if(aResponseStatus == 302){
-            return this.SUCCESS;
-        }
-        return this.UNKNOWN;
+    submit: {
+		value: function PostMachi_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var postURI = ioService.newURI("../bbs/write.cgi", null, this._board.url);
 
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(postURI, this._thread.plainURL, this);
+
+            var postData = [];
+            postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
+            postData.push("BBS="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
+            postData.push("KEY="    + this._thread.datID);
+            postData.push("TIME="   + Math.ceil(Date.now() / 1000));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+            postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
+
+            this._httpRequest.post(postData.join("&"));
+        }
+    },
+
+
+    responseCheck: {
+		value: function Post_responseCheck(aResponseData, aResponseStatus){
+            if(aResponseStatus === 302){
+                return this.SUCCESS;
+            }
+
+            return this.UNKNOWN;
+        }
     }
 
-};
-PostMachi.prototype.__proto__ = Post.prototype;
+});
+
+PostMachi.constructor = PostMachi;
 
 
 
@@ -541,58 +564,64 @@ function PostP2(aThread, aBoard){
     this._board = aBoard;
 }
 
-PostP2.prototype = {
+PostP2.prototype = Object.create(Post.prototype, {
 
-    charset: 'Shift_JIS',
+    charset: {
+		value: 'Shift_JIS'
+    },
 
-    submit: function PostP2_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var postURI = ioService.newURI(ChaikaCore.pref.getChar('login.p2.post_url'), null, null);
+    submit: {
+		value: function PostP2_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var postURI = ioService.newURI(ChaikaCore.pref.getChar('login.p2.post_url'), null, null);
 
-        this._httpRequest = new HttpRequest(postURI, null, this);
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(postURI, null, this);
 
-        //JBBS用に調整
-        if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1 ||
-           this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
-            var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
-            var host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
-        }else{
-            var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
-            var host = this._board.url.host;
+            var bbs, host;
+
+            if(this._board.url.host.contains('jbbs.livedoor.jp') ||
+               this._board.url.host.contains('jbbs.shitaraba.net')){
+                bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+                host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
+            }else{
+                bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+                host = this._board.url.host;
+            }
+
+            //csrfidを書き込みページから取得する
+            var csrfid = ChaikaP2Login.getCsrfid(host, bbs, this._thread.datID);
+            if(!csrfid){
+                return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
+            }
+
+            var postData = [];
+            postData.push("bbs="    + bbs);
+            postData.push("key="    + this._thread.datID);
+            postData.push("time="   + Math.ceil(new Date(this._thread.lastModified).getTime() / 1000));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
+            postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
+            postData.push("host="    + host);
+            postData.push("csrfid="  + csrfid);
+            postData.push("detect_hint=%81%9D%81%9E");
+
+            if(ChaikaBeLogin.isLoggedIn()){
+                postData.push("submit_beres=" + this._convert("BEで書き込む", this.charset, false, true));
+            }else{
+                postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
+            }
+
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
+
+            this._httpRequest.post(postData.join("&"));
         }
-
-        //csrfidを書き込みページから取得する
-        var csrfid = ChaikaP2Login.getCsrfid(host, bbs, this._thread.datID);
-        if(!csrfid){
-            return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
-        }
-
-        var postData = [];
-        postData.push("bbs="    + bbs);
-        postData.push("key="    + this._thread.datID);
-        postData.push("time="   + Math.ceil(new Date(this._thread.lastModified).getTime() / 1000));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
-        postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
-        postData.push("host="    + host);
-        postData.push("csrfid="  + csrfid);
-        postData.push("detect_hint=%81%9D%81%9E");
-
-        if(ChaikaBeLogin.isLoggedIn()){
-            postData.push("submit_beres=" + this._convert("BEで書き込む", this.charset, false, true));
-        }else{
-            postData.push("submit=" + this._convert("書き込む", this.charset, false, true));
-        }
-
-        if(additionalData){
-            postData = postData.concat(additionalData);
-        }
-
-        this._httpRequest.post(postData.join("&"));
     }
-};
-PostP2.prototype.__proto__ = Post.prototype;
+});
+
+PostP2.constructor = PostP2;
 
 
 
@@ -602,59 +631,63 @@ function Post2chNewThread(aBoard){
 }
 
 
-Post2chNewThread.prototype = {
-    getErrorMessages: function Post2chNewThread_getErrorMessages(){
-        var result = [];
+Post2chNewThread.prototype = Object.create(Post.prototype, {
 
+    getErrorMessages: {
+		value: function Post2chNewThread_getErrorMessages(){
+            var result = [];
+            var convertedTitle = this._convert(this.title, this.charset, true, false);
 
-        var convertedTitle = this._convert(this.title, this.charset, true, false);
-            // タイトルの未記入チェック
-        if(convertedTitle == ""){
-            result.push("タイトルが空です");
+            if(convertedTitle === ""){
+                result.push("タイトルが空です");
+            }
+
+            return result.concat(Post.prototype.getErrorMessages.apply(this));
         }
-
-        var superClassMethod = Post.prototype.getErrorMessages;
-        return result.concat(superClassMethod.apply(this));
     },
 
 
-    getThreadTitle:function Post2chNewThread_getThreadTitle(){
-        return this.title;
+    getThreadTitle: {
+		value: function Post2chNewThread_getThreadTitle(){
+            return this.title;
+        }
     },
 
 
-    submit: function Post2chNewThread_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var postURI = ioService.newURI("../test/bbs.cgi?guid=ON", null, this._board.url);
+    submit: {
+		value: function Post2chNewThread_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var postURI = ioService.newURI("../test/bbs.cgi?guid=ON", null, this._board.url);
 
-        this._httpRequest = new HttpRequest(postURI, this._board.url, this);
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(postURI, this._board.url, this);
 
-        var postData = [];
-        postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
-        postData.push("bbs="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
-        postData.push("time="   + (Math.ceil(Date.now() / 1000) - 300)); // 5分前の時間を指定
+            var postData = [];
+            postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
+            postData.push("bbs="    + this._board.url.directory.match(/\/([^\/]+)\/?$/)[1]);
+            postData.push("time="   + (Math.ceil(Date.now() / 1000) - 300)); // 5分前の時間を指定
 
-        postData.push("subject=" + this._convert(this.title, this.charset, false, true));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
-        postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
+            postData.push("subject=" + this._convert(this.title, this.charset, false, true));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
+            postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
 
-        if(additionalData){
-            postData = postData.concat(additionalData);
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
+
+
+            if(ChaikaRoninLogin.enabled){
+                postData.push("sid=" + encodeURIComponent(ChaikaCore.pref.getChar('login.ronin.session_id')));
+            }
+
+            this._httpRequest.post(postData.join("&"));
         }
-
-
-        if(ChaikaRoninLogin.enabled){
-            postData.push("sid=" + encodeURIComponent(ChaikaCore.pref.getChar('login.ronin.session_id')));
-        }
-
-        this._httpRequest.post(postData.join("&"));
     }
 
-};
+});
 
-Post2chNewThread.prototype.__proto__ = Post.prototype;
+Post2chNewThread.constructor = Post2chNewThread;
 
 
 
@@ -663,43 +696,48 @@ function PostJBBSNewThread(aBoard){
     this._board = aBoard;
 }
 
-PostJBBSNewThread.prototype = {
-    charset: "euc-jp",
+PostJBBSNewThread.prototype = Object.create(Post2chNewThread.prototype, {
 
-    submit: function PostJBBSNewThread_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
-        var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
-        var postURI;
+    charset: {
+        value: "euc-jp"
+    },
 
-        if(this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
-            postURI = 'http://jbbs.shitaraba.net/bbs/write.cgi/';
-        }else{
-            postURI = 'http://jbbs.livedoor.jp/bbs/write.cgi/';
+    submit: {
+        value: function PostJBBSNewThread_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+            var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
+            var postURI;
+
+            if(this._board.url.host.contains('jbbs.shitaraba.net')){
+                postURI = 'http://jbbs.shitaraba.net/bbs/write.cgi/';
+            }else{
+                postURI = 'http://jbbs.livedoor.jp/bbs/write.cgi/';
+            }
+
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(ioService.newURI(postURI + dir + '/' + bbs + '/new/', null, null), null, this);
+
+            var postData = [];
+            postData.push("BBS="    + bbs);
+            postData.push("DIR="    + dir);
+            postData.push("TIME="   + (Math.ceil(Date.now() / 1000) - 300));
+            postData.push("SUBJECT=" + this._convert(this.title, this.charset, false, true));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
+            postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
+            postData.push("submit=" + this._convert("新規書き込み", this.charset, false, true));
+
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
+
+            this._httpRequest.post(postData.join("&"));
         }
-
-        this._httpRequest = new HttpRequest(ioService.newURI(postURI + dir + '/' + bbs + '/new/', null, null), null, this);
-
-        var postData = [];
-        postData.push("BBS="    + bbs);
-        postData.push("DIR="    + dir);
-        postData.push("TIME="   + (Math.ceil(Date.now() / 1000) - 300));
-        postData.push("SUBJECT=" + this._convert(this.title, this.charset, false, true));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("NAME="    + this._convert(this.name, this.charset, false, true));
-        postData.push("MAIL="    + this._convert(this.mail, this.charset, false, true));
-        postData.push("submit=" + this._convert("新規書き込み", this.charset, false, true));
-
-        if(additionalData){
-            postData = postData.concat(additionalData);
-        }
-
-        ChaikaCore.logger.debug(postData);
-        this._httpRequest.post(postData.join("&"));
     }
-};
-PostJBBSNewThread.prototype.__proto__ = Post2chNewThread.prototype;
+});
+
+PostJBBSNewThread.constructor = PostJBBSNewThread;
 
 
 
@@ -708,57 +746,61 @@ function PostNewThreadP2(aBoard){
     this._board = aBoard;
 }
 
-PostNewThreadP2.prototype = {
-    submit: function PostNewThreadP2_submit(aListener, additionalData){
-        this._listener = aListener;
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var postURI = ioService.newURI(ChaikaCore.pref.getChar('login.p2.post_url'), null, null);
+PostNewThreadP2.prototype = Object.create(Post2chNewThread.prototype, {
 
-        this._httpRequest = new HttpRequest(postURI, null, this);
+    submit: {
+        value: function PostNewThreadP2_submit(aListener, additionalData){
+            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+            var postURI = ioService.newURI(ChaikaCore.pref.getChar('login.p2.post_url'), null, null);
 
-        //JBBS用に調整
-        if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1 ||
-           this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
-            var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
-            var host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
-        }else{
-            var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
-            var host = this._board.url.host;
+            this._listener = aListener;
+            this._httpRequest = new HttpRequest(postURI, null, this);
+
+            var bbs, host;
+
+            if(this._board.url.host.indexOf('jbbs.livedoor.jp') > -1 ||
+               this._board.url.host.indexOf('jbbs.shitaraba.net') > -1){
+                bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+                host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
+            }else{
+                bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
+                host = this._board.url.host;
+            }
+
+            //csrfidを書き込みページから取得する
+            var csrfid = ChaikaP2Login.getCsrfid(host, bbs);
+            if(!csrfid){
+                return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
+            }
+
+            var postData = [];
+            postData.push("bbs="    + bbs);
+            postData.push("time="   + (Math.ceil(Date.now() / 1000) - 300));
+            postData.push("subject=" + this._convert(this.title, this.charset, false, true));
+            postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
+            postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
+            postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
+            postData.push("host="    + host);
+            postData.push("csrfid="  + csrfid);
+            postData.push("detect_hint=%81%9D%81%9E");
+            postData.push("newthread=1");
+
+            if(ChaikaBeLogin.isLoggedIn()){
+                postData.push("submit_beres=" + this._convert("BEで書き込む", this.charset, false, true));
+            }else{
+                postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
+            }
+
+            if(additionalData){
+                postData = postData.concat(additionalData);
+            }
+
+            this._httpRequest.post(postData.join("&"));
         }
-
-        //csrfidを書き込みページから取得する
-        var csrfid = ChaikaP2Login.getCsrfid(host, bbs);
-        if(!csrfid){
-            return this._listener.onError(this, "P2 LOGIN ERROR (Cannot get csrfid)", this.UNKNOWN);
-        }
-
-        var postData = [];
-        postData.push("bbs="    + bbs);
-        postData.push("time="   + (Math.ceil(Date.now() / 1000) - 300));
-        postData.push("subject=" + this._convert(this.title, this.charset, false, true));
-        postData.push("MESSAGE=" + this._convert(this.message, this.charset, false, true));
-        postData.push("FROM="    + this._convert(this.name, this.charset, false, true));
-        postData.push("mail="    + this._convert(this.mail, this.charset, false, true));
-        postData.push("host="    + host);
-        postData.push("csrfid="  + csrfid);
-        postData.push("detect_hint=%81%9D%81%9E");
-        postData.push("newthread=1");
-
-        if(ChaikaBeLogin.isLoggedIn()){
-            postData.push("submit_beres=" + this._convert("BEで書き込む", this.charset, false, true));
-        }else{
-            postData.push("submit=" + this._convert("新規スレッド作成", this.charset, false, true));
-        }
-
-        if(additionalData){
-            postData = postData.concat(additionalData);
-        }
-
-        this._httpRequest.post(postData.join("&"));
     }
-};
-PostNewThreadP2.prototype.__proto__ = Post2chNewThread.prototype;
+});
 
+PostNewThreadP2.constructor = PostNewThreadP2;
 
 
 
@@ -846,10 +888,11 @@ HttpRequest.prototype = {
         const NS_ERROR_MODULE_NETWORK      = 2152398848;
         const NS_ERROR_REDIRECT_LOOP       = NS_ERROR_MODULE_NETWORK + 31;
 
-        if(aStatus == 0 || aStatus == NS_ERROR_REDIRECT_LOOP){
+        if(aStatus === 0 || aStatus === NS_ERROR_REDIRECT_LOOP){
             aRequest.QueryInterface(Ci.nsIHttpChannel);
 
             this._headers = [];
+
             try{
                 aRequest.visitResponseHeaders(this);
                 this.listener.onHttpStop(this, this._data.join("\n"), this._headers,
