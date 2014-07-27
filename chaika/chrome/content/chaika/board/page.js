@@ -272,7 +272,7 @@ var BoardTree = {
             //透明あぼーんの影響で最後の方は参照できなくなる
             if(!thread) continue;
 
-            let aboneResult = ChaikaAboneManager.shouldAbone({
+            let hitAboneData = ChaikaAboneManager.shouldAbone({
                 title: thread.getAttribute('title'),
                 date: thread.getAttribute('created'),
                 thread_url: thread.getAttribute('url'),
@@ -280,14 +280,19 @@ var BoardTree = {
                 isThread: true
             });
 
-            if(aboneResult){
-                if(aboneResult.hide === true ||
-                   aboneResult.hide === undefined && enableHideAbone){
+            if(hitAboneData){
+                if(hitAboneData.hide === true ||
+                   hitAboneData.hide === undefined && enableHideAbone){
                     thread.parentNode.removeChild(thread);
                     i--;
                     iz--;
+                    continue;
+                }
+
+                if(hitAboneData.highlight){
+                    thread.setAttribute('highlighted', 'true');
                 }else{
-                    thread.setAttribute('title', '***** ABONE ***** (' + aboneResult.title + ')');
+                    thread.setAttribute('title', '***** ABONE ***** (' + hitAboneData.title + ')');
                 }
             }
         }

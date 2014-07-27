@@ -44,6 +44,11 @@
 }
 
 
+#boardTree treechildren::-moz-tree-row(highlight-true){
+  background-color: #ff9 !important;
+}
+
+
 #boardTree treechildren::-moz-tree-image(status){
   margin-left: 2px;
   list-style-image: url("chrome://chaika/skin/board/status-icon.png") !important;

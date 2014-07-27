@@ -61,37 +61,78 @@
 </marbletoolbar>
 
 
-<tree id="boardTree" class="plain" flex="2" context="boardTreeContextMenu"
-        onclick="BoardTree.click(event)" ondblclick="BoardTree.click(event)"
-        onkeypress="BoardTree.keyDown(event)"
-        ondraggesture="nsDragAndDrop.startDrag(event, BoardTree);"
-         onmousemove="BoardTree.mouseMove(event)"
-         onmouseout="BoardTree.mouseOut(event)"
-        datasources="#boardTree" ref="*" querytype="xml" flags="dont-build-content">
+<tree id="boardTree"
+      class="plain"
+      flex="2"
+      context="boardTreeContextMenu"
+      onclick="BoardTree.click(event)"
+      ondblclick="BoardTree.click(event)"
+      onkeypress="BoardTree.keyDown(event)"
+      ondraggesture="nsDragAndDrop.startDrag(event, BoardTree)"
+      onmousemove="BoardTree.mouseMove(event)"
+      onmouseout="BoardTree.mouseOut(event)"
+      datasources="#boardTree"
+      ref="*"
+      querytype="xml"
+      flags="dont-build-content">
+
     <treecols>
-        <treecol id="boardTreeCol-status" label="!"        sort="?statusSort" style="width:3em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-status"
+                 label="!"
+                 sort="?statusSort"
+                 style="width:3em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-number" label="No"       sort="?numberSort" style="width:3em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-number"
+                 label="No"
+                 sort="?numberSort"
+                 style="width:3em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-title"  label="タイトル" sort="?title" flex="1" ignoreincolumnpicker="true"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-title"
+                 label="タイトル"
+                 sort="?title"
+                 flex="1"
+                 ignoreincolumnpicker="true"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-count"  label="レス"     sort="?countSort"  style="width:4em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-count"
+                 label="レス"
+                 sort="?countSort"
+                 style="width:4em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-read"   label="既読"     sort="?readSort"   style="width:4em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-read"
+                 label="既読"
+                 sort="?readSort"
+                 style="width:4em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-unread" label="未読"     sort="?unreadSort" style="width:4em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-unread"
+                 label="未読"
+                 sort="?unreadSort"
+                 style="width:4em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-force"   label="勢い"    sort="?forceSort"  style="width:4em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-force"
+                 label="勢い"
+                 sort="?forceSort"
+                 style="width:4em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
         <splitter class="tree-splitter"/>
-        <treecol id="boardTreeCol-created" label="作成日"  sort="?createdSort" style="width:9em;"
-                class="boardTreeCol" persist2="hidden width sortActive sortDirection"/>
+        <treecol id="boardTreeCol-created"
+                 label="作成日"
+                 sort="?createdSort"
+                 style="width:9em;"
+                 class="boardTreeCol"
+                 persist2="hidden width sortActive sortDirection"/>
     </treecols>
 
     <template>
@@ -99,7 +140,7 @@
         <action>
             <treechildren flex="1">
                 <treeitem uri="?">
-                    <treerow properties="s?status">
+                    <treerow properties="s?status highlight-?highlighted">
                         <treecell label=""         properties="s?status status"/>
                         <treecell label="?number"  properties="s?status number"/>
                         <treecell label="?title"   properties="s?status title" value="?url"/>
@@ -109,10 +150,11 @@
                         <treecell label="?force"   properties="s?status force"/>
                         <treecell label="?created" properties="s?status created"/>
                     </treerow>
-                </treeitem> 
+                </treeitem>
             </treechildren>
         </action>
     </template>
+
 </tree>
 
 </page>
