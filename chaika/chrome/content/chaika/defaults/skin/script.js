@@ -474,7 +474,7 @@ var ResInfo = {
             for(let id in idTable){
                 if(typeof idTable[id] !== 'number') continue;
 
-                let idNodes = $.selectorAll('.resID[data-id="' + id + '"]');
+                let idNodes = $.selectorAll('.resID[data-id*="' + id + '"]');
                 if(!idNodes) continue;
 
                 idNodes.forEach((idNode) => {
@@ -974,8 +974,8 @@ Popup.ID = {
         //同じIDを持つレスを取得する
         var selfNumber = $.parentByClass('resContainer', this).dataset.number;
         var selector = Prefs.get('pref-include-self-post') ?
-                ".resContainer[data-id='" + resID + "']" :
-                ".resContainer[data-id='" + resID + "']:not([data-number='" + selfNumber + "'])";
+                ".resContainer[data-id*='" + resID + "']" :
+                ".resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
         var sameIDPosts = $.selectorAll(selector);
 
 
