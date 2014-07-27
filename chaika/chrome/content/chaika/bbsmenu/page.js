@@ -555,28 +555,26 @@ var Bbsmenu = {
 
 
     getOutsideDoc: function Bbsmenu_getOutsideDoc(){
-        var    outsidexmlFile = ChaikaCore.getDataDir();
-        outsidexmlFile.appendRelativePath("outside.xml");
+        var outsideXMLFile = ChaikaCore.getDataDir();
+        outsideXMLFile.appendRelativePath("outside.xml");
 
-        if(!outsidexmlFile.exists()){
+        if(!outsideXMLFile.exists()){
             var defaultOutsideFile = ChaikaCore.getDefaultsDir();
             defaultOutsideFile.appendRelativePath("outside.xml");
-            defaultOutsideFile.copyTo(outsidexmlFile.parent, null);
+            defaultOutsideFile.copyTo(outsideXMLFile.parent, null);
 
-            outsidexmlFile = outsidexmlFile.clone();
+            outsideXMLFile = outsideXMLFile.clone();
         }
 
-        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-        var outsideXMLURL = ioService.newFileURI(outsidexmlFile);
-        var httpReq = new XMLHttpRequest();
-        httpReq.open("GET", outsideXMLURL.spec, false);
-        httpReq.send(null);
-        var outsideDoc = httpReq.responseXML;
+        var outsideXMLString = ChaikaCore.io.readString(outsideXMLFile, 'UTF-8');
+        var outsideDoc = (new DOMParser()).parseFromString(outsideXMLString, 'text/xml');
+
 
         var categoryNodes = outsideDoc.getElementsByTagName("category");
+
         for(var i=0; i<categoryNodes.length; i++){
-            var node = categoryNodes[i];
+            let node = categoryNodes[i];
             node.setAttribute("isContainer", "true");
             node.setAttribute("isOpen", "false");
         }

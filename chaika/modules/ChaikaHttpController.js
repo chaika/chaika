@@ -597,7 +597,7 @@ ChaikaNGFiles.prototype = {
         var lines = data.replace(/\r/g, "\n").split(/\n+/);
 
         for(let i=0, l=lines.length; i<l; i++){
-            var data = lines[i].split(/=\*/);
+            data = lines[i].split(/=\*/);
 
             if(data[0] && !(/^\s*(?:;|'|#|\/\/)/).test(data[0])){
                 this.ngData.push({
@@ -626,10 +626,10 @@ ChaikaNGFiles.prototype = {
             if(channel instanceof Ci.nsIHttpChannel && channel.responseStatus != 200){
                 ChaikaCore.logger.error('channel status: ' + channel.responseStatus);
             }else{
-                var byteArray = new Array();
+                var byteArray = [];
                 var readLength = binaryInputStream.available();
 
-                while(readLength != 0){
+                while(readLength !== 0){
                     byteArray = byteArray.concat(binaryInputStream.readByteArray(readLength));
                     readLength = binaryInputStream.available();
                 }
@@ -640,9 +640,9 @@ ChaikaNGFiles.prototype = {
 
                 var hash = cryptoHash.finish(false);
 
-                function toHexString(charCode){
+                var toHexString = function(charCode){
                     return ("0" + charCode.toString(16)).slice(-2);
-                }
+                };
 
                 return [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
             }
