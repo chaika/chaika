@@ -175,6 +175,7 @@ var ChaikaSearch = {
     /**
      * 検索プラグインフォルダを返す
      * なければ作成する
+     * @return {nsFile}
      */
     _getPluginFolder: function(){
         let pluginFolder = ChaikaCore.getDataDir();
@@ -197,10 +198,10 @@ var ChaikaSearch = {
      * ファイル名からネームスペース名を得る
      * @param {String} fileName ファイル名
      * @return {String} ネームスペース名
+     * @example _getPluginNameSpace('foo.search.js') // -> Foo
      */
     _getPluginNameSpace: function(fileName){
-        //hogehoge.search.js -> Hogehoge
-        return fileName[0].toUpperCase() + fileName.match(/^.([^\.]+)/)[1];
+        return fileName[0].toUpperCase() + fileName.split('.')[0].substring(1);
     },
 
 };
