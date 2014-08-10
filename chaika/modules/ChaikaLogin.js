@@ -577,25 +577,36 @@ var ChaikaBeLogin = {
 };
 
 
+
 /**
- * p2.2ch.net ログインオブジェクト
+ * p2/rep2 ログインオブジェクト
  * @extends ChaikaLogin
  */
 var ChaikaP2Login = {
 
-    //p2にログインしているかどうか
+    /**
+     * p2にログインしているかどうか
+     * @type {Boolean}
+     */
     _loggedIn: false,
 
-    //p2での書き込みを有効にするかどうか
+
+    /**
+     * p2での書き込みを有効にするかどうか
+     * @type {Boolean}
+     */
     _enabled: false,
+
 
     get enabled(){
         return this._enabled && this.isLoggedIn();
     },
 
+
     set enabled(bool){
         this._enabled = bool;
     },
+
 
     get cookieManager(){
         if(!this._cookieManager)
@@ -604,12 +615,14 @@ var ChaikaP2Login = {
         return this._cookieManager;
     },
 
+
     get os(){
         if(!this._os)
             this._os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
 
         return this._os;
     },
+
 
     /**
      * ユーザーIDとパスワードを返す関数
@@ -713,6 +726,7 @@ var ChaikaP2Login = {
         return this._loggedIn;
     },
 
+
     login: function ChaikaP2Login_login(){
         //確実にログアウトする
         this.logout();
@@ -734,6 +748,7 @@ var ChaikaP2Login = {
         this._req.send(formStr);
     },
 
+
     logout: function ChaikaP2Login_logout(){
         //クッキーを削除する
         this.cookieManager.remove(ChaikaCore.pref.getChar("login.p2.cookie_domain"), 'PS', '/', false);
@@ -744,29 +759,10 @@ var ChaikaP2Login = {
         this.os.notifyObservers(null, "ChaikaP2Login:Logout", "OK");
     },
 
+
     handleEvent: function(event){
         //XMLHttpRequestでない場合は終了
         if(!this._req) return;
-
-        //w2鯖の場合は自動で修正してやり直す
-        if(this._req.channel.URI.spec.indexOf('w2.p2.2ch.net') !== -1 &&
-           ChaikaCore.pref.getChar('login.p2.login_url').indexOf('w2.p2.2ch.net') === -1){
-            ChaikaCore.pref.setChar('login.p2.login_url', "http://w2.p2.2ch.net/p2/?b=pc");
-            ChaikaCore.pref.setChar('login.p2.post_url', 'http://w2.p2.2ch.net/p2/post.php?grid=ON');
-            ChaikaCore.pref.setChar('login.p2.csrfid_url', 'http://w2.p2.2ch.net/p2/post_form.php');
-
-            return this.login();
-        }
-
-        //w2ではないのにw2に設定されていた場合も自動で修正する
-        if(this._req.channel.URI.spec.indexOf('w2.p2.2ch.net') === -1 &&
-            ChaikaCore.pref.getChar('login.p2.login_url').indexOf('w2.p2.2ch.net') !== -1){
-            ChaikaCore.pref.setChar('login.p2.login_url', "http://p2.2ch.net/p2/?b=pc");
-            ChaikaCore.pref.setChar('login.p2.post_url', 'http://p2.2ch.net/p2/post.php?grid=ON');
-            ChaikaCore.pref.setChar('login.p2.csrfid_url', 'http://p2.2ch.net/p2/post_form.php');
-
-            return this.login();
-        }
 
 
         //一度ブラウザでログインしないとCookieを受け取れない問題への対策
@@ -777,14 +773,14 @@ var ChaikaP2Login = {
         cookies.forEach(function(cookie){
             if(cookie.options.value !== 'deleted' && cookie.options.domain){
                 this.cookieManager.add(
-                    '.' + cookie.options.domain,
+                    cookie.options.domain,
                     cookie.options.path,
                     cookie.name,
                     cookie.value,
                     false, false, false,
                     cookie.options.expires ?
                         cookie.options.expires.getTime() / 1000 :
-                        ( Date.now() / 1000 ) + ( 10 * 365 * 24 * 60 * 60 )
+                        ( Date.now() / 1000 ) + ( 7 * 24 * 60 * 60 )
                 );
             }
         }, this);
@@ -803,6 +799,7 @@ var ChaikaP2Login = {
 
         this._req = null;
     },
+
 
     /**
      * 書き込みページからcsrfidを得る

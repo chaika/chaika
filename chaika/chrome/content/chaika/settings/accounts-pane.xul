@@ -5,18 +5,36 @@
 <prefpane id="paneAccounts" onpaneload="gAccountsPane.startup()">
 
     <preferences>
-        <preference id="extensions.chaika.login.ronin.id" type="string"
-                name="extensions.chaika.login.ronin.id"/>
-        <preference id="extensions.chaika.login.ronin.password" type="string"
-                name="extensions.chaika.login.ronin.password"/>
-        <preference id="extensions.chaika.login.be.id" type="string"
-                name="extensions.chaika.login.be.id"/>
-        <preference id="extensions.chaika.login.be.password" type="string"
-                name="extensions.chaika.login.be.password"/>
-        <preference id="extensions.chaika.login.p2.id" type="string"
-                name="extensions.chaika.login.p2.id"/>
-        <preference id="extensions.chaika.login.p2.password" type="string"
-                name="extensions.chaika.login.p2.password"/>
+        <preference id="extensions.chaika.login.ronin.id"
+                    name="extensions.chaika.login.ronin.id"
+                    type="string" />
+        <preference id="extensions.chaika.login.ronin.password"
+                    name="extensions.chaika.login.ronin.password"
+                    type="string" />
+        <preference id="extensions.chaika.login.be.id"
+                    name="extensions.chaika.login.be.id"
+                    type="string" />
+        <preference id="extensions.chaika.login.be.password"
+                    name="extensions.chaika.login.be.password"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.id"
+                    name="extensions.chaika.login.p2.id"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.password"
+                    name="extensions.chaika.login.p2.password"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.login_url"
+                    name="extensions.chaika.login.p2.login_url"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.post_url"
+                    name="extensions.chaika.login.p2.post_url"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.csrfid_url"
+                    name="extensions.chaika.login.p2.csrfid_url"
+                    type="string" />
+        <preference id="extensions.chaika.login.p2.cookie_domain"
+                    name="extensions.chaika.login.p2.cookie_domain"
+                    type="string" />
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
@@ -24,77 +42,93 @@
 
     <groupbox>
         <caption class="setting-description" label="浪人 / ●" />
-        <hbox align="start">
-            <grid>
-                <columns>
-                    <column />
-                    <column width="200"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="ID" style="text-align:right;"/>
-                        <textbox preference="extensions.chaika.login.ronin.id"/>
-                    </row>
-                    <row>
-                        <label value="秘密鍵" style="text-align:right;"/>
-                        <textbox type="password"
-                            preference="extensions.chaika.login.ronin.password"
-                            onsyncfrompreference="return gAccountsPane.setPasswordBox('Ronin')"
-                            onsynctopreference="return gAccountsPane.setPasswordPref('Ronin', this.value)"/>
-                    </row>
-                </rows>
-            </grid>
-        </hbox>
+
+        <grid flex="1">
+            <columns>
+                <column />
+                <column flex="1" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="ID" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.ronin.id" flex="1" />
+                </row>
+                <row>
+                    <label value="秘密鍵" style="text-align:right;" />
+                    <textbox type="password"
+                             flex="1"
+                             preference="extensions.chaika.login.ronin.password"
+                             onsyncfrompreference="return gAccountsPane.setPasswordBox('Ronin')"
+                             onsynctopreference="return gAccountsPane.setPasswordPref('Ronin', this.value)" />
+                </row>
+            </rows>
+        </grid>
     </groupbox>
 
     <groupbox>
         <caption class="setting-description" label="Be" />
-        <hbox align="start">
-            <grid>
-                <columns>
-                    <column />
-                    <column width="200"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="ID" style="text-align:right;"/>
-                        <textbox preference="extensions.chaika.login.be.id"/>
-                    </row>
-                    <row>
-                        <label value="パスワード" style="text-align:right;"/>
-                        <textbox type="password"
-                            preference="extensions.chaika.login.be.password"
-                            onsyncfrompreference="return gAccountsPane.setPasswordBox('Be')"
-                            onsynctopreference="return gAccountsPane.setPasswordPref('Be', this.value)"/>
-                    </row>
-                </rows>
-            </grid>
-        </hbox>
+
+        <grid flex="1">
+            <columns>
+                <column />
+                <column flex="1" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="ID" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.be.id" flex="1" />
+                </row>
+                <row>
+                    <label value="パスワード" style="text-align:right;" />
+                    <textbox type="password"
+                             flex="1"
+                             preference="extensions.chaika.login.be.password"
+                             onsyncfrompreference="return gAccountsPane.setPasswordBox('Be')"
+                             onsynctopreference="return gAccountsPane.setPasswordPref('Be', this.value)" />
+                </row>
+            </rows>
+        </grid>
     </groupbox>
 
     <groupbox>
-        <caption class="setting-description" label="p2.2ch.net" />
-        <hbox align="start">
-            <grid>
-                <columns>
-                    <column />
-                    <column width="200"/>
-                </columns>
-                <rows>
-                    <row>
-                        <label value="ID" style="text-align:right;"/>
-                        <textbox preference="extensions.chaika.login.p2.id"/>
-                    </row>
-                    <row>
-                        <label value="パスワード" style="text-align:right;"/>
-                        <textbox type="password"
-                            preference="extensions.chaika.login.p2.password"
-                            onsyncfrompreference="return gAccountsPane.setPasswordBox('p2')"
-                            onsynctopreference="return gAccountsPane.setPasswordPref('p2', this.value)"/>
-                    </row>
-                </rows>
-            </grid>
-        </hbox>
+        <caption class="setting-description" label="p2 / rep2" />
+
+        <grid flex="1">
+            <columns>
+                <column />
+                <column flex="1" />
+            </columns>
+            <rows>
+                <row>
+                    <label value="ID" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.p2.id" flex="1" />
+                </row>
+                <row>
+                    <label value="パスワード" style="text-align:right;" />
+                    <textbox type="password"
+                             flex="1"
+                             preference="extensions.chaika.login.p2.password"
+                             onsyncfrompreference="return gAccountsPane.setPasswordBox('p2')"
+                             onsynctopreference="return gAccountsPane.setPasswordPref('p2', this.value)" />
+                </row>
+                <row>
+                    <label value="ログイン先 URL" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.p2.login_url" flex="1" />
+                </row>
+                <row>
+                    <label value="投稿先 URL" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.p2.post_url" flex="1" />
+                </row>
+                <row>
+                    <label value="投稿画面 URL" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.p2.csrfid_url" flex="1" />
+                </row>
+                <row>
+                    <label value="Cookie ドメイン" style="text-align:right;" />
+                    <textbox preference="extensions.chaika.login.p2.cookie_domain" flex="1" />
+                </row>
+            </rows>
+        </grid>
     </groupbox>
 
 </prefpane>
