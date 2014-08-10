@@ -67,7 +67,7 @@ function parseCookie(cookieStr){
     var cookies = [];
     var cookie_array = cookieStr.split(splitter);
 
-    ChaikaCore.logger.debug(cookie_array);
+    ChaikaCore.logger.debug('Parse Cookie:', cookie_array);
 
     cookie_array.forEach(function(e){
         var cookie = {
@@ -81,11 +81,19 @@ function parseCookie(cookieStr){
             var _key = param[0].toLowerCase();
             var value = param[1];
 
-            if (attributes.indexOf(_key) > 0) {
-                if (_key === 'expires') {
-                    cookie.options[_key] = new Date(value.replace(/-/g, ' '));
-                } else {
-                    cookie.options[_key] = value || true;
+            if (attributes.indexOf(_key) !== -1){
+                switch(_key){
+                    case 'expires':
+                        cookie.options[_key] = new Date(value.replace(/-/g, ' '));
+                        break;
+
+                    case 'domain':
+                        cookie.options[_key] = value.startsWith('.') ? value : '.' + value;
+                        break;
+
+                    default:
+                        cookie.options[_key] = value || true;
+
                 }
             } else {
                 cookie.name = key;
@@ -503,6 +511,9 @@ var ChaikaBeLogin = {
     logout: function ChaikaBeLogin_logout(){
         this.cookieManager.remove(".2ch.net", 'MDMD', '/', false);
         this.cookieManager.remove(".2ch.net", 'DMDM', '/', false);
+        this.cookieManager.remove('.bbspink.com', 'MDMD', '/', false);
+        this.cookieManager.remove('.bbspink.com', 'DMDM', '/', false);
+
         this._loggedIn = false;
 
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
@@ -524,15 +535,28 @@ var ChaikaBeLogin = {
 
         cookies.forEach(function(cookie){
             if(cookie.options.value !== 'deleted' && cookie.options.domain){
+                //for 2ch.net
                 this.cookieManager.add(
-                    '.' + cookie.options.domain,
+                    cookie.options.domain,
                     cookie.options.path,
                     cookie.name,
                     cookie.value,
                     false, false, false,
                     cookie.options.expires ?
                         cookie.options.expires.getTime() / 1000 :
-                        ( Date.now() / 1000 ) + ( 10 * 365 * 24 * 60 * 60 )
+                        ( Date.now() / 1000 ) + ( 7 * 24 * 60 * 60 )
+                );
+
+                //for bbspink.com
+                this.cookieManager.add(
+                    '.bbspink.com',
+                    cookie.options.path,
+                    cookie.name,
+                    cookie.value,
+                    false, false, false,
+                    cookie.options.expires ?
+                        cookie.options.expires.getTime() / 1000 :
+                        ( Date.now() / 1000 ) + ( 7 * 24 * 60 * 60 )
                 );
             }
         }, this);
