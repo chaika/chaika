@@ -70,6 +70,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
         ChaikaSearch._startup();
 
+        Components.utils.import("resource://chaika-modules/ChaikaAA.js");
+        ChaikaAA._startup();
+
 
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
@@ -85,11 +88,12 @@ ChaikaService.prototype = {
 
 
     _quitApp: function ChaikaService__quitApp(){
-        ChaikaAboneManager._quit();
-        ChaikaNGFiles._quit();
-        ChaikaCore._quit();
+        ChaikaAA._quit();
         ChaikaRoninLogin._quit();
+        ChaikaAboneManager._quit();
+        ChaikaHttpController._quit();
         ChaikaServer._quit();
+        ChaikaCore._quit();
     },
 
 

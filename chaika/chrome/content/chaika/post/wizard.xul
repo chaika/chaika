@@ -63,7 +63,7 @@
         <checkbox id="p2Check" label="p2" oncommand="FormPage.toggleP2Login()"/>
         <toolbarbutton label="ツール" type="menu">
             <menupopup position="before_end">
-                <menuitem id="insertAAMenu" label="AAの挿入"
+                <menuitem id="insertAAMenu" label="AA・定型文の挿入"
                         oncommand="AAPanel.openPopup(this.parentNode.parentNode)"/>
                 <menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
                         type="checkbox" checked="false" persist="checked"
