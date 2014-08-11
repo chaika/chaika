@@ -37,7 +37,8 @@
               flex="1"
               hidecolumnpicker="true"
               seltype="single"
-              onclick="gAAManager.handleClick(event)">
+              onclick="gAAManager.handleClick(event)"
+              ondragstart="gAAManager.handleDragStart(event)">
 
             <treecols>
                 <treecol hideheader="true" primary="true" flex="1"/>

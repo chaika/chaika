@@ -96,6 +96,16 @@ var gAAManager = {
     },
 
 
+    handleDragStart: function(event){
+        if(event.target.localName !== 'treechildren') return;
+
+        let sourceIndex = this._view.selectedIndex;
+
+        event.dataTransfer.setData('text/x-moz-tree-index', sourceIndex);
+        event.dataTransfer.dropEffect = 'move';
+    },
+
+
     insertFolder: function(title){
         this._view.appendItem('folder', title || '新規フォルダ');
     },
@@ -328,9 +338,60 @@ AATreeView.prototype = {
 
     isSorted: function(){ return false; },
 
-    canDrop: function(targetIndex, orientation){ return false; },
+    canDrop: function(targetIndex, orientation, dataTransfer){
+        if(!dataTransfer.types.contains('text/x-moz-tree-index')) return false;
 
-    drop: function(targetIndex, orientation){},
+        let sourceIndex = this.selectedIndex;
+
+        if(sourceIndex === -1) return false;
+
+        if(sourceIndex === targetIndex) return false;
+
+        if(this.getParentIndex(sourceIndex) === targetIndex) return false;
+
+        if(sourceIndex === (targetIndex + orientation)) return false;
+
+        return true;
+    },
+
+    drop: function(targetIndex, orientation, dataTransfer){
+        if(!this.canDrop(targetIndex, orientation, dataTransfer)) return;
+
+        let sourceIndex = this.selectedIndex;
+        let sourceNode = this._visibleNodes[sourceIndex];
+        let targetNode = this._visibleNodes[targetIndex];
+
+        sourceNode.parentNode.removeChild(sourceNode);
+
+        switch(orientation){
+            case Ci.nsITreeView.DROP_BEFORE:
+                targetNode.parentNode.insertBefore(sourceNode, targetNode);
+                break;
+
+            case Ci.nsITreeView.DROP_AFTER:
+                if(this.hasNextSibling(targetIndex)){
+                    targetNode.parentNode.insertBefore(sourceNode, targetNode.nextSibling);
+                }else{
+                    targetNode.parentNode.appendChild(sourceNode);
+                }
+                break;
+
+            case Ci.nsITreeView.DROP_ON:
+                targetNode.appendChild(sourceNode);
+                targetNode.setAttribute('opened', 'true');
+                break;
+        }
+
+        this._buildVisibleNodes();
+        this._treeBoxObject.invalidate();
+
+        let newIndex = this._visibleNodes.indexOf(sourceNode);
+
+        this.selection.clearSelection();
+        this.selection.select(newIndex);
+        this._treeBoxObject.ensureRowIsVisible(newIndex);
+        this._treeBoxObject.treeBody.parentNode.focus();
+    },
 
     getParentIndex: function(rowIndex){
         return this._visibleNodes[rowIndex]._parentIndex;
