@@ -122,7 +122,7 @@ var ChaikaAA = {
 
         this._doc = parser.parseFromString("<root/>", "text/xml");
 
-        appendSubDir(this._doc.documentElement, aaDir, 0);
+        appendSubDir(this.getAAXML(), aaDir, 0);
     },
 
 
@@ -130,7 +130,56 @@ var ChaikaAA = {
      * データを保存する
      */
     _saveData: function(){
+        let parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
+        let serializer = Cc["@mozilla.org/xmlextras/xmlserializer;1"].createInstance(Ci.nsIDOMSerializer);
 
+        let aaDir = ChaikaCore.getDataDir();
+        aaDir.appendRelativePath('AA');
+
+        aaDir.clone().remove(true);
+        aaDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+
+
+        var visitDirectory = (function(parentNode, currentDir){
+            ChaikaCore.logger.debug('visit:', parentNode.getAttribute('title'));
+
+            let currentNode = parentNode.firstChild;
+
+            if(currentNode.nodeName === 'aa'){
+                let doc = parser.parseFromString('<aalist/>', 'text/xml');
+                let root = doc.documentElement;
+
+                do{
+                    let title = currentNode.getAttribute('title');
+                    let content = currentNode.textContent;
+                    let aaNode = doc.createElement('aa');
+
+                    aaNode.setAttribute('title', title);
+
+                    if(title !== content){
+                        aaNode.appendChild(doc.createCDATASection(content));
+                    }
+
+                    root.appendChild(aaNode);
+                }while(currentNode = currentNode.nextSibling);
+
+                let xmlFile = currentDir.clone().parent;
+                xmlFile.appendRelativePath(parentNode.getAttribute('title') + '.aa.xml');
+
+                ChaikaCore.logger.debug('Save aa.xml:', xmlFile.path);
+
+                ChaikaCore.io.writeString(xmlFile, 'UTF-8', false, serializer.serializeToString(doc));
+            }else{
+                do{
+                    let childDir = currentDir.clone();
+                    childDir.appendRelativePath(currentNode.getAttribute('title'));
+
+                    visitDirectory(currentNode, childDir);
+                }while(currentNode = currentNode.nextSibling);
+            }
+        }).bind(this);
+
+        visitDirectory(this.getAAXML(), aaDir);
     },
 
 

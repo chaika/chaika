@@ -29,6 +29,8 @@
 
                     <menuitem label="AAList.txt の読み込み..."
                               oncommand="gAAManager.loadAAList()" />
+
+                    <menuitem label="Save" oncommand="ChaikaAA._saveData();" />
                 </menupopup>
             </button>
         </hbox>
