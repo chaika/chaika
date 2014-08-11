@@ -6,28 +6,33 @@
 
     <script type="application/javascript" src="chrome://chaika/content/post/aaPanel.js"/>
 
-    <panel id="aaPanel" onpopupshowing="AAPanel.popupShowing(event)"
-            onpopupshown="AAPanel.popupShown(event)">
+    <panel id="aaPanel" onpopupshowing="AAPanel.popupShowing(event)">
         <hbox id="aaPanel-innerBox" width="420" height="300">
             <vbox id="aaPanel-sidebar" width="160">
-                <tree id="aaPanel-dirTree" flex="1"
-                        hidecolumnpicker="true" seltype="single"
-                        datasources="#aaPanel-dirTree" ref="*" querytype="xml"
-                        onselect="AAPanel.dirTreeSelect(event)">
+                <tree id="aaPanel-dirTree"
+                      flex="1"
+                      hidecolumnpicker="true"
+                      seltype="single"
+                      datasources="#aaPanel-dirTree"
+                      ref="*"
+                      querytype="xml"
+                      onselect="AAPanel.dirTreeSelect(event)">
+
                     <treecols>
                         <treecol hideheader="true" primary="true" flex="1"/>
                     </treecols>
+
                     <template>
                         <query>
                             <assign var="?tagName" expr="name()"/>
                         </query>
                         <rule>
-                            <where subject="?tagName" rel="equals" value="file"/>
+                            <where subject="?tagName" rel="equals" value="folder"/>
                             <action>
                                 <treechildren>
                                     <treeitem uri="?" open="true" container="true">
                                         <treerow>
-                                            <treecell label="?name" value="?path" properties="title"/>
+                                            <treecell label="?title" properties="title"/>
                                         </treerow>
                                     </treeitem>
                                 </treechildren>
@@ -41,14 +46,21 @@
                 </hbox>
             </vbox>
 
-            <tree id="aaPanel-listTree" flex="1" flags="dont-build-content"
-                    hidecolumnpicker="true" seltype="single"
-                    datasources="#aaPanel-listTree" ref="*" querytype="xml"
-                    onclick="AAPanel.listTreeSelect(event)"
-                    onmousemove="AAPanel.listTreeMouseMove(event)">
+            <tree id="aaPanel-listTree"
+                  flex="1"
+                  flags="dont-build-content"
+                  hidecolumnpicker="true"
+                  seltype="single"
+                  datasources="#aaPanel-listTree"
+                  ref="*"
+                  querytype="xml"
+                  onclick="AAPanel.listTreeSelect(event)"
+                  onmousemove="AAPanel.listTreeMouseMove(event)">
+
                 <treecols>
-                    <treecol  hideheader="true" flex="1"/>
+                    <treecol hideheader="true" flex="1"/>
                 </treecols>
+
                 <template>
                     <query>
                         <assign var="?tagName" expr="name()"/>

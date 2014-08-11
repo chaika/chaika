@@ -351,9 +351,6 @@ var FormPage = {
             ChaikaBeLogin.login();
         }
 
-        //AAメニュー有効化
-        document.getElementById("insertAAMenu").disabled = !AAPanel.aaDirExists();
-
         //gPostの初期化
         this._setPost();
 

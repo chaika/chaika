@@ -117,9 +117,13 @@ var ChaikaAA = {
         let aaDir = ChaikaCore.getDataDir();
         aaDir.appendRelativePath("AA");
 
+        if(!aaDir.exists()){
+            aaDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+        }
+
         this._doc = parser.parseFromString("<root/>", "text/xml");
 
-        appendSubDir(this.getAAXML(), aaDir, 0);
+        appendSubDir(this.getAATree(), aaDir, 0);
     },
 
 
@@ -178,11 +182,11 @@ var ChaikaAA = {
             }
         }).bind(this);
 
-        visitDirectory(this.getAAXML(), aaDir);
+        visitDirectory(this.getAATree(), aaDir);
     },
 
 
-    getAAXML: function(){
+    getAATree: function(){
         return this._doc.documentElement;
     }
 

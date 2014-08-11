@@ -67,7 +67,7 @@ var gAAManager = {
 
     _initTree: function(){
         this._tree = document.getElementById("aaTree");
-        this._view = new AATreeView(ChaikaAA.getAAXML());
+        this._view = new AATreeView(ChaikaAA.getAATree());
         this._tree.view = this._view;
     },
 
