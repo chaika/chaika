@@ -84,14 +84,6 @@ var gAAManager = {
 
         if(this._view.isContainer(row.value)){
             this._view.toggleOpenState(row.value);
-
-            this._aaLabel.value = '';
-            this._aaTextbox.value = '';
-        }else{
-            let aa = this._view._visibleNodes[row.value];
-
-            this._aaLabel.value = aa.getAttribute('title');
-            this._aaTextbox.value = aa.textContent;
         }
     },
 
@@ -106,13 +98,40 @@ var gAAManager = {
     },
 
 
-    insertFolder: function(title){
-        this._view.appendItem('folder', title || '新規フォルダ');
+    handleSelect: function(event){
+        let selectedItem = this._view._visibleNodes[this._view.selectedIndex];
+        this._populateNodeData(selectedItem);
     },
 
 
-    insertAA: function(title, value){
-        this._view.appendItem('aa', title || '新規 AA', value);
+    _populateNodeData: function(node){
+        if(node.nodeName === 'folder'){
+            this._populateData(node.getAttribute('title'));
+        }else{
+            this._populateData(node.getAttribute('title'), node.textContent);
+        }
+    },
+
+
+    _populateData: function(title, content){
+        this._aaLabel.value = title || '';
+        this._aaTextbox.value = content || '';
+    },
+
+
+    insertFolder: function(){
+        let title = window.prompt('フォルダ名を入力して下さい.', '', '');
+        if(!title) return;
+
+        this._view.appendItem('folder', title);
+    },
+
+
+    insertAA: function(){
+        let title = window.prompt('AA のタイトルを入力して下さい.', '', '');
+        if(!title) return;
+
+        this._view.appendItem('aa', title);
     },
 
 
@@ -152,11 +171,11 @@ var gAAManager = {
                 }
             });
 
-            this.insertFolder('AAList.txt');
+            this._view.appendItem('folder', 'AAList.txt');
 
             for(let title in aaTables){
                 if(title && aaTables.hasOwnProperty(title) && aaTables[title]){
-                    this.insertAA(title, aaTables[title]);
+                    this._view.appendItem('aa', title, aaTables[title]);
                 }
             }
         }
@@ -292,8 +311,11 @@ AATreeView.prototype = {
         let node = this._visibleNodes[index];
 
         node.setAttribute('title', title);
-        node.removeChild(node.firstChild);
-        node.appendChild(document.createTextNode(value));
+
+        if(node.nodeName === 'aa'){
+            node.removeChild(node.firstChild);
+            node.appendChild(document.createTextNode(value));
+        }
 
         this._treeBoxObject.invalidateRow(index);
     },
@@ -440,9 +462,7 @@ AATreeView.prototype = {
     },
 
     getImageSrc: function(row, col){},
-
     getProgressMode: function(row, col){},
-
     getCellValue: function(row, col){},
 
     getCellText: function(row, col){
@@ -477,10 +497,20 @@ AATreeView.prototype = {
     cycleHeader: function(col){},
     selectionChanged: function(){},
     cycleCell: function(row, col){},
-    isEditable: function(row, col){},
+
+    isEditable: function(row, col){
+        return true;
+    },
+
     isSelectable: function(row, col){},
     setCellValue: function(row, col, value){},
-    setCellText: function(row, col, value){},
+
+    setCellText: function(row, col, value){
+        this._visibleNodes[row].setAttribute('title', value);
+        this._treeBoxObject.invalidateRow(row);
+        gAAManager._populateNodeData(this._visibleNodes[row]);
+    },
+
     performAction: function(action){},
     performActionOnRow: function(action, row){},
     performActionOnCell: function(action, row, col){},

@@ -29,8 +29,6 @@
 
                     <menuitem label="AAList.txt の読み込み..."
                               oncommand="gAAManager.loadAAList()" />
-
-                    <menuitem label="Save" oncommand="ChaikaAA._saveData();" />
                 </menupopup>
             </button>
         </hbox>
@@ -39,8 +37,10 @@
               flex="1"
               hidecolumnpicker="true"
               seltype="single"
+              editable="true"
               onclick="gAAManager.handleClick(event)"
-              ondragstart="gAAManager.handleDragStart(event)">
+              ondragstart="gAAManager.handleDragStart(event)"
+              onselect="gAAManager.handleSelect(event)">
 
             <treecols>
                 <treecol hideheader="true" primary="true" flex="1"/>

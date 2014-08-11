@@ -142,6 +142,8 @@ var ChaikaAA = {
 
             let currentNode = parentNode.firstChild;
 
+            if(!currentNode) return;
+
             if(currentNode.nodeName === 'aa'){
                 let doc = parser.parseFromString('<aalist/>', 'text/xml');
                 let root = doc.documentElement;
