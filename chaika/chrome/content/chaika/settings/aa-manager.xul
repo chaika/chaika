@@ -19,7 +19,14 @@
                               oncommand="gAAManager.insertFolder();" />
                     <menuitem label="新規 AA"
                               oncommand="gAAManager.insertAA();" />
+
                     <menuseparator/>
+
+                    <menuitem label="項目の削除"
+                              oncommand="gAAManager.removeItem();" />
+
+                    <menuseparator />
+
                     <menuitem label="AAList.txt の読み込み..."
                               oncommand="gAAManager.loadAAList()" />
                 </menupopup>
@@ -29,6 +36,7 @@
         <tree id="aaTree"
               flex="1"
               hidecolumnpicker="true"
+              seltype="single"
               onclick="gAAManager.handleClick(event)">
 
             <treecols>
@@ -45,8 +53,7 @@
         <hbox align="center" pack="start">
             <label value="ラベル:" />
             <textbox id="aa-label" flex="1" />
-            <button label="保存" class="button-save" />
-            <button label="削除" class="button-delete" />
+            <button label="保存" oncommand="gAAManager.saveAA();" />
         </hbox>
 
         <textbox multiline="true" id="aa-textbox" flex="1" />
