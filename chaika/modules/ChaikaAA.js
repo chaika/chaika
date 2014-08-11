@@ -81,7 +81,6 @@ var ChaikaAA = {
 
                     let folder = this._doc.createElement('folder');
                     folder.setAttribute("title", entry.leafName);
-                    folder.setAttribute('level', aLevel);
 
                     aParentNode.appendChild(folder);
 
@@ -91,7 +90,6 @@ var ChaikaAA = {
 
                     let folder = this._doc.createElement('folder');
                     folder.setAttribute("title", entry.leafName.replace(aaExtReg, ""));
-                    folder.setAttribute('level', aLevel);
 
                     aParentNode.appendChild(folder);
 
@@ -103,7 +101,6 @@ var ChaikaAA = {
                     Array.slice(AAs).forEach((AA) => {
                         let aaNode = this._doc.createElement('aa');
                         aaNode.setAttribute('title', AA.getAttribute('title'));
-                        aaNode.setAttribute('level', aLevel + 1);
 
                         let aaStr = AA.textContent || AA.getAttribute('title');
                         aaNode.appendChild(this._doc.createTextNode(aaStr));

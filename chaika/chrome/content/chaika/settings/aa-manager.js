@@ -194,9 +194,11 @@ AATreeView.prototype = {
     },
 
     _buildVisibleNodes: function(){
-        this._visibleNodes = Array.slice(this._xml.querySelectorAll(':root > folder, folder[opened] > *'));
+        this._visibleNodes = Array.slice(this._xml.querySelectorAll(':root > folder, folder[opened] > :-moz-any(folder, aa)'));
 
         this._visibleNodes = this._visibleNodes.filter((node) => {
+            if(!node) return false;
+
             if(node.matches){
                 //Firefox 34+
                 return !node.matches('folder:not([opened]) *');
@@ -207,6 +209,7 @@ AATreeView.prototype = {
         });
 
         this._visibleNodes.forEach((node) => {
+            node._level = this._getAccurateLevel(node);
             node._parentIndex = this._visibleNodes.indexOf(node.parentNode);
         });
     },
@@ -235,8 +238,13 @@ AATreeView.prototype = {
         let parentNode = this._visibleNodes[parentIndex] || this._xml;
         let node = document.createElement(type);
 
+
+        if(!this.canAppend(node, parentNode)){
+            return window.alert('AA とフォルダを同じ階層に置くことはできません.');
+        }
+
+
         node.setAttribute('title', title);
-        node.setAttribute('level', parentIndex > -1 ? this.getLevel(parentIndex) + 1 : 0);
 
         if(value){
             node.appendChild(document.createTextNode(value));
@@ -291,9 +299,13 @@ AATreeView.prototype = {
     },
 
     removeItemAt: function(index){
+        let lastRowCount = this.rowCount;
+
         this._visibleNodes[index].parentNode.removeChild(this._visibleNodes[index]);
+
         this._buildVisibleNodes();
-        this._treeBoxObject.rowCountChanged(index, -1);
+        this._treeBoxObject.rowCountChanged(index, this.rowCount - lastRowCount);
+
         this.selection.clearSelection();
     },
 
@@ -338,6 +350,10 @@ AATreeView.prototype = {
 
     isSorted: function(){ return false; },
 
+    canAppend: function(sourceNode, parentNode){
+        return parentNode.childNodes.length === parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
+    },
+
     canDrop: function(targetIndex, orientation, dataTransfer){
         if(!dataTransfer.types.contains('text/x-moz-tree-index')) return false;
 
@@ -350,6 +366,16 @@ AATreeView.prototype = {
         if(this.getParentIndex(sourceIndex) === targetIndex) return false;
 
         if(sourceIndex === (targetIndex + orientation)) return false;
+
+
+        //aa 要素と folder 要素は同じ階層に位置できない
+        let sourceNode = this._visibleNodes[sourceIndex];
+        let parentNode = orientation === Ci.nsITreeView.DROP_ON ?
+                            this._visibleNodes[targetIndex] :
+                            this._visibleNodes[targetIndex].parentNode;
+
+        if(!this.canAppend(sourceNode, parentNode)) return false;
+
 
         return true;
     },
@@ -402,7 +428,15 @@ AATreeView.prototype = {
     },
 
     getLevel: function(rowIndex){
-        return this._visibleNodes[rowIndex].getAttribute('level') - 0;
+        return this._visibleNodes[rowIndex]._level;
+    },
+
+    _getAccurateLevel: function(node){
+        let level = -2;
+
+        while(node = node.parentNode) ++level;
+
+        return level;
     },
 
     getImageSrc: function(row, col){},
