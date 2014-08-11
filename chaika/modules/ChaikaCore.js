@@ -557,7 +557,11 @@ ChaikaLogger.prototype = {
 
         //確実に文字列に直す
         args = args.map(function(arg){
-            return arg.toString();
+            try{
+                return arg.toString();
+            }catch(ex){
+                return typeof arg;
+            }
         });
 
         var message = "[" + stackName + ":" + stackLine + "] " + aType +  " " + args.join(' ');

@@ -118,6 +118,14 @@
     </groupbox>
 
     <groupbox>
+        <caption class="setting-description" label="AA・定型文" />
+        <vbox align="start">
+            <button label="AA マネージャ..."
+                    oncommand="gThreadPane.openAAManager()"/>
+        </vbox>
+    </groupbox>
+
+    <groupbox>
         <caption class="setting-description" label="その他" />
         <vbox>
             <checkbox label="スレッド表示のリンクからはリファラを送らない"

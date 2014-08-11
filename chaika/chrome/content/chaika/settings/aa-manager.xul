@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/settings/aa-manager.css" type="text/css"?>
+
+<window id="aaManagerDialog"
+        title="AA・定型文 マネージャ"
+        width="600" height="500"
+        onload="gAAManager.startup()"
+        onunload="gAAManager.shutdown()"
+        persist="screenX screenY width height"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<hbox flex="1">
+    <vbox id="sidebar" flex="1">
+        <hbox>
+            <button label="ツール" type="menu">
+                <menupopup position="after_start">
+                    <menuitem label="新規フォルダ"
+                              oncommand="gAAManager.insertFolder();" />
+                    <menuitem label="新規 AA"
+                              oncommand="gAAManager.insertAA();" />
+
+                    <menuseparator/>
+
+                    <menuitem label="項目の削除"
+                              oncommand="gAAManager.removeItem();" />
+
+                    <menuseparator />
+
+                    <menuitem label="AAList.txt の読み込み..."
+                              oncommand="gAAManager.loadAAList()" />
+                </menupopup>
+            </button>
+        </hbox>
+
+        <tree id="aaTree"
+              flex="1"
+              hidecolumnpicker="true"
+              seltype="single"
+              editable="true"
+              onclick="gAAManager.handleClick(event)"
+              ondragstart="gAAManager.handleDragStart(event)"
+              onselect="gAAManager.handleSelect(event)">
+
+            <treecols>
+                <treecol hideheader="true" primary="true" flex="1"/>
+            </treecols>
+
+            <treechildren id="aaTree-children" flex="1" />
+        </tree>
+    </vbox>
+
+    <splitter />
+
+    <vbox flex="1">
+        <hbox align="center" pack="start">
+            <label value="ラベル:" />
+            <textbox id="aa-label" flex="1" />
+            <button label="保存" oncommand="gAAManager.saveAA();" />
+        </hbox>
+
+        <textbox multiline="true" id="aa-textbox" flex="1" />
+    </vbox>
+</hbox>
+
+<script type="application/javascript; version=1.7"
+            src="chrome://chaika/content/settings/aa-manager.js"/>
+</window>

@@ -71,15 +71,22 @@
                           label="不具合報告テンプレート(詳細)の挿入"
                           oncommand="FormPage.insertBugReportTemplate(true);" />
                 <menuseparator />
-                <menuitem id="insertAAMenu" label="AAの挿入"
-                        oncommand="AAPanel.openPopup(this.parentNode.parentNode)"/>
-                <menuitem id="useAAFontCheck" label="AA 用フォントを利用する"
-                        type="checkbox" checked="false" persist="checked"
-                        oncommand="FormPage.setUseAAFont()"/>
+                <menuitem id="insertAAMenu"
+                          label="AA・定型文の挿入"
+                          oncommand="AAPanel.openPopup(this.parentNode.parentNode)" />
+                <menuitem id="useAAFontCheck"
+                          label="AA 用フォントを利用する"
+                          type="checkbox"
+                          checked="false"
+                          persist="checked"
+                          oncommand="FormPage.setUseAAFont()"/>
                 <menuseparator />
-                <menuitem id="alwaysRaisedCheck" label="常に最前面にする"
-                            type="checkbox" checked="false" persist="checked"
-                            oncommand="FormPage.setAlwaysRaised()" />
+                <menuitem id="alwaysRaisedCheck"
+                          label="常に最前面にする"
+                          type="checkbox"
+                          checked="false"
+                          persist="checked"
+                          oncommand="FormPage.setAlwaysRaised()" />
             </menupopup>
         </toolbarbutton>
         <panel id="aaPanel" insertTextbox="messeageForm" position="before_end"/>

@@ -148,5 +148,10 @@ var gThreadPane = {
     openAboneManager: function(){
         var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
         document.documentElement.openWindow("", aboneManagerURL);
+    },
+
+    openAAManager: function(){
+        var aboneManagerURL = "chrome://chaika/content/settings/aa-manager.xul";
+        document.documentElement.openWindow("", aboneManagerURL);
     }
 };
