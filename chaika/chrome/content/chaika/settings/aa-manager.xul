@@ -29,27 +29,13 @@
         <tree id="aaTree"
               flex="1"
               hidecolumnpicker="true"
-              seltype="single"
-              datasources="#aaTree"
-              ref="*"
-              querytype="xml">
+              onclick="gAAManager.handleClick(event)">
 
             <treecols>
                 <treecol hideheader="true" primary="true" flex="1"/>
             </treecols>
 
-            <template>
-                <query expr="*" />
-                <action>
-                    <treechildren>
-                        <treeitem uri="?" open="true" container="true">
-                            <treerow>
-                                <treecell label="?title" />
-                            </treerow>
-                        </treeitem>
-                    </treechildren>
-                </action>
-            </template>
+            <treechildren id="aaTree-children" flex="1" />
         </tree>
     </vbox>
 
