@@ -7,6 +7,16 @@ var gAAManager = {
 
     startup: function(){
         this._initTree();
+
+        this._aaLabel = document.getElementById('aa-label');
+        this._aaTextbox = document.getElementById('aa-textbox');
+
+        let fontFamily = ChaikaCore.pref.getUniChar("thread_aa_font_name");
+        let fontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
+        let lineHeight = ChaikaCore.pref.getInt("thread_aa_line_space") + fontSize;
+        let fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+
+        this._aaTextbox.style.font = fontStyle;
     },
 
 
@@ -34,6 +44,14 @@ var gAAManager = {
 
         if(this._view.isContainer(row.value)){
             this._view.toggleOpenState(row.value);
+
+            this._aaLabel.value = '';
+            this._aaTextbox.value = '';
+        }else{
+            let aa = this._view._visibleNodes[row.value];
+
+            this._aaLabel.value = aa.getAttribute('title');
+            this._aaTextbox.value = aa.textContent;
         }
     }
 

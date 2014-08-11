@@ -44,12 +44,12 @@
     <vbox flex="1">
         <hbox align="center" pack="start">
             <label value="ラベル:" />
-            <textbox class="label" flex="1" />
+            <textbox id="aa-label" flex="1" />
             <button label="保存" class="button-save" />
             <button label="削除" class="button-delete" />
         </hbox>
 
-        <textbox multiline="true" class="aaTextarea" flex="1" />
+        <textbox multiline="true" id="aa-textbox" flex="1" />
     </vbox>
 </hbox>
 
