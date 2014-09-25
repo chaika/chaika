@@ -1,22 +1,15 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
-/** Icons **/
+/** Icons for the toolbar button **/
 
 #chaika-toolbarbutton {
-    -moz-box-orient: horizontal !important;
-
-    list-style-image: url("chrome://chaika/skin/browser/toolbarbutton.png") !important;
-    -moz-image-region: rect(0px, 24px, 24px, 0px);
-}
-
-#chaika-toolbarbutton > .toolbarbutton-icon {
-    width: 16px;
-    height: 16px;
+    -moz-box-orient: horizontal;
+    list-style-image: url("icon.svg") !important;
 }
 
 #chaika-toolbarbutton[cui-areatype="menu-panel"],
 toolbarpaletteitem[place="palette"] > #chaika-toolbarbutton{
-    -moz-box-orient: vertical !important;
+    -moz-box-orient: vertical;
 }
 
 
