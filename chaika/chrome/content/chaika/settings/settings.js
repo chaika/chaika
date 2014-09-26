@@ -49,11 +49,24 @@ function startup(){
         }
     }
 
-    window.sizeToContent();
+    adjustWindowSize();
+    window.addEventListener('paneload', adjustWindowSize, false);
 }
 
 
 function shutdown(){
+    window.removeEventListener('paneload', adjustWindowSize, false);
+}
+
+
+function adjustWindowSize(){
+    //Mac ではタブ切り替えの際に自動的にウィンドウの高さが調節されるため, sizeToContent を毎回呼び出すと表示が崩れる.
+    //一方, Windows ではウィンドウの高さが調整されないため, 毎回 sizeToContent を呼ぶ必要がある.
+    //高さが自動調節されるかどうかは, タブを切り替える前後で高さが変わっているかどうかを調べることで判別できる.
+    if(!window._previousInnerHeight || window.innerHeight === window._previousInnerHeight){
+        window.sizeToContent();
+        window._previousInnerHeight = window.innerHeight;
+    }
 }
 
 
