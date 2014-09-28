@@ -308,7 +308,7 @@ ChaikaBrowserOverlay.aboneEvent = {
                 break;
 
             case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_EX:
-                legacyAboneType = 99;  //Chaika Abone Manager 互換
+                legacyAboneType = 99;  //Chaika Abone Helper 互換
                 break;
         }
 

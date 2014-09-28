@@ -165,7 +165,9 @@ AboneData.prototype = {
 
 
     _saveNgData: function(){
-        ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data.join("\n"));
+        if(this._data && this._data.length > 0){
+            ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data.join("\n"));
+        }
     },
 
 
@@ -224,11 +226,18 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         value: function(){
             AboneData.prototype._loadNgData.apply(this, arguments);
 
-            //有効期限切れのものを削除する
-            this._dataObj = this._data.map((item) => JSON.parse(item))
-                                      .filter((item) => item.expire ? item.expire > Date.now() : true);
+            try{
+                this._dataObj = this._data.map((item) => JSON.parse(item));
 
-            this._data = this._dataObj.map((item) => JSON.stringify(item));
+                //有効期限切れのものを削除する
+                this._dataObj = this._dataObj.filter((item) => item.expire ? item.expire > Date.now() : true);
+
+                this._data = this._dataObj.map((item) => JSON.stringify(item));
+            }catch(ex){
+                //不正なフォーマットのデータが含まれていたとき
+                ChaikaCore.logger.error('Unable to load ' + this._ngFile.leafName + '\n', ex);
+                this._dataObj = this._data = [];
+            }
         }
     },
 
