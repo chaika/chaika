@@ -51,6 +51,7 @@ For Developers
     * [launchpad](https://bugs.launchpad.net/bbs2ch) : b2r バグトラッカー
     * [あぼーん改善案](http://bbs2ch.sourceforge.jp/?page=%A4%A2%A4%DC%A1%BC%A4%F3%B2%FE%C1%B1)
     * [書きこみ改善案](http://bbs2ch.sourceforge.jp/?page=%BD%F1%A4%AD%B9%FE%A4%DF%B2%FE%C1%B1)
+    * [bbs2chreader開発板](http://jbbs.shitaraba.net/computer/41231/): Nazoさん作成の旧開発板
 
 #### branch について
 基本規則は http://havelog.ayumusato.com/develop/git/e513-git_branch_model.html に準拠。
