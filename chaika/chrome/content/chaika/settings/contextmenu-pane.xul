@@ -12,6 +12,8 @@
                 name="extensions.chaika.contextmenu.copy.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.search.enabled"
                 name="extensions.chaika.contextmenu.search.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.history.enabled"
+                name="extensions.chaika.contextmenu.history.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.skin.enabled"
                 name="extensions.chaika.contextmenu.skin.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.write.enabled"
@@ -35,7 +37,7 @@
         <preference id="extensions.chaika.contextmenu.find-next-thread.enabled"
                 name="extensions.chaika.contextmenu.find-next-thread.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.register-selection-as-aa.enabled"
-                name="extensions.chaika.contextmenu.register-seleciton-as-aa.enabled" type="bool" />
+                name="extensions.chaika.contextmenu.register-selection-as-aa.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.toggle-sidebar.enabled"
                 name="extensions.chaika.contextmenu.toggle-sidebar.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.open-settings.enabled"
@@ -63,6 +65,7 @@
                     <checkbox label="あぼーん" preference="extensions.chaika.contextmenu.abone.enabled" />
                     <checkbox label="コピー" preference="extensions.chaika.contextmenu.copy.enabled" />
                     <checkbox label="検索" preference="extensions.chaika.contextmenu.search.enabled" />
+                    <checkbox label="履歴" preference="extensions.chaika.contextmenu.history.enabled" />
                     <checkbox label="スキン" preference="extensions.chaika.contextmenu.skin.enabled" />
                     <checkbox label="このスレッドに書き込む" preference="extensions.chaika.contextmenu.write.enabled" />
                     <checkbox label="このスレッドのログを削除" preference="extensions.chaika.contextmenu.delete-log.enabled" />

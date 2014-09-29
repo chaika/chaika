@@ -39,6 +39,10 @@
                 </xul:menupopup>
             </xul:menu>
 
+            <xul:menu label="履歴" anonid="history">
+                <xul:menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)" />
+            </xul:menu>
+
             <xul:menu label="スキン" anonid="skin">
                 <xul:menupopup style="-moz-binding:url(chrome://chaika/content/skinMenu.xml#skinMenuPopup)" />
             </xul:menu>

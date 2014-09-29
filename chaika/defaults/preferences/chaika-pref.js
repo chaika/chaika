@@ -25,6 +25,7 @@ pref('extensions.chaika.contextmenu.flattened', false);
 pref("extensions.chaika.contextmenu.abone.enabled", true);
 pref("extensions.chaika.contextmenu.copy.enabled", true);
 pref("extensions.chaika.contextmenu.search.enabled", true);
+pref("extensions.chaika.contextmenu.history.enabled", true);
 pref("extensions.chaika.contextmenu.skin.enabled", true);
 pref("extensions.chaika.contextmenu.write.enabled", true);
 pref("extensions.chaika.contextmenu.delete-log.enabled", true);
