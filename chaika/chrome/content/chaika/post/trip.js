@@ -39,33 +39,37 @@
 var Trip = {
 
     getTrip: function Trip_getTrip(aTripKey){
-        var tripKey = aTripKey.substring(1);
+        var uniConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
+                            .createInstance(Ci.nsIScriptableUnicodeConverter);
+        uniConverter.charset = 'Shift_JIS';
 
-             // 12文字以上なら新形式
-             // http://qb5.2ch.net/test/read.cgi/operate/1244993904/309n
-        if(tripKey.length >= 12){
+        var tripKey = uniConverter.convertToByteArray(aTripKey, {}).map((charCode) => {
+            return String.fromCharCode(charCode);
+        }).join("");
 
-                // crypt(DES) の キーと salt を直接指定
-                // ##xxxxxxxxxxxxxxxxnn
-                // xx = 16進文字列(8byte) nn = salt(2文字以下なら "." で埋める)
-            var directTripReg = /^#([A-Fa-f0-9]{16})([\./A-Za-z0-9]{0,2})$/;
+        // #以降が12文字以上なら新形式
+        // http://qb5.2ch.net/test/read.cgi/operate/1244993904/309n
+        if(tripKey.length >= 13){
+            // crypt(DES) の キーと salt を直接指定
+            // ##xxxxxxxxxxxxxxxxnn
+            // xx = 16進文字列(8byte), nn = salt(2文字以下なら "." で埋める)
+            let directTripReg = /^##([A-Fa-f0-9]{16})([\./A-Za-z0-9]{0,2})$/;
             if(directTripReg.test(tripKey)){
-                return this.getDirectTrip(aTripKey);
+                return this.getDirectTrip(tripKey);
             }
 
-                // #$ や直接指定の ## 以外のトリップキーは将来の拡張に予約されている
-            var mark = tripKey.substring(0, 1);
-            if(mark == "$" || mark == "#"){
+            // #$ や直接指定の ## 以外のトリップキーは将来の拡張に予約されている
+            if(tripKey[1] === "$" || tripKey[1] === "#"){
                 return "???";
             }
 
-                // 新12文字トリップ
-                // SHA-1 を Base64 に変換した値の先頭12文字("+"は"."に置換される)
-            return this.getSHA1Trip(aTripKey);
-        }
-
+            // 新12文字トリップ
+            // SHA-1 を Base64 に変換した値の先頭12文字("+"は"."に置換される)
+            return this.getSHA1Trip(tripKey);
+        }else{
             // 従来の形式
-        return this.getOldTrip(aTripKey);
+            return this.getOldTrip(tripKey);
+        }
     },
 
 

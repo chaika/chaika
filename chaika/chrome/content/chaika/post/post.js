@@ -206,17 +206,8 @@ Post.prototype = {
         var tripPos = name.indexOf("#");
 
         if(tripPos !== -1){
-            var tripKey = name.substring(tripPos);
-
-            var uniConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
-                    .createInstance(Ci.nsIScriptableUnicodeConverter);
-            uniConverter.charset = gPost.charset;
-
-            tripKey = uniConverter.convertToByteArray(tripKey, {}).map((charCode) => {
-                    return String.fromCharCode(charCode);
-            }).join("");
-
-            var trip = Trip.getTrip(tripKey);
+            let tripKey = name.substring(tripPos);
+            let trip = Trip.getTrip(tripKey);
 
             name = [
                 name.substring(0, tripPos),
