@@ -34,6 +34,8 @@
                 name="extensions.chaika.contextmenu.go-to-board.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.find-next-thread.enabled"
                 name="extensions.chaika.contextmenu.find-next-thread.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.register-selection-as-aa.enabled"
+                name="extensions.chaika.contextmenu.register-seleciton-as-aa.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.toggle-sidebar.enabled"
                 name="extensions.chaika.contextmenu.toggle-sidebar.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.open-settings.enabled"
@@ -74,6 +76,7 @@
                     <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.change-limit-l50.enabled" />
                     <checkbox label="スレッド一覧を開く" preference="extensions.chaika.contextmenu.go-to-board.enabled" />
                     <checkbox label="次スレを検索する" preference="extensions.chaika.contextmenu.find-next-thread.enabled" />
+                    <checkbox label="選択部分を AA として登録する" preference="extensions.chaika.contextmenu.register-selection-as-aa.enabled" />
                     <checkbox label="サイドバーを表示" preference="extensions.chaika.contextmenu.toggle-sidebar.enabled" />
                     <checkbox label="オプション..." preference="extensions.chaika.contextmenu.open-settings.enabled" />
                 </vbox>

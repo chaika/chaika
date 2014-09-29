@@ -57,6 +57,11 @@ var gAAManager = {
         let fontStyle = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
 
         this._aaTextbox.style.font = fontStyle;
+
+        //コンテキストメニューから呼ばれた場合
+        if('arguments' in window && typeof window.arguments[0] === 'string'){
+            setTimeout(() => { this._view.appendItem('aa', '', window.arguments[0]); }, 0);
+        }
     },
 
 
@@ -127,11 +132,11 @@ var gAAManager = {
     },
 
 
-    insertAA: function(){
+    insertAA: function(body){
         let title = window.prompt('AA のタイトルを入力して下さい.', '', '');
         if(!title) return;
 
-        this._view.appendItem('aa', title);
+        this._view.appendItem('aa', title, body);
     },
 
 
@@ -233,17 +238,13 @@ AATreeView.prototype = {
         });
     },
 
-    appendItem: function(type, title, value){
-        ChaikaCore.logger.debug('Append Item:', type, title, value);
-
+    appendItem: function(type, title, body){
         let selectedIndex = this.selectedIndex;
         let parentIndex;
-
 
         if(selectedIndex === -1){
             selectedIndex = this.rowCount - 1;
         }
-
 
         if(this.isContainer(selectedIndex) && type === 'aa'){
             parentIndex = selectedIndex;
@@ -251,7 +252,7 @@ AATreeView.prototype = {
             parentIndex = this.getParentIndex(selectedIndex);
         }
 
-        title = this._getUniqueName(parentIndex, title);
+        title = this._getUniqueName(parentIndex, title || 'Untitled');
 
 
         let parentNode = this._visibleNodes[parentIndex] || this._xml;
@@ -262,31 +263,31 @@ AATreeView.prototype = {
             return window.alert('AA とフォルダを同じ階層に置くことはできません.');
         }
 
+        ChaikaCore.logger.debug('Append Item:', 'parent:', parentNode.getAttribute('title'),
+                                'type:', type, 'title:', title, 'body:', body);
+
 
         node.setAttribute('title', title);
 
-        if(value){
-            node.appendChild(document.createTextNode(value));
+        if(body){
+            node.appendChild(document.createTextNode(body));
         }
 
         parentNode.appendChild(node);
 
 
-        //open parent folders
-        let folder = node;
-
-        while(folder = folder.parentNode){
-            if(folder.nodeName === 'folder'){
-                folder.setAttribute('opened', 'true');
-            }
+        //open the parent
+        if(parentNode.nodeName === 'folder'){
+            parentNode.setAttribute('opened', 'true');
         }
+
+        let oldRowCount = this.rowCount;
 
         this._buildVisibleNodes();
 
+        let newIndex = this._visibleNodes.indexOf(node);
 
-        let newIndex = this._visibleNodes.indexOf(parentNode.lastChild);
-
-        this._treeBoxObject.rowCountChanged(newIndex, 1);
+        this._treeBoxObject.rowCountChanged(parentIndex, this.rowCount - oldRowCount);
         this.selection.select(newIndex);
         this._treeBoxObject.ensureRowIsVisible(newIndex);
         this._treeBoxObject.treeBody.focus();

@@ -67,6 +67,10 @@
 
             <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
+            <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
+
+            <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
+
             <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
                 <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
                 <xul:observes element="viewChaikaSidebar" attribute="checked" />
@@ -335,28 +339,29 @@
 
                 var disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
 
-                var selectedText = content.getSelection();
+                var selection = content.getSelection();
+                var selectedText = selection.toString();
 
 
                 switch(anonymousID){
                     case 'abone-name':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selection);
                         break;
 
                     case 'abone-mail':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selection);
                         break;
 
                     case 'abone-id':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selection);
                         break;
 
                     case 'abone-word':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selection);
                         break;
 
                     case 'abone-ex':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selectedText);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selection);
                         break;
 
                     case "open-abone-manager":
@@ -427,6 +432,10 @@
                         this.findNextThread(addTab);
                         break;
 
+                    case "register-selection-as-aa":
+                        this.registerAsAA(selectedText);
+                        break;
+
                     case "open-settings":
                         this.openSettings();
                         break;
@@ -452,7 +461,7 @@
         /**
          * 指定された文字列をNGワードに追加する
          * @param {Number} ngType NGワードの種類
-         * @param {String} ngWord 追加するNGワード
+         * @param {Selection} ngWord 追加するNGワード
          * @see ChaikaAboneManager
          */
         -->
@@ -838,6 +847,21 @@
                 let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
 
                 this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * AA として文字列を登録する
+         * @param {String} aaStr 追加する AA 文字列
+         */
+        -->
+        <method name="registerAsAA">
+            <parameter name="aaStr" />
+            <body><![CDATA[
+                window.openDialog("chrome://chaika/content/settings/aa-manager.xul",
+                                  "_blank", "chrome, resizable, minimazable, toolbar", aaStr);
             ]]></body>
         </method>
 

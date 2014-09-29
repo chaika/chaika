@@ -36,6 +36,7 @@ pref("extensions.chaika.contextmenu.change-limit-all.enabled", true);
 pref("extensions.chaika.contextmenu.change-limit-l50.enabled", true);
 pref("extensions.chaika.contextmenu.go-to-board.enabled", true);
 pref("extensions.chaika.contextmenu.find-next-thread.enabled", true);
+pref("extensions.chaika.contextmenu.register-selection-as-aa.enabled", true);
 pref("extensions.chaika.contextmenu.toggle-sidebar.enabled", true);
 pref("extensions.chaika.contextmenu.open-settings.enabled", true);
 
