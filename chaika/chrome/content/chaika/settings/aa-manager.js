@@ -353,7 +353,11 @@ AATreeView.prototype = {
 
     getRowProperties: function(index){},
 
-    getCellProperties: function(row, col){},
+    getCellProperties: function(row, col){
+        if(this.isContainer(row)){
+            return 'title';
+        }
+    },
 
     getColumnProperties: function(col){},
 
