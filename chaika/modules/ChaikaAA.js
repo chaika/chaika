@@ -114,11 +114,18 @@ var ChaikaAA = {
             entries.close();
         }).bind(this);
 
+
         let aaDir = ChaikaCore.getDataDir();
         aaDir.appendRelativePath("AA");
 
         if(!aaDir.exists()){
             aaDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+        }
+
+        if(!aaDir.directoryEntries.hasMoreElements()){
+            let uncategorized = aaDir.clone();
+            uncategorized.appendRelativePath('Uncategorized.aa.xml');
+            uncategorized.create(Ci.nsIFile.NORMAL_FILE_TYPE, 0755);
         }
 
         this._doc = parser.parseFromString("<root/>", "text/xml");
