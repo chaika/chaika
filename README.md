@@ -18,8 +18,8 @@ For Users
 * [FAQ(よくある質問)](http://bbs2ch.sourceforge.jp/?page=FAQ)
 
 ### コミュニティ
-* [2ch現行スレッド](http://find.2ch.net/search?q=bbs2chreader%2Fchaika&board=software&site=2ch&match=full&status=&size=10)
-* [スレッド避難所](http://yy22.kakiko.com/test/read.cgi/bbs2ch/1222488320/)
+* [2ch現行スレッド](http://dig.2ch.net/?keywords=bbs2chreader%2Fchaika&AndOr=0&maxResult=50&atLeast=1&Sort=5&Link=1&Bbs=all&924=1)
+* [スレッド避難所](http://jbbs.shitaraba.net/computer/44179/)
 * [公式アップローダー](http://bbs2ch.sourceforge.jp/uploader/upload.php)
 * [スキン一覧](http://bbs2ch.sourceforge.jp/?page=Skin%2F0.4.5)
 
@@ -31,15 +31,15 @@ For Developers
 ---
 
 ### テスト環境
+* [chaika 開発版](https://github.com/chaika/chaika/tree/develop)
 
-* [開発用テスト板](http://yy22.kakiko.com/bbs2ch/) : バグ再現レスなどはこちらに投稿。
-* [開発用テスト板2](http://jbbs.shitaraba.net/computer/43679/)
+* [開発用テスト板](http://jbbs.shitaraba.net/computer/43679/)
 
 ### バグ一覧・ToDo
-* 最新バグ一覧: [Issues](https://github.com/chaika/chaika/issues)
+* 最新バグ一覧: [Issues](https://github.com/chaika/chaika/issues?q=is%3Aopen+is%3Aissue+-label%3Afixed)
 
 * 更新が停止したバグ一覧など  
-    (新規投稿は上にお願いします)
+    (新規投稿は上のバグ一覧にお願いします)
     * [旧旧ToDo](https://spreadsheets.google.com/pub?key=pbbe5TFNb21RVxOf7ygNJfg) : b2r 0.5系 (flysonさん作成)
     * [旧ToDo](http://d.hatena.ne.jp/nazodane/20080609/1212999112) : b2r 0.5系 (Nazoさん作成)
     * [launchpad](https://bugs.launchpad.net/bbs2ch) : b2r バグトラッカー
