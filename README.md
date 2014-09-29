@@ -29,6 +29,12 @@ For Users
 
 For Developers
 ---
+## 関連アドオン・スキン開発
+* [開発者の方向けオンラインマニュアル](https://github.com/chaika/chaika/wiki#%E9%96%8B%E7%99%BA%E8%80%85%E3%81%AE%E6%96%B9%E5%90%91%E3%81%91)
+
+
+## chaika 本体の開発
+メイン開発者として参画する、パッチを投稿する、Pull Requestを行う、オンラインヘルプを整備するなど、どのような形での参加であれ大歓迎です。
 
 ### テスト環境
 * [chaika 開発版](https://github.com/chaika/chaika/tree/develop)
