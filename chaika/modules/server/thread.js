@@ -680,10 +680,11 @@ Thread2ch.prototype = {
             var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
 
             if(ChaikaHttpController.ivur.enabled){
-                resMes = resMes.replace(regUrlLink, function(aStr, aScheme, aSecure, aSpec, aOffset, aS){
-                    var url = 'http' + aSecure + ':' + aSpec;
-                    url = ChaikaHttpController.ivur.replaceURL(url);
-                    return '<a href="' + url + '" class="outLink">' + aScheme + aSecure + ':' + aSpec + '</a>';
+                resMes = resMes.replace(regUrlLink, function(aStr, aScheme, aSecure, aSpec){
+                    const url = 'http' + (aSecure || '') + ':' + aSpec;
+                    const image_url = ChaikaHttpController.ivur.replaceURL(url);
+
+                    return '<a href="' + image_url + '" class="outLink">' + url + '</a>';
                 });
             }else{
                 resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
