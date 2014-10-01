@@ -53,11 +53,7 @@
         </menupopup>
     </marblebutton>
 
-    <deck id="dckUpdate" selectedIndex="0">
-        <marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)"/>
-        <marblebutton id="MoveCheck"  label="確認" oncommand="boardMoveCheck(event)"/>
-        <marblebutton id="MoveNewURL" label="移動" oncommand="moveNewURL(event)"/>
-    </deck>
+    <marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)" />
 </marbletoolbar>
 
 

@@ -477,7 +477,7 @@ var BoardTree = {
 };
 
 function setStatus(aString){
-    document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0; 
+    document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0;
     document.getElementById("lblStatus").value = aString;
 }
 
@@ -512,44 +512,35 @@ function subjectUpdate(aEvent, aForce){
     gSubjectDownloader.onStart = function(aDownloader){
         setStatus("start: " + this.url.spec);
     };
+
     gSubjectDownloader.onStop = function(aDownloader, aStatus){
         setStatus("");
 
         var subjectFile = gBoard.subjectFile.clone();
         var settingFile = gBoard.settingFile.clone();
 
-        if(aStatus == 302 || !subjectFile.exists() || subjectFile.fileSize==0){
-            setStatus("スレッド一覧を取得できませんでした。板が移転した可能性があります。");
-            document.getElementById("dckUpdate").selectedIndex = 1;
-            return;
+        if(aStatus === 302 || !subjectFile.exists() || subjectFile.fileSize === 0){
+            setStatus("スレッド一覧を取得できませんでした。板の移転を確認しています...");
+            return checkBoardRelocation();
         }
 
         gBoard.boardSubjectUpdate();
 
-        if(!settingFile.exists() || settingFile.fileSize==0){
+        if(!settingFile.exists() || settingFile.fileSize === 0){
             settingUpdate();
         }else{
             BoardTree.initTree();
         }
     };
+
     gSubjectDownloader.onProgressChange = function(aDownloader, aPercentage){
         setStatus("downloading: " + aPercentage + "%");
     };
+
     gSubjectDownloader.onError = function(aDownloader, aErrorCode){
-        var errorText = "";
-        switch(aErrorCode){
-            case ChaikaDownloader.ERROR_BAD_URL:
-                errorText = "BAD URL";
-                break;
-            case ChaikaDownloader.ERROR_NOT_AVAILABLE:
-                errorText = "NOT AVAILABLE";
-                break;
-            case ChaikaDownloader.ERROR_FAILURE:
-                errorText = "ERROR FAILURE";
-                break;
-        }
         setStatus("ネットワークの問題により、スレッド一覧を取得できませんでした。");
     };
+
 
     gSubjectDownloader.download();
     setStatus("request: " + gSubjectDownloader.url.spec);
@@ -638,104 +629,93 @@ function bannerLoadError(aEvent){
     alert("バナーの読み込みに失敗しました");
 }
 
-function boardMoveCheck(aEvent){
-    if(aEvent.type=="click" && aEvent.button!=0) return;
+function checkBoardRelocation(){
+    gBoardMoveChecker = new NewBoardURLFinder();
 
-    gBoardMoveChecker = new b2rBoardMoveChecker();
-    gBoardMoveChecker.onChecked = function(aSuccess, aNewURL){
-        if(aSuccess){
-            setStatus(aNewURL +" への移転を確認しました");
-            gNewURL = aNewURL;
-            document.getElementById("dckUpdate").selectedIndex = 2;
-        }else{
-            setStatus("移転先を確認できませんでした");
-            gNewURL = null;
-            document.getElementById("dckUpdate").selectedIndex = 0;
+    gBoardMoveChecker.onSuccess = function(aNewURL){
+        var shouldMove = confirm(aNewURL + ' への移転を確認しました。新しい URL へ移動しますか？');
+
+        if(shouldMove){
+            moveToNewURL(aNewURL);
         }
-        gBoardMoveChecker = null;
-    }
+    };
+
+    gBoardMoveChecker.onFail = function(){
+        setStatus("移転先を確認できませんでした。板の URL を再度確認して下さい。");
+    };
+
     gBoardMoveChecker.check(gBoard.url.spec);
-    setStatus("板の移転を確認中...");
 }
 
-function moveNewURL(aEvent){
-    if(aEvent.type=="click" && aEvent.button!=0) return;
-
-    if(gNewURL){
+function moveToNewURL(newURL){
+    if(newURL){
         var oldLogDir = ChaikaBoard.getLogFileAtURL(gBoard.url);
+
         try{
             var subjectFile = gBoard.subjectFile.clone();
             var settingFile = gBoard.settingFile.clone();
-            if(subjectFile.exists() && subjectFile.fileSize==0){
+
+            if(subjectFile.exists() && subjectFile.fileSize === 0){
                 subjectFile.remove(true);
             }
-            if(settingFile.exists() && settingFile.fileSize==0){
+
+            if(settingFile.exists() && settingFile.fileSize === 0){
                 settingFile.remove(true);
             }
+
             oldLogDir.remove(false);
         }catch(ex){}
 
         setTimeout(function(){
-            window.location.href = "chaika://board/" + gNewURL;
+            window.location.href = "chaika://board/" + newURL;
         }, 0);
-    }else{
-        document.getElementById("dckUpdate").selectedIndex = 0;
     }
 }
 
-function b2rBoardMoveChecker(){
+
+function NewBoardURLFinder(){
 }
 
-b2rBoardMoveChecker.prototype = {
-    get cheking(){
-        this._checkiing;
-    },
+NewBoardURLFinder.prototype = {
 
     check: function(aBoardURLSpec){
-        this._checkiing = false;
-        if(this._httpReq && this._httpReq.readyState!=0){
+        if(this._httpReq && this._httpReq.readyState !== 0){
             this._httpReq.abort();
         }
+
         this._httpReq = new XMLHttpRequest();
-        var context = this;
-        this._httpReq.onreadystatechange = function(){
-            context._onreadystatechange();
-        }
+
+        this._httpReq.onreadystatechange = this._onreadystatechange.bind(this);
         this._httpReq.open("GET", aBoardURLSpec);
         this._httpReq.send(null);
-        this._checkiing = true;
     },
 
     abort: function(){
-        this._checkiing = false;
-        if(this._httpReq && this._httpReq.readyState!=0){
+        if(this._httpReq && this._httpReq.readyState !== 0){
             this._httpReq.abort();
             this._httpReq = null;
         }
     },
 
     _onreadystatechange: function(){
-        switch(this._httpReq.readyState){
-            case 4:
-                break;
-            default:
-                return;
-        }
+        if(this._httpReq.readyState !== 4) return;
 
         var responseText = this._httpReq.responseText;
-        if(responseText.match(/Change your bookmark/m)){
+
+        if(/Change your bookmark/m.test(responseText)){
             if(responseText.match(/<a href=\"([^\"]+)\">/m)){
-                this.onChecked(true, RegExp.$1);
+                this.onSuccess(RegExp.$1);
             }
         }else{
-            this.onChecked(false, null);
+            this.onFail();
         }
-        this._checkiing = false;
+
         this._httpReq = null;
     },
 
     onChecked: function(aSuccess, aNewURL){}
-}
+};
+
 
 var UpdateObserver = {
 
