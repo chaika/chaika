@@ -159,6 +159,14 @@ var ChaikaRoninLogin = {
      */
     _enabled: false,
 
+
+    /**
+     * ID を取得中か否か
+     * @type {Boolean}
+     */
+    _processing: false,
+
+
     /**
      * 起動時に実行される
      */
@@ -264,10 +272,25 @@ var ChaikaRoninLogin = {
 
 
     login: function ChaikaRoninLogin_login(){
-        //すでに有効なセッションIDが存在する場合にはスキップする
-        if(this.isLoggedIn()){
-            return;
+        var account = this.getLoginInfo();
+
+        //有効なアカウントが存在しないとき
+        if(!account){
+            return ChaikaCore.logger.debug('Login Error: No Account Available');
         }
+
+        //すでに有効なセッションIDが存在するとき
+        if(this.isLoggedIn()){
+            return ChaikaCore.logger.debug('Login Error: Session ID Is Still Valid');
+        }
+
+        //Session ID を取得中なとき
+        if(this._processing){
+            return ChaikaCore.logger.debug('Login Error: Another Process Is Running');
+        }
+
+
+        this._processing = true;
 
         //確実にログアウトする
         this.logout();
@@ -278,14 +301,8 @@ var ChaikaRoninLogin = {
         httpChannel.setRequestHeader("Content-Type", "application/x-www-form-urlencoded", false);
         httpChannel = httpChannel.QueryInterface(Ci.nsIUploadChannel);
 
-        var account = this.getLoginInfo();
-
-        if(!account){
-            return;
-        }
-
         var strStream = Cc["@mozilla.org/io/string-input-stream;1"].createInstance(Ci.nsIStringInputStream);
-        var postString = String("ID=" + account.id + "&PW=" + account.password);
+        var postString = "ID=" + account.id + "&PW=" + account.password;
 
         strStream.setData(postString, postString.length);
         httpChannel.setUploadStream(strStream, "application/x-www-form-urlencoded", -1);
@@ -297,6 +314,8 @@ var ChaikaRoninLogin = {
 
     logout: function ChaikaRoninLogin_logout(){
         ChaikaCore.pref.setChar("login.ronin.session_id", "");
+
+        ChaikaCore.logger.debug('Logged Out');
 
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.notifyObservers(null, "ChaikaRoninLogin:Logout", "OK");
@@ -325,8 +344,11 @@ var ChaikaRoninLogin = {
         this.logout();
 
         ChaikaCore.logger.debug("Auth: NG");
+
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.notifyObservers(null, "Chaika2chViewer:Auth", "NG");
+
+        this._processing = false;
     },
 
     /**
@@ -336,30 +358,39 @@ var ChaikaRoninLogin = {
         ChaikaCore.pref.setChar("login.ronin.session_id", aSessionID);
         ChaikaCore.pref.setInt("login.ronin.last_auth_time", Date.now());
 
-        ChaikaCore.logger.debug("Auth: OK");
+        ChaikaCore.logger.debug("Auth: OK; Session ID:", aSessionID);
+
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.notifyObservers(null, "Chaika2chViewer:Auth", "OK");
+
+        this._processing = false;
     },
 
+
     _listener: {
-        onStartRequest: function authListener_onStartRequest(aRequest, aContext){
+        onStartRequest: function(aRequest, aContext){
             this._binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
                     .createInstance(Ci.nsIBinaryInputStream);
             this._data = [];
+
+            ChaikaCore.logger.debug('Start Request');
         },
 
-        onDataAvailable: function authListener_onDataAvailable(aRequest, aContext,
-                                            aInputStream, aOffset, aCount){
+        onDataAvailable: function(aRequest, aContext, aInputStream, aOffset, aCount){
             this._binaryStream.setInputStream(aInputStream);
             this._data.push(this._binaryStream.readBytes(aCount));
+
+            ChaikaCore.logger.debug('Data Available; Received Data:', this._data.join(''));
         },
 
-        onStopRequest: function authListener_onStopRequest(aRequest, aContext, aStatus){
+        onStopRequest: function(aRequest, aContext, aStatus){
             var data = this._data.join("");
 
+            aRequest.QueryInterface(Ci.nsIHttpChannel);
             ChaikaCore.logger.debug("Auth Response: " + data);
+            ChaikaCore.logger.debug('HTTP Status:', aRequest.responseStatus);
 
-            if(data.lastIndexOf("SESSION-ID=ERROR:", 0) !== -1){
+            if(data.startsWith("SESSION-ID=ERROR:")){
                 ChaikaRoninLogin._onFail();
                 return;
             }
