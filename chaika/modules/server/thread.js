@@ -239,7 +239,7 @@ Thread2ch.prototype = {
             return;
         }
 
-        this.converter = new b2rThreadConverter();
+        this.converter = new ThreadConverter();
         try{
             this.converter.init(this, this.thread.url, this.thread.boardURL, this.thread.type);
         }catch(ex){
@@ -1359,11 +1359,11 @@ Id2Color.prototype = {
 }
 
 
-// ***** ***** ***** ***** ***** b2rThreadConverter ***** ***** ***** ***** *****
-function b2rThreadConverter(){
+// ***** ***** ***** ***** ***** ThreadConverter ***** ***** ***** ***** *****
+function ThreadConverter(){
 }
 
-b2rThreadConverter.prototype = {
+ThreadConverter.prototype = {
 
     init: function(aContext, aThreadURL, aBoardURL, aType){
         this._context = aContext;
