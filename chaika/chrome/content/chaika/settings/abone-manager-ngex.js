@@ -1,3 +1,4 @@
+/* See license.txt for terms of usage */
 
 Components.utils.import('resource://chaika-modules/ChaikaCore.js');
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");

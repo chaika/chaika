@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 
+<!-- See license.txt for terms of usage -->
+
 <bindings id="skinMenuBindings"
         xmlns="http://www.mozilla.org/xbl"
         xmlns:xbl="http://www.mozilla.org/xbl"

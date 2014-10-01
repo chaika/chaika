@@ -1,3 +1,5 @@
+/* See license.txt for terms of usage */
+
 var ChaikaBrowserOverlay = {
 
     _initCount: 0,

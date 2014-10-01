@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/bbsmenu/page.css" type="text/css"?>

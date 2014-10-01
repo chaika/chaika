@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
 <overlay id="boardPaneOverlay"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-
 
 <prefpane id="paneBoard">
 

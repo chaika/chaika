@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 
+<!-- See license.txt for terms of usage -->
+
 <!DOCTYPE bindings [
     <!ENTITY % globalDTD SYSTEM "chrome://global/locale/global.dtd">
     %globalDTD;
