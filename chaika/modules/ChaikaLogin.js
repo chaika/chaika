@@ -366,8 +366,8 @@ var ChaikaRoninLogin = {
             ChaikaCore.logger.debug('HTTP Status:', aRequest.responseStatus);
 
             if(data.startsWith("SESSION-ID=ERROR:")){
-                //ChaikaRoninLogin._onFail();
-                //return;
+                ChaikaRoninLogin._onFail();
+                return;
             }
 
             //先頭のSESSION-ID=と改行コードを取り除く
