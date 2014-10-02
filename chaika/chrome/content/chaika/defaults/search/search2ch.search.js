@@ -57,7 +57,7 @@ var Search2ch = {
         let json = JSON.parse(this._req.responseText);
 
         if(!json.success){
-            return this._defer.reject('Failed duo to server error.', this._req.responseText);
+            return this._defer.reject('Failed due to server error.', this._req.responseText);
         }
 
         let boards = [];

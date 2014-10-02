@@ -50,7 +50,7 @@
 
         <method name="_initMenu">
             <body><![CDATA[
-                this._destoryMenu();
+                this._destroyMenu();
 
                 var skinMenu = this.parentNode;
 
@@ -105,7 +105,7 @@
         </method>
 
 
-        <method name="_destoryMenu">
+        <method name="_destroyMenu">
             <body><![CDATA[
                 while(this.hasChildNodes()){
                     this.removeChild(this.firstChild);
