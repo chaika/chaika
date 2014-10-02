@@ -101,31 +101,20 @@ AboneData.prototype = {
 
 
     _loadNgData: function(){
-        if(!this._ngFile.exists())
-            return this._data = [];
+        if(!this._ngFile.exists()){
+            this._data = [];
+            return;
+        }
 
-        //空白行を除いて読み込む
-        this._data = ChaikaCore.io.readString(this._ngFile);
+        this._data = ChaikaCore.io.readUnknownEncodingString(this._ngFile, true, 'utf-8', 'Shift_JIS');
 
-        //U+FFFD (REPLACEMENT CHARACTER) が含まれる場合には
-        //Shift-JISで保存されている旧式のファイルであるということなので
-        //Shift-JIS で再読込する
-        if(this._data.contains("\uFFFD")){
-            ChaikaCore.logger.warning("The encoding of " + this._ngFile.leafName +
-                                      " is Shift-JIS. Try to convert to UTF-8.");
-
-            this._data = ChaikaCore.io.readString(this._ngFile, 'Shift-JIS');
-
-            //読み込みに成功していればUTF-8で保存し直す
-            if(!this._data.contains("\uFFFD")){
-                ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data);
-            }else{
-                ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
-            }
+        if(!this._data){
+            ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
+            this._data = "";
         }
 
         this._data = this._data.split('\n')
-                               .filter((line) => !!line);
+                               .filter((line) => !!line); //空白行を取り除く
     },
 
 

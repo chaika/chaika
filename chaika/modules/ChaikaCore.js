@@ -976,6 +976,7 @@ ChaikaIO.prototype = {
     readString: function ChaikaIO_readString(aFile, aCharset){
         var result = [];
         var stream;
+
         try{
             stream = this.getFileInputStream(aFile, aCharset);
         }catch(ex){
@@ -984,8 +985,9 @@ ChaikaIO.prototype = {
         }
 
         try{
-            var str = {};
-            while (stream.readString(1024*16, str) != 0){
+            let str = {};
+
+            while (stream.readString(1024*16, str) !== 0){
                 result.push(str.value);
             }
         }catch(ex){
@@ -996,6 +998,44 @@ ChaikaIO.prototype = {
         }
 
         return result.join("");
+    },
+
+
+    /**
+     * エンコーディングが不明なファイルを読み込む
+     * @param {nsIFile} file 読みこむファイル
+     * @param {Boolean} overrideOrigFile 元のファイルを UTF-8 で上書きするかどうか
+     * @param {String} suspects エンコーディングの候補
+     */
+    readUnknownEncodingString: function(file, overrideOrigFile, ...suspects){
+        if(suspects.indexOf('UTF-8') === -1 || suspects.indexOf('utf-8') === -1){
+            suspects.unshift('utf-8');
+        }
+
+        var fileString;
+
+        while(true){
+            fileString = this.readString(file, suspects[0]);
+
+            suspects.shift();
+
+            //U+FFFD = REPLACEMENT CHARACTER
+            if(!fileString.contains('\uFFFD')){
+                //Shift_JIS から UTF-8 へ変換すると、\ が ＼ または ¥ へと誤変換されることがある
+                fileString = fileString.replace(/(?:\uff3c|\u00a5)/g, '\\');
+
+                if(overrideOrigFile){
+                    this.writeString(file, 'utf-8', false, fileString);
+                }
+
+                return fileString;
+            }else if(suspects.length <= 0){
+                ChaikaCore.logger.error('Unable to read string from ' + file.leafName + ': Unknown Encoding');
+                return null;
+            }
+        }
+
+        return null;
     },
 
 
@@ -1040,10 +1080,10 @@ ChaikaIO.prototype = {
             fileStream.init(aFile, PR_RDONLY, PR_PERMS_FILE, 0);
             binaryStream.setInputStream(fileStream);
 
-            var str;
             while(binaryStream.available() > 1024*16){
                 result.push(binaryStream.readBytes(1024*16));
             }
+
             result.push(binaryStream.readBytes(binaryStream.available()));
         }catch(ex){
             ChaikaCore.logger.error(ex);
