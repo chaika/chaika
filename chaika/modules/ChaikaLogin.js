@@ -149,11 +149,16 @@ var ChaikaRoninLogin = {
 
 
     get enabled(){
-        return this._enabled && this.isLoggedIn();
+        let isLoggedIn = this.isLoggedIn();
+
+        ChaikaCore.logger.debug('internal flag:', this._enabled, 'logged in:', isLoggedIn);
+
+        return this._enabled && isLoggedIn;
     },
 
 
     set enabled(bool){
+        ChaikaCore.logger.debug('set internal flag to:', bool);
         this._enabled = bool;
     },
 
@@ -292,8 +297,13 @@ var ChaikaRoninLogin = {
         //  https://pink-chan-store.myshopify.com/pages/developers
         let lastAuthTime = ChaikaCore.pref.getInt("login.ronin.last_auth_time");
         let now = Date.now();
+        let sessionID = ChaikaCore.pref.getChar("login.ronin.session_id");
 
-        return (now - lastAuthTime) < 6 * 60 * 60 * 1000 && ChaikaCore.pref.getChar("login.ronin.session_id");
+        ChaikaCore.logger.debug((now-lastAuthTime), sessionID);
+
+        return (now - lastAuthTime) < 6 * 60 * 60 * 1000 &&
+               typeof sessionID === 'string' &&
+               sessionID !== "";
     },
 
     _getLoginURI: function ChaikaRoninLogin__getLoginURI(){

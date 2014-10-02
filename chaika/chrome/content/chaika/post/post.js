@@ -255,6 +255,7 @@ Post.prototype = {
 
         if(ChaikaRoninLogin.enabled){
             postData.push("sid=" + encodeURIComponent(ChaikaCore.pref.getChar('login.ronin.session_id')));
+            ChaikaCore.logger.debug('Ronin Enabled:\n', postData.join('\n'));
         }
 
         this._httpRequest.post(postData.join("&"));

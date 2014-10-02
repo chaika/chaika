@@ -475,6 +475,8 @@ var FormPage = {
             ChaikaRoninLogin.enabled = false;
             FormPage._roninCheck.checked = false;
         }
+
+        ChaikaCore.logger.debug('ChaikaRoninLogin.enabled:', ChaikaRoninLogin.enabled);
     },
 
 
