@@ -296,12 +296,12 @@ var ChaikaRoninLogin = {
         //  ※実際の有効期限は24時間である
         //  https://pink-chan-store.myshopify.com/pages/developers
         let lastAuthTime = ChaikaCore.pref.getInt("login.ronin.last_auth_time");
-        let now = Date.now();
+        let now = Date.now() / 1000;
         let sessionID = ChaikaCore.pref.getChar("login.ronin.session_id");
 
-        ChaikaCore.logger.debug((now-lastAuthTime), sessionID);
+        ChaikaCore.logger.debug(now, lastAuthTime, now - lastAuthTime, sessionID);
 
-        return (now - lastAuthTime) < 6 * 60 * 60 * 1000 &&
+        return (now - lastAuthTime) < 6 * 60 * 60 &&
                typeof sessionID === 'string' &&
                sessionID !== "";
     },
@@ -331,7 +331,7 @@ var ChaikaRoninLogin = {
      */
     _onSuccess: function ChaikaRoninLogin__onSuccess(aSessionID){
         ChaikaCore.pref.setChar("login.ronin.session_id", aSessionID);
-        ChaikaCore.pref.setInt("login.ronin.last_auth_time", Date.now());
+        ChaikaCore.pref.setInt("login.ronin.last_auth_time", Date.now() / 1000);
 
         ChaikaCore.logger.debug("Auth: OK; Session ID:", aSessionID);
 
@@ -366,8 +366,8 @@ var ChaikaRoninLogin = {
             ChaikaCore.logger.debug('HTTP Status:', aRequest.responseStatus);
 
             if(data.startsWith("SESSION-ID=ERROR:")){
-                ChaikaRoninLogin._onFail();
-                return;
+                //ChaikaRoninLogin._onFail();
+                //return;
             }
 
             //先頭のSESSION-ID=と改行コードを取り除く
