@@ -747,6 +747,9 @@ Thread2ch.prototype = {
                 ].join('/');
                 var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
                 var datKakoURL = ioService.newURI(rokkaURLSpec + '/?sid=' + KAGI, null, null).QueryInterface(Ci.nsIURL);
+
+                ChaikaCore.logger.debug(datKakoURL.spec);
+
                 this.httpChannel = ChaikaCore.getHttpChannel(datKakoURL);
                 this._maruMode = true;
             }else if(ChaikaCore.pref.getBool("thread_get_log_from_mimizun")){
