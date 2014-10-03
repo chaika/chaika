@@ -912,6 +912,7 @@ Thread2ch.prototype = {
             case 206: // 差分GET OK
                 break;
             case 302: // DAT落ち
+            case 403: // DAT落ちに対して403が返される場合がある: https://github.com/chaika/chaika/issues/105
                 if(this._kakoDatDownload){
                     this.write(this.converter.getFooter("dat_down"));
                     this.close();
