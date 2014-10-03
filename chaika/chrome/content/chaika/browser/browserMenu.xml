@@ -535,18 +535,23 @@
         <method name="copyClipBoard">
             <parameter name="template" />
             <body><![CDATA[
-                const osname= Services.appinfo.OS;
+                const osname = Services.appinfo.OS;
                 const NEWLINE = (osname == "Darwin") ? "\n" : "\r\n";
+                const removeLimit = this.ChaikaCore.pref.getBool('browser.browsermenu.remove_limit_when_copy');
 
-                var url = (this._getCurrentThreadURL() || getBrowser().currentURI).spec;
+                var uri = (this._getCurrentThreadURL() || getBrowser().currentURI);
+
+                if(removeLimit){
+                    uri = Services.io.newURI("./", null, uri);
+                }
 
                 var text = template.replace("%TITLE%", content.document.title, "g")
-                                    .replace("%URL%", url, "g")
-                                    .replace("%SEL%", content.getSelection().toString(), "g")
-                                    .replace("%NEWLINE%", NEWLINE, "g");
+                                   .replace("%URL%", uri.spec, "g")
+                                   .replace("%SEL%", content.getSelection().toString(), "g")
+                                   .replace("%NEWLINE%", NEWLINE, "g");
 
-                var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"]
-                                    .getService(Ci.nsIClipboardHelper);
+                var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
+
                 clipboard.copyString(text);
             ]]></body>
         </method>

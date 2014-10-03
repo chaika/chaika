@@ -13,6 +13,8 @@
                 name="extensions.chaika.browser.browsermenu.open_in_new_tab" type="bool" />
         <preference id="extensions.chaika.browser.browsermenu.disregard_url_limit"
                 name="extensions.chaika.browser.browsermenu.disregard_url_limit" type="bool" />
+        <preference id="extensions.chaika.browser.browsermenu.remove_limit_when_copy"
+                name="extensions.chaika.browser.browsermenu.remove_limit_when_copy" type="bool" />
         <preference id="extensions.chaika.browser.browsermenu.confirm_add_abone"
                 name="extensions.chaika.browser.browsermenu.confirm_add_abone" type="bool" />
         <preference id="extensions.chaika.browser.browsermenu.reload_when_skin_changed"
@@ -42,15 +44,17 @@
                 tooltiptext="ツールバーボタンおよびコンテキストメニューに共通の設定を行います." />
         <vbox>
             <checkbox label="左クリックで新しいタブに開く" tooltiptext="OFFの場合は中クリックで新しいタブに開くことができます."
-                    preference="extensions.chaika.browser.browsermenu.open_in_new_tab" />
+                      preference="extensions.chaika.browser.browsermenu.open_in_new_tab" />
             <checkbox label="URL の表示制限を書き換えて開く"
-                    preference="extensions.chaika.browser.browsermenu.disregard_url_limit" />
+                      preference="extensions.chaika.browser.browsermenu.disregard_url_limit" />
+            <checkbox label="コピーする際に URL の表示制限を削除する"
+                      preference="extensions.chaika.browser.browsermenu.remove_limit_when_copy" />
             <checkbox label="NGワードを直接登録せずにあぼーんマネージャを開く"
-                    preference="extensions.chaika.browser.browsermenu.confirm_add_abone" />
+                      preference="extensions.chaika.browser.browsermenu.confirm_add_abone" />
             <checkbox label="chaika 上でスキンを変更した時に自動で再読み込みする"
-                    preference="extensions.chaika.browser.browsermenu.reload_when_skin_changed" />
+                      preference="extensions.chaika.browser.browsermenu.reload_when_skin_changed" />
             <checkbox label="スレッド検索をサイドバーで行う"
-                    preference="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" />
+                      preference="extensions.chaika.browser.browsermenu.find_2ch_in_sidebar" />
         </vbox>
     </groupbox>
 
