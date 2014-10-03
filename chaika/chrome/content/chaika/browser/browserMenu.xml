@@ -539,13 +539,27 @@
                 const NEWLINE = (osname == "Darwin") ? "\n" : "\r\n";
                 const removeLimit = this.ChaikaCore.pref.getBool('browser.browsermenu.remove_limit_when_copy');
 
-                var uri = (this._getCurrentThreadURL() || getBrowser().currentURI);
+                var uri = this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL() ||
+                          getBrowser().currentURI;
+
+                var title;
+
+                try{
+                    title = (new this.ChaikaThread(uri)).title;
+                }catch(ex){
+                    try{
+                        title = (new this.ChaikaBoard(uri)).getTitle();
+                    }catch(ex2){
+                        title = content.document.title;
+                    }
+                }
 
                 if(removeLimit){
                     uri = Services.io.newURI("./", null, uri);
                 }
 
-                var text = template.replace("%TITLE%", content.document.title, "g")
+                var text = template.replace("%TITLE%", title, "g")
                                    .replace("%URL%", uri.spec, "g")
                                    .replace("%SEL%", content.getSelection().toString(), "g")
                                    .replace("%NEWLINE%", NEWLINE, "g");
