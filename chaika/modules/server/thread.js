@@ -562,7 +562,7 @@ Thread2ch.prototype = {
 
         // レス番リンク処理 & 連鎖あぼーんの判定
         // \x81\x84 = ＞
-        var regResPointer = /(?:<a>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
+        var regResPointer = /(?:<a.*?>)?((?:&gt;|\x81\x84){1,2})((?:\d{1,4}\s*(?:<\/a>|,|\-)*\s*)+)/g;
         var fixInvalidAnchor = ChaikaCore.pref.getBool('thread_fix_invalid_anchor');
         var shouldChainAbone = false;
         var shouldChainHideAbone = false;
