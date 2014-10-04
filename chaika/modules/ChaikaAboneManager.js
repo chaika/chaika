@@ -180,18 +180,19 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         value: function(){
             AboneData.prototype._loadNgData.apply(this, arguments);
 
-            try{
-                this._dataObj = this._data.map((item) => JSON.parse(item));
+            this._dataObj = this._data.map((json) => {
+                try{
+                    return JSON.parse(json);
+                }catch(ex){
+                    ChaikaCore.logger.warning('Invalid JSON:', json, '\n' + ex);
+                    return null;
+                }
+            });
 
-                //有効期限切れのものを削除する
-                this._dataObj = this._dataObj.filter((item) => item.expire ? item.expire > Date.now() : true);
-
-                this._data = this._dataObj.map((item) => JSON.stringify(item));
-            }catch(ex){
-                //不正なフォーマットのデータが含まれていたとき
-                ChaikaCore.logger.error('Unable to load ' + this._ngFile.leafName + '\n', ex);
-                this._dataObj = this._data = [];
-            }
+            //有効期限切れのものを削除する
+            //削除結果を _data にも反映させる
+            this._dataObj = this._dataObj.filter((item) => item && (item.expire ? item.expire > Date.now() : true));
+            this._data = this._dataObj.map((item) => JSON.stringify(item));
         }
     },
 
