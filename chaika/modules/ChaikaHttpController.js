@@ -217,7 +217,7 @@ ChaikaImageViewURLReplace.prototype = {
 
         var data = ChaikaCore.io.readUnknownEncodingString(file, true, 'utf-8', 'Shift_JIS');
 
-        if(!data){
+        if(data === null){
             ChaikaCore.logger.error('Fail in converting the encoding of ImageViewURLReplace.dat');
             return;
         }
@@ -575,7 +575,7 @@ ChaikaNGFiles.prototype = {
 
         var data = ChaikaCore.io.readUnknownEncodingString(ngFile, true, 'utf-8', 'Shift_JIS');
 
-        if(!data){
+        if(data === null){
             ChaikaCore.logger.error('Fail in converting the encoding of NGFiles.txt');
             return;
         }

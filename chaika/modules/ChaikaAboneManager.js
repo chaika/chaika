@@ -108,7 +108,7 @@ AboneData.prototype = {
 
         this._data = ChaikaCore.io.readUnknownEncodingString(this._ngFile, true, 'utf-8', 'Shift_JIS');
 
-        if(!this._data){
+        if(this._data === null){
             ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
             this._data = "";
         }
