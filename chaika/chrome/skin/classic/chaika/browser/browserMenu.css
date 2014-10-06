@@ -3,10 +3,10 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 /** Icons for the toolbar button **/
+@import url('chrome://chaika/skin/browser/browserMenu-icon.css');
 
 #chaika-toolbarbutton {
     -moz-box-orient: horizontal;
-    list-style-image: url("icon.svg") !important;
 }
 
 #chaika-toolbarbutton[cui-areatype="menu-panel"],

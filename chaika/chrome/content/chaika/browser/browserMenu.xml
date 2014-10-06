@@ -91,6 +91,7 @@
 
     <resources>
         <stylesheet src="chrome://chaika/skin/browser/browserMenu.css"/>
+        <stylesheet src="chrome://chaika/skin/browser/browserMenu-icon.css"/>
     </resources>
 
     <handlers>
