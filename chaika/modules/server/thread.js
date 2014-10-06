@@ -524,20 +524,18 @@ Thread2ch.prototype = {
             if(aboneResult){
                 let enableChain = aboneResult.chain === true ||
                                   aboneResult.chain === undefined && this._enableChainAbone;
-                let enableHide = aNumber !== -1 && (
-                                    aboneResult.hide === true ||
-                                    aboneResult.hide === undefined && this._enableHideAbone
-                                 );
+                let enableHide = aboneResult.hide === true ||
+                                 aboneResult.hide === undefined && this._enableHideAbone;
 
                 isAbone = true;
                 ngData = aboneResult;
 
                 //連鎖あぼーん (親)
                 if(enableChain){
-                    this._chainAboneNumbers.push(aNumber);
+                    this._chainAboneNumbers.push(resNumber);
 
                     if(enableHide){
-                        this._chainHideAboneNumbers.push(aNumber);
+                        this._chainHideAboneNumbers.push(resNumber);
                     }
                 }
 
@@ -547,7 +545,7 @@ Thread2ch.prototype = {
                     let expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
                     ChaikaAboneManager.ex.add({
-                        title: 'NGID: ' + resID + ' (Auto NGID: ' + this.thread.title + ' >>' + aNumber + ')',
+                        title: 'NGID: ' + resID + ' (Auto NGID: ' + this.thread.title + ' >>' + resNumber + ')',
                         target: 'post',
                         match: 'all',
                         expire: expire.getTime(),
@@ -676,7 +674,7 @@ Thread2ch.prototype = {
 
         //連鎖あぼーん (子) 処理
         if(shouldChainAbone){
-            this._chainAboneNumbers.push(aNumber);
+            this._chainAboneNumbers.push(resNumber);
             isAbone = true;
             ngData = 'Chain Abone: >>' + chainAboneParent;
         }
@@ -684,7 +682,7 @@ Thread2ch.prototype = {
 
         //連鎖透明あぼーん (子) 処理
         if(shouldChainHideAbone){
-            this._chainHideAboneNumbers.push(aNumber);
+            this._chainHideAboneNumbers.push(resNumber);
             return '';
         }
 
@@ -726,7 +724,7 @@ Thread2ch.prototype = {
         });
 
 
-        return this.converter.getResponse(aNew, aNumber, resName, resMail, resMailName, resDate,
+        return this.converter.getResponse(aNew, resNumber, resName, resMail, resMailName, resDate,
                                           resID, resIP, resHost, resBeLink, resBeID, resBeBaseID, resMes, isAbone, ngData);
     },
 
@@ -1050,6 +1048,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
 
             //2ch互換へと変換
             var resArray = line.split("<>");
+            var resNumber = aNumber;
             var resName = "";
             var resMail = "";
             var resDate = "";
@@ -1074,7 +1073,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
                 threadTitle
             ].join('<>');
 
-            return Thread2ch.prototype.datLineParse.apply(this, [line, aNumber, aNew]);
+            return Thread2ch.prototype.datLineParse.apply(this, [line, resNumber, aNew]);
         }
     },
 
