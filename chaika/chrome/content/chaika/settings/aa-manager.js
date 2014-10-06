@@ -232,8 +232,8 @@ AATreeView.prototype = {
 
         node.setAttribute('title', title);
 
-        if(body){
-            node.appendChild(document.createTextNode(body));
+        if(type === 'aa'){
+            node.appendChild(document.createTextNode(body || ''));
         }
 
         parentNode.appendChild(node);
