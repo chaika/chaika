@@ -9,7 +9,7 @@
     <title>リリースノート [chaika]</title>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
-            if(location.search.indexOf('updated=1') > -1){
+            if(location.search.contains('updated=1')){
                 document.body.classList.add('updated');
             }
 
@@ -186,8 +186,10 @@
                 <aside class="info">
                     <p>正規表現による指定、複数条件の組み合わせ、スレッドあぼーん、自動NGIDなど
                     多様な方法であぼーんを行うことが可能になりました。</p>
-                    <p>chaika 1.6.3 以前で同様の機能を提供していた chaikaAboneEx, Chaika Abone Helper
-                    を利用されていた方は、<a href="#">移行ツール</a>を利用してデータを移行することができます。</p>
+                    <p>chaika 1.6.3 以前で同様の機能を提供していた
+                    chaikaAboneEx, Chaika Abone Helper を利用されていた方は、
+                    <a href="http://bbs2ch.sourceforge.jp/uploader/upload.php?page=all">移行ツール</a>
+                    を利用してデータを移行することができます。</p>
                 </aside>
             </li>
             <li class="new">AA マネージャを実装
@@ -277,6 +279,8 @@
                 のエンコーディングを Shift_JIS から UTF-8 へ変更
                 (<a href="https://github.com/chaika/chaika/issues/48">#48</a>)</li>
 
+            <li class="fixed">&gt;&gt;1 が透明あぼーんされるとスレッドが正しく表示できない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/117">#117</a>)</li>
             <li class="fixed">正しく過去ログが取得できないことがある問題を修正
                 (<a href="https://github.com/chaika/chaika/issues/105">#105</a>)</li>
             <li class="fixed">書き込みウィザードが最小化できない問題を修正
