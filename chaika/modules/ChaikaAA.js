@@ -107,8 +107,17 @@ var ChaikaAA = {
         let aaDir = ChaikaCore.getDataDir();
         aaDir.appendRelativePath('AA');
 
-        aaDir.clone().remove(true);
-        aaDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+
+        //Clear the folder
+        let entries = aaDir.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
+
+        while(true){
+            let entry = entries.nextFile;
+            if(!entry) break;
+            entry.remove(true);
+        }
+
+        entries.close();
 
 
         var visitDirectory = (function(parentNode, currentDir){
