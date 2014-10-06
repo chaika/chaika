@@ -65,10 +65,10 @@ ThreadServerScript.prototype  = {
         }
         var boardURL = ChaikaThread.getBoardURL(threadURL);
         var type = ChaikaBoard.getBoardType(threadURL);
-            // 板のタイプが、BOARD_TYPE_PAGE でも、
-            // URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
-        if(type == ChaikaBoard.BOARD_TYPE_PAGE &&
-                    threadURL.spec.indexOf("/test/read.cgi/") != -1){
+
+        // 板のタイプが、BOARD_TYPE_PAGE でも、
+        // URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
+        if(type === ChaikaBoard.BOARD_TYPE_PAGE && threadURL.spec.contains("/test/read.cgi/")){
             type = ChaikaBoard.BOARD_TYPE_2CH;
         }
 
@@ -105,7 +105,7 @@ ThreadServerScript.prototype  = {
 
     getThreadURL: function(aRequestURL){
         var threadURLSpec = aRequestURL.path.substring(8);
-        if(threadURLSpec == "") return null;
+        if(threadURLSpec === "") return null;
 
         // threadURLSpec = decodeURIComponent(threadURLSpec);
         var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
@@ -172,7 +172,7 @@ Thread2ch.prototype = {
         return (this.thread.url.fileName.match(/\-(\d+)/)) ? parseInt(RegExp.$1) : null;
     },
     get optionsNoFirst(){
-        return (this.thread.url.fileName.indexOf("n") !== -1);
+        return this.thread.url.fileName.contains("n");
     },
 
     init: function(aHandler, aThreadURL, aBoardURL, aType){
@@ -247,7 +247,7 @@ Thread2ch.prototype = {
 
         // 取得済みログの送信
         if(this.thread.datFile.exists()){
-            var datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
+            let datLines = ChaikaCore.io.readData(this.thread.datFile).split("\n");
             datLines.pop();
 
             this._logLineCount = datLines.length;
@@ -256,8 +256,9 @@ Thread2ch.prototype = {
             //単レス指定
             if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
                 this._headerResponded = true;
-                var title = UniConverter.toSJIS(this.thread.title);
-                var header = this.converter.getHeader(title);
+
+                let title = UniConverter.toSJIS(this.thread.title);
+                let header = this.converter.getHeader(title);
                 this.write(header);
                 this.write(this.datLineParse(datLines[this.optionsOnes-1],
                                 this.optionsOnes, false));
@@ -268,18 +269,20 @@ Thread2ch.prototype = {
             //レス範囲指定
             }else if(this.optionsEnd  && this.optionsEnd <= this._logLineCount){
                 this._headerResponded = true;
-                var title = UniConverter.toSJIS(this.thread.title);
-                var header = this.converter.getHeader(title);
+
+                let title = UniConverter.toSJIS(this.thread.title);
+                let header = this.converter.getHeader(title);
                 this.write(header);
 
-                var start = this.optionsStart ? this.optionsStart : 1;
+                let start = this.optionsStart ? this.optionsStart : 1;
+                let end = this.optionsEnd;
+
                 if(start < 1) start = 1;
-                var end = this.optionsEnd;
                 if(end > datLines.length) end = datLines.length;
                 if(start > end) start = end;
 
-                var content = "";
-                for(var i=start-1; i<end; i++){
+                let content = "";
+                for(let i=start-1; i<end; i++){
                     content += ( this.datLineParse(datLines[i], i+1, false) + '\n' );
                 }
                 this.write(content);
@@ -294,16 +297,18 @@ Thread2ch.prototype = {
                     this.write(this.datLineParse(datLines[0], 1, false) +"\n");
                 }else if(this.thread.title){
                     this._headerResponded = true;
-                    var title = UniConverter.toSJIS(this.thread.title);
-                    var header = this.converter.getHeader(title);
+
+                    let title = UniConverter.toSJIS(this.thread.title);
+                    let header = this.converter.getHeader(title);
                     this.write(header);
                 }else{
                     this.write(this.datLineParse(datLines[0], 1, false) +"\n");
                 }
 
-                var start = 1;
-                var end = datLines.length;
-                if(this.optionsLast == 0){
+                let start = 1;
+                let end = datLines.length;
+
+                if(this.optionsLast === 0){
                     this.write(this.converter.getNewMark() +"\n");
                     this.datDownload();
                     return;
@@ -315,8 +320,8 @@ Thread2ch.prototype = {
                     if(start > end) start = end;
                 }
 
-                var content = "";
-                for(var i=start; i<end; i++){
+                let content = "";
+                for(let i=start; i<end; i++){
                     content += ( this.datLineParse(datLines[i], i+1, false) + '\n' );
                 }
 
@@ -351,21 +356,22 @@ Thread2ch.prototype = {
 
 
     htmlToText: function(aStr){
+        var fmtConverter = Cc["@mozilla.org/widget/htmlformatconverter;1"].createInstance(Ci.nsIFormatConverter);
         var fromStr = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-        fromStr.data = aStr;
+        var toStr = { value: null };
+
         try{
-            var toStr = { value: null };
-            var    formatConverter = Cc["@mozilla.org/widget/htmlformatconverter;1"]
-                                    .createInstance(Ci.nsIFormatConverter);
-            formatConverter.convert("text/html", fromStr, fromStr.toString().length,
-                                        "text/unicode", toStr, {});
+            fromStr.data = aStr;
+            fmtConverter.convert("text/html", fromStr, fromStr.toString().length, "text/unicode", toStr, {});
         }catch(e){
             return aStr;
         }
+
         if(toStr.value){
             toStr = toStr.value.QueryInterface(Ci.nsISupportsString);
             return toStr.toString();
         }
+
         return aStr;
     },
 
@@ -385,7 +391,7 @@ Thread2ch.prototype = {
         var sanitizedStr = this._serializer.serializeToString(fragment);
 
         //serializeで余計に挿入されるxmlns属性を削除
-        sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g')
+        sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g');
 
         //実体参照を元に戻す
         sanitizedStr = sanitizedStr.replace(" &amp;# ", "&#", "g");
@@ -579,7 +585,7 @@ Thread2ch.prototype = {
         var shouldChainAbone = false;
         var shouldChainHideAbone = false;
         var chainAboneParent;
-        resMes = resMes.replace(regResPointer, (aStr, ancMark, ancStr, aOffset, aS) => {
+        resMes = resMes.replace(regResPointer, (aStr, ancMark, ancStr) => {
             let enableChainAbone = this._chainAboneNumbers.length > 0;
             let ancNums = [];
 
@@ -688,7 +694,7 @@ Thread2ch.prototype = {
 
 
         // 通常リンク処理
-        if(resMes.indexOf("ttp")!=-1){
+        if(resMes.contains("ttp")){
             var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
 
             if(ChaikaHttpController.ivur.enabled){
@@ -734,45 +740,47 @@ Thread2ch.prototype = {
         this._mimizunMode = false;
 
         if(aKako){
+            this._kakoDatDownload = true;
+
             if(ChaikaRoninLogin.isLoggedIn()){
                 //Rokka spec: https://github.com/Cipherwraith/Rokka/blob/master/README.md
-                var KAGI = encodeURIComponent(ChaikaCore.pref.getChar("login.ronin.session_id"));
-                var hostParts = this.thread.plainURL.host.split('.');
-                var pathParts = this.thread.plainURL.path.split('/');
-                var rokkaURLSpec = [
+                let KAGI = encodeURIComponent(ChaikaCore.pref.getChar("login.ronin.session_id"));
+                let hostParts = this.thread.plainURL.host.split('.');
+                let pathParts = this.thread.plainURL.path.split('/');
+                let rokkaURLSpec = [
                     "http://rokka." + hostParts[1] + '.' + hostParts[2],  //2ch.com or bbspink.com
                     hostParts[0],  //SERVER
                     pathParts[3],  //BOARD
                     this.thread.datID
                 ].join('/');
-                var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-                var datKakoURL = ioService.newURI(rokkaURLSpec + '/?sid=' + KAGI, null, null).QueryInterface(Ci.nsIURL);
+                let ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+                let datKakoURL = ioService.newURI(rokkaURLSpec + '/?sid=' + KAGI, null, null).QueryInterface(Ci.nsIURL);
 
                 ChaikaCore.logger.debug(datKakoURL.spec);
 
                 this.httpChannel = ChaikaCore.getHttpChannel(datKakoURL);
                 this._maruMode = true;
             }else if(ChaikaCore.pref.getBool("thread_get_log_from_mimizun")){
-                var mimizunURLSpec  = [
+                let mimizunURLSpec  = [
                     "http://mimizun.com/log/2ch",
                     this.thread.boardURL.filePath,
                     this.thread.datID,
                     ".dat"
                 ].join("");
 
-                var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-                var mimizunURL = ioService.newURI(mimizunURLSpec, null, null).QueryInterface(Ci.nsIURL);
+                let ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+                let mimizunURL = ioService.newURI(mimizunURLSpec, null, null).QueryInterface(Ci.nsIURL);
+
                 this.httpChannel = ChaikaCore.getHttpChannel(mimizunURL);
                 this._mimizunMode = true;
             }else{
                 this.httpChannel = ChaikaCore.getHttpChannel(this.thread.datKakoURL);
             }
-            this._kakoDatDownload = true;
-
         }else{
             this.httpChannel = ChaikaCore.getHttpChannel(this.thread.datURL);
             this._kakoDatDownload = false;
         }
+
         this.httpChannel.requestMethod = "GET";
         this.httpChannel.redirectionLimit = 0; // 302 等のリダイレクトを行わない
         this.httpChannel.loadFlags = this.httpChannel.LOAD_BYPASS_CACHE;
@@ -781,8 +789,8 @@ Thread2ch.prototype = {
 
         // 差分GET
         if(this.thread.datFile.exists() && this.thread.lastModified){
-            var lastModified = this.thread.lastModified;
-            var range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
+            let lastModified = this.thread.lastModified;
+            let range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
             this.httpChannel.setRequestHeader("Accept-Encoding", "", false);
             this.httpChannel.setRequestHeader("If-Modified-Since", lastModified, false);
             this.httpChannel.setRequestHeader("Range", "bytes=" + range + "-", false);
@@ -797,7 +805,7 @@ Thread2ch.prototype = {
     onStartRequest: function(aRequest, aContext){
         this._bInputStream = Cc["@mozilla.org/binaryinputstream;1"]
                     .createInstance(Ci.nsIBinaryInputStream);
-        this._data = new Array();
+        this._data = [];
         this._dataBuffer = '';
     },
 
@@ -809,14 +817,14 @@ Thread2ch.prototype = {
         var httpStatus = aRequest.responseStatus;
 
         // あぼーん発生の場合
-        if(httpStatus == 416){
+        if(httpStatus === 416){
             this._threadAbone = true;
             return;
         }
 
         // 新着がない場合は終了
-        if(!(httpStatus == 200 || httpStatus == 206)) return;
-        if(aCount == 0) return;
+        if(!(httpStatus === 200 || httpStatus === 206)) return;
+        if(aCount === 0) return;
 
         this._bInputStream.setInputStream(aInputStream);
 
@@ -824,12 +832,12 @@ Thread2ch.prototype = {
         // データ全体の先頭の1byteを調べる
         // ついでに受信したデータを読み込む
         var availableData = "";
-        if(!this._aboneChecked && httpStatus == 206){
+        if(!this._aboneChecked && httpStatus === 206){
             var firstChar = this._bInputStream.readBytes(1);
             availableData = this._bInputStream.readBytes(aCount - 1);
 
             //もし改行でなければあぼーん発生ということ
-            if(firstChar.charCodeAt(0) != 10){
+            if(firstChar.charCodeAt(0) !== 10){
                 this._threadAbone = true;
             }
         }else{
@@ -838,7 +846,7 @@ Thread2ch.prototype = {
         this._aboneChecked = true;
 
 
-        if(this._maruMode && !this._mimizunMode && this._data.length == 0){
+        if(this._maruMode && !this._mimizunMode && this._data.length === 0){
             if(availableData.match(/\n/)){
                 availableData = RegExp.rightContext;
             }else{
@@ -865,13 +873,13 @@ Thread2ch.prototype = {
 
         //ステータスが206 Partial Contentの場合、
         //受信したデータの中に既読レスは含まれない
-        if(this._readLogCount && httpStatus == 206){
+        if(this._readLogCount && httpStatus === 206){
             this._readLogCount = 0;
         }
 
         //新着レスのみからなる変換済みデータを作成
         var newResLines = "";      //新着レスの生データ
-        var newResHTMLLines = ""   //新着レスの変換済みデータ
+        var newResHTMLLines = "";   //新着レスの変換済みデータ
         for(let i=0, l=lines.length; i<l; i++){
             //既読部分は飛ばす
             if(this._readLogCount > 0){
@@ -895,8 +903,11 @@ Thread2ch.prototype = {
 
         this._bInputStream = null;
         aRequest.QueryInterface(Ci.nsIHttpChannel);
+
+        var httpStatus;
+
         try{
-            var httpStatus = aRequest.responseStatus;
+            httpStatus = aRequest.responseStatus;
         }catch(ex){
             this.write(this.converter.getFooter("network_error"));
             this.close();
@@ -942,13 +953,14 @@ Thread2ch.prototype = {
 
             // XXX TODO 一部互換スクリプトには、未更新でも 206 を返すものがある?
         var newResLength = this.thread.lineCount - this._logLineCount;
-        if(newResLength == 0){
+
+        if(newResLength === 0){
             this.write(this.converter.getFooter("not_modified"));
             this.close();
             return;
         }
 
-        if(httpStatus == 200 || httpStatus == 206){
+        if(httpStatus === 200 || httpStatus === 206){
             this.datSave(this._data.join(""));
         }
         this.write(this.converter.getFooter("ok"));
@@ -1086,14 +1098,14 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
             var httpStatus = aRequest.responseStatus;
 
             // あぼーん発生の場合
-            if(httpStatus == 416){
+            if(httpStatus === 416){
                 this._threadAbone = true;
                 return;
             }
 
             // 新着がない場合は終了
-            if(!(httpStatus == 200 || httpStatus == 206)) return;
-            if(aCount == 0) return;
+            if(!(httpStatus === 200 || httpStatus === 206)) return;
+            if(aCount === 0) return;
 
             this._bInputStream.setInputStream(aInputStream);
 
@@ -1101,12 +1113,12 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
             // データ全体の先頭の1byteを調べる
             // ついでに受信したデータを読み込む
             var availableData = "";
-            if(!this._aboneChecked && httpStatus == 206){
+            if(!this._aboneChecked && httpStatus === 206){
                 var firstChar = this._bInputStream.readBytes(1);
                 availableData = this._bInputStream.readBytes(aCount - 1);
 
                 //もし改行でなければあぼーん発生ということ
-                if(firstChar.charCodeAt(0) != 10){
+                if(firstChar.charCodeAt(0) !== 10){
                     this._threadAbone = true;
                 }
             }else{
@@ -1154,7 +1166,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
 
 
             //差分取得の場合は受信したデータの中に既読レスは含まれない
-            if(this._readLogCount && (httpStatus == 206 || this._deltaMode)){
+            if(this._readLogCount && (httpStatus === 206 || this._deltaMode)){
                 this._readLogCount = 0;
             }
 
@@ -1205,7 +1217,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
                     return;
             }
 
-            if(httpStatus == 200 || httpStatus == 206){
+            if(httpStatus === 200 || httpStatus === 206){
                 this.datSave(this._data.join(""));
             }
             this.write(this.converter.getFooter("ok"));
@@ -1279,16 +1291,17 @@ function Id2Color(){
 }
 
 Id2Color.prototype = {
-    _char64To8: new Array(),
-    _cache: new Array(),
-    _bgcache: new Array(),
+    _char64To8: [],
+    _cache: [],
+    _bgcache: [],
 
     init: function(){
         var idChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        var i=0;
+        var i = 0;
+
         for(var m in idChars){
-            this._char64To8[idChars[m]]=i
-            if(((parseInt(m)+1)%8)==0) i++;
+            this._char64To8[idChars[m]] = i;
+            if(((parseInt(m) + 1) % 8) === 0) i++;
         }
     },
 
@@ -1326,7 +1339,7 @@ Id2Color.prototype = {
         }
         return cache[aID];
     }
-}
+};
 
 
 // ***** ***** ***** ***** ***** ThreadConverter ***** ***** ***** ***** *****
@@ -1345,28 +1358,28 @@ ThreadConverter.prototype = {
         this._id2Color.init();
 
         try{
-            this._tmpHeader   = ChaikaCore.io.readData(this._resolveSkinFile("Header.html"));
-            this._tmpFooter   = ChaikaCore.io.readData(this._resolveSkinFile("Footer.html"));
-            this._tmpRes      = ChaikaCore.io.readData(this._resolveSkinFile("Res.html"));
-            this._tmpNewRes      = ChaikaCore.io.readData(this._resolveSkinFile("NewRes.html"));
-            this._tmpNewMark  = ChaikaCore.io.readData(this._resolveSkinFile("NewMark.html"));
+            this._tmpHeader = ChaikaCore.io.readData(this._resolveSkinFile("Header.html"));
+            this._tmpFooter = ChaikaCore.io.readData(this._resolveSkinFile("Footer.html"));
+            this._tmpRes = ChaikaCore.io.readData(this._resolveSkinFile("Res.html"));
+            this._tmpNewRes = ChaikaCore.io.readData(this._resolveSkinFile("NewRes.html"));
+            this._tmpNewMark = ChaikaCore.io.readData(this._resolveSkinFile("NewMark.html"));
         }catch(ex){
             ChaikaCore.logger.error(ex);
             throw Components.results.NS_ERROR_FILE_NOT_FOUND;
         }
 
-        this._tmpNGRes    = null;
+        this._tmpNGRes = null;
         this._tmpNGNewRes = null;
         try{
             var ngResFile = this._resolveSkinFile("NGRes.html");
             var ngNewResFile = this._resolveSkinFile("NGNewRes.html");
             if(ngResFile.exists() && ngNewResFile.exists()){
-                this._tmpNGRes      = ChaikaCore.io.readData(ngResFile);
+                this._tmpNGRes = ChaikaCore.io.readData(ngResFile);
                 this._tmpNGNewRes = ChaikaCore.io.readData(ngNewResFile);
             }
         }catch(ex){
             ChaikaCore.logger.error(ex);
-            this._tmpNGRes    = null;
+            this._tmpNGRes = null;
             this._tmpNGNewRes = null;
         }
 
@@ -1381,14 +1394,14 @@ ThreadConverter.prototype = {
         this._tmpGetNewRes = this.toFunction(this._tmpNewRes);
 
         if(this._tmpNGRes && this._tmpNGNewRes){
-            this._tmpNGRes    = this._replaceBaseTag(this._tmpNGRes);
+            this._tmpNGRes = this._replaceBaseTag(this._tmpNGRes);
             this._tmpNGNewRes = this._replaceBaseTag(this._tmpNGNewRes);
-            this._tmpGetNGRes    = this.toFunction(this._tmpNGRes);
+            this._tmpGetNGRes = this.toFunction(this._tmpNGRes);
             this._tmpGetNGNewRes = this.toFunction(this._tmpNGNewRes);
         }
 
         // 旧仕様の互換性確保
-        if(this._tmpFooter.indexOf('<STATUS/>') === -1){
+        if(!this._tmpFooter.contains('<STATUS/>')){
             this._tmpFooter = '<p class="info"><STATUS/></p>\n' + this._tmpFooter;
         }
     },
@@ -1414,27 +1427,26 @@ ThreadConverter.prototype = {
      * @param aString string 置換される文字列
      */
     _replaceBaseTag: function(aString){
-        var requestURL = this._context._handler.request.url;
-        var threadURLSpec = requestURL.path.substring(8);
         var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
         var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
         var fontName = ChaikaCore.pref.getUniChar("thread_font_name");
-        fontName = UniConverter.toSJIS(fontName);
         var fontSize = ChaikaCore.pref.getInt("thread_font_size");
         var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
-        aaFontName = UniConverter.toSJIS(aaFontName);
         var aaFontSize = ChaikaCore.pref.getInt("thread_aa_font_size");
         var aaLineSpace = ChaikaCore.pref.getInt("thread_aa_line_space");
 
+        fontName = UniConverter.toSJIS(fontName);
+        aaFontName = UniConverter.toSJIS(aaFontName);
+
         return aString.replace(/<SKINPATH\/>/g, skinURISpec)
-                .replace(/<THREADURL\/>/g, this._threadURL.resolve("./"))
-                .replace(/<BOARDURL\/>/g, this._boardURL.spec)
-                .replace(/<SERVERURL\/>/g, serverURLSpec)
-                .replace(/<FONTNAME\/>/g, "\'" + fontName + "\'")
-                .replace(/<FONTSIZE\/>/g, fontSize + "px")
-                .replace(/<AAFONTNAME\/>/g, "\'" + aaFontName + "\'")
-                .replace(/<AAFONTSIZE\/>/g, aaFontSize + "px")
-                .replace(/<AALINEHEIGHT\/>/g, aaFontSize + aaLineSpace + "px");
+                      .replace(/<THREADURL\/>/g, this._threadURL.resolve("./"))
+                      .replace(/<BOARDURL\/>/g, this._boardURL.spec)
+                      .replace(/<SERVERURL\/>/g, serverURLSpec)
+                      .replace(/<FONTNAME\/>/g, "\'" + fontName + "\'")
+                      .replace(/<FONTSIZE\/>/g, fontSize + "px")
+                      .replace(/<AAFONTNAME\/>/g, "\'" + aaFontName + "\'")
+                      .replace(/<AAFONTSIZE\/>/g, aaFontSize + "px")
+                      .replace(/<AALINEHEIGHT\/>/g, aaFontSize + aaLineSpace + "px");
     },
 
     getHeader: function(aTitle){
@@ -1453,20 +1465,19 @@ ThreadConverter.prototype = {
         var lineCount = this._context.thread.lineCount;
 
         return this._tmpFooter.replace(/<STATUS\/>/g, this.getStatusText(aStatusText))
-                    .replace(/<SIZE\/>/g, datSize)
-                    .replace(/<SIZEKB\/>/g, datSizeKB)
-                    .replace(/<GETRESCOUNT\/>/g, logLineCount)
-                    .replace(/<NEWRESCOUNT\/>/g, lineCount - logLineCount)
-                    .replace(/<ALLRESCOUNT\/>/g, lineCount);
+                              .replace(/<SIZE\/>/g, datSize)
+                              .replace(/<SIZEKB\/>/g, datSizeKB)
+                              .replace(/<GETRESCOUNT\/>/g, logLineCount)
+                              .replace(/<NEWRESCOUNT\/>/g, lineCount - logLineCount)
+                              .replace(/<ALLRESCOUNT\/>/g, lineCount);
     },
 
     getStatusText: function(aStatus){
-        var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
-                    .getService(Ci.nsIStringBundleService);
-        var statusBundle = strBundleService.createBundle(
-                    "resource://chaika-modules/server/thread-status.properties");
+        var strBundleService = Cc["@mozilla.org/intl/stringbundle;1"].getService(Ci.nsIStringBundleService);
+        var statusBundle = strBundleService.createBundle("resource://chaika-modules/server/thread-status.properties");
         var statusText = "";
-        if(typeof(aStatus) == "string"){
+
+        if(typeof aStatus === "string"){
             try{
                 statusText = statusBundle.GetStringFromName(aStatus);
             }catch(ex){}
@@ -1475,6 +1486,7 @@ ThreadConverter.prototype = {
                 statusText = statusBundle.formatStringFromName("error", [String(aStatus)], 1);
             }catch(ex){}
         }
+
         return UniConverter.toSJIS(statusText);
     },
 
@@ -1496,26 +1508,25 @@ ThreadConverter.prototype = {
             let ngData = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(aNGData.title || aNGData));
 
             //タグを置換する
-            return aRes
-                    .replace(/(?:\r|\n|\t)/g, "")
-                    .replace(/<!--.*?-->/g, "")
-                    .replace(/<PLAINNUMBER\/>/g, aNumber)
-                    .replace(/<NUMBER\/>/g, aNumber)
-                    .replace(/<NAME\/>/g, aName)
-                    .replace(/<MAIL\/>/g, aMail)
-                    .replace(/<MAILNAME\/>/g, aMailName)
-                    .replace(/<DATE\/>/g, aDate)
-                    .replace(/<ID\/>/g, aID)
-                    .replace(/<IDCOLOR\/>/g, resIDColor)
-                    .replace(/<IDBACKGROUNDCOLOR\/>/g, resIDBgColor)
-                    .replace(/<IP\/>/g, aIP)
-                    .replace(/<HOST\/>/g, aHost)
-                    .replace(/<BEID\/>/g, aBeLink)  //スキンタグの <BEID/> は正確には BeLink である
-                    .replace(/<BENUMBER\/>/g, aBeID)
-                    .replace(/<BEBASEID\/>/g, aBeBaseID)
-                    .replace(/<MESSAGE\/>/g, aMessage)
-                    .replace(/<NGDATA\/>/g, ngData)
-                    .replace(/<ABONEWORD\/>/g, ngData);  //Chaika Abone Helper 互換
+            return aRes.replace(/(?:\r|\n|\t)/g, "")
+                       .replace(/<!--.*?-->/g, "")
+                       .replace(/<PLAINNUMBER\/>/g, aNumber)
+                       .replace(/<NUMBER\/>/g, aNumber)
+                       .replace(/<NAME\/>/g, aName)
+                       .replace(/<MAIL\/>/g, aMail)
+                       .replace(/<MAILNAME\/>/g, aMailName)
+                       .replace(/<DATE\/>/g, aDate)
+                       .replace(/<ID\/>/g, aID)
+                       .replace(/<IDCOLOR\/>/g, resIDColor)
+                       .replace(/<IDBACKGROUNDCOLOR\/>/g, resIDBgColor)
+                       .replace(/<IP\/>/g, aIP)
+                       .replace(/<HOST\/>/g, aHost)
+                       .replace(/<BEID\/>/g, aBeLink)  //スキンタグの <BEID/> は正確には BeLink である
+                       .replace(/<BENUMBER\/>/g, aBeID)
+                       .replace(/<BEBASEID\/>/g, aBeBaseID)
+                       .replace(/<MESSAGE\/>/g, aMessage)
+                       .replace(/<NGDATA\/>/g, ngData)
+                       .replace(/<ABONEWORD\/>/g, ngData);  //Chaika Abone Helper 互換
         };
     },
 
@@ -1578,7 +1589,7 @@ ThreadConverter.prototype = {
             }
         }else{
             if(aNew){
-                resFunc = this._tmpGetNewRes
+                resFunc = this._tmpGetNewRes;
             }else{
                 resFunc = this._tmpGetRes;
             }
