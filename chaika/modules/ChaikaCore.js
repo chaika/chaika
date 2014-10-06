@@ -1008,34 +1008,24 @@ ChaikaIO.prototype = {
      * @param {String} suspects エンコーディングの候補
      */
     readUnknownEncodingString: function(file, overrideOrigFile, ...suspects){
-        if(suspects.indexOf('UTF-8') === -1 || suspects.indexOf('utf-8') === -1){
-            suspects.unshift('utf-8');
-        }
+        var encoding = suspects.shift();
+        var fileString = this.readString(file, encoding);
 
-        var fileString;
-
-        while(true){
-            fileString = this.readString(file, suspects[0]);
-
-            suspects.shift();
-
-            //U+FFFD = REPLACEMENT CHARACTER
-            if(!fileString.contains('\uFFFD')){
-                //Shift_JIS から UTF-8 へ変換すると、\ が ＼ または ¥ へと誤変換されることがある
-                fileString = fileString.replace(/(?:\uff3c|\u00a5)/g, '\\');
-
-                if(overrideOrigFile){
-                    this.writeString(file, 'utf-8', false, fileString);
-                }
-
-                return fileString;
-            }else if(suspects.length <= 0){
+        //U+FFFD = REPLACEMENT CHARACTER
+        if(fileString.contains('\uFFFD')){
+            if(suspects.length > 0){
+                fileString = this.readUnknownEncodingString(file, overrideOrigFile, suspects);
+            }else{
                 ChaikaCore.logger.error('Unable to read string from ' + file.leafName + ': Unknown Encoding');
                 return null;
             }
         }
 
-        return null;
+        if(fileString !== null && overrideOrigFile){
+            this.writeString(file, 'utf-8', false, fileString);
+        }
+
+        return fileString;
     },
 
 
