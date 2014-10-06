@@ -412,6 +412,7 @@ Thread2ch.prototype = {
         var resIP = "";
         var resHost = "";
         var resMes = "";
+        var threadTitle = "";
         var isAbone = false;
         var ngData = '';  // あぼーんされる原因となったNGデータ
 
@@ -421,6 +422,19 @@ Thread2ch.prototype = {
             resMail = resArray[1];
             resDate = resArray[2];
             resMes = resArray[3];
+            threadTitle = resArray[4];
+        }
+
+
+        // スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
+        if(!this._headerResponded && threadTitle){
+            this._headerResponded = true;
+
+            this.thread.title = UniConverter.fromSJIS(threadTitle);
+
+            let header = this.converter.getHeader(threadTitle);
+            this.write(header);
+            this._handler.response.flush();
         }
 
 
@@ -710,18 +724,6 @@ Thread2ch.prototype = {
                         '</span></span>';
             }
         });
-
-
-        // スレッドのタイトルが見つかったときは HTML ヘッダを追加して送る
-        if(!this._headerResponded && resArray[4]){
-            this._headerResponded = true;
-            var title = resArray[4];
-            this.thread.title = UniConverter.fromSJIS(title);
-
-            var header = this.converter.getHeader(title);
-            this.write(header);
-            this._handler.response.flush();
-        }
 
 
         return this.converter.getResponse(aNew, aNumber, resName, resMail, resMailName, resDate,
