@@ -225,7 +225,21 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
             if(aRule.regexp){
                 let regexp = new RegExp(aRule.query, aRule.ignoreCase ? 'i' : '');
-                return regexp.test(target);
+
+                switch(aRule.condition){
+                    case 'contains':
+                    case 'equals':
+                    case 'startsWith':
+                    case 'endsWith':
+                        return regexp.test(target);
+
+                    case 'notContain':
+                    case 'notEqual':
+                        return !regexp.test(target);
+
+                    default:
+                        return false;
+                }
             }else{
                 if(aRule.ignoreCase){
                     target = target.toLowerCase();
