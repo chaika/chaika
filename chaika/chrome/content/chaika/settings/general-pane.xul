@@ -11,7 +11,7 @@
     <preferences>
         <preference id="extensions.chaika.http_proxy_mode"
                 name="extensions.chaika.http_proxy_mode" type="int"
-                onchange="setContainerDisabled(this.name, 'txtProxyValue', '2')"/>
+                onchange="setContainerDisabled(this.name, 'txtProxyValue', 2)"/>
         <preference id="extensions.chaika.http_proxy_value"
                 name="extensions.chaika.http_proxy_value" type="unichar"/>
         <preference id="extensions.chaika.appoint_data_dir"

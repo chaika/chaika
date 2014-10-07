@@ -42,7 +42,7 @@ var gGeneralPane = {
         setContainerDisabled("extensions.chaika.appoint_data_dir",
                 "boxDataDir", true);
         setContainerDisabled("extensions.chaika.http_proxy_mode",
-                "txtProxyValue", "2");
+                "txtProxyValue", 2);
     },
 
     selectDataDir: function(){
