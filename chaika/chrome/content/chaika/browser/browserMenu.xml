@@ -10,83 +10,81 @@
 
 <binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">
     <content>
-        <xul:arrowscrollbox class="popup-internal-box chaika-browser-menu" flex="1" orient="vertical" anonid="root">
-            <xul:menu label="あぼーん" anonid="abone">
-                <xul:menupopup>
-                    <xul:menuitem label="名前" anonid="abone-name" />
-                    <xul:menuitem label="メール" anonid="abone-mail" />
-                    <xul:menuitem label="ID" anonid="abone-id" />
-                    <xul:menuitem label="本文" anonid="abone-word" />
-                    <xul:menuitem label="NGEx" anonid="abone-ex" />
-                    <xul:menuseparator />
-                    <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
-                </xul:menupopup>
-            </xul:menu>
+        <xul:menu label="あぼーん" anonid="abone">
+            <xul:menupopup>
+                <xul:menuitem label="名前" anonid="abone-name" />
+                <xul:menuitem label="メール" anonid="abone-mail" />
+                <xul:menuitem label="ID" anonid="abone-id" />
+                <xul:menuitem label="本文" anonid="abone-word" />
+                <xul:menuitem label="NGEx" anonid="abone-ex" />
+                <xul:menuseparator />
+                <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
+            </xul:menupopup>
+        </xul:menu>
 
-            <xul:menu label="コピー" anonid="copy" class="chaika-shown-on-bbs">
-                <xul:menupopup>
-                    <xul:menuitem label="タイトル" anonid="copy-title" />
-                    <xul:menuitem label="URL" anonid="copy-url" />
-                    <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
-                    <xul:menuitem label="タイトルと URL と選択部分" anonid="copy-title-url-selection" class="chaika-shown-when-text-selected" />
-                </xul:menupopup>
-            </xul:menu>
+        <xul:menu label="コピー" anonid="copy" class="chaika-shown-on-bbs">
+            <xul:menupopup>
+                <xul:menuitem label="タイトル" anonid="copy-title" />
+                <xul:menuitem label="URL" anonid="copy-url" />
+                <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
+                <xul:menuitem label="タイトルと URL と選択部分" anonid="copy-title-url-selection" class="chaika-shown-when-text-selected" />
+            </xul:menupopup>
+        </xul:menu>
 
-            <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
-                <xul:menupopup>
-                    <xul:vbox anonid="search-thread" />
-                    <xul:menuseparator anonid="search-thread-sep" />
-                    <xul:menuitem label="板で検索" anonid="search-in-board" />
-                    <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
-                </xul:menupopup>
-            </xul:menu>
+        <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
+            <xul:menupopup>
+                <xul:vbox anonid="search-thread" />
+                <xul:menuseparator anonid="search-thread-sep" />
+                <xul:menuitem label="板で検索" anonid="search-in-board" />
+                <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
+            </xul:menupopup>
+        </xul:menu>
 
-            <xul:menu label="履歴" anonid="history">
-                <xul:menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)" />
-            </xul:menu>
+        <xul:menu label="履歴" anonid="history">
+            <xul:menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)" />
+        </xul:menu>
 
-            <xul:menu label="スキン" anonid="skin">
-                <xul:menupopup style="-moz-binding:url(chrome://chaika/content/skinMenu.xml#skinMenuPopup)" />
-            </xul:menu>
+        <xul:menu label="スキン" anonid="skin">
+            <xul:menupopup style="-moz-binding:url(chrome://chaika/content/skinMenu.xml#skinMenuPopup)" />
+        </xul:menu>
 
-            <xul:menuseparator anonid="skin-sep" />
+        <xul:menuseparator anonid="skin-sep" />
 
-            <xul:menuitem label="このスレッドに書き込む" anonid="write" class="chaika-shown-on-thread" />
-            <xul:menuitem label="このスレッドのログを削除" anonid="delete-log" class="chaika-shown-on-thread" />
+        <xul:menuitem label="このスレッドに書き込む" anonid="write" class="chaika-shown-on-thread" />
+        <xul:menuitem label="このスレッドのログを削除" anonid="delete-log" class="chaika-shown-on-thread" />
 
-            <xul:menuseparator anonid="thread-sep" class="chaika-shown-on-thread" />
+        <xul:menuseparator anonid="thread-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="chaika で開く" anonid="view-in-chaika" class="chaika-shown-on-bbs-not-chaika" />
-            <xul:menuitem label="ブラウザで開く" anonid="view-in-browser" class="chaika-shown-on-chaika" />
+        <xul:menuitem label="chaika で開く" anonid="view-in-chaika" class="chaika-shown-on-bbs-not-chaika" />
+        <xul:menuitem label="ブラウザで開く" anonid="view-in-browser" class="chaika-shown-on-chaika" />
 
-            <xul:menuseparator anonid="view-in-sep" class="chaika-shown-on-bbs" />
+        <xul:menuseparator anonid="view-in-sep" class="chaika-shown-on-bbs" />
 
-            <xul:menuitem label="リンク先を chaika で開く" anonid="open-link-in-chaika" class="chaika-shown-on-bbs-link" />
-            <xul:menuitem label="リンク先をブラウザで開く" anonid="open-link-in-browser" class="chaika-shown-on-bbs-link" />
+        <xul:menuitem label="リンク先を chaika で開く" anonid="open-link-in-chaika" class="chaika-shown-on-bbs-link" />
+        <xul:menuitem label="リンク先をブラウザで開く" anonid="open-link-in-browser" class="chaika-shown-on-bbs-link" />
 
-            <xul:menuseparator anonid="open-link-in-sep" class="chaika-shown-on-bbs-link" />
+        <xul:menuseparator anonid="open-link-in-sep" class="chaika-shown-on-bbs-link" />
 
-            <xul:menuitem label="すべてのレスを表示" anonid="change-limit-all" class="chaika-shown-on-thread" />
-            <xul:menuitem label="新着50件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
-            <xul:menuitem label="スレッド一覧を開く" anonid="go-to-board" class="chaika-shown-on-thread" />
-            <xul:menuitem label="次のスレッドを検索する" anonid="find-next-thread" class="chaika-shown-on-thread" />
+        <xul:menuitem label="すべてのレスを表示" anonid="change-limit-all" class="chaika-shown-on-thread" />
+        <xul:menuitem label="新着50件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
+        <xul:menuitem label="スレッド一覧を開く" anonid="go-to-board" class="chaika-shown-on-thread" />
+        <xul:menuitem label="次のスレッドを検索する" anonid="find-next-thread" class="chaika-shown-on-thread" />
 
-            <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
+        <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
+        <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
 
-            <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
+        <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
 
-            <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
-                <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
-                <xul:observes element="viewChaikaSidebar" attribute="checked" />
-                <xul:observes element="viewChaikaSidebar" attribute="type" />
-            </xul:menuitem>
+        <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
+            <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
+            <xul:observes element="viewChaikaSidebar" attribute="checked" />
+            <xul:observes element="viewChaikaSidebar" attribute="type" />
+        </xul:menuitem>
 
-            <xul:menuseparator anonid="sidebar-sep" />
+        <xul:menuseparator anonid="sidebar-sep" />
 
-            <xul:menuitem label="オプション..." anonid="open-settings"/>
-        </xul:arrowscrollbox>
+        <xul:menuitem label="オプション..." anonid="open-settings"/>
     </content>
 
     <resources>
@@ -107,6 +105,9 @@
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
+
+            this.classList.add('chaika-browser-menu');
+            this.classList.add('popup-internal-box');
 
             this._createSearchMenu();
         ]]></constructor>
@@ -305,7 +306,7 @@
                 const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
                 const isOnBBSLink = isContextMenu && gContextMenu.onLink && this._isBBS(gContextMenu.linkURL);
 
-                let root = document.getAnonymousElementByAttribute(this, "anonid", "root");
+                let root = this;
 
                 isOnBBS ? root.classList.add('chaika-status-on-bbs') :
                           root.classList.remove('chaika-status-on-bbs');
