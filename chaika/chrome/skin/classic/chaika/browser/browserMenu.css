@@ -24,6 +24,12 @@ toolbarpaletteitem[place="palette"] > #chaika-toolbarbutton{
 .chaika-browser-menu:not(.chaika-status-on-thread) .chaika-shown-on-thread,
 .chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs-not-chaika,
 .chaika-browser-menu.chaika-status-on-chaika .chaika-shown-on-bbs-not-chaika{
-    visibility: collapse;
-    -moz-user-focus: ignore;
+    /*
+    レイアウトが崩れるのを防ぐため, XUL 要素を非表示にする場合には
+    visibility: collapse; と -moz-user-focus: ignore; を使用するのがよいと言われている.
+    しかし, Bug 313088 - -moz-user-focus problems for custom namespace element
+    の影響により XBL 内では -moz-user-focus: ignore; が正しく動作しないため,
+    display: none; を代わりに使用することとした.
+    */
+    display: none;
 }
