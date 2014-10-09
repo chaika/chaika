@@ -661,10 +661,8 @@ var FormPage = {
         relatedAddons.then((addonList) => {
             template += "【ユーザーエージェント】" + userAgent + '\n';
             template += "【使用スキン】" + skinName + '\n';
-            template += "【関連アドオン】\n" +
-                        (addonList.length > 0 ? addonList.join('\n') :
-                                               '(なし)')
-                        + '\n\n';
+            template += "【関連アドオン】\n" + (addonList.join('\n') || '(なし)');
+            template += '\n\n';
 
             if(detailed){
                 let changedPrefs = this._getChangedPrefList();
