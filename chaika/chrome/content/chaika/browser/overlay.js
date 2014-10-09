@@ -8,7 +8,7 @@ var ChaikaBrowserOverlay = {
         //10s待ってもChaikaCoreが初期化されていなかったら
         //初期化は失敗したものとみなす
         if(ChaikaBrowserOverlay._initCount > 100){
-            return;
+            return ChaikaCore.logger.error('Failed in initializing ChaikaCore.');
         }
 
         if(ChaikaBrowserOverlay.ChaikaCore.initialized){
@@ -61,16 +61,16 @@ Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBr
 
 ChaikaBrowserOverlay.browserMenu = {
 
-    get browserMenu(){
-        return ChaikaBrowserOverlay.contextMenu._contextMenu.firstChild ||  // when normal
-                ChaikaBrowserOverlay.contextMenu._contextMenu;  // when flattened
+    get _root(){
+        delete this._root;
+        return (this._root = document.getElementsByClassName('chaika-browser-menu')[0]);
     },
 
     /**
      * browserMenu.xml に処理を移譲する
      */
     __noSuchMethod__: function(methodName, args){
-        return this.browserMenu[methodName].apply(this.browserMenu, args);
+        return this._root[methodName].apply(this._root, args);
     },
 
 
@@ -191,14 +191,16 @@ ChaikaBrowserOverlay.contextMenu = {
         }
 
 
-        //設定で非表示にされているものを非表示にする
-
         this._contextMenu.hidden = false;
 
+
+        //設定で非表示にされているものを非表示にする
         //ChaikaCore.pref を使うと存在しない設定値の場合エラーが出てしまうので自前で用意する
         var prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
-        var menuitems = document.getAnonymousNodes(ChaikaBrowserOverlay.browserMenu.browserMenu)
-                                    .item(0).querySelectorAll('menu, menuitem');
+        var menupopup = this._contextMenu.classList.contains('chaika-browser-menu') ?
+                            this._contextMenu :
+                            this._contextMenu.getElementsByClassName('chaika-browser-menu')[0];
+        var menuitems = document.getAnonymousNodes(menupopup);
 
         Array.slice(menuitems).forEach(function(item){
             try{
@@ -214,7 +216,7 @@ ChaikaBrowserOverlay.toolbarButton = {
 
     start: function toolbarButton_start(){
         if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser.toolbarbutton.show_only_on_bbs')){
-            gBrowser.addProgressListener(ChaikaBrowserOverlay.toolbarButton.webProgress)
+            gBrowser.addProgressListener(ChaikaBrowserOverlay.toolbarButton.webProgress);
         }
 
         //初回起動時にボタンを追加する
@@ -348,7 +350,7 @@ ChaikaBrowserOverlay.aboneEvent = {
         }
     }
 
-}
+};
 
 
 window.addEventListener("load",   ChaikaBrowserOverlay.start, false);
