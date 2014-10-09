@@ -487,6 +487,9 @@ Thread2ch.prototype = {
             resID = RegExp.$2;
         }
 
+        // resDate の末尾に空白が残ってしまう問題へ対処する
+        resDate = resDate.trim();
+
 
         if(resBeLink){
             // 2ch Be の不具合により BeID が数値でなくなる場合があるので,
