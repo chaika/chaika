@@ -20,7 +20,7 @@ var Search2ch = {
 
     name: '2ch検索 (search.2ch.net)',
 
-    version: '1.0.0pre',
+    version: '1.0.0',
 
     updateURL: '%%ChaikaDefaultsDir%%/search/search2ch.search.js',
 
@@ -91,7 +91,7 @@ var Search2ch = {
         this._defer.resolve(boards);
     },
 
-}
+};
 
 
 //Polyfill for Firefox 24

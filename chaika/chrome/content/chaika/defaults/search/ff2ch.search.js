@@ -17,7 +17,7 @@ var Ff2ch = {
 
     name: '2ch検索 (ff2ch.syoboi.jp)',
 
-    version: '1.0.0pre',
+    version: '1.0.0',
 
     updateURL: '%%ChaikaDefaultsDir%%/search/ff2ch.search.js',
 
@@ -87,7 +87,7 @@ var Ff2ch = {
         this._defer.resolve(boards);
     },
 
-}
+};
 
 
 //Polyfill for Firefox 24

@@ -6,7 +6,7 @@ var Dig2ch = {
 
     name: '2ch検索 (dig.2ch.net)',
 
-    version: '1.0.0pre',
+    version: '1.0.0',
 
     updateURL: '%%ChaikaDefaultsDir%%/search/dig2ch.search.js',
 
