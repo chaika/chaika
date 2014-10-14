@@ -588,7 +588,7 @@ Thread2ch.prototype = {
         var shouldChainAbone = false;
         var shouldChainHideAbone = false;
         var chainAboneParent;
-        resMes = resMes.replace(regResPointer, (aStr, ancMark, ancStr) => {
+        resMes = resMes.replace(regResPointer, (aStr, ancMark, ancBody) => {
             let enableChainAbone = this._chainAboneNumbers.length > 0;
             let ancNums = [];
 
@@ -597,7 +597,7 @@ Thread2ch.prototype = {
                 //アンカー番号解析
                 //アンカー番号の配列に落としこむ: >>1-3,5 -> [[1,2,3],5]
                 //最大500個に制限する
-                ancStr.replace(/(?:\s+|<\/a>)/g, '').split(',').forEach((ancNumRange) => {
+                ancBody.replace(/(?:\s+|<\/a>)/g, '').split(',').forEach((ancNumRange) => {
                     if(ancNumRange && !isNaN(ancNumRange)){
                         //範囲指定がないとき
                         if(ancNums.length < 500){
@@ -663,7 +663,8 @@ Thread2ch.prototype = {
 
             //アンカーリンク処理
             if(!fixInvalidAnchor){
-                return '<a href="#res' + parseInt(ancStr) + '" class="resPointer">' + ancMark + ancStr + '</a>';
+                // ancBody に </a> が含まれているため閉じる必要はない
+                return '<a href="#res' + parseInt(ancBody) + '" class="resPointer">' + ancMark + ancBody;
             }else{
                 let links = [];
 
