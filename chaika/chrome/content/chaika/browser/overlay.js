@@ -195,17 +195,21 @@ ChaikaBrowserOverlay.contextMenu = {
 
 
         //設定で非表示にされているものを非表示にする
-        //ChaikaCore.pref を使うと存在しない設定値の場合エラーが出てしまうので自前で用意する
-        var prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
-        var menupopup = this._contextMenu.classList.contains('chaika-browser-menu') ?
-                            this._contextMenu :
-                            this._contextMenu.getElementsByClassName('chaika-browser-menu')[0];
-        var menuitems = document.getAnonymousNodes(menupopup);
+        let prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
+        let prefNames = prefs.getChildList("", {});
+        let root = this._contextMenu.classList.contains('chaika-browser-menu') ?
+                        this._contextMenu :
+                        this._contextMenu.firstChild;
 
-        Array.slice(menuitems).forEach(function(item){
-            try{
-                item.hidden = !prefs.getBoolPref(item.getAttribute('anonid') + '.enabled');
-            }catch(ex){}
+        prefNames.forEach((name) => {
+            if(!name.endsWith('enabled')) return;
+
+            var anonid = name.replace('.enabled', '');
+            var menuitem = document.getAnonymousElementByAttribute(root, 'anonid', anonid);
+
+            if(menuitem){
+                menuitem.hidden = !prefs.getBoolPref(name);
+            }
         });
     },
 
