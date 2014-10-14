@@ -338,7 +338,6 @@
             <parameter name="aEvent"/>
             <parameter name="aMiddleClicked"/>
             <body><![CDATA[
-                var menupopup = document.getAnonymousElementByAttribute(this, "anonid", "menupopup");
                 var targetElement = aEvent.originalTarget;
                 var anonymousID = targetElement.getAttribute("anonid");
 
@@ -459,7 +458,14 @@
 
                 //中クリックの場合にポップアップが閉じないのに対処する
                 if(aMiddleClicked){
-                    menupopup.hidePopup();
+                    let contextMenu = document.getElementById('contentAreaContextMenu');
+                    let menupopup = this.parentNode.getElementsByTagName('menupopup')[0];
+
+                    contextMenu.hidePopup();
+
+                    if(menupopup){
+                        menupopup.hidePopup();
+                    }
                 }
             ]]></body>
         </method>
