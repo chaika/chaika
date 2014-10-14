@@ -146,14 +146,34 @@ var ChaikaSearch = {
         let pluginFolder = ChaikaCore.getDataDir();
         pluginFolder.appendRelativePath('search');
 
-        //フォルダがまだ存在しない場合には、
-        //defaults フォルダからコピーしてくる
-        if(!pluginFolder.exists()){
-            let origPluginFolder = ChaikaCore.getDefaultsDir();
-            origPluginFolder.appendRelativePath('search');
+        let origPluginFolder = ChaikaCore.getDefaultsDir();
+        origPluginFolder.appendRelativePath('search');
 
+
+        if(!pluginFolder.exists()){
+            //フォルダがまだ存在しない場合には、
+            //defaults フォルダからコピーしてくる
             origPluginFolder.copyTo(ChaikaCore.getDataDir(), null);
+        }else{
+            //新規に追加されたデフォルトプラグインをコピーする
+
+            let entries = origPluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
+
+            while(true){
+                let origPlugin = entries.nextFile;
+                if(!origPlugin) break;
+
+                let plugin = pluginFolder.clone();
+                plugin.appendRelativePath(origPlugin.leafName);
+
+                if(!plugin.exists()){
+                    origPlugin.copyTo(pluginFolder, null);
+                }
+            }
+
+            entries.close();
         }
+
 
         return pluginFolder;
     },
