@@ -294,6 +294,21 @@ NGExView.prototype = {
 
 
     getNgData: function(){
+        // eval 関数の代替
+        function _eval(str){
+            switch(str){
+                case 'true':
+                    return true;
+
+                case 'false':
+                    return false;
+
+                case 'undefined':
+                    return void 0;
+            }
+        }
+
+
         let ngData = Object.create(NGExData);
 
         ngData.title = this._labelbox.value;
@@ -302,8 +317,8 @@ NGExView.prototype = {
         ngData.autoNGID = this._root.querySelector('.autoNGID').checked;
         ngData.highlight = this._root.querySelector('.highlight').checked;
 
-        ngData.hide = eval(this._root.querySelector('.hide-abone').value);
-        ngData.chain = eval(this._root.querySelector('.chain-abone').value);
+        ngData.hide = _eval(this._root.querySelector('.hide-abone').value);
+        ngData.chain = _eval(this._root.querySelector('.chain-abone').value);
 
         if(this._root.querySelector('.set-expire').checked){
             let datepicker = this._root.querySelector('.expire-date');

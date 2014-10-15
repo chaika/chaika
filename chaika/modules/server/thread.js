@@ -663,7 +663,12 @@ Thread2ch.prototype = {
 
             //アンカーリンク処理
             if(!fixInvalidAnchor){
-                // ancBody に </a> が含まれているため閉じる必要はない
+                // > 一つなど不正なアンカの場合, 2ch 側ではリンクが貼られていないので
+                // 末尾に </a> を補って通常アンカの場合と同じ状態にする
+                if(!ancBody.contains('</a>')){
+                    ancBody += '</a>';
+                }
+
                 return '<a href="#res' + parseInt(ancBody) + '" class="resPointer">' + ancMark + ancBody;
             }else{
                 let links = [];
