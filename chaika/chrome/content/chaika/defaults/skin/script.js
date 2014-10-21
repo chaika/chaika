@@ -353,10 +353,16 @@ var Prefs = {
 
     /**
      * 設定項目を取得する
-     * localStorage.getItem へのシンタックスシュガー
      */
     get: function(key){
-        let value = JSON.parse(localStorage.getItem(key));
+        let value;
+
+        try{
+            value = JSON.parse(localStorage.getItem(key));
+        }catch(ex){
+            // localStorage へのアクセスが拒否された場合
+            value = this.defaultValue[key];
+        }
 
         if(value === null){
             value = this.defaultValue[key];
@@ -368,10 +374,14 @@ var Prefs = {
 
     /**
      * 設定項目を設定する
-     * localStorage.setItem へのシンタックスシュガー
      */
     set: function(key, value){
-        localStorage.setItem(key, JSON.stringify(value));
+        try{
+            localStorage.setItem(key, JSON.stringify(value));
+        }catch(ex){
+            console.warn('The change is ignored and will not be saved ' +
+                         'because writing to the local storage is prohibited by the user.');
+        }
     },
 
 
