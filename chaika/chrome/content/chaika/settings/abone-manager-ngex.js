@@ -129,6 +129,9 @@ NGExView.prototype = {
 
         this.setAutoNaming(true);
         this.insertRule();
+
+        let now = new Date();
+        this._populateExpire(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
     },
 
 
@@ -356,21 +359,12 @@ NGExView.prototype = {
         this._root.querySelector('.hide-abone').value = ngData.hide + '';
         this._root.querySelector('.chain-abone').value = ngData.chain + '';
 
-        if(typeof ngData.expire === 'number'){
-            this._root.querySelector('.set-expire').checked = true;
+        let now = new Date();
+        let expire = ngData.expire ? new Date(ngData.expire) :
+                                     new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
 
-            let datepicker = this._root.querySelector('.expire-date');
-            let timepicker = this._root.querySelector('.expire-time');
-            let expire = new Date(ngData.expire);
-
-            datepicker.year = expire.getFullYear();
-            datepicker.month = expire.getMonth();
-            datepicker.date = expire.getDate();
-            timepicker.hour = expire.getHours();
-            timepicker.minute = expire.getMinutes();
-        }else{
-            this._root.querySelector('.set-expire').checked = false;
-        }
+        this._root.querySelector('.set-expire').checked = !!ngData.expire;
+        this._populateExpire(expire);
 
 
         this.clearRules();
@@ -400,5 +394,17 @@ NGExView.prototype = {
             this.setLabel();
         }
     },
+
+
+    _populateExpire: function(expire){
+        let datepicker = this._root.querySelector('.expire-date');
+        let timepicker = this._root.querySelector('.expire-time');
+
+        datepicker.year = expire.getFullYear();
+        datepicker.month = expire.getMonth();
+        datepicker.date = expire.getDate();
+        timepicker.hour = expire.getHours();
+        timepicker.minute = expire.getMinutes();
+    }
 
 };
