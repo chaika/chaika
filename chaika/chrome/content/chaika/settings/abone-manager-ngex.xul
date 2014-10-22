@@ -55,7 +55,7 @@
                             <menuitem label="ID" value="id" />
                             <menuitem label="BeID" value="be" />
                             <menuitem label="Be基礎番号" value="baseBe" />
-                            <menuitem label="本文" value="msg" />
+                            <menuitem label="本文" value="msg" selected="true" />
                             <menuitem label="スレタイ" value="title" />
                             <menuitem label="板URL" value="board_url" />
                             <menuitem label="スレURL" value="thread_url" />
