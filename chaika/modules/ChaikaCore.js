@@ -1164,10 +1164,11 @@ ChaikaIO.prototype = {
      * @return {String} エンコード後の文字列
      */
     escapeHTML: function ChaikaCore_escapeHTML(aStr){
-        return aStr.split('&').join('&amp;')
-                    .split('<').join('&lt;')
-                    .split('>').join('&gt;')
-                    .split('"').join('&quot;');
+        return aStr.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/"/g, '&quot;')
+                   .replace(/'/g, '&#039;');
     },
 
 
@@ -1177,11 +1178,12 @@ ChaikaIO.prototype = {
      * @return {String} デコード後の文字列
      */
     unescapeHTML: function ChaikaCore_unescapeHTML(aStr){
-        return aStr.split('&lt;').join('<')
-                    .split('&gt;').join('>')
-                    .split('&quot;').join('"')
-                    .split('&amp;').join('&')
-                    .split('&copy;').join(this.fromUTF8Octets('©'));
+        return aStr.replace(/&lt;/g, '<')
+                   .replace(/&gt;/g, '>')
+                   .replace(/&quot;/g, '"')
+                   .replace(/&#039;/g, "'")
+                   .replace(/&amp;/g, '&')
+                   .replace(/&copy;/g, this.fromUTF8Octets('©'));
     },
 
 
