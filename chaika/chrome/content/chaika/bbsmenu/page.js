@@ -244,7 +244,8 @@ var SearchBox = {
         Notification.removeAll();
         Notification.info('検索中');
 
-        let promise = ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr);
+        let plugin = ChaikaSearch.getPlugin(this.getSearchMode());
+        let promise = plugin.search(ChaikaCore.io.escapeHTML(aSearchStr));
 
         promise.then(this._showResults, this._onError)
                .then(null, this._onError);
@@ -258,7 +259,9 @@ var SearchBox = {
 
         results.forEach((board) => {
             let boardItem = document.createElement('board');
-            boardItem.setAttribute('title', board.title);
+            let boardTitle = ChaikaCore.io.unescapeHTML(board.title);
+
+            boardItem.setAttribute('title', boardTitle);
             boardItem.setAttribute('url', board.url || '');
             boardItem.setAttribute('type', board.type || ChaikaBoard.BOARD_TYPE_PAGE);
 
@@ -270,9 +273,15 @@ var SearchBox = {
 
                 board.threads.forEach((thread) => {
                     let threadItem = document.createElement('thread');
+                    let threadTitle = ChaikaCore.io.unescapeHTML(thread.title);
+
+                    if(thread.post){
+                        threadTitle += ' [' + thread.post + ']';
+                    }
+
                     threadItem.setAttribute('url', thread.url);
-                    threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
-                    threadItem.setAttribute('boardName', board.title);
+                    threadItem.setAttribute('title', threadTitle);
+                    threadItem.setAttribute('boardName', boardTitle);
 
                     boardItem.appendChild(threadItem);
                 });
