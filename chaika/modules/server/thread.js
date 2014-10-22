@@ -383,7 +383,8 @@ Thread2ch.prototype = {
      */
     sanitizeHTML: function(aStr){
         //実体参照を保護する
-        aStr = aStr.replace("&#", " &# ", "g");
+        aStr = aStr.replace("&#", "_&#_", "g")  // &#169; など
+                   .replace(/&([a-zA-Z0-9]+?);/g, '_&_$1;');  // &copy; など
 
         //sanitize
         var doc = this._parser.parseFromString("<html><body></body></html>", 'text/html');
@@ -394,7 +395,8 @@ Thread2ch.prototype = {
         sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g');
 
         //実体参照を元に戻す
-        sanitizedStr = sanitizedStr.replace(" &amp;# ", "&#", "g");
+        sanitizedStr = sanitizedStr.replace("_&amp;#_", "&#", "g")
+                                   .replace(/_&amp;_([a-zA-Z0-9]+?);/g, '&$1;');
 
         // <br /> をもとに戻す
         sanitizedStr = sanitizedStr.replace('<br />', '<br>', 'g');
