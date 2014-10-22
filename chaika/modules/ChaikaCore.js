@@ -1161,7 +1161,7 @@ ChaikaIO.prototype = {
     /**
      * HTML実体参照にエンコードする
      * @param {String} aStr エンコードする文字列
-     * @return {String}　エンコード後の文字列
+     * @return {String} エンコード後の文字列
      */
     escapeHTML: function ChaikaCore_escapeHTML(aStr){
         return aStr.split('&').join('&amp;')
@@ -1174,13 +1174,14 @@ ChaikaIO.prototype = {
     /**
      * HTML実体参照をデコードする
      * @param {String} aStr デコードする文字列
-     * @return {String}　デコード後の文字列
+     * @return {String} デコード後の文字列
      */
     unescapeHTML: function ChaikaCore_unescapeHTML(aStr){
         return aStr.split('&lt;').join('<')
                     .split('&gt;').join('>')
                     .split('&quot;').join('"')
-                    .split('&amp;').join('&');
+                    .split('&amp;').join('&')
+                    .split('&copy;').join(decodeURIComponent(escape('©')));
     }
 };
 
