@@ -699,9 +699,9 @@ ChaikaNGFiles.prototype = {
             if(this.ngData[i].hash === hash){
                 uri = uri.QueryInterface(Ci.nsIURL);
 
-                var alertStr = decodeURIComponent(escape(
+                var alertStr = ChaikaCore.io.fromUTF8Octets(
                     'NGFiles.txt に基づき ' + uri.fileName + ' をブロックしました。\n説明: '
-                )) + this.ngData[i].description;
+                ) + this.ngData[i].description;
 
                 var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
                 alertsService.showAlertNotification("chrome://chaika/content/icon.png", "Chaika", alertStr, false, "", null);
