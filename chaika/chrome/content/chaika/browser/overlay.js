@@ -17,6 +17,8 @@ var ChaikaBrowserOverlay = {
             ChaikaBrowserOverlay.toolbarButton.start();
             ChaikaBrowserOverlay.aboneEvent.start();
 
+            gBrowser.addProgressListener(ChaikaBrowserOverlay.webProgress);
+
             //リリースノートの表示
             setTimeout(function(){ ChaikaBrowserOverlay._showReleaseNotes(); }, 0);
         }else{
@@ -29,8 +31,9 @@ var ChaikaBrowserOverlay = {
     stop: function ChaikaBrowserOverlay_stop(){
         ChaikaBrowserOverlay.browserMenu.stop();
         ChaikaBrowserOverlay.contextMenu.stop();
-        ChaikaBrowserOverlay.toolbarButton.stop();
         ChaikaBrowserOverlay.aboneEvent.stop();
+
+        gBrowser.removeProgressListener(ChaikaBrowserOverlay.webProgress);
     },
 
 
@@ -51,9 +54,54 @@ var ChaikaBrowserOverlay = {
         }
     },
 
+
+    checkIvurRedirection: function(aLocation){
+        if(!aLocation.spec.startsWith('chaika://ivur/')) return;
+
+        let originalURI = aLocation.spec.replace('chaika://ivur/', '')
+                                        .replace('?dummy_ext=.jpg', '');
+
+        PopupNotifications.show(
+            gBrowser.selectedBrowser,
+            'chaika-ivur-popup',
+            'ImageViewURLReplace.dat によって書き換えられたリンク先を表示しています。元のリンク先を表示しますか？',
+            null,
+            {
+                label: '元のリンク先へ移動する',
+                accessKey: 'O',
+                callback: function(){
+                    openUILinkIn(originalURI, 'current');
+                }
+            },
+            null,
+            {
+                popupIconURL: 'chrome://chaika/content/icon.png'
+            }
+        );
+    },
+
+
+    webProgress: {
+        onLocationChange: function(aWebProgress, aRequest, aLocation){
+            setTimeout(() => {
+                ChaikaBrowserOverlay.toolbarButton.onLocationChange(aLocation);
+                ChaikaBrowserOverlay.checkIvurRedirection(aLocation);
+            }, 0);
+        },
+
+        onStateChange: function(){},
+        onProgressChange: function(){},
+        onStatusChange: function(){},
+        onSecurityChange: function(){},
+        onLinkIconAvailable: function(){},
+
+        QueryInterface: XPCOMUtils.generateQI(["nsIWebProgressListener", "nsISupportsWeakReference"])
+    }
+
 };
 
 
+Components.utils.import("resource://gre/modules/PopupNotifications.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAboneManager.js', ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBrowserOverlay);
@@ -219,10 +267,6 @@ ChaikaBrowserOverlay.contextMenu = {
 ChaikaBrowserOverlay.toolbarButton = {
 
     start: function toolbarButton_start(){
-        if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser.toolbarbutton.show_only_on_bbs')){
-            gBrowser.addProgressListener(ChaikaBrowserOverlay.toolbarButton.webProgress);
-        }
-
         //初回起動時にボタンを追加する
         if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool("browser.toolbarbutton.installed") &&
            !document.getElementById('chaika-toolbarbutton')){
@@ -234,31 +278,18 @@ ChaikaBrowserOverlay.toolbarButton = {
 
                 ChaikaBrowserOverlay.ChaikaCore.pref.setBool("browser.toolbarbutton.installed", true);
         }
+
+        this._toolbarbutton = document.getElementById('chaika-toolbarbutton');
     },
 
-    stop: function toolbarButton_stop(){
-        try{
-            gBrowser.removeProgressListener(ChaikaBrowserOverlay.toolbarButton.webProgress);
-        }catch(ex){}
-    },
 
-    webProgress: {
-        QueryInterface: XPCOMUtils.generateQI(["nsIWebProgressListener",
-                                           "nsISupportsWeakReference"]),
+    onLocationChange: function(aLocation){
+        if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser.toolbarbutton.show_only_on_bbs')){
+            return;
+        }
 
-        onLocationChange: function(aWebProgress, aRequest, aLocation){
-            setTimeout(function(){
-                document.getElementById('chaika-toolbarbutton').hidden =
-                    aLocation.spec !== 'about:customizing' &&
-                    !ChaikaBrowserOverlay.browserMenu._isBBS(aLocation.spec);
-            }, 0);
-        },
-
-        onStateChange: function(){},
-        onProgressChange: function(){},
-        onStatusChange: function(){},
-        onSecurityChange: function(){},
-        onLinkIconAvailable: function(){}
+        this._toolbarbutton.hidden = aLocation.spec !== 'about:customizing' &&
+                                     !ChaikaBrowserOverlay.browserMenu._isBBS(aLocation.spec);
     }
 };
 
