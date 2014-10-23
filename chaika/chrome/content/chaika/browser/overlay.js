@@ -4,7 +4,7 @@ var ChaikaBrowserOverlay = {
 
     _initCount: 0,
 
-    start: function ChaikaBrowserOverlay_start(){
+    start: function(){
         //10s待ってもChaikaCoreが初期化されていなかったら
         //初期化は失敗したものとみなす
         if(ChaikaBrowserOverlay._initCount > 100){
@@ -28,7 +28,7 @@ var ChaikaBrowserOverlay = {
     },
 
 
-    stop: function ChaikaBrowserOverlay_stop(){
+    stop: function(){
         ChaikaBrowserOverlay.browserMenu.stop();
         ChaikaBrowserOverlay.contextMenu.stop();
         ChaikaBrowserOverlay.aboneEvent.stop();
@@ -41,7 +41,7 @@ var ChaikaBrowserOverlay = {
      * ブラウザ起動時のウィンドウロード後に一度だけ実行される
      * バージョン更新時にのみ自動的にリリースノートを表示する
      */
-    _showReleaseNotes: function ChaikaBrowserOverlay__showReleaseNotes(){
+    _showReleaseNotes: function(){
         //現在のバージョン
         var currentVersion = ChaikaBrowserOverlay.ChaikaAddonInfo.version;
 
@@ -147,7 +147,7 @@ ChaikaBrowserOverlay.browserMenu = {
 
 ChaikaBrowserOverlay.contextMenu = {
 
-    start: function contextMenu_start(){
+    start: function(){
         this._contextMenu = document.getElementById('context-chaika');
 
         let enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("contextmenu.enabled");
@@ -168,7 +168,7 @@ ChaikaBrowserOverlay.contextMenu = {
     },
 
 
-    stop: function contextMenu_stop(){
+    stop: function(){
         this._contextMenu.hidden = true;
 
         let browserContextMenu = document.getElementById("contentAreaContextMenu");
@@ -190,7 +190,7 @@ ChaikaBrowserOverlay.contextMenu = {
     /**
      * コンテキストメニューをフラットにする
      */
-    _flattenContextMenu: function contextMenu__flattenContextMenu(){
+    _flattenContextMenu: function(){
         // Remove menu#context-chaika
         this._contextMenu.parentNode.removeChild(this._contextMenu);
 
@@ -216,7 +216,7 @@ ChaikaBrowserOverlay.contextMenu = {
     /**
      * コンテキストメニューが表示された時に呼ばれる
      */
-    _popupShowing: function contextMenu__popupShowing(){
+    _popupShowing: function(){
         //掲示板上でのみ表示する設定の場合
         // i) ページが掲示板上である -> 表示
         // ii) ページが掲示板上でない
@@ -266,7 +266,7 @@ ChaikaBrowserOverlay.contextMenu = {
 
 ChaikaBrowserOverlay.toolbarButton = {
 
-    start: function toolbarButton_start(){
+    start: function(){
         //初回起動時にボタンを追加する
         if(!ChaikaBrowserOverlay.ChaikaCore.pref.getBool("browser.toolbarbutton.installed") &&
            !document.getElementById('chaika-toolbarbutton')){
@@ -296,19 +296,19 @@ ChaikaBrowserOverlay.toolbarButton = {
 
 ChaikaBrowserOverlay.aboneEvent = {
 
-    start: function aboneEvent_start(){
+    start: function(){
         Services.obs.addObserver(this, "chaika-abone-data-add", false);
         Services.obs.addObserver(this, "chaika-abone-data-remove", false);
     },
 
 
-    stop: function aboneEvent_stop(){
+    stop: function(){
         Services.obs.removeObserver(this, "chaika-abone-data-add", false);
         Services.obs.removeObserver(this, "chaika-abone-data-remove", false);
     },
 
 
-    observe: function aboneEvent_observe(aSubject, aTopic, aData){
+    observe: function(aSubject, aTopic, aData){
         let aboneType,
             legacyAboneType,  // b2r/chaika 1.6.3互換のあぼーんタイプ値
             eventType;
