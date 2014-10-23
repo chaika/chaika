@@ -173,6 +173,7 @@ body {
 .resNumber {
     font-weight: bold;
     color: #111;
+    cursor: pointer;
 }
 
 .resNew .resNumber {

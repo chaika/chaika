@@ -305,7 +305,7 @@ function init(){
 
     Prefs.startup();
     ResInfo.startup();
-    ResCollapse.startup();
+    ResCommand.startup();
     AboneHandler.startup();
     Popup.startup();
 }
@@ -500,41 +500,72 @@ var ResInfo = {
 
 
 
-var ResCollapse = {
+/**
+ * レスに対するコマンドの実装
+ */
+var ResCommand = {
 
     startup: function(){
-        document.addEventListener('click', this.toggleCollapse, false);
+        document.addEventListener('click', this, false);
     },
 
 
-    toggleCollapse: function(aEvent){
-        var target = aEvent.originalTarget;
+    handleEvent: function(aEvent){
+        let target = aEvent.originalTarget;
+        let container = $.parentByClass('resContainer', target);
 
-        //HTML外要素の場合
+        // HTML 外要素の場合
         if(!(target instanceof HTMLElement)) return;
 
-        if(target.className !== "resHeader"){
-            target = $.parentByClass('resHeader', target);
-            if(!target) return;
+        // レス要素外の場合
+        if(!container) return;
+
+
+        switch(target.className){
+            case 'resNumber':
+                this.replyTo(target.textContent);
+                break;
+
+            default:
+                if($.parentByClass('resHeader', target) && container.dataset.aboned === 'true'){
+                    this.toggleCollapse(container);
+                }
+                break;
         }
+    },
 
-        var resContainer = target.parentNode;
 
-        //あぼーんレスでなかった場合は終了
-        if(resContainer.dataset.aboned !== 'true') return;
+    /**
+     * 返信する
+     * @param {Number} resNumber 返信元のレス番号
+     */
+    replyTo: function(resNumber){
+        location.href = 'chaika://post/' + EXACT_URL + resNumber;
+    },
 
+
+    /**
+     * レスの表示/非表示を切り替える
+     * @param {Element} resContainer 対象のレス要素
+     */
+    toggleCollapse: function(resContainer){
         resContainer.classList.toggle('collapsed');
     }
 
 };
 
 
+
+/**
+ * 即時あぼーんを扱う
+ */
 var AboneHandler = {
 
     startup: function(){
         document.addEventListener("chaika-abone-add", this, false);
         document.addEventListener('chaika-abone-remove', this, false);
     },
+
 
     handleEvent: function(aEvent){
         var aboneType = aEvent.sourceEvent.type;
