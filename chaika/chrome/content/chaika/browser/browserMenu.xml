@@ -338,18 +338,17 @@
             <parameter name="aEvent"/>
             <parameter name="aMiddleClicked"/>
             <body><![CDATA[
-                var targetElement = aEvent.originalTarget;
-                var anonymousID = targetElement.getAttribute("anonid");
+                let targetElement = aEvent.originalTarget;
+                let anonymousID = targetElement.getAttribute("anonid");
+                let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
+                let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
+                let selection = content.getSelection();
+                let selectedText = selection.toString();
 
-                var addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
+
                 if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
                     addTab = !addTab;
                 }
-
-                var disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-
-                var selection = content.getSelection();
-                var selectedText = selection.toString();
 
 
                 switch(anonymousID){
@@ -456,13 +455,20 @@
                         }
                 }
 
+
+                //メニューの項目を実行した時にサイドバー開閉コマンドが動作しないようにする
+                aEvent.stopPropagation();
+
+
                 //中クリックの場合にポップアップが閉じないのに対処する
                 if(aMiddleClicked){
                     let contextMenu = document.getElementById('contentAreaContextMenu');
                     let menupopup = this.parentNode.getElementsByTagName('menupopup')[0];
 
+                    //コンテキストメニューの場合
                     contextMenu.hidePopup();
 
+                    //ツールバーボタンの場合
                     if(menupopup){
                         menupopup.hidePopup();
                     }
