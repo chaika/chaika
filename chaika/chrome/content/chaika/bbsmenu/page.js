@@ -50,6 +50,7 @@ var Page = {
         var browser = ChaikaCore.browser.getBrowserWindow();
         if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
             document.getElementById("viewFoxAge2chMenu").hidden = false;
+            document.getElementById('viewFoxAge2chMenu-separator').hidden = false;
         }
     },
 
