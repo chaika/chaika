@@ -752,34 +752,49 @@ var FormPage = {
     _setDefaultMailName: function FormPage_setDefaultMailName(){
 
         function getDefaultData(aFileName){
-            var defaultDataFile = ChaikaCore.getDataDir();
+            let defaultDataFile = ChaikaCore.getDataDir();
             defaultDataFile.appendRelativePath(aFileName);
 
             if(!defaultDataFile.exists()){
-                var defaultsFile = ChaikaCore.getDefaultsDir();
+                let defaultsFile = ChaikaCore.getDefaultsDir();
                 defaultsFile.appendRelativePath(defaultDataFile.leafName);
                 defaultsFile.copyTo(defaultDataFile.parent, null);
                 defaultDataFile = defaultDataFile.clone();
             }
 
-            var urlSpec = gBoard.url.spec;
-            var lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
-                            .replace(/\r/g, "\n").split(/\n+/);
-            for(var i=0; i<lines.length; i++){
-                var data = lines[i].split(/\t+/);
-                if(!(/^\s*(?:;|'|#|\/\/)/).test(data[0]) && urlSpec.indexOf(data[0]) != -1){
-                    return (data[1]);
+            let boardURL = gBoard.url.spec;
+            let lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
+                                     .split(/[\n\r]+/);
+
+            for(let i=0; i<lines.length; i++){
+                // タブがない行は単なる空行
+                if(!lines[i].contains('\t')) continue;
+
+                // コメント行
+                if(/^\s*(?:;|'|#|\/\/)/.test(lines[i])) continue;
+
+
+                let [boardID, defaultData, target] = lines[i].split(/\t+/);
+
+                if(target && ((target === 'thread' && gWizType !== WIZ_TYPE_NEW_THREAD) ||
+                              (target === 'post' && gWizType !== WIZ_TYPE_RES))){
+                    continue;
+                }
+
+                if(boardURL.contains(boardID)){
+                    return defaultData;
                 }
             }
+
             return null;
         }
 
 
-        var defaultData = getDefaultData("defaultmail.txt");
-        if(defaultData) this._mailForm.value = defaultData;
+        let defaultMail = getDefaultData("defaultmail.txt");
+        if(defaultMail !== null) this._mailForm.value = defaultMail;
 
-        defaultData = getDefaultData("defaultname.txt");
-        if(defaultData) this._nameForm.value = defaultData;
+        let defaultName = getDefaultData("defaultname.txt");
+        if(defaultName !== null) this._nameForm.value = defaultName;
     }
 };
 
