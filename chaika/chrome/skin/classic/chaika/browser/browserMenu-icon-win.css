@@ -1,0 +1,36 @@
+/* See license.txt for terms of usage */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#chaika-toolbarbutton {
+    list-style-image: url('chrome://chaika/skin/browser/icon-win-classic.svg');
+}
+
+@media (-moz-os-version: windows-xp){
+    #chaika-toolbarbutton{
+        list-style-image: url('chrome://chaika/skin/browser/icon-win-xp.svg');
+    }
+}
+
+@media (-moz-os-version: windows-vista), (-moz-os-version: windows-win7){
+    #chaika-toolbarbutton{
+        list-style-image: url('chrome://chaika/skin/browser/icon-win-aero.svg');
+    }
+}
+
+@media (-moz-windows-theme: luna-silver){
+    #chaika-toolbarbutton{
+        list-style-image: url('chrome://chaika/skin/browser/icon-win-lunasilver.svg');
+    }
+}
+
+@media (-moz-windows-classic: 1){
+    #chaika-toolbarbutton {
+        list-style-image: url('chrome://chaika/skin/browser/icon-win-classic.svg');
+    }
+}
+
+#chaika-toolbarbutton:-moz-lwtheme-brighttext:not([cui-areatype="menu-panel"]),
+toolbarpaletteitem:not([place="palette"]) > #chaika-toolbarbutton:-moz-lwtheme-brighttext{
+    list-style-image: url('chrome://chaika/skin/browser/icon-inverted.svg');
+}

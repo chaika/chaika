@@ -1,3 +1,5 @@
+/* See license.txt for terms of usage */
+
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 #lblTitle {
@@ -41,6 +43,11 @@
 #boardTree[treesize="big"] treechildren::-moz-tree-row {
   font-size: 16px !important;
   height: 1.5em !important;
+}
+
+
+#boardTree treechildren::-moz-tree-row(highlight-true){
+  background-color: #ff9 !important;
 }
 
 

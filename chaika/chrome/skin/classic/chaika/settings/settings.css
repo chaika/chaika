@@ -1,3 +1,5 @@
+/* See license.txt for terms of usage */
+
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 prefpane {
@@ -13,11 +15,6 @@ radio[pane]{
 
 .paneButtonIcon {
   display: none;
-}
-
-
-grid {
-  min-height: 120px;
 }
 
 row.setting-row {

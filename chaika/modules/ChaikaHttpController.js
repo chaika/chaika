@@ -1,44 +1,17 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is chaika.
- *
- * The Initial Developer of the Original Code is
- * chaika.xrea.jp
- * Portions created by the Initial Developer are Copyright (C) 2009
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *    flyson <flyson.moz at gmail.com>
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
+/* See license.txt for terms of usage */
 
 
 EXPORTED_SYMBOLS = ["ChaikaHttpController"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+
+try{
+    //Firefox 25+
+    Components.utils.import("resource://gre/modules/Promise.jsm");
+}catch(ex){
+    //Firefox 24
+    Components.utils.import("resource://gre/modules/commonjs/sdk/core/promise.js");
+}
 
 
 const Ci = Components.interfaces;
@@ -52,8 +25,6 @@ const Cr = Components.results;
  */
 var ChaikaHttpController = {
 
-    HTTP_REQUEST_TOPIC: '',
-
     /** @private */
     _startup: function(){
         this.ref = new ChaikaRefController();
@@ -66,16 +37,8 @@ var ChaikaHttpController = {
         this.ngfiles.startup();
 
 
-        //Firefox 18以降は http-on-opening-request を,
-        //それ以前は　http-on-modify-request を使用する
-        if(ChaikaCore.browser.geckoVersionCompare(18) <= 0){
-            this.HTTP_REQUEST_TOPIC = 'http-on-opening-request';
-        }else{
-            this.HTTP_REQUEST_TOPIC = 'http-on-modify-request';
-        }
-
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.addObserver(this, this.HTTP_REQUEST_TOPIC, true);
+        os.addObserver(this, 'http-on-opening-request', true);
 
         var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.addObserver("extensions.chaika.refController.enabled", this, true);
@@ -89,7 +52,7 @@ var ChaikaHttpController = {
     /** @private */
     _quit: function(){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.removeObserver(this, this.HTTP_REQUEST_TOPIC);
+        os.removeObserver(this, 'http-on-opening-request');
 
         var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
         pref.removeObserver("extensions.chaika.refController.enabled", this);
@@ -102,7 +65,7 @@ var ChaikaHttpController = {
 
     /** @private */
     observe: function ChaikaHttpController_observe(aSubject, aTopic, aData){
-        if(aTopic === this.HTTP_REQUEST_TOPIC){
+        if(aTopic === 'http-on-opening-request'){
             let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
 
             // リファラがなければ終了
@@ -224,15 +187,13 @@ ChaikaImageViewURLReplace.prototype = {
     /**
      * 処理したURLをキーに、置換ルールを値に持つハッシュ
      */
-    urls: {},
+    _replaceMap: {},
 
 
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('imageViewURLReplace.enabled');
 
-        if(this.enabled){
-            this._loadFile();
-        }
+        this._loadFile();
     },
 
     quit: function(){
@@ -240,7 +201,7 @@ ChaikaImageViewURLReplace.prototype = {
 
 
     _loadFile: function ChaikaIvur__loadFile(){
-        this.rules = new Array();
+        this.rules = [];
 
         const IVUR_NAME = 'ImageViewURLReplace.dat';
 
@@ -254,7 +215,14 @@ ChaikaImageViewURLReplace.prototype = {
             file = file.clone();
         }
 
-        var lines = ChaikaCore.io.readString(file, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
+        var data = ChaikaCore.io.readUnknownEncodingString(file, true, 'utf-8', 'Shift_JIS');
+
+        if(data === null){
+            ChaikaCore.logger.error('Fail in converting the encoding of ImageViewURLReplace.dat');
+            return;
+        }
+
+        var lines = data.replace(/\r/g, "\n").split(/\n+/);
         for(let i=0, l=lines.length; i<l; i++){
             let config = this._parseConfig(lines[i]);
             if(config){
@@ -294,20 +262,20 @@ ChaikaImageViewURLReplace.prototype = {
             return null;
         }
 
-        config.target = new RegExp(data[0]);
+        config.target = data[0];
         config.image = data[1];
         config.referrer = data[2];
         config.userAgent = data[5];
 
         if(data[3]){
-            if(data[3].indexOf('$COOKIE') > -1){
+            if(data[3].contains('$COOKIE')){
                 config.cookie.shouldGet = true;
-                config.cookie.referrer = data[3].match(/\$COOKIE=?([^\$]*)/)[1];
+                config.cookie.referrer = data[3].split('=')[1] || '';
             }
 
-            if(data[3].indexOf('$EXTRACT') > -1 && data[4]){
+            if(data[3].contains('$EXTRACT') && data[4]){
                 config.extract.pattern = data[4];
-                config.extract.referrer = data[3].match(/\$EXTRACT=?([^\$]*)/)[1];
+                config.extract.referrer = data[3].split('=')[1] || '';
                 config.cookie.shouldGet = true;
             }
 
@@ -336,6 +304,7 @@ ChaikaImageViewURLReplace.prototype = {
             }
         }).replace(/\$EXTRACT(\d+)?/g, function(_str, _backRefs){
             if(!_backRefs){
+                //$EXTRACT は $EXTRACT1 を指定したものとみなされる
                 return aExtractMatch[1];
             }else{
                 return aExtractMatch[_backRefs];
@@ -352,64 +321,63 @@ ChaikaImageViewURLReplace.prototype = {
      */
     replaceURL: function ChaikaIvur_replaceURL(url){
         for(let i=0, l=this.rules.length; i<l; i++){
-            let match;
-            if(match = url.match(this.rules[i].target)){
+            let rule = this.rules[i];
+            let match = url.match(new RegExp(rule.target));
 
-                //補正文字列がない場合はブロックする
-                //今後リクエストは発生しないのでこれで終わり
-                if(!this.rules[i].image){
-                    return '';
-                }
+            if(!match) continue;
 
-
-                //コピーして ivurObj を作成する
-                let ivurObj = JSON.parse(JSON.stringify(this.rules[i]));
-
-                //$EXTRACT でないとき
-                if(!ivurObj.extract.pattern){
-                    //後方参照の解決
-                    ivurObj.image = this._resolveBackReference(ivurObj.image, match);
-                    ivurObj.referrer = this._resolveBackReference(ivurObj.referrer, match);
-                    ivurObj.cookie.referrer = this._resolveBackReference(ivurObj.cookie.referrer, match);
-
-                    //Cookieの取得
-                    if(ivurObj.cookie.shouldGet){
-                        let request = new this.Request(ivurObj);
-                        request.getCookie();
-                    }
-                }else{
-                    //後方参照の解決
-                    ivurObj.referrer = this._resolveBackReference(ivurObj.referrer, match);
-                    ivurObj.cookie.referrer = this._resolveBackReference(ivurObj.cookie.referrer, match);
-                    ivurObj.extract.referrer = this._resolveBackReference(ivurObj.extract.referrer, match);
-                    ivurObj.extract.pattern =
-                        new RegExp(this._resolveBackReference(ivurObj.extract.pattern, match));
-
-                    //スクレイピングにより補正文字列とCookieを取得
-                    let request = new this.Request(ivurObj);
-                    let extractMatch = request.fetchExtract();
-
-                    //スクレイピングに失敗した時は元の URL を返す
-                    if(!extractMatch){
-                        ChaikaCore.logger.error('Fail to fetch $EXTRACT.');
-                        return url;
-                    }
-
-                    //後方参照の解決
-                    ivurObj.image = this._resolveBackReference(ivurObj.image, match, extractMatch);
-                }
-
-                //urlsに保存する
-                this.urls[ivurObj.image] = JSON.parse(JSON.stringify(ivurObj));
-
-                //補正後の URL を返す
-                //$VIEWER が指定されている場合や元のURLに画像の拡張子がある場合には、
-                //スキンに画像のURLであると判断されるように URL の末尾に .jpg を付ける
-                let forceViewer = ivurObj.processFlag.indexOf('$VIEWER') > -1 ||
-                                    /(?:jpe?g|png|gif|bmp)$/.test(url);
-
-                return ivurObj.image + '?chaika_ivur_enabled=1' + (forceViewer ? '&dummy_ext=.jpg' : '');
+            //補正文字列がない場合はブロックする
+            //今後リクエストは発生しないのでこれで終わり
+            if(!rule.image){
+                return '';
             }
+
+
+            //コピーして ivurObj を作成する
+            let ivurObj = JSON.parse(JSON.stringify(rule));
+
+
+            if(!ivurObj.extract.pattern){
+                //$EXTRACT でないとき
+
+                //後方参照の解決
+                ivurObj.image = this._resolveBackReference(ivurObj.image, match);
+                ivurObj.referrer = this._resolveBackReference(ivurObj.referrer, match);
+                ivurObj.cookie.referrer = this._resolveBackReference(ivurObj.cookie.referrer, match);
+
+                //Cookieの取得
+                if(ivurObj.cookie.shouldGet){
+                    let request = new ChaikaIvurRequest(ivurObj);
+
+                    request.fetchCookie().then((cookieStr) => {
+                        this._replaceMap[url].cookie.str = cookieStr;
+                    }).catch((err) => {
+                        ChaikaCore.logger.error('Fail to fetch cookie.', err, JSON.stringify(ivurObj));
+                    });
+                }
+            }else{
+                //後方参照の解決
+                ivurObj.referrer = this._resolveBackReference(ivurObj.referrer, match);
+                ivurObj.cookie.referrer = this._resolveBackReference(ivurObj.cookie.referrer, match);
+                ivurObj.extract.referrer = this._resolveBackReference(ivurObj.extract.referrer, match);
+                ivurObj.extract.pattern = this._resolveBackReference(ivurObj.extract.pattern, match);
+
+                //スクレイピングにより補正文字列とCookieを取得
+                let request = new ChaikaIvurRequest(ivurObj);
+
+                request.fetchExtract().then((extractMatch) => {
+                    if(!extractMatch) throw new Error('No Match.');
+
+                    this._replaceMap[url].image =
+                        this._resolveBackReference(this._replaceMap[url].image, match, extractMatch);
+                }).catch((err) => {
+                    ChaikaCore.logger.error('Fail to fetch $EXTRACT.', err, JSON.stringify(ivurObj));
+                });
+            }
+
+            this._replaceMap[url] = ivurObj;
+
+            return 'chaika://ivur/' + url + '?dummy_ext=.jpg';
         }
 
         return url;
@@ -422,17 +390,34 @@ ChaikaImageViewURLReplace.prototype = {
      */
     apply: function ChaikaIvur_apply(aHttpChannel){
         var url = aHttpChannel.URI.spec;
-        if(url.indexOf('?chaika_ivur_enabled=1') === -1) return;
+        var ivurObj = this._replaceMap[url];
 
-        url = url.replace('?chaika_ivur_enabled=1', '')
-                .replace('&dummy_ext=.jpg', '');
-
-        var ivurObj = this.urls[url];
         if(!ivurObj) return;
+        if(!ivurObj.image.startsWith('http')) return;
 
         aHttpChannel.setRequestHeader('Referer', ivurObj.referrer, false);
         aHttpChannel.setRequestHeader('Cookie', ivurObj.cookie.str, false);
     },
+
+
+    /**
+     * 置き換え後の画像URLを返す
+     * @param {nsIURI} aURI
+     * @return {String} URL
+     */
+    getRedirectURI: function(aURI){
+        let url = aURI.spec.replace('chaika://ivur/', '')
+                           .replace('?dummy_ext=.jpg', '');
+
+        let ivurObj = this._replaceMap[url];
+
+        if(!ivurObj) return url;
+        if(!ivurObj.image.startsWith('http')) return url;
+
+        ChaikaCore.logger.debug('[ivur]', aURI.spec, '->', ivurObj.image);
+
+        return ivurObj.image;
+    }
 
 };
 
@@ -442,91 +427,107 @@ ChaikaImageViewURLReplace.prototype = {
  * @constructor
  * @private
  */
-ChaikaImageViewURLReplace.prototype.Request = function(ivurObj){
+function ChaikaIvurRequest(ivurObj){
     this.init(ivurObj);
-};
+}
 
-ChaikaImageViewURLReplace.prototype.Request.prototype = {
+ChaikaIvurRequest.prototype = {
 
     timeout: 10 * 1000,
 
-    init: function(ivurObj){
-        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.addObserver(this, ChaikaHttpController.HTTP_REQUEST_TOPIC, false);
-        os.addObserver(this, 'http-on-examine-response', false);
 
+    init: function(ivurObj){
         this._ivurObj = ivurObj;
         this._request = Cc["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
         this._request.QueryInterface(Ci.nsIDOMEventTarget).QueryInterface(Ci.nsIXMLHttpRequest);
     },
 
 
-    destroy: function(){
-        var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
-        os.removeObserver(this, ChaikaHttpController.HTTP_REQUEST_TOPIC);
-        os.removeObserver(this, 'http-on-examine-response');
-
-        this._ivurObj = null;
-    },
-
-
     /**
      * Cookieを取得する
      */
-    getCookie: function ChaikaIvurRequest_getCookie(){
-        this._request.timeout = this.timeout;
+    fetchCookie: function(){
+        let defer = Promise.defer();
+
+//        this._request.timeout = this.timeout;
         this._request.open('GET', this._ivurObj.referrer, true);
-        this._request.addEventListener('load', this.destroy.bind(this), false);
+
+        this._request.addEventListener('load', (event) => {
+            let req = event.target;
+            let channel = req.channel;
+
+            if(req.status !== 200 || !req.responseText || !channel){
+                return defer.reject(req.status);
+            }
+
+            try{
+                let cookie = channel.getResponseHeader('Set-Cookie');
+
+                if(!cookie){
+                    defer.reject(req.status);
+                }else{
+                    defer.resolve(cookie);
+                }
+            }catch(ex){
+                defer.reject(ex);
+            }
+        }, false);
+
+        this._request.addEventListener('error', (err) => {
+            defer.reject(err);
+        }, false);
+
 
         this._request.setRequestHeader('Referer', this._ivurObj.cookie.referrer);
+
         if(this._ivurObj.userAgent){
             this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
         }
 
         this._request.send(null);
+
+        return defer.promise;
     },
 
 
     /**
      * $EXTRACT に基づきスクレイピングする
-     * @return {RegExp} スクレイピングした結果のRegExp
+     * @return {Promise.<RegExp>} スクレイピングした結果のRegExp
      */
-    fetchExtract: function ChaikaIvurRequest_fetchExtract(){
-        this._request.timeout = this.timeout;
-        this._request.open('GET', this._ivurObj.referrer, false);
+    fetchExtract: function(){
+        let defer = Promise.defer();
+
+//        this._request.timeout = this.timeout;
+        this._request.open('GET', this._ivurObj.referrer, true);
+
+        this._request.addEventListener('load', (event) => {
+            let req = event.target;
+
+            if(req.status !== 200 || !req.responseText){
+                return defer.reject(req.status);
+            }
+
+            let regexp = new RegExp(this._ivurObj.extract.pattern);
+
+            defer.resolve(req.responseText.match(regexp));
+        }, false);
+
+        this._request.addEventListener('error', (event) => {
+            defer.reject(event.target.status);
+        }, false);
+
 
         this._request.setRequestHeader('Content-Type', 'text/html');
         this._request.setRequestHeader('Referer', this._ivurObj.extract.referrer);
+
         if(this._ivurObj.userAgent){
             this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
         }
 
         this._request.send(null);
 
-        var extractMatch = null;
-        if(this._request.status === 200 && this._request.responseText){
-            extractMatch = this._request.responseText.match(this._ivurObj.extract.pattern);
-        }
-
-        this.destroy();
-        return extractMatch;
-    },
-
-
-    observe: function ChaikaIvurRequest_observe(aSubject, aTopic, aData){
-        if(aTopic === 'http-on-examine-response'){
-            let httpChannel = aSubject.QueryInterface(Ci.nsIHttpChannel);
-
-            if(httpChannel.URI.spec === this._ivurObj.referrer){
-                try{
-                    this._ivurObj.cookie.str = httpChannel.getResponseHeader('Set-Cookie');
-                    httpChannel.setResponseHeader('Set-Cookie', '');
-                }catch(ex){
-                    this._ivurObj.cookie.str = '';
-                }
-            }
-        }
-    },
+        return defer.promise;
+    }
 };
 
 
@@ -549,9 +550,7 @@ ChaikaNGFiles.prototype = {
     startup: function(){
         this.enabled = ChaikaCore.pref.getBool('ngfiles.enabled');
 
-        if(this.enabled){
-            this._loadFile();
-        }
+        this._loadFile();
     },
 
     quit: function(){
@@ -574,9 +573,17 @@ ChaikaNGFiles.prototype = {
             ngFile = ngFile.clone();
         }
 
-        var lines = ChaikaCore.io.readString(ngFile, "Shift_JIS").replace(/\r/g, "\n").split(/\n+/);
+        var data = ChaikaCore.io.readUnknownEncodingString(ngFile, true, 'utf-8', 'Shift_JIS');
+
+        if(data === null){
+            ChaikaCore.logger.error('Fail in converting the encoding of NGFiles.txt');
+            return;
+        }
+
+        var lines = data.replace(/\r/g, "\n").split(/\n+/);
+
         for(let i=0, l=lines.length; i<l; i++){
-            var data = lines[i].split(/=\*/);
+            data = lines[i].split(/=\*/);
 
             if(data[0] && !(/^\s*(?:;|'|#|\/\/)/).test(data[0])){
                 this.ngData.push({
@@ -605,10 +612,10 @@ ChaikaNGFiles.prototype = {
             if(channel instanceof Ci.nsIHttpChannel && channel.responseStatus != 200){
                 ChaikaCore.logger.error('channel status: ' + channel.responseStatus);
             }else{
-                var byteArray = new Array();
+                var byteArray = [];
                 var readLength = binaryInputStream.available();
 
-                while(readLength != 0){
+                while(readLength !== 0){
                     byteArray = byteArray.concat(binaryInputStream.readByteArray(readLength));
                     readLength = binaryInputStream.available();
                 }
@@ -619,9 +626,9 @@ ChaikaNGFiles.prototype = {
 
                 var hash = cryptoHash.finish(false);
 
-                function toHexString(charCode){
+                var toHexString = function(charCode){
                     return ("0" + charCode.toString(16)).slice(-2);
-                }
+                };
 
                 return [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
             }
@@ -693,8 +700,8 @@ ChaikaNGFiles.prototype = {
                 uri = uri.QueryInterface(Ci.nsIURL);
 
                 var alertStr = decodeURIComponent(escape(
-                    'NGFiles.txt に基づき' + uri.fileName + ' (' + hash + ') をブロックしました。'
-                ));
+                    'NGFiles.txt に基づき ' + uri.fileName + ' をブロックしました。\n説明: '
+                )) + this.ngData[i].description;
 
                 var alertsService = Cc["@mozilla.org/alerts-service;1"].getService(Ci.nsIAlertsService);
                 alertsService.showAlertNotification("chrome://chaika/content/icon.png", "Chaika", alertStr, false, "", null);

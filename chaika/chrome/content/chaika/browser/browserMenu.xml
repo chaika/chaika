@@ -1,0 +1,925 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<bindings id="chaikaBrowserMenuBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">
+    <content>
+        <xul:arrowscrollbox orient="vertical" flex="1">
+            <children />
+            <xul:menu label="あぼーん" anonid="abone">
+                <xul:menupopup>
+                    <xul:menuitem label="名前" anonid="abone-name" />
+                    <xul:menuitem label="メール" anonid="abone-mail" />
+                    <xul:menuitem label="ID" anonid="abone-id" />
+                    <xul:menuitem label="本文" anonid="abone-word" />
+                    <xul:menuitem label="NGEx" anonid="abone-ex" />
+                    <xul:menuseparator />
+                    <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
+                </xul:menupopup>
+            </xul:menu>
+
+            <xul:menu label="コピー" anonid="copy" class="chaika-shown-on-bbs">
+                <xul:menupopup>
+                    <xul:menuitem label="タイトル" anonid="copy-title" />
+                    <xul:menuitem label="URL" anonid="copy-url" />
+                    <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
+                    <xul:menuitem label="タイトルと URL と選択部分" anonid="copy-title-url-selection" class="chaika-shown-when-text-selected" />
+                </xul:menupopup>
+            </xul:menu>
+
+            <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
+                <xul:menupopup>
+                    <xul:vbox anonid="search-thread" />
+                    <xul:menuseparator anonid="search-thread-sep" />
+                    <xul:menuitem label="板で検索" anonid="search-in-board" />
+                    <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
+                </xul:menupopup>
+            </xul:menu>
+
+            <xul:menu label="履歴" anonid="history">
+                <xul:menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)" />
+            </xul:menu>
+
+            <xul:menu label="スキン" anonid="skin">
+                <xul:menupopup style="-moz-binding:url(chrome://chaika/content/skinMenu.xml#skinMenuPopup)" />
+            </xul:menu>
+
+            <xul:menuseparator anonid="skin-sep" />
+
+            <xul:menuitem label="このスレッドに書き込む" anonid="write" class="chaika-shown-on-thread" />
+            <xul:menuitem label="このスレッドのログを削除" anonid="delete-log" class="chaika-shown-on-thread" />
+
+            <xul:menuseparator anonid="thread-sep" class="chaika-shown-on-thread" />
+
+            <xul:menuitem label="chaika で開く" anonid="view-in-chaika" class="chaika-shown-on-bbs-not-chaika" />
+            <xul:menuitem label="ブラウザで開く" anonid="view-in-browser" class="chaika-shown-on-chaika" />
+
+            <xul:menuseparator anonid="view-in-sep" class="chaika-shown-on-bbs" />
+
+            <xul:menuitem label="リンク先を chaika で開く" anonid="open-link-in-chaika" class="chaika-shown-on-bbs-link" />
+            <xul:menuitem label="リンク先をブラウザで開く" anonid="open-link-in-browser" class="chaika-shown-on-bbs-link" />
+
+            <xul:menuseparator anonid="open-link-in-sep" class="chaika-shown-on-bbs-link" />
+
+            <xul:menuitem label="すべてのレスを表示" anonid="change-limit-all" class="chaika-shown-on-thread" />
+            <xul:menuitem label="新着50件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
+            <xul:menuitem label="スレッド一覧を開く" anonid="go-to-board" class="chaika-shown-on-thread" />
+            <xul:menuitem label="次のスレッドを検索する" anonid="find-next-thread" class="chaika-shown-on-thread" />
+
+            <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
+
+            <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
+
+            <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
+
+            <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
+                <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
+                <xul:observes element="viewChaikaSidebar" attribute="checked" />
+                <xul:observes element="viewChaikaSidebar" attribute="type" />
+            </xul:menuitem>
+
+            <xul:menuseparator anonid="sidebar-sep" />
+
+            <xul:menuitem label="オプション..." anonid="open-settings"/>
+        </xul:arrowscrollbox>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://chaika/skin/browser/browserMenu.css"/>
+        <stylesheet src="chrome://chaika/skin/browser/browserMenu-icon.css"/>
+    </resources>
+
+    <handlers>
+        <handler event="popupshowing" action="this._onPopupshowing(event)" />
+        <handler event="command" action="this._doCommand(event, false)"/>
+        <handler event="click" button="1" action="this._doCommand(event, true)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
+            Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
+
+            this.classList.add('chaika-browser-menu');
+            this.classList.add('popup-internal-box');
+
+            this._createSearchMenu();
+        ]]></constructor>
+
+
+        <!-- Utility Methods -->
+
+        <!--
+        /**
+         * 現在開いているスレッドのURLを返す
+         * @return {nsIURI} スレッドURL(chaika 形式ではない) ない場合はnullが返る
+         */
+        -->
+        <method name="_getCurrentThreadURL">
+            <body><![CDATA[
+                var currentURI = null;
+                try{
+                    currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
+                }catch(ex){
+                    return null;
+                }
+
+                if(!this._isThread(currentURI)) return null;
+
+                return this._getPlainURL(currentURI);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 現在開いている板、または開いているスレッドが所属している板のURLを返す
+         * @return {nsIURI} 板URL(chaika 形式ではない) ない場合はnullが返る
+         */
+        -->
+        <method name="_getCurrentBoardURL">
+            <body><![CDATA[
+                var currentURI = null;
+                try{
+                    currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
+                }catch(ex){
+                    return null;
+                }
+
+                var threadURI = this._getCurrentThreadURL();
+                if(threadURI){
+                    return this.ChaikaThread.getBoardURL(threadURI);
+                }else if(this._isBoard(currentURI)){
+                    return this._getPlainURL(currentURI);
+                }
+
+                return null;
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * chaika 形式の URL を標準の形式に変換する
+         * @param {nsIURI|String} aURI 変換するURL
+         * @return {nsIURI} 変換後の URL 変換できなかった場合はnullが返る
+         */
+        -->
+        <method name="_getPlainURL">
+            <parameter name="aURI"/>
+            <body><![CDATA[
+                if(!(aURI instanceof Components.interfaces.nsIURI)){
+                    aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+                }
+
+                if(!this._isChaika(aURI)) return aURI;
+
+                var plainURL = aURI.path.substring(1).replace(/^thread\//, "");
+
+                plainURL = plainURL.replace("/test/read.html/", "/test/read.cgi/")
+                                    .replace("/test/mread.cgi/", "/test/read.cgi/");
+
+                try{
+                    return Services.io.newURI(plainURL, null, null);
+                }catch(ex){
+                    return null;
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * chaika 形式の URL であるかどうかを返す
+         * @param {nsIURI|String} aURI 調べる URL
+         * @return {Boolean}
+         */
+        -->
+        <method name="_isChaika">
+            <parameter name="aURI"/>
+            <body><![CDATA[
+                try{
+                    if(!(aURI instanceof Components.interfaces.nsIURI)){
+                        aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+                    }
+
+                    var isThread = (aURI.host === "localhost" || aURI.host === "127.0.0.1") &&
+                                    aURI.path.substring(0, 8) === "/thread/";
+                    var isBoard = aURI.spec.lastIndexOf("chaika://board/", 0) !== -1;
+
+                    return isThread || isBoard;
+                }catch(ex){
+                    return false;
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 掲示板の URL であるかどうかを返す
+         * @param {nsIURI|String} aURI 調べる URL
+         * @return {Boolean}
+         */
+        -->
+        <method name="_isBBS">
+            <parameter name="aURI"/>
+            <body><![CDATA[
+                var plainURL = this._getPlainURL(aURI);
+                return this.ChaikaBoard.getBoardType(plainURL) !== this.ChaikaBoard.BOARD_TYPE_PAGE;
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * スレッドの URL であるかどうかを返す
+         * @param {nsIURI|String} aURI 調べる URL
+         * @return {Boolean}
+         */
+        -->
+        <method name="_isThread">
+            <parameter name="aURI"/>
+            <body><![CDATA[
+                return this._isBBS(aURI) && /\/(?:test|bbs)\/m?read\.(?:cgi|html)\//.test(aURI.spec || aURI);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 板の URL であるかどうかを返す
+         * @param {nsIURI|String} aURI 調べる URL
+         * @return {Boolean}
+         */
+        -->
+        <method name="_isBoard">
+            <parameter name="aURI"/>
+            <body><![CDATA[
+                return this._isBBS(aURI) && !this._isThread(aURI);
+            ]]></body>
+        </method>
+
+
+        <method name="_createSearchMenu">
+            <body><![CDATA[
+                let searchMenu = document.getAnonymousElementByAttribute(this, "anonid", "search-thread");
+
+                this.ChaikaSearch.plugins.forEach(plugin => {
+                    if(!plugin.url) return;
+
+                    let menuitem = document.createElement('menuitem');
+
+                    menuitem.setAttribute('label', plugin.name + ' で検索');
+                    menuitem.setAttribute('anonid', plugin.id);
+
+                    searchMenu.appendChild(menuitem);
+                });
+            ]]></body>
+        </method>
+
+
+        <method name="_onPopupshowing">
+            <body><![CDATA[
+                //表示・非表示を制御するためのステータスを設定する
+                this._setStatus();
+            ]]></body>
+        </method>
+
+
+        <method name="_setStatus">
+            <body><![CDATA[
+                const currentURI = getBrowser().currentURI;
+
+                const isOnBBS = this._isBBS(currentURI);
+                const isOnChaika = this._isChaika(currentURI);
+                const isOnThread = this._isThread(currentURI);
+                const isOnBoard = this._isBoard(currentURI);
+
+                const isContextMenu = !!gContextMenu;
+                const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
+                const isOnBBSLink = isContextMenu && gContextMenu.onLink && this._isBBS(gContextMenu.linkURL);
+
+                let root = this;
+
+                isOnBBS ? root.classList.add('chaika-status-on-bbs') :
+                          root.classList.remove('chaika-status-on-bbs');
+                isOnChaika ? root.classList.add('chaika-status-on-chaika') :
+                             root.classList.remove('chaika-status-on-chaika');
+                isOnThread ? root.classList.add('chaika-status-on-thread') :
+                             root.classList.remove('chaika-status-on-thread');
+                isOnBoard ? root.classList.add('chaika-status-on-board') :
+                            root.classList.remove('chaika-status-on-board');
+                isTextSelected ? root.classList.add('chaika-status-text-selected') :
+                                 root.classList.remove('chaika-status-text-selected');
+                isOnBBSLink ? root.classList.add('chaika-status-on-bbs-link') :
+                              root.classList.remove('chaika-status-on-bbs-link');
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * メニューのコマンドを実行する
+         * @param {Event} aEvent
+         * @param {Boolean} aMiddleClicked 中クリックかどうか
+         */
+        -->
+        <method name="_doCommand">
+            <parameter name="aEvent"/>
+            <parameter name="aMiddleClicked"/>
+            <body><![CDATA[
+                var targetElement = aEvent.originalTarget;
+                var anonymousID = targetElement.getAttribute("anonid");
+
+                var addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
+                if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
+                    addTab = !addTab;
+                }
+
+                var disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
+
+                var selection = content.getSelection();
+                var selectedText = selection.toString();
+
+
+                switch(anonymousID){
+                    case 'abone-name':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selection);
+                        break;
+
+                    case 'abone-mail':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selection);
+                        break;
+
+                    case 'abone-id':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selection);
+                        break;
+
+                    case 'abone-word':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selection);
+                        break;
+
+                    case 'abone-ex':
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selection);
+                        break;
+
+                    case "open-abone-manager":
+                        this.openAboneManager();
+                        break;
+
+                    case 'copy-title':
+                        this.copyClipBoard('%TITLE%');
+                        break;
+
+                    case 'copy-url':
+                        this.copyClipBoard('%URL%');
+                        break;
+
+                    case 'copy-title-url':
+                        this.copyClipBoard('%TITLE%%NEWLINE%%URL%');
+                        break;
+
+                    case 'copy-title-url-selection':
+                        this.copyClipBoard('%SEL%%NEWLINE%%NEWLINE%%TITLE%%NEWLINE%%URL%');
+                        break;
+
+                    case 'search-in-board':
+                        this.searchInBoard(selectedText, addTab);
+                        break;
+
+                    case 'search-in-thread':
+                        this.searchInThread(selectedText);
+                        break;
+
+                    case "write":
+                        this.write();
+                        break;
+
+                    case "delete-log":
+                        this.deleteLog();
+                        break;
+
+                    case "view-in-chaika":
+                        this.viewInChaika(null, addTab, disregardLimit);
+                        break;
+
+                    case "view-in-browser":
+                        this.viewInBrowser(null, addTab, disregardLimit);
+                        break;
+
+                    case 'open-link-in-chaika':
+                        this.viewInChaika(gContextMenu.linkURL, addTab, disregardLimit);
+                        break;
+
+                    case 'open-link-in-browser':
+                        this.viewInBrowser(gContextMenu.linkURL, addTab, disregardLimit);
+                        break;
+
+                    case "change-limit-all":
+                        this.changeLimit("", addTab);
+                        break;
+
+                    case "change-limit-l50":
+                        this.changeLimit("l50", addTab);
+                        break;
+
+                    case "go-to-board":
+                        this.goToBoard(addTab);
+                        break;
+
+                    case "find-next-thread":
+                        this.findNextThread(addTab);
+                        break;
+
+                    case "register-selection-as-aa":
+                        this.registerAsAA(selectedText);
+                        break;
+
+                    case "open-settings":
+                        this.openSettings();
+                        break;
+
+                    default:
+                        //検索メニューかも
+                        if(targetElement.parentNode.getAttribute('anonid') === 'search-thread'){
+                            this.searchThread(anonymousID, selectedText, addTab);
+                        }
+                }
+
+                //中クリックの場合にポップアップが閉じないのに対処する
+                if(aMiddleClicked){
+                    let contextMenu = document.getElementById('contentAreaContextMenu');
+                    let menupopup = this.parentNode.getElementsByTagName('menupopup')[0];
+
+                    contextMenu.hidePopup();
+
+                    if(menupopup){
+                        menupopup.hidePopup();
+                    }
+                }
+            ]]></body>
+        </method>
+
+
+        <!-- Commands -->
+
+        <!--
+        /**
+         * 指定された文字列をNGワードに追加する
+         * @param {Number} ngType NGワードの種類
+         * @param {Selection} ngWord 追加するNGワード
+         * @see ChaikaAboneManager
+         */
+        -->
+        <method name="addAbone">
+            <parameter name="ngType" />
+            <parameter name="ngWord" />
+            <body><![CDATA[
+                var shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
+
+                if(ngType !== this.ChaikaAboneManager.ABONE_TYPE_EX){
+                    if(shouldConfirm){
+                        this.openAboneManager(ngType, ngWord.toString());
+                    }else{
+                        this.ChaikaAboneManager[ngType].add(ngWord.toString());
+                    }
+                }else{
+                    let ngData = {
+                        target: 'post',
+                        match: 'all',
+                        rules: [],
+                    };
+
+                    for(let i = 0, iz = ngWord.rangeCount; i < iz; i++){
+                        let range = ngWord.getRangeAt(i);
+
+                        ngData.rules.push({
+                            target: 'msg',
+                            query: range.toString(),
+                            condition: 'contains'
+                        });
+                    }
+
+                    this.openAboneManager(ngType, ngData);
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * あぼーんマネージャを開く (引数は右クリックあぼーんで使用)
+         * @param {String} [ngType] NGデータの種類
+         * @param {String|NGExData} [ngWord] NGデータ
+         */
+        -->
+        <method name="openAboneManager">
+            <parameter name="ngType" />
+            <parameter name="ngWord" />
+            <body><![CDATA[
+                window.openDialog("chrome://chaika/content/settings/abone-manager.xul",
+                                  "_blank", "chrome, resizable, minimazable, toolbar",
+                                  ngType, ngWord);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * クリップボードに指定された文字をコピーする
+         * @param {String} template コピーする文字列の形式を指定する文字列
+         * @note template で使用可能な特殊文字一覧:
+         *          %TITLE%: ページタイトル, %URL%: ページURL, %SEL%: 選択文字列, %NEWLINE%: 改行
+         */
+        -->
+        <method name="copyClipBoard">
+            <parameter name="template" />
+            <body><![CDATA[
+                const osname = Services.appinfo.OS;
+                const NEWLINE = (osname == "Darwin") ? "\n" : "\r\n";
+                const removeLimit = this.ChaikaCore.pref.getBool('browser.browsermenu.remove_limit_when_copy');
+
+                var uri = this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL() ||
+                          getBrowser().currentURI;
+
+                var title;
+
+                try{
+                    title = (new this.ChaikaThread(uri)).title;
+                }catch(ex){
+                    try{
+                        title = (new this.ChaikaBoard(uri)).getTitle();
+                    }catch(ex2){
+                        title = content.document.title;
+                    }
+                }
+
+                if(removeLimit){
+                    uri = Services.io.newURI("./", null, uri);
+                }
+
+                var text = template.replace("%TITLE%", title, "g")
+                                   .replace("%URL%", uri.spec, "g")
+                                   .replace("%SEL%", content.getSelection().toString(), "g")
+                                   .replace("%NEWLINE%", NEWLINE, "g");
+
+                var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
+
+                clipboard.copyString(text);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 2ちゃんねる検索での検索結果を開く
+         * @param {String} 検索プラグインID
+         * @param {String} aTerm 検索文字列
+         * @param {Boolean} aAddTab 新しいタブで開くかどうか
+         */
+        -->
+        <method name="searchThread">
+            <parameter name="aID" />
+            <parameter name="aTerm" />
+            <parameter name="aAddTab" />
+            <body><![CDATA[
+                var sidebarMode = this.ChaikaCore.pref.getBool('browser.browsermenu.find_2ch_in_sidebar');
+
+                if(!sidebarMode){
+                    let plugin = this.ChaikaSearch.getPlugin(aID);
+                    let term = aTerm;
+
+                    if(plugin.charset.toUpperCase() !== 'UTF-8'){
+                        let converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
+                        converter.charset = plugin.charset;
+                        term = escape(converter.ConvertFromUnicode(aTerm));
+                    }
+
+                    let searchURI = Services.io.newURI(plugin.url.replace('%%TERM%%', term), null, null);
+                    this.ChaikaCore.browser.openURL(searchURI, aAddTab);
+                }else{
+                    const SIDEBAR_URL = 'chrome://chaika/content/bbsmenu/page.xul';
+                    var sidebarBox = document.getElementById("sidebar-box");
+                    var sidebar = document.getElementById("sidebar");
+
+                    function _doSearch(){
+                        setTimeout(function(){
+                            var sideDoc = sidebar.contentDocument;
+                            var sideWin = sidebar.contentWindow;
+                            var searchBox = sideDoc.getElementById("searchBox");
+
+                            searchBox.focus();
+                            searchBox.value = aTerm;
+                            sideWin.SearchBox.setSearchMode(aID);
+                            sideWin.SearchBox.search(aTerm);
+
+                            sidebar.removeEventListener('DOMContentLoaded', _doSearch, false);
+                        }, 0);
+                    }
+
+                    if(sidebarBox.hidden || sidebar.getAttribute('src') !== SIDEBAR_URL){
+                        sidebar.addEventListener("DOMContentLoaded", _doSearch, false);
+                        toggleSidebar("viewChaikaSidebar", true);
+                    }else{
+                        _doSearch();
+                    }
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 板一覧で検索する
+         * @param {String} aTerm 検索文字列
+         * @param {Boolean} aAddTab 新規タブに開くかどうか
+         */
+        -->
+        <method name="searchInBoard">
+            <parameter name="aTerm" />
+            <parameter name="aAddTab" />
+            <body><![CDATA[
+                var boardURL = this._getCurrentBoardURL();
+                if(!boardURL) return;
+
+                var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(aTerm), null, null);
+
+                this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * スレッド内で検索する
+         * @note 本来ならスキンの検索機能を呼び出したいが、仕様が固まっておらず困難
+         */
+        -->
+        <method name="searchInThread">
+            <parameter name="aTerm" />
+            <body><![CDATA[
+                //今のところ標準の検索バーを出して検索するだけ
+                gFindBar.onFindCommand();
+                gFindBar._findField.value = aTerm;
+                gFindBar._find();
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 書き込みウィザードを開く
+         */
+        -->
+        <method name="write">
+            <body><![CDATA[
+                var threadURL = this._getCurrentThreadURL();
+                if(!threadURL) return;
+
+                var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
+                var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+                window.openDialog(postWizardURLSpec, "_blank",
+                            "chrome, resizable, minimizable, dialog", threadPlainURL.spec);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * ログを削除する
+         */
+        -->
+        <method name="deleteLog">
+            <body><![CDATA[
+                var threadURL = this._getCurrentThreadURL();
+                if(!threadURL) return;
+
+                if(this.ChaikaCore.pref.getBool("warn_when_delete_log")){
+                    var result = Services.prompt.confirm(null, "ログの削除 [chaika]",
+                                    "このスレッドのログを削除しますか?");
+                    if(!result) return;
+                }
+
+                try{
+                    var thread = new this.ChaikaThread(threadURL);
+                    thread.deleteThreadData();
+                }catch(ex){
+                    this.ChaikaCore.logger.error(ex);
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * chaika で開く
+         * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+         * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+         * @param {Boolean} [disregardLimit=false] 表示制限を置き換えるかどうか
+         */
+        -->
+        <method name="viewInChaika">
+            <parameter name="aURI"/>
+            <parameter name="aAddTab"/>
+            <parameter name="disregardLimit"/>
+            <body><![CDATA[
+                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                if(!url) return;
+
+                try{
+                    if(this._isBoard(url)){
+                        this.ChaikaCore.browser.openBoard(url, aAddTab);
+                    }else{
+                        var threadURL = this._getPlainURL(url);
+                        this.ChaikaCore.browser.openThread(threadURL, aAddTab, disregardLimit, false);
+                    }
+                }catch(ex){
+                    this.ChaikaCore.logger.error(ex);
+                    return;
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * ブラウザで開く
+         * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+         * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+         * @param {Boolean} [disregardLimit] 表示制限を書き換えて開くかどうか
+         */
+        -->
+        <method name="viewInBrowser">
+            <parameter name="aURI"/>
+            <parameter name="aAddTab"/>
+            <parameter name="disregardLimit" />
+            <body><![CDATA[
+                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                if(!url) return;
+
+                url = this._getPlainURL(url);
+
+                if(url){
+                    this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * スレッドの表示オプションを変更する
+         * @param {String} aOption 表示オプション "l30", "45-", ""(すべて表示) など
+         * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+         */
+        -->
+        <method name="changeLimit">
+            <parameter name="aOption"/>
+            <parameter name="aAddTab"/>
+            <body><![CDATA[
+                var threadURL = this._getCurrentThreadURL();
+                if(!threadURL) return;
+
+                var currentURL = getBrowser().currentURI;
+
+                try{
+                    var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+                    threadURL = Services.io.newURI('./' + aOption, null, threadPlainURL);
+                    this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, !this._isChaika(currentURL));
+                }catch(ex){
+                    this.ChaikaCore.logger.error(ex);
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 板を開く
+         * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
+         */
+        -->
+        <method name="goToBoard">
+            <parameter name="aAddTab"/>
+            <body><![CDATA[
+                var boardURL = this._getCurrentBoardURL();
+                if(boardURL){
+                    var currentURI = getBrowser().currentURI;
+
+                    if(this._isChaika(currentURI)){
+                        this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
+                    }else{
+                        this.ChaikaCore.browser.openURL(boardURL, aAddTab);
+                    }
+                }
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 次のスレッドを検索する
+         * FoxAge2ch がインストールされている時は FoxAge2ch の次スレ検索機能を呼び出す
+         * ない場合は板一覧でスレタイを用いて検索をする
+         * @param {Boolean} [aAddTab=false] 板一覧で検索する場合に新規タブで開くかどうか
+         */
+        -->
+        <method name="findNextThread">
+            <parameter name="aAddTab" />
+            <body><![CDATA[
+                const FOX_AGE_2CH = !!document.getElementById("viewFoxAge2chSidebar");
+
+                var threadURI = this._getCurrentThreadURL();
+                if(!threadURI) return;
+
+                //FoxAge2chがインストールされている場合は
+                //FoxAge2chの次スレ検索機能の使用を試みる
+                if(FOX_AGE_2CH){
+                    //FoxAge2chに登録されている場合のみ次スレ検索が可能
+                    let FoxAge2chUtils = (Components.utils.import("resource://foxage2ch/utils.jsm", {})).FoxAge2chUtils;
+                    let [boardID, threadID] = FoxAge2chUtils.parseFromURL(threadURI.spec);
+                    let item = FoxAge2chUtils.service.getItem(threadID);
+
+                    if(item){
+                        window.openDialog(
+                            "chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
+                            "chrome,centerscreen,modal,dialog=no,all", threadID
+                        );
+                        return;
+                    }
+                }
+
+                //FoxAge2chがインストールされていない場合および
+                //FoxAge2chに未登録のスレッドの場合は
+                //chaika の検索機能を使用する
+
+                //検索文字列
+                let query = (new this.ChaikaThread(threadURI)).title;
+
+                //最も後ろの数字がある場所を探索する
+                //String#lastIndexOfには正規表現が渡せないため、
+                //reverseしてからsearchを用いる
+                let index = query.split('').reverse().join('').search(/\d+/);
+
+                //もし中間よりも後に数字が存在した場合、それより後ろをカットする
+                if(index !== -1 && (index + 1) < (query.length / 2)){
+                    query = query.replace(/^(.*?)\d+\D*$/, '$1');
+                }
+
+                //検索文字列を設定して板を開く
+                let boardURL = this._getCurrentBoardURL();
+                let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
+
+                this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * AA として文字列を登録する
+         * @param {String} aaStr 追加する AA 文字列
+         */
+        -->
+        <method name="registerAsAA">
+            <parameter name="aaStr" />
+            <body><![CDATA[
+                window.openDialog("chrome://chaika/content/settings/aa-manager.xul",
+                                  "_blank", "chrome, resizable, minimazable, toolbar", aaStr);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 設定画面を開く
+         */
+        -->
+        <method name="openSettings">
+            <body><![CDATA[
+                var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
+                var features = "";
+                try{
+                    var instantApply = Services.prefs.getBoolPref("browser.preferences.instantApply");
+                    features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+                }catch(ex){
+                    features = "chrome,titlebar,toolbar,centerscreen,modal,minimazable";
+                }
+                window.openDialog(settingDialogURL, "", features);
+            ]]></body>
+        </method>
+    </implementation>
+</binding>
+
+</bindings>

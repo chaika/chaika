@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *    flyson <flyson at users.sourceforge.jp>
+ *    nodaguti <nodaguti at gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -37,160 +38,121 @@
 
 
 const FONT_PREVIEW = [
-		"出されたご飯は残さず食べる。",
-		"転んでも泣かない。",
-		"おいらのギャグには大爆笑する。"].join("\n");
+        "出されたご飯は残さず食べる。",
+        "転んでも泣かない。",
+        "おいらのギャグには大爆笑する。"].join("\n");
 const AA_FONT_PREVIEW = [
-		"　 ┌───────────────┐ ",
-		"　 │ .右のAAのｽﾞﾚない環境が標準モナ.｜",
-		"　 └──y────────────‐┘ ",
-		" ∧＿∧　　　　　　| 　 　 |＼|／　|　　　　　｜ 　　｜",
-		"（　´∀｀）　　　　　 | ∧ ∧  |/⌒ヽ、| ∧＿∧ | ∧∧ |",
-		"（　　 　 つ 　 　 　 |(,,ﾟДﾟ)||,,ﾟ Θﾟ）|（； ´Д｀）|(=ﾟωﾟ)|"].join("\n");
+        "　 ┌───────────────┐ ",
+        "　 │ .右のAAのｽﾞﾚない環境が標準モナ.｜",
+        "　 └──y────────────‐┘ ",
+        " ∧＿∧　　　　　　| 　 　 |＼|／　|　　　　　｜ 　　｜",
+        "（　´∀｀）　　　　　 | ∧ ∧  |/⌒ヽ、| ∧＿∧ | ∧∧ |",
+        "（　　 　 つ 　 　 　 |(,,ﾟДﾟ)||,,ﾟ Θﾟ）|（； ´Д｀）|(=ﾟωﾟ)|"].join("\n");
 
 
 var gThreadPane = {
-	_initialized: false,
+    _initialized: false,
 
-	startup: function(){
-		this.initThreadSkinList();
-		this.initThreadFontList();
-		this.initThreadAAFontList();
-		document.getElementById("fontPreview").value = FONT_PREVIEW;
-		document.getElementById("aaFontPreview").value = AA_FONT_PREVIEW;
-		this._initialized = true;
-		this.setFontPreviewBoxFont();
-		this.setAAFontPreviewBoxFont();
-	},
+    startup: function(){
+        this.initThreadFontList();
+        this.initThreadAAFontList();
+        document.getElementById("fontPreview").value = FONT_PREVIEW;
+        document.getElementById("aaFontPreview").value = AA_FONT_PREVIEW;
+        this._initialized = true;
+        this.setFontPreviewBoxFont();
+        this.setAAFontPreviewBoxFont();
+    },
 
-	initThreadSkinList: function(){
-		var lstThreadSkinList = document.getElementById("lstThreadSkinList");
+    initThreadFontList: function(){
+        var lstThreadFontList = document.getElementById("lstThreadFontList");
 
-		var menupopup = lstThreadSkinList.menupopup;
-		while(menupopup.firstChild){
-			menupopup.removeChild(menupopup.firstChild);
-		}
+        var fontEnumerator = Components.classes["@mozilla.org/gfx/fontenumerator;1"]
+                .createInstance(Components.interfaces.nsIFontEnumerator);
 
-			// 規定のスキン
-		lstThreadSkinList.appendItem("(Default)", "");
+        var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
+        fonts.sort();
+        for(var i=0; i<fonts.length; i++){
+            var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
+        }
 
-		var skinDir = ChaikaCore.getDataDir();
-		skinDir.appendRelativePath("skin");
-		try{
-			if(!skinDir.exists()) skinDir.create(skinDir.DIRECTORY_TYPE, 0777);
-		}catch(ex){
-			return;
-		}
-
-		var entries = skinDir.directoryEntries
-				.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
-		while(true){
-			var entry = entries.nextFile;
-			if(!entry) break;
-			if(entry.isDirectory()){
-				lstThreadSkinList.appendItem(entry.leafName, entry.leafName);
-			}
-		}
-		entries.close();
-
-			// MenuList の Value と同じ MenuItem を選択
-		var menuItems = lstThreadSkinList.menupopup.childNodes;
-		for(var i=0; i<menuItems.length; i++){
-			if(menuItems[i].getAttribute("value") == lstThreadSkinList.value){
-				lstThreadSkinList.selectedIndex = i;
-			}
-		}
-			// 同じ MenuItem が無い場合は、デフォルトを選択
-		if(lstThreadSkinList.selectedIndex == -1){
-				lstThreadSkinList.selectedIndex = 0;
-		}
-	},
-
-	initThreadFontList: function(){
-		var lstThreadFontList = document.getElementById("lstThreadFontList");
-
-		var fontEnumerator = Components.classes["@mozilla.org/gfx/fontenumerator;1"]
-				.createInstance(Components.interfaces.nsIFontEnumerator);
-
-		var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
-		fonts.sort();
-		for(var i=0; i<fonts.length; i++){
-			var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
-		}
-
-			// MenuList の Value と同じ MenuItem を選択
-		var menuItems = lstThreadFontList.menupopup.childNodes;
-		for(var i=0; i<menuItems.length; i++){
-			if(menuItems[i].getAttribute("value") == lstThreadFontList.value){
-				lstThreadFontList.selectedIndex = i;
-			}
-		}
-			// 同じ MenuItem が無い場合は、デフォルトを選択
-		if(lstThreadFontList.selectedIndex == -1){
-				lstThreadFontList.selectedIndex = 1;
-		}
-	},
+            // MenuList の Value と同じ MenuItem を選択
+        var menuItems = lstThreadFontList.menupopup.childNodes;
+        for(var i=0; i<menuItems.length; i++){
+            if(menuItems[i].getAttribute("value") == lstThreadFontList.value){
+                lstThreadFontList.selectedIndex = i;
+            }
+        }
+            // 同じ MenuItem が無い場合は、デフォルトを選択
+        if(lstThreadFontList.selectedIndex == -1){
+                lstThreadFontList.selectedIndex = 1;
+        }
+    },
 
 
-	initThreadAAFontList: function(){
-		var lstThreadFontList = document.getElementById("lstThreadAAFontList");
+    initThreadAAFontList: function(){
+        var lstThreadFontList = document.getElementById("lstThreadAAFontList");
 
-		var fontEnumerator = Components.classes["@mozilla.org/gfx/fontenumerator;1"]
-				.createInstance(Components.interfaces.nsIFontEnumerator);
+        var fontEnumerator = Components.classes["@mozilla.org/gfx/fontenumerator;1"]
+                .createInstance(Components.interfaces.nsIFontEnumerator);
 
-		var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
-		fonts.sort();
-		for(var i=0; i<fonts.length; i++){
-			var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
-		}
+        var fonts = fontEnumerator.EnumerateFonts("ja", "", {});
+        fonts.sort();
+        for(var i=0; i<fonts.length; i++){
+            var item = lstThreadFontList.appendItem(fonts[i], fonts[i]);
+        }
 
-			// MenuList の Value と同じ MenuItem を選択
-		var menuItems = lstThreadFontList.menupopup.childNodes;
-		for(var i=0; i<menuItems.length; i++){
-			if(menuItems[i].getAttribute("value") == lstThreadFontList.value){
-				lstThreadFontList.selectedIndex = i;
-			}
-		}
-			// 同じ MenuItem が無い場合は、デフォルトを選択
-		if(lstThreadFontList.selectedIndex == -1){
-				lstThreadFontList.selectedIndex = 1;
-		}
-	},
-
-
-	openFontPreview: function(aAnchor, aPanelID){
-		var panel = document.getElementById(aPanelID);
-		panel.openPopup(aAnchor, "after_start", -40, 0, false);
-	},
+            // MenuList の Value と同じ MenuItem を選択
+        var menuItems = lstThreadFontList.menupopup.childNodes;
+        for(var i=0; i<menuItems.length; i++){
+            if(menuItems[i].getAttribute("value") == lstThreadFontList.value){
+                lstThreadFontList.selectedIndex = i;
+            }
+        }
+            // 同じ MenuItem が無い場合は、デフォルトを選択
+        if(lstThreadFontList.selectedIndex == -1){
+                lstThreadFontList.selectedIndex = 1;
+        }
+    },
 
 
-	setFontPreviewBoxFont: function(){
-		if(!this._initialized) return;
-		var fontPreview = document.getElementById("fontPreview");
-		var fontSize = parseInt(document.getElementById("fontSize").value);
-		var fontFamily = document.getElementById("lstThreadFontList").value;
-		fontPreview.style.font = [fontSize, "px '", fontFamily, "'"].join("");
-	},
+    openFontPreview: function(aAnchor, aPanelID){
+        var panel = document.getElementById(aPanelID);
+        panel.openPopup(aAnchor, "after_start", -40, 0, false);
+    },
 
 
-	setAAFontPreviewBoxFont: function(){
-		if(!this._initialized) return;
-		var fontPreview = document.getElementById("aaFontPreview");
-		var fontSize = parseInt(document.getElementById("aaFontSize").value);
-		var lineHeight = (parseInt(document.getElementById("aaLineHeight").value) + fontSize);
-		var fontFamily = document.getElementById("lstThreadAAFontList").value;
-		fontPreview.style.font = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
-	},
+    setFontPreviewBoxFont: function(){
+        if(!this._initialized) return;
+        var fontPreview = document.getElementById("fontPreview");
+        var fontSize = parseInt(document.getElementById("fontSize").value);
+        var fontFamily = document.getElementById("lstThreadFontList").value;
+        fontPreview.style.font = [fontSize, "px '", fontFamily, "'"].join("");
+    },
 
 
-	openSkinDir: function(){
-		var skinDir = ChaikaCore.getDataDir();
-		skinDir.appendRelativePath("skin");
-		ChaikaCore.io.revealDir(skinDir);
-	},
+    setAAFontPreviewBoxFont: function(){
+        if(!this._initialized) return;
+        var fontPreview = document.getElementById("aaFontPreview");
+        var fontSize = parseInt(document.getElementById("aaFontSize").value);
+        var lineHeight = (parseInt(document.getElementById("aaLineHeight").value) + fontSize);
+        var fontFamily = document.getElementById("lstThreadAAFontList").value;
+        fontPreview.style.font = [fontSize, "px/", lineHeight, "px '", fontFamily, "'"].join("");
+    },
 
-	openAboneManager: function(){
-		var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-		document.documentElement.openWindow("", aboneManagerURL);
-	}
+
+    openSkinDir: function(){
+        var skinDir = ChaikaCore.getDataDir();
+        skinDir.appendRelativePath("skin");
+        ChaikaCore.io.revealDir(skinDir);
+    },
+
+    openAboneManager: function(){
+        var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
+        document.documentElement.openWindow("", aboneManagerURL);
+    },
+
+    openAAManager: function(){
+        var aboneManagerURL = "chrome://chaika/content/settings/aa-manager.xul";
+        document.documentElement.openWindow("", aboneManagerURL);
+    }
 };

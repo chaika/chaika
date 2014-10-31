@@ -1,78 +1,76 @@
 <?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://browser/skin/places/places.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/bbsmenu/page.css" type="text/css"?>
 
 
 <page id="bookmarksPanel" title="BBSMENU [chaika]" class="bbsmenuPage"
-		onload="Page.startup()" onunload="Page.shutdown()"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        onload="Page.startup()" onunload="Page.shutdown()"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
 <script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js"/>
 
 <popupset>
-	<menupopup id="searchModeMenu" onpopupshowing="SearchBox.searchModeMenuShowing(event)">
-	     <menuitem label="find.2ch.net で検索" value="find2ch"     type="radio" name="searchModeMenuItem"
-	     		oncommand="SearchBox.setSearchMode('find2ch')"/>
-	     <menuitem label="板名フィルタ"  value="boardFilter" type="radio" name="searchModeMenuItem"
-	     		oncommand="SearchBox.setSearchMode('boardFilter')"/>
-	</menupopup>
+    <menupopup id="searchModeMenu" />
 
-	<menupopup id="historyMenuContext"
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
+    <menupopup id="historyMenuContext"
+            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"/>
 
-	<menupopup id="treeContextMenu"
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-			onpopupshowing="return Tree.showContext(event)"/>
+    <menupopup id="treeContextMenu"
+            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+            onpopupshowing="return Tree.showContext(event)"/>
 </popupset>
 
 <hbox align="center">
-	<textbox id="searchBox" value="" emptytext="" flex="1" type="search" timeout="2000"
-			searchmode="find2ch" persist="searchmode"
-			oncommand="if(this.value =='') SearchBox.search('')"
-			onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
-		<box><dropmarker popup="searchModeMenu" class="plain"/></box>
-	</textbox>
-	
-	<menubar id="mainMenubar" class="plain">
-		<menu id="historyMenu" label="履歴" class="plain menu-iconic">
-			<menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
-					position="after_end" tooltiptext=""
-					itemContext="historyMenuContext"/>
-		</menu>
+    <textbox id="searchBox" value="" emptytext="" flex="1" type="search" timeout="2000"
+            oncommand="if(this.value === '') SearchBox.search('')"
+            onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
+        <box><dropmarker popup="searchModeMenu" class="plain"/></box>
+    </textbox>
 
-		<menu id="toolsMenu" label="ツール" class="plain menu-iconic">
-			<menupopup id="toolsMenuPopup" position="after_end">
-				<menuitem label="bbsmenu 更新" oncommand="BbsmenuUpdater.update()"/>
-				<menuseparator/>
-				<menuitem label="ログマネージャ" oncommand="Page.openLogManager()"/>
-				<menuitem label="データフォルダを開く" oncommand="Page.openDataFolder()"/>
-				<menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
-						 hidden="true" oncommand="Page.viewFoxAge2ch()"/>
-				<menu label="ヘルプ">
-					<menupopup>
-						<menuitem label="リリースノート" oncommand="Page.openReleaseNotes()"/>
-						<menuitem label="トラブルシューティング情報" oncommand="Page.openSupport()"/>
-					</menupopup>
-				</menu>
-				<menuseparator/>
-				<menuitem label="オプション..." oncommand="Page.openSettings()"/>
-			</menupopup>
-		</menu>
-	</menubar>
+    <menubar id="mainMenubar" class="plain">
+        <menu id="historyMenu" label="履歴" class="plain menu-iconic">
+            <menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
+                    position="after_end" tooltiptext=""
+                    itemContext="historyMenuContext"/>
+        </menu>
+
+        <menu id="toolsMenu" label="ツール" class="plain menu-iconic">
+            <menupopup id="toolsMenuPopup" position="after_end">
+                <menuitem label="bbsmenu 更新" oncommand="BbsmenuUpdater.update()"/>
+                <menuseparator/>
+                <menuitem label="ログマネージャ" oncommand="Page.openLogManager()"/>
+                <menuitem label="データフォルダを開く" oncommand="Page.openDataFolder()"/>
+                <menuitem label="FoxAge2ch" id="viewFoxAge2chMenu"
+                         hidden="true" oncommand="Page.viewFoxAge2ch()"/>
+                <menu label="ヘルプ">
+                    <menupopup>
+                        <menuitem label="リリースノート" oncommand="Page.openReleaseNotes()"/>
+                        <menuitem label="トラブルシューティング情報" oncommand="Page.openSupport()"/>
+                        <menuitem label="オンラインヘルプ" oncommand="Page.openOnlineHelp()"/>
+                    </menupopup>
+                </menu>
+                <menuseparator/>
+                <menuitem label="オプション..." oncommand="Page.openSettings()"/>
+            </menupopup>
+        </menu>
+    </menubar>
 </hbox>
 
 <notificationbox id="notification"/>
 
 <tree id="bookmarks-view" class="sidebar-placesTree bbsmenuTree" hidecolumnpicker="true" flex="1"
-		openedCategories="" persist="openedCategories"
-		context="treeContextMenu">
-	<treecols>
-		<treecol id="title" flex="1" primary="true" hideheader="true"/>
-	</treecols>
-	<treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1"
-			onclick="Tree.click(event)" ondblclick="Tree.click(event)"/>
+        openedCategories="" persist="openedCategories"
+        context="treeContextMenu">
+    <treecols>
+        <treecol id="title" flex="1" primary="true" hideheader="true"/>
+    </treecols>
+    <treechildren id="bookmarks-view-children" class="sidebar-placesTreechildren" flex="1"
+            onclick="Tree.click(event)" ondblclick="Tree.click(event)"/>
 </tree>
 
 </page>

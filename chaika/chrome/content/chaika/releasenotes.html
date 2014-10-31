@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+<!-- See license.txt for terms of usage -->
+
 <html>
 <head>
     <meta charset="utf-8" />
@@ -6,7 +9,7 @@
     <title>リリースノート [chaika]</title>
     <script>
         window.addEventListener('DOMContentLoaded', function(){
-            if(location.search.indexOf('updated=1') > -1){
+            if(location.search.contains('updated=1')){
                 document.body.classList.add('updated');
             }
 
@@ -173,6 +176,134 @@
             ご利用ありがとうございます。<br />
             公式サイト等へのリンクはページ下部をご覧ください。
         </p>
+    </section>
+
+    <section>
+        <h1>1.7.0 - 2014/10/14</h1>
+        <ul>
+            <li class="new">あぼーん方法に NGEx を追加
+                (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)
+                <aside class="info">
+                    <p>正規表現による指定、複数条件の組み合わせ、スレッドあぼーん、自動NGIDなど
+                    多様な方法であぼーんを行うことが可能になりました。</p>
+                    <p>chaika 1.6.3 以前で同様の機能を提供していた
+                    chaikaAboneEx, Chaika Abone Helper を利用されていた方は、
+                    <a href="http://bbs2ch.sourceforge.jp/uploader/upload.php?page=all">移行ツール</a>
+                    を利用してデータを移行することができます。</p>
+                </aside>
+            </li>
+            <li class="new">AA マネージャを実装
+                (<a href="https://github.com/chaika/chaika/issues/6">#6</a>,
+                 <a href="https://github.com/chaika/chaika/issues/7">#7</a>)
+                 <ul class="list">
+                    <li>GUI から AA の追加、編集、削除、フォルダの移動などが行える機能を追加</li>
+                    <li>AAList.txt からのインポートに対応</li>
+                    <li>コンテキストメニューからの登録に対応</li>
+                 </ul>
+            </li>
+            <li class="new">ツールバーボタンを刷新
+                (<a href="https://github.com/chaika/chaika/issues/19">#19</a>)
+                <ul class="list">
+                    <li>アイコンが各 OS のツールバーボタンにマッチするよう新しいものに変更されました
+                        (Thanks <a href="http://anago.2ch.net/test/read.cgi/software/1403350012/283">&gt;&gt;283</a>
+                         for creating icons)
+                    </li>
+                    <li>Australis および テーマ適用時の表示に対応しました</li>
+                    <li>ボタンを任意の位置に移動できるようになりました</li>
+                    <li>コンテキストメニューと内容が完全に共通化されました</li>
+                    <li>サイドバーを開閉するボタンは削除されました</li>
+                </ul>
+            </li>
+            <li class="new">サイドバー・コンテキストメニューの検索機能をプラグイン化
+                (<a href="https://github.com/chaika/chaika/issues/62">#62</a>)
+                <aside class="info">
+                    <p>
+                        <a href="http://dig.2ch.net/">dig.2ch.net</a>,
+                        <a href="http://search.2ch.net/">search.2ch.net</a>,
+                        <a href="http://ff2ch.syoboi.jp/">ff2ch.syoboi.jp</a>
+                        での検索に対応しました。
+                    </p>
+                    <p>新規プラグインのインストール方法など詳細については
+                    <a href="https://github.com/chaika/chaika/wiki/%E6%A4%9C%E7%B4%A2%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3">オンラインマニュアル</a>
+                    を参照して下さい。</p>
+                </aside>
+            </li>
+            <li class="new">デフォルトスキンを改善
+                <ul class="list">
+                    <li>表示範囲外アンカーのポップアップに対応 (<a href="https://github.com/chaika/chaika/issues/2">#2</a>)</li>
+                    <li>ID別発言数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                    <li>被参照数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                    <li>逆参照ポップアップ機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                    <li>あぼーんされる原因となったNGワードを表示する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
+                    <li>あぼーんの削除を即時に反映する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
+                    <li>設定画面を実装 (<a href="https://github.com/chaika/chaika/issues/69">#69</a>)</li>
+                    <li>Favicon を追加 (<a href="https://github.com/chaika/chaika/issues/1">#1</a>)</li>
+                    <li>ポップアップの挙動を改善 (<a href="https://github.com/chaika/chaika/issues/21">#21</a>)</li>
+                    <li>スレッドリダイレクタが有効の場合にスレッドのブラウザ表示ができない問題を修正</li>
+                </ul>
+            </li>
+            <li class="new">書き込みウィザードに不具合報告テンプレートの挿入機能を追加
+                (<a href="https://github.com/chaika/chaika/issues/70">#70</a>)</li>
+            <li class="new">投稿時に誤爆を警告する機能を追加
+                (<a href="https://github.com/chaika/chaika/issues/61">#61</a>)</li>
+            <li class="new">書き込みウィザードの警告を強調する機能を追加
+                (<a href="https://github.com/chaika/chaika/issues/52">#52</a>)</li>
+            <li class="new">ログマネージャにおいてダブルクリックでスレッドを開く機能を追加
+                (<a href="https://github.com/chaika/chaika/issues/25">#25</a>)</li>
+            <li class="new">サイドバーにオンラインヘルプを開くメニューを追加
+                (<a href="https://github.com/chaika/chaika/issues/23">#23</a>)</li>
+
+            <li class="new">浪人に暫定的に対応
+                (<a href="https://github.com/chaika/chaika/issues/53">#53</a>)
+                <aside class="info">
+                    <p>環境によっては ログインできない・浪人経由で書き込めない・浪人経由で過去ログが取得できない
+                    などの問題が発生することが報告されており、現在調査中です。</p>
+                </aside>
+            </li>
+            <li class="new">p2 に関する詳細設定が設定画面からできるよう改善
+                (<a href="https://github.com/chaika/chaika/issues/5">#5</a>)
+                <aside class='info'>
+                    <p><a href="http://akid.s17.xrea.com/">rep2</a> や
+                    <a href="http://p2.moritapo.jp">p2.moritapo.jp</a>
+                    へ対応させるには設定の書き換えが必要です。</p>
+                </aside>
+            </li>
+            <li class="new">Be 2.0 および Pink ちゃんねるの Be に対応
+                (<a href="https://github.com/chaika/chaika/issues/56">#56</a>,
+                 <a href="https://github.com/chaika/chaika/issues/80">#80</a>)</li>
+            <li class="new">png 形式の Be アイコン および Emoticons に対応
+                (<a href="https://github.com/chaika/chaika/issues/64">#64</a>,
+                 <a href="https://github.com/chaika/chaika/issues/67">#67</a>)</li>
+
+            <li class="changed">AA レスの判定アルゴリズムを改善
+                (<a href="https://github.com/chaika/chaika/issues/66">#66</a>)</li>
+            <li class="changed">板の移転をより積極的に通知するよう改善</li>
+            <li class="changed">ImageViewURLReplace.dat によるリンクの置き換え処理を高速化
+                (<a href="https://github.com/chaika/chaika/issues/29">#29</a>)</li>
+            <li class="changed">ログマネージャにおいて上部に板名を表示するよう変更
+                (<a href="https://github.com/chaika/chaika/issues/26">#26</a>)</li>
+            <li class="changed">あぼーんの設定ファイル, kakikomi.txt, ImageViewURLReplace.dat, NGFiles.txt
+                のエンコーディングを Shift_JIS から UTF-8 へ変更
+                (<a href="https://github.com/chaika/chaika/issues/48">#48</a>)</li>
+
+            <li class="fixed">&gt;&gt;1 が透明あぼーんされるとスレッドが正しく表示できない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/117">#117</a>)</li>
+            <li class="fixed">正しく過去ログが取得できないことがある問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/105">#105</a>)</li>
+            <li class="fixed">書き込みウィザードが最小化できない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/55">#55</a>)</li>
+            <li class="fixed">板においてコンテキストメニューの「コピー」が正しく動作しない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/107">#107</a>)</li>
+            <li class="fixed">URL に特定の文字列が含まれる場合に表示が崩れる問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/49">#49</a>)</li>
+            <li class="fixed">1.6.1 のときからアンカーリンクの部分が不正な HTML になっていた問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/110">#110</a>,
+                 <a href="https://github.com/chaika/chaika/issues/">#124</a>)</li>
+            <li class="fixed">したらば掲示板でトリップのプレビューが文字化けする問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/96">#96</a>)</li>
+            <li class="fixed">したらば掲示板で特定の文字を含むスレッドのタイトルがスレッド一覧で正しく表示されない問題を修正
+                (<a href="https://github.com/chaika/chaika/issues/103">#103</a>)</li>
+        </ul>
     </section>
 
     <section>
@@ -425,7 +556,7 @@
 
 <footer>
     <ul class="list">
-        <li><a href="http://chaika.xrea.jp/">chaika 公式サイト</a></li>
+        <li><a href="https://github.com/chaika/chaika">chaika 公式サイト</a></li>
         <li>chaikaは<a href="https://github.com/chaika/chaika">Github</a>でホスティングされています。
             より詳細な更新履歴については<a href="https://github.com/chaika/chaika/commits/develop">コミットログ</a>をご覧ください。
         </li>

@@ -1,42 +1,9 @@
-/* ***** BEGIN LICENSE BLOCK *****
- * Version: MPL 1.1/GPL 2.0/LGPL 2.1
- *
- * The contents of this file are subject to the Mozilla Public License Version
- * 1.1 (the "License"); you may not use this file except in compliance with
- * the License. You may obtain a copy of the License at
- * http://www.mozilla.org/MPL/
- *
- * Software distributed under the License is distributed on an "AS IS" basis,
- * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
- * for the specific language governing rights and limitations under the
- * License.
- *
- * The Original Code is chaika.
- *
- * The Initial Developer of the Original Code is
- * chaika.xrea.jp
- * Portions created by the Initial Developer are Copyright (C) 2009
- * the Initial Developer. All Rights Reserved.
- *
- * Contributor(s):
- *    flyson <flyson.moz at gmail.com>
- *
- * Alternatively, the contents of this file may be used under the terms of
- * either the GNU General Public License Version 2 or later (the "GPL"), or
- * the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
- * in which case the provisions of the GPL or the LGPL are applicable instead
- * of those above. If you wish to allow use of your version of this file only
- * under the terms of either the GPL or the LGPL, and not to allow others to
- * use your version of this file under the terms of the MPL, indicate your
- * decision by deleting the provisions above and replace them with the notice
- * and other provisions required by the GPL or the LGPL. If you do not delete
- * the provisions above, a recipient may use your version of this file under
- * the terms of any one of the MPL, the GPL or the LGPL.
- *
- * ***** END LICENSE BLOCK ***** */
+/* See license.txt for terms of usage */
 
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
@@ -45,107 +12,102 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 const MODE_BBSMENU = 0;
-const MODE_BBSMENU_FILTER = 1;
-const MODE_FIND2CH = 2;
+const MODE_SEARCH = 1;
 
 
 var Page = {
 
-	startup: function Page_startup(){
-		PrefObserver.start();
-		var tree = document.getElementById("bookmarks-view");
-		tree.collapsed = true;
-		tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+    startup: function Page_startup(){
+        var tree = document.getElementById("bookmarks-view");
+        tree.collapsed = true;
+        tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
 
-		this.showViewFoxAge2chMenu();
-		SearchBox.init();
+        this.showViewFoxAge2chMenu();
+        SearchBox.init();
+        PrefObserver.start();
 
-		setTimeout(function(){ Page.delayStartup(); }, 0);
-	},
+        setTimeout(function(){ Page.delayStartup(); }, 0);
+    },
 
-	delayStartup: function Page_delayStartup(){
-		var tree = document.getElementById("bookmarks-view");
-		tree.collapsed = false;
+    delayStartup: function Page_delayStartup(){
+        var tree = document.getElementById("bookmarks-view");
+        tree.collapsed = false;
 
-		if(Bbsmenu.getItemCount() == 0){
-			BbsmenuUpdater.update();
-		}else{
-			Bbsmenu.initTree();
-		}
-	},
+        if(Bbsmenu.getItemCount() == 0){
+            BbsmenuUpdater.update();
+        }else{
+            Bbsmenu.initTree();
+        }
+    },
 
-	shutdown: function Page_shutdown(){
-		PrefObserver.stop();
-		Tree.saveOpenedCategories();
-	},
-
-
-	showViewFoxAge2chMenu: function Page_showViewFoxAge2chMenu(){
-		var browser = ChaikaCore.browser.getBrowserWindow();
-		if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
-			document.getElementById("viewFoxAge2chMenu").hidden = false;
-		}
-	},
+    shutdown: function Page_shutdown(){
+        PrefObserver.stop();
+        Tree.saveOpenedCategories();
+    },
 
 
-	openLogManager: function Page_openLogManager(){
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var logManagerURL = ioService.newURI("chaika://log-manager/", null, null);
-
-		ChaikaCore.browser.openURL(logManagerURL, true);
-	},
-
-
-	openDataFolder: function Page_openDataFolder(){
-		var logDir = ChaikaCore.getDataDir();
-		ChaikaCore.io.revealDir(logDir);
-	},
+    showViewFoxAge2chMenu: function Page_showViewFoxAge2chMenu(){
+        var browser = ChaikaCore.browser.getBrowserWindow();
+        if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
+            document.getElementById("viewFoxAge2chMenu").hidden = false;
+        }
+    },
 
 
-	openSupport: function Page_openSupport(){
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var supportURL = ioService.newURI("chaika://support/", null, null);
-
-		ChaikaCore.browser.openURL(supportURL, true);
-	},
+    openLogManager: function Page_openLogManager(){
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://log-manager/", null, null), true);
+    },
 
 
-	openReleaseNotes: function Page_openReleaseNotes(){
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var releasenotesURL = ioService.newURI("chaika://releasenotes/", null, null);
-
-		ChaikaCore.browser.openURL(releasenotesURL, true);
-	},
+    openDataFolder: function Page_openDataFolder(){
+        var logDir = ChaikaCore.getDataDir();
+        ChaikaCore.io.revealDir(logDir);
+    },
 
 
-	openSettings: function Page_openSettings(){
-		var winMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
-			.getService(Ci.nsIWindowMediator);
-		var settingdWin = winMediator.getMostRecentWindow("chaika:settings");
-		if(settingdWin){
-			settingdWin.focus();
-			return;
-		}
-
-		var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
-		var features = "";
-		try{
-			var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-			var instantApply = pref.getBoolPref("browser.preferences.instantApply");
-			features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-		}catch(ex){
-			features = "chrome,titlebar,toolbar,centerscreen,modal";
-		}
-		window.openDialog(settingDialogURL, "", features);
-	},
+    openSupport: function Page_openSupport(){
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://support/", null, null), true);
+    },
 
 
-	viewFoxAge2ch: function Page_viewFoxAge2ch(){
-		var browser = ChaikaCore.browser.getBrowserWindow();
-		if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
-			browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
-		}
-	}
+    openReleaseNotes: function Page_openReleaseNotes(){
+        ChaikaCore.browser.openURL(Services.io.newURI("chaika://releasenotes/", null, null), true);
+    },
+
+
+    openOnlineHelp: function(){
+        ChaikaCore.browser.openURL(Services.io.newURI("https://github.com/chaika/chaika/wiki", null, null), true);
+    },
+
+
+    openSettings: function Page_openSettings(){
+        var winMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
+            .getService(Ci.nsIWindowMediator);
+        var settingdWin = winMediator.getMostRecentWindow("chaika:settings");
+        if(settingdWin){
+            settingdWin.focus();
+            return;
+        }
+
+        var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
+        var features = "";
+        try{
+            var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+            var instantApply = pref.getBoolPref("browser.preferences.instantApply");
+            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
+        }catch(ex){
+            features = "chrome,titlebar,toolbar,centerscreen,modal";
+        }
+        window.openDialog(settingDialogURL, "", features);
+    },
+
+
+    viewFoxAge2ch: function Page_viewFoxAge2ch(){
+        var browser = ChaikaCore.browser.getBrowserWindow();
+        if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
+            browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
+        }
+    }
 
 };
 
@@ -154,28 +116,28 @@ var Page = {
 
 var PrefObserver = {
 
-	PREF_BRANCH: "extensions.chaika.bbsmenu.",
+    PREF_BRANCH: "extensions.chaika.bbsmenu.",
 
-	start: function PrefObserver_start(){
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
-		this._branch = prefService.getBranch(this.PREF_BRANCH).QueryInterface(Ci.nsIPrefBranch);
-		this._branch.addObserver("", this, false);
-	},
-
-
-	stop: function PrefObserver_stop(){
-		this._branch.removeObserver("", this);
-	},
+    start: function PrefObserver_start(){
+        var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+        this._branch = prefService.getBranch(this.PREF_BRANCH).QueryInterface(Ci.nsIPrefBranch);
+        this._branch.addObserver("", this, false);
+    },
 
 
-	observe: function PrefObserver_observe(aSubject, aTopic, aData){
-		if(aTopic != "nsPref:changed") return;
+    stop: function PrefObserver_stop(){
+        this._branch.removeObserver("", this);
+    },
 
-		if(aData == "tree_size"){
-			Tree.changeTreeSize();
-		}
 
-	}
+    observe: function PrefObserver_observe(aSubject, aTopic, aData){
+        if(aTopic != "nsPref:changed") return;
+
+        if(aData == "tree_size"){
+            Tree.changeTreeSize();
+        }
+
+    }
 
 };
 
@@ -184,53 +146,53 @@ var PrefObserver = {
 
 var Notification = {
 
-	info: function Notification_info(aLabel, aTimeout){
-		var notification = document.getElementById("notification");
-		var newNode = notification.appendNotification(aLabel, null, null,
-				notification.PRIORITY_INFO_MEDIUM, null);
+    info: function Notification_info(aLabel, aTimeout){
+        var notification = document.getElementById("notification");
+        var newNode = notification.appendNotification(aLabel, null, null,
+                notification.PRIORITY_INFO_MEDIUM, null);
 
-		if(aTimeout){
-			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
-		}
+        if(aTimeout){
+            setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
+        }
 
-		return newNode;
-	},
-
-
-	warning: function Notification_warning(aLabel, aTimeout){
-		var notification = document.getElementById("notification");
-		var newNode = notification.appendNotification(aLabel, null, null,
-				notification.PRIORITY_WARNING_MEDIUM, null);
-
-		if(aTimeout){
-			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
-		}
-		return newNode;
-	},
+        return newNode;
+    },
 
 
-	critical: function Notification_critical(aLabel, aTimeout){
-		var notification = document.getElementById("notification");
-		var newNode = notification.appendNotification(aLabel, null, null,
-				notification.PRIORITY_CRITICAL_MEDIUM, null);
+    warning: function Notification_warning(aLabel, aTimeout){
+        var notification = document.getElementById("notification");
+        var newNode = notification.appendNotification(aLabel, null, null,
+                notification.PRIORITY_WARNING_MEDIUM, null);
 
-		if(aTimeout){
-			setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
-		}
-		return newNode;
-	},
-
-
-	removeAll: function Notification_removeAll(){
-		var notification = document.getElementById("notification");
-		notification.removeAllNotifications(false);
-	},
+        if(aTimeout){
+            setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
+        }
+        return newNode;
+    },
 
 
-	remove: function Notification_remove(aNode){
-		var notification = document.getElementById("notification");
-		notification.removeNotification(aNode);
-	}
+    critical: function Notification_critical(aLabel, aTimeout){
+        var notification = document.getElementById("notification");
+        var newNode = notification.appendNotification(aLabel, null, null,
+                notification.PRIORITY_CRITICAL_MEDIUM, null);
+
+        if(aTimeout){
+            setTimeout(function(){ Notification.remove(newNode); }, aTimeout);
+        }
+        return newNode;
+    },
+
+
+    removeAll: function Notification_removeAll(){
+        var notification = document.getElementById("notification");
+        notification.removeAllNotifications(false);
+    },
+
+
+    remove: function Notification_remove(aNode){
+        var notification = document.getElementById("notification");
+        notification.removeNotification(aNode);
+    }
 
 };
 
@@ -239,54 +201,118 @@ var Notification = {
 
 var SearchBox = {
 
-	init: function SearchBox_init(){
-		if(!this._textbox) this._textbox = document.getElementById("searchBox");
+    init: function SearchBox_init(){
+        this._textbox = document.getElementById("searchBox");
 
-		switch(this.getSearchMode()){
-			case "find2ch":
-				this._textbox.emptyText = "2ch 検索";
-				break;
-			case "boardFilter":
-				this._textbox.emptyText = "フィルタ";
-				break;
-		}
-	},
+        this._createMenu();
+        this.setSearchMode(ChaikaCore.pref.getChar('bbsmenu.search.default_engine_name'));
+    },
 
+    /**
+     * 検索メニューを構築する
+     */
+    _createMenu: function(){
+        let popup = document.getElementById('searchModeMenu');
 
-	search: function SearchBox_search(aSearchStr){
-		if(!aSearchStr){
-			Bbsmenu.initTree();
-			return;
-		}
+        ChaikaSearch.plugins.forEach(plugin => {
+            if(!plugin.search) return;
 
-		switch(this.getSearchMode()){
-			case "find2ch":
-				Find2ch.search(aSearchStr);
-				break;
-			case "boardFilter":
-				Bbsmenu.filter(aSearchStr);
-				break;
-		}
-	},
+            let menuitem = document.createElement('menuitem');
 
+            menuitem.setAttribute('label', plugin.name);
+            menuitem.setAttribute('value', plugin.id);
+            menuitem.setAttribute('type', 'radio');
+            menuitem.setAttribute('name', 'searchModeMenuitem');
 
-	getSearchMode: function SearchBox_getSearchMode(){
-		return this._textbox.getAttribute("searchmode");
-	},
+            menuitem.addEventListener('command', event => {
+                this._textbox.emptyText = event.target.getAttribute('label');
+            });
+
+            popup.appendChild(menuitem);
+        });
+    },
 
 
-	setSearchMode: function SearchBox_setSearchMode(aValue){
-		this._textbox.setAttribute("searchmode", aValue);
-		this.init();
-		return aValue;
-	},
+    search: function SearchBox_search(aSearchStr){
+        //空文字が入力された場合には検索モードを終了する
+        if(!aSearchStr){
+            Bbsmenu.initTree();
+            return;
+        }
+
+        //検索を実行する
+        Notification.removeAll();
+        Notification.info('検索中');
+
+        let promise = ChaikaSearch.getPlugin(this.getSearchMode()).search(aSearchStr);
+
+        promise.then(this._showResults, this._onError)
+               .then(null, this._onError);
+    },
+
+    _showResults: function(results){
+        Notification.removeAll();
+
+        let doc = document.implementation.createDocument(null, '', null);
+        let root = document.createElement('category');
+
+        results.forEach((board) => {
+            let boardItem = document.createElement('board');
+            boardItem.setAttribute('title', board.title);
+            boardItem.setAttribute('url', board.url || '');
+            boardItem.setAttribute('type', board.type || ChaikaBoard.BOARD_TYPE_PAGE);
+
+            //板名フィルタの場合、threadsが空になるが、
+            //それ以外の時は板はフォルダ扱いになる
+            if(board.threads){
+                boardItem.setAttribute('isContainer', 'true');
+                boardItem.setAttribute('isOpen', 'true');
+
+                board.threads.forEach((thread) => {
+                    let threadItem = document.createElement('thread');
+                    threadItem.setAttribute('url', thread.url);
+                    threadItem.setAttribute('title', thread.title + ' [' + (thread.post || '-') + ']');
+                    threadItem.setAttribute('boardName', board.title);
+
+                    boardItem.appendChild(threadItem);
+                });
+            }
+
+            root.appendChild(boardItem);
+        });
+
+        doc.appendChild(root);
+
+        Tree.initTree(doc, MODE_SEARCH);
+    },
+
+    _onError: function(aError){
+        Notification.removeAll();
+        Notification.warning('検索に失敗しました', 2500);
+        ChaikaCore.logger.error('Search failed:', aError);
+    },
 
 
-	searchModeMenuShowing: function SearchBox_searchModeMenuShowing(aEvent){
-		var target = aEvent.target;
-		var element = target.getElementsByAttribute("value", SearchBox.getSearchMode())[0]
-		element.setAttribute("checked", "true");
-	}
+    /**
+     * 現在選択されている検索エンジンのIDを返す
+     * @return {String} 検索エンジンのID
+     */
+    getSearchMode: function SearchBox_getSearchMode(){
+        let popup = document.getElementById('searchModeMenu');
+        let selectedItem = popup.querySelector('[checked="true"]');
+
+        return selectedItem.getAttribute('value');
+    },
+
+
+    /**
+     * 検索エンジンを指定する
+     * @param {String} aID 検索エンジンのID
+     */
+    setSearchMode: function(aID){
+        document.querySelector('menuitem[value="' + aID + '"]').setAttribute('checked', 'true');
+        this._textbox.emptyText = ChaikaSearch.getPlugin(aID).name;
+    }
 
 };
 
@@ -295,43 +321,43 @@ var SearchBox = {
 
 var BbsmenuUpdater = {
 
-	_downloader: null,
-	_infoNode: null,
+    _downloader: null,
+    _infoNode: null,
 
 
-	update: function BbsmenuUpdater_update(){
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-		var bbsmenuHtmlURLSpec = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_url");
-		var bbsmenuHtmlURL = ioService.newURI(bbsmenuHtmlURLSpec, null, null);
-		var bbsmenuHtmlCharset = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_charset");
+    update: function BbsmenuUpdater_update(){
+        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+        var bbsmenuHtmlURLSpec = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_url");
+        var bbsmenuHtmlURL = ioService.newURI(bbsmenuHtmlURLSpec, null, null);
+        var bbsmenuHtmlCharset = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_charset");
 
-		this._downloader = new ChaikaSimpleDownloader();
-		this._downloader.download(bbsmenuHtmlURL, bbsmenuHtmlCharset, this);
-		Notification.removeAll();
-		this._infoNode = Notification.info("BBSMENU 更新中");
-	},
-
-
-	onStop: function BbsmenuUpdater_onStop(aDownloader, aResponse, aHttpStatus){
-		if(aResponse && aResponse.indexOf(".2ch.net/") != -1){
-			Bbsmenu.update(aResponse);
-			Bbsmenu.initTree()
-			Notification.info("更新しました", 1200);
-		}else{
-			Notification.critical("更新に失敗しました", 2500);
-		}
-		Notification.remove(this._infoNode);
-		this._downloader = null;
-		this._infoNode = null;
-	},
+        this._downloader = new ChaikaSimpleDownloader();
+        this._downloader.download(bbsmenuHtmlURL, bbsmenuHtmlCharset, this);
+        Notification.removeAll();
+        this._infoNode = Notification.info("BBSMENU 更新中");
+    },
 
 
-	onError: function BbsmenuUpdater_onError(aDownloader, aErrorCode){
-		Notification.critical("更新に失敗しました", 2500);
-		Notification.remove(this._infoNode);
-		this._downloader = null;
-		this._infoNode = null;
-	}
+    onStop: function BbsmenuUpdater_onStop(aDownloader, aResponse, aHttpStatus){
+        if(aResponse && aResponse.indexOf(".2ch.net/") != -1){
+            Bbsmenu.update(aResponse);
+            Bbsmenu.initTree()
+            Notification.info("更新しました", 1200);
+        }else{
+            Notification.critical("更新に失敗しました", 2500);
+        }
+        Notification.remove(this._infoNode);
+        this._downloader = null;
+        this._infoNode = null;
+    },
+
+
+    onError: function BbsmenuUpdater_onError(aDownloader, aErrorCode){
+        Notification.critical("更新に失敗しました", 2500);
+        Notification.remove(this._infoNode);
+        this._downloader = null;
+        this._infoNode = null;
+    }
 
 };
 
@@ -340,637 +366,438 @@ var BbsmenuUpdater = {
 
 var Bbsmenu = {
 
-	initTree: function Bbsmenu_initTree(){
-		var doc = this.getBbsmenuDoc();
-		Tree.initTree(doc, MODE_BBSMENU);
-	},
+    initTree: function Bbsmenu_initTree(){
+        var doc = this.getBbsmenuDoc();
+        Tree.initTree(doc, MODE_BBSMENU);
+    },
+
+    update: function Bbsmenu_update(aHtmlSource){
+        var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
+        var domParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
+        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+        var bbsmenuDoc = domParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
+        var fragment = parserUtils.parseFragment(aHtmlSource, 0, false, null, bbsmenuDoc.documentElement);
+        bbsmenuDoc.documentElement.appendChild(fragment);
 
 
-	filter: function Bbsmenu_filter(aFilterStr){
-		var doc = this.getFilterDoc(aFilterStr);
-		Tree.initTree(doc, MODE_BBSMENU_FILTER);
-	},
+        var storage = ChaikaCore.storage;
+        var categoryInsertStatement = storage.createStatement(
+                "INSERT INTO bbsmenu(title, title_n, path, is_category) VALUES(?1, '', ?2, 1);");
+        var bosrdInsertStatement = storage.createStatement(
+                "INSERT INTO bbsmenu(title, title_n, url, path, board_type, board_id, is_category) " +
+                "VALUES(?1, '', ?2, ?3, ?4, ?5, 0);");
+        var node = null;
+        var currentCategoryPath = "";
 
 
-	update: function Bbsmenu_update(aHtmlSource){
-		var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
-		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+        storage.beginTransaction();
+        try{
+            storage.executeSimpleSQL("DELETE FROM bbsmenu");
+            storage.executeSimpleSQL("INSERT INTO bbsmenu(title, title_n, path, is_category) " +
+                    "VALUES('2ch', '', '/2ch/', 1);");
 
-		var bbsmenuDoc = domParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
-		var fragment = parserUtils.parseFragment(aHtmlSource, 0, false, null, bbsmenuDoc.documentElement);
-		bbsmenuDoc.documentElement.appendChild(fragment);
+            var xpath = "root/html:font/html:b/text() | root/html:font/html:a[@href]" +
+                            " | root/font/b/text() | root/font/a[@href]";
+            function resolver(){
+                return "http://www.w3.org/1999/xhtml";
+            }
+            var xpathResult = bbsmenuDoc.evaluate(xpath, bbsmenuDoc, resolver,
+                    Ci.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+            while(node = xpathResult.iterateNext()){
+                if(node.nodeType == Ci.nsIDOMNode.TEXT_NODE){
+                    var title = node.nodeValue;
+                    currentCategoryPath = "/2ch/" + title.replace("/", "_", "g") + "/";
+                    categoryInsertStatement.bindStringParameter(0, title);
+                    categoryInsertStatement.bindStringParameter(1, currentCategoryPath);
+                    categoryInsertStatement.execute();
+                }else if(currentCategoryPath){
+                    var title = node.firstChild.nodeValue;
+                    var urlSpec = node.getAttribute("href");
+                    var type = ChaikaBoard.BOARD_TYPE_PAGE;
+                    var boardID = "";
+                    try{
+                        var url = ioService.newURI(urlSpec, null, null);
+                        type = ChaikaBoard.getBoardType(url);
+                        if(type != ChaikaBoard.BOARD_TYPE_PAGE){
+                            boardID = ChaikaBoard.getBoardID(url);
+                        }
+                    }catch(ex){
+                        ChaikaCore.logger.error(urlSpec +" : "+ ex);
+                    }
 
+                    var path = currentCategoryPath + title.replace("/", "_", "g") + "/";
+                    bosrdInsertStatement.bindStringParameter(0, title);
+                    bosrdInsertStatement.bindStringParameter(1, urlSpec);
+                    bosrdInsertStatement.bindStringParameter(2, path);
+                    bosrdInsertStatement.bindInt32Parameter(3, type);
+                    bosrdInsertStatement.bindStringParameter(4, boardID);
+                    bosrdInsertStatement.execute();
+                }
+            }
+        }catch(ex){
+            ChaikaCore.logger.error(ex);
+        }finally{
+            categoryInsertStatement.reset();
+            bosrdInsertStatement.reset();
+            categoryInsertStatement.finalize();
+            bosrdInsertStatement.finalize();
+            storage.commitTransaction();
+        }
 
-		var storage = ChaikaCore.storage;
-		var categoryInsertStatement = storage.createStatement(
-				"INSERT INTO bbsmenu(title, title_n, path, is_category) VALUES(?1, '', ?2, 1);");
-		var bosrdInsertStatement = storage.createStatement(
-				"INSERT INTO bbsmenu(title, title_n, url, path, board_type, board_id, is_category) " +
-				"VALUES(?1, '', ?2, ?3, ?4, ?5, 0);");
-		var node = null;
-		var currentCategoryPath = "";
+    },
 
+    getItemCount: function Bbsmenu_getItemCount(){
+        var result = 0;
 
-		storage.beginTransaction();
-		try{
-			storage.executeSimpleSQL("DELETE FROM bbsmenu");
-			storage.executeSimpleSQL("INSERT INTO bbsmenu(title, title_n, path, is_category) " +
-					"VALUES('2ch', '', '/2ch/', 1);");
+        var storage = ChaikaCore.storage;
+        var countStatement = storage.createStatement("SELECT count(rowid) FROM bbsmenu;");
 
-			var xpath = "root/html:font/html:b/text() | root/html:font/html:a[@href]" +
-							" | root/font/b/text() | root/font/a[@href]";
-			function resolver(){
-				return "http://www.w3.org/1999/xhtml";
-			}
-			var xpathResult = bbsmenuDoc.evaluate(xpath, bbsmenuDoc, resolver,
-					Ci.nsIDOMXPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
-			while(node = xpathResult.iterateNext()){
-				if(node.nodeType == Ci.nsIDOMNode.TEXT_NODE){
-					var title = node.nodeValue;
-					currentCategoryPath = "/2ch/" + title.replace("/", "_", "g") + "/";
-					categoryInsertStatement.bindStringParameter(0, title);
-					categoryInsertStatement.bindStringParameter(1, currentCategoryPath);
-					categoryInsertStatement.execute();
-				}else if(currentCategoryPath){
-					var title = node.firstChild.nodeValue;
-					var urlSpec = node.getAttribute("href");
-					var type = ChaikaBoard.BOARD_TYPE_PAGE;
-					var boardID = "";
-					try{
-						var url = ioService.newURI(urlSpec, null, null);
-						type = ChaikaBoard.getBoardType(url);
-						if(type != ChaikaBoard.BOARD_TYPE_PAGE){
-							boardID = ChaikaBoard.getBoardID(url);
-						}
-					}catch(ex){
-						ChaikaCore.logger.error(urlSpec +" : "+ ex);
-					}
+        storage.beginTransaction();
+        try{
+            countStatement.step();
+            result = countStatement.getInt32(0);
+        }catch(ex){
+            ChaikaCore.logger.error(ex);
+        }finally{
+            countStatement.reset();
+            countStatement.finalize();
+            storage.commitTransaction();
+        }
+        return result;
+    },
 
-					var path = currentCategoryPath + title.replace("/", "_", "g") + "/";
-					bosrdInsertStatement.bindStringParameter(0, title);
-					bosrdInsertStatement.bindStringParameter(1, urlSpec);
-					bosrdInsertStatement.bindStringParameter(2, path);
-					bosrdInsertStatement.bindInt32Parameter(3, type);
-					bosrdInsertStatement.bindStringParameter(4, boardID);
-					bosrdInsertStatement.execute();
-				}
-			}
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}finally{
-			categoryInsertStatement.reset();
-			bosrdInsertStatement.reset();
-			categoryInsertStatement.finalize();
-			bosrdInsertStatement.finalize();
-			storage.commitTransaction();
-		}
+    getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
+        var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
+        var outsideDoc = this.getOutsideDoc();
 
-	},
+        var nodes = outsideDoc.documentElement.childNodes;
+        for(var i=0; i<nodes.length; i++){
+            var node = nodes[i];
+            var newNode = bbsmenuDoc.importNode(node, true);
+            bbsmenuDoc.documentElement.appendChild(newNode);
+        }
 
+        var storage = ChaikaCore.storage;
+        var sql = "SELECT title, url, path, board_type, is_category FROM bbsmenu;";
+        var statement = storage.createStatement(sql);
+        storage.beginTransaction();
+        try{
+            var currentCategory = null;
+            while(statement.executeStep()){
+                var title      = statement.getString(0);
+                var url        = statement.getString(1);
+                var path       = statement.getString(2);
+                var boardType  = statement.getInt32(3);
+                var isCategory = (statement.getInt32(4) == 1);
 
-	getItemCount: function Bbsmenu_getItemCount(){
-		var result = 0;
+                if(path == "/2ch/") continue;
 
-		var storage = ChaikaCore.storage;
-		var countStatement = storage.createStatement("SELECT count(rowid) FROM bbsmenu;");
+                if(isCategory){
+                    currentCategory = bbsmenuDoc.createElement("category");
+                    currentCategory.setAttribute("isContainer", "true");
+                    currentCategory.setAttribute("title", title);
+                    currentCategory.setAttribute("isOpen", "false");
+                    bbsmenuDoc.documentElement.appendChild(currentCategory);
+                }else if(currentCategory){
+                    var item = bbsmenuDoc.createElement("board");
+                    item.setAttribute("title", title);
+                    item.setAttribute("url", url);
+                    item.setAttribute("type",  boardType);
+                    currentCategory.appendChild(item);
+                }
+            }
+        }catch(ex){
+            ChaikaCore.logger.error(ex);
+        }finally{
+            statement.reset();
+            statement.finalize();
+            storage.commitTransaction();
+        }
 
-		storage.beginTransaction();
-		try{
-			countStatement.step();
-			result = countStatement.getInt32(0);
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}finally{
-			countStatement.reset();
-			countStatement.finalize();
-			storage.commitTransaction();
-		}
-		return result;
-	},
-
-
-	getFilterDoc: function Bbsmenu_getFilterDoc(aFilterStr){
-		var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
-
-
-		var storage = ChaikaCore.storage;
-		var sql = [
-			"SELECT title, url, path, board_type FROM bbsmenu",
-			"WHERE is_category=0 AND x_normalize(title) LIKE x_normalize(?1)"
-		].join("\n");
-		var statement = storage.createStatement(sql);
-		storage.beginTransaction();
-		try{
-			statement.bindStringParameter(0, "%" + aFilterStr + "%");
-			while(statement.executeStep()){
-				var title      = statement.getString(0);
-				var url        = statement.getString(1);
-				var path       = statement.getString(2);
-				var boardType  = statement.getInt32(3);
-				var item = bbsmenuDoc.createElement("board");
-				item.setAttribute("title", title);
-				item.setAttribute("url", url);
-				item.setAttribute("type",  boardType);
-				bbsmenuDoc.documentElement.appendChild(item);
-			}
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}finally{
-			statement.reset();
-			statement.finalize();
-			storage.commitTransaction();
-		}
-		return bbsmenuDoc;
-	},
+        return bbsmenuDoc;
+    },
 
 
-	getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
-		var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
-		var outsideDoc = this.getOutsideDoc();
+    getOutsideDoc: function Bbsmenu_getOutsideDoc(){
+        var outsideXMLFile = ChaikaCore.getDataDir();
+        outsideXMLFile.appendRelativePath("outside.xml");
 
-		var nodes = outsideDoc.documentElement.childNodes;
-		for(var i=0; i<nodes.length; i++){
-			var node = nodes[i];
-			var newNode = bbsmenuDoc.importNode(node, true);
-			bbsmenuDoc.documentElement.appendChild(newNode);
-		}
+        if(!outsideXMLFile.exists()){
+            var defaultOutsideFile = ChaikaCore.getDefaultsDir();
+            defaultOutsideFile.appendRelativePath("outside.xml");
+            defaultOutsideFile.copyTo(outsideXMLFile.parent, null);
 
-		var storage = ChaikaCore.storage;
-		var sql = "SELECT title, url, path, board_type, is_category FROM bbsmenu;";
-		var statement = storage.createStatement(sql);
-		storage.beginTransaction();
-		try{
-			var currentCategory = null;
-			while(statement.executeStep()){
-				var title      = statement.getString(0);
-				var url        = statement.getString(1);
-				var path       = statement.getString(2);
-				var boardType  = statement.getInt32(3);
-				var isCategory = (statement.getInt32(4) == 1);
-
-				if(path == "/2ch/") continue;
-
-				if(isCategory){
-					currentCategory = bbsmenuDoc.createElement("category");
-					currentCategory.setAttribute("isContainer", "true");
-					currentCategory.setAttribute("title", title);
-					currentCategory.setAttribute("isOpen", "false");
-					bbsmenuDoc.documentElement.appendChild(currentCategory);
-				}else if(currentCategory){
-					var item = bbsmenuDoc.createElement("board");
-					item.setAttribute("title", title);
-					item.setAttribute("url", url);
-					item.setAttribute("type",  boardType);
-					currentCategory.appendChild(item);
-				}
-			}
-		}catch(ex){
-			ChaikaCore.logger.error(ex);
-		}finally{
-			statement.reset();
-			statement.finalize();
-			storage.commitTransaction();
-		}
-
-		return bbsmenuDoc;
-	},
+            outsideXMLFile = outsideXMLFile.clone();
+        }
 
 
-	getOutsideDoc: function Bbsmenu_getOutsideDoc(){
-		var	outsidexmlFile = ChaikaCore.getDataDir();
-		outsidexmlFile.appendRelativePath("outside.xml");
+        var outsideXMLString = ChaikaCore.io.readString(outsideXMLFile, 'UTF-8');
+        var outsideDoc = (new DOMParser()).parseFromString(outsideXMLString, 'text/xml');
 
-		if(!outsidexmlFile.exists()){
-			var defaultOutsideFile = ChaikaCore.getDefaultsDir();
-			defaultOutsideFile.appendRelativePath("outside.xml");
-			defaultOutsideFile.copyTo(outsidexmlFile.parent, null);
 
-			outsidexmlFile = outsidexmlFile.clone();
-		}
+        var categoryNodes = outsideDoc.getElementsByTagName("category");
 
-		var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+        for(var i=0; i<categoryNodes.length; i++){
+            let node = categoryNodes[i];
+            node.setAttribute("isContainer", "true");
+            node.setAttribute("isOpen", "false");
+        }
 
-		var outsideXMLURL = ioService.newFileURI(outsidexmlFile);
-		var httpReq = new XMLHttpRequest();
-		httpReq.open("GET", outsideXMLURL.spec, false);
-		httpReq.send(null);
-		var outsideDoc = httpReq.responseXML;
-
-		var categoryNodes = outsideDoc.getElementsByTagName("category");
-		for(var i=0; i<categoryNodes.length; i++){
-			var node = categoryNodes[i];
-			node.setAttribute("isContainer", "true");
-			node.setAttribute("isOpen", "false");
-		}
-
-		return outsideDoc;
-	}
+        return outsideDoc;
+    }
 
 };
-
-
-
-
-var Find2ch = {
-
-	_downloader: null,
-	_infoNode: null,
-
-	get isHTMLMode(){
-		return !ChaikaCore.pref.getBool('bbsmenu.find2ch.use_rss');
-	},
-
-	search: function Find2ch_search(aSearchStr){
-		const isHTML = this.isHTMLMode;
-		const QUERY_URL = isHTML ? "http://find.2ch.net/?COUNT=50&BBS=ALL&TYPE=TITLE&STR=" : 'http://find.2ch.net/rss.php/';
-		const ENCODE = isHTML ? 'euc-jp' : 'utf-8';
-		const QUERY = isHTML ? escape(this._convertEncode(aSearchStr, ENCODE)) :
-								encodeURIComponent(ChaikaCore.io.escapeHTML(aSearchStr));
-
-		this._downloader = new XMLHttpRequest();
-		this._downloader.onerror = this.onError;
-		this._downloader.onreadystatechange = this.onReadyStateChange;
-		this._downloader.open("GET", QUERY_URL + QUERY, true);
-		this._downloader.overrideMimeType('text/plain; charset=' + ENCODE);
-		this._downloader.send(null);
-
-		Notification.removeAll();
-		this._infoNode = Notification.info("検索中");
-	},
-
-
-	onReadyStateChange: function Find2ch_onReadyStateChange(aEvent){
-		if(aEvent.target.readyState === 4 && aEvent.target.status === 200){
-			Find2ch.onStop(aEvent.target.responseText);
-		}
-	},
-
-	onStop: function Find2ch_onStop(aResponse){
-		if(aResponse){
-			if( (this.isHTMLMode && aResponse.indexOf('<html') !== -1) ||
-			   aResponse.indexOf('<rdf:RDF') !== -1){
-				this.initTree(aResponse);
-			}
-		}
-
-		Notification.remove(this._infoNode);
-		this._downloader = null;
-		this._infoNode = null;
-	},
-
-
-	onError: function Find2ch_onError(aEvent){
-		Notification.critical("検索に失敗しました", 2500);
-		Notification.remove(this._infoNode);
-		this._downloader = null;
-		this._infoNode = null;
-	},
-
-
-	initTree: function Find2ch_initTree(aResponse){
-		var resultDoc = this.isHTMLMode ? this._convertDocFromHTML(aResponse) :
-										  this._convertDocFromRSS(aResponse);
-		Tree.initTree(resultDoc, MODE_FIND2CH);
-	},
-
-	_convertDocFromRSS: function(aResponseStr){
-		var httpReq = new XMLHttpRequest();
-		httpReq.open("GET", "chrome://chaika/content/bbsmenu/find2ch.xsl", false);
-		httpReq.send(null);
-
-		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
-				.createInstance(Ci.nsIDOMParser);
-		var xsltDoc = domParser.parseFromString(httpReq.responseText, "text/xml");
-		var findDoc = domParser.parseFromString(aResponseStr, "text/xml");
-
-		var xslt = new XSLTProcessor();
-		xslt.importStylesheet(xsltDoc);
-
-		return xslt.transformToDocument(findDoc);
-	},
-
-	_convertDocFromHTML: function(aResponseStr){
-		var domParser = Cc["@mozilla.org/xmlextras/domparser;1"]
-				.createInstance(Ci.nsIDOMParser);
-		var findDoc = domParser.parseFromString(aResponseStr, "text/html");
-
-		var resultDoc = document.implementation.createDocument(null, '', null);
-		var root = document.createElement('category');
-
-		var resultObj = {};  //key: board name, value: an array of threads
-
-		//最後のdtは広告
-		Array.slice(findDoc.querySelectorAll('.content_pane dt:not(:last-child)')).forEach(function(item){
-			var links = item.getElementsByTagName('a');
-
-			var thread = links[0];
-			var threadURI = thread.getAttribute('href').replace(/\d+-\d+$/, '');
-			var threadTitle = ChaikaCore.io.unescapeHTML(thread.textContent);
-
-			var post = thread.nextSibling.nodeValue.replace(/\D/g, '') || '0';
-			var boardTitle = links[1].textContent;
-
-			var threadItem = document.createElement('thread');
-			threadItem.setAttribute('url', threadURI);
-			threadItem.setAttribute('title', threadTitle + ' [' + post + ']');
-			threadItem.setAttribute('boardName', boardTitle);
-
-			if(!resultObj[boardTitle]){
-				resultObj[boardTitle] = [];
-			}
-			resultObj[boardTitle].push(threadItem);
-		});
-
-		for(let boardTitle in resultObj){
-			var boardItem = document.createElement('board');
-			boardItem.setAttribute('title', boardTitle);
-			boardItem.setAttribute('isContainer', 'true');
-			boardItem.setAttribute('isOpen', 'true');
-
-			resultObj[boardTitle].forEach(function(threadItem){
-				boardItem.appendChild(threadItem);
-			});
-
-			root.appendChild(boardItem);
-		}
-
-		resultDoc.appendChild(root);
-
-		return resultDoc;
-	},
-
-	_convertEncode: function(aStr, aEncode){
-		var converter = Cc["@mozilla.org/intl/scriptableunicodeconverter"].getService(Ci.nsIScriptableUnicodeConverter);
-
-		try{
-			converter.charset = aEncode;
-			return converter.ConvertFromUnicode(aStr);
-		}catch(e){
-			return aStr;
-		}
-	}
-
-};
-
-
 
 
 var Tree = {
 
-	initTree: function Tree_initTree(aTreeDoc, aMode){
-		if(!this._tree){
-			this._treeBoxObject = null;
-			this._tree = document.getElementById("bookmarks-view");
-			this._tree.view = this;
-			this._atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
-		}
+    initTree: function Tree_initTree(aTreeDoc, aMode){
+        if(!this._tree){
+            this._treeBoxObject = null;
+            this._tree = document.getElementById("bookmarks-view");
+            this._tree.view = this;
+            this._atomService = Cc["@mozilla.org/atom-service;1"].getService(Ci.nsIAtomService);
+        }
 
-		if(this._doc && this._mode == MODE_BBSMENU){
-			this.saveOpenedCategories();
-		}
+        if(this._doc && this._mode == MODE_BBSMENU){
+            this.saveOpenedCategories();
+        }
 
-		this._mode = aMode;
-		var lastRowCount = this.rowCount;
-		this._doc = aTreeDoc;
-		this.loadOpenedCategories();
-		this.setVisivleData();
-		this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
-		this._treeBoxObject.invalidate();
-	},
-
-
-	setVisivleData: function Tree_setVisivleData(){
-		var xpath = "descendant::*[not(ancestor::*[@isContainer='true']/@isOpen='false')]";
-		this._visibleNodes = this._xpathEvaluate(xpath);
-
-		for each(var node in this._visibleNodes){
-			node._title = node.getAttribute("title");
-
-			node._isContainer = (node.getAttribute("isContainer") == "true");
-			if(node._isContainer){
-				node._isContainerOpen = (node.getAttribute("isOpen") == "true");
-			}
-
-			node._level = this._doc.evaluate("ancestor::*[@isContainer='true']", node, null,
-				XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
-
-			node._parentIndex = this._visibleNodes.indexOf(node.parentNode);
-		}
-		this.rowCount = this._visibleNodes.length;
-	},
+        this._mode = aMode;
+        var lastRowCount = this.rowCount;
+        this._doc = aTreeDoc;
+        this.loadOpenedCategories();
+        this.setVisivleData();
+        this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
+        this._treeBoxObject.invalidate();
+    },
 
 
-	_xpathEvaluate: function Tree__xpathEvaluate(aXpath, aContextNode){
-		var contextNode = aContextNode || this._doc.documentElement;
+    setVisivleData: function Tree_setVisivleData(){
+        var xpath = "descendant::*[not(ancestor::*[@isContainer='true']/@isOpen='false')]";
+        this._visibleNodes = this._xpathEvaluate(xpath);
 
-		var xpathResult = this._doc.evaluate(aXpath, contextNode, null,
-			XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+        for each(var node in this._visibleNodes){
+            node._title = node.getAttribute("title");
 
-		var result = [];
-		var node;
-		while(node = xpathResult.iterateNext()){
-			result.push(node);
-		}
-		return result;
-	},
+            node._isContainer = (node.getAttribute("isContainer") == "true");
+            if(node._isContainer){
+                node._isContainerOpen = (node.getAttribute("isOpen") == "true");
+            }
 
+            node._level = this._doc.evaluate("ancestor::*[@isContainer='true']", node, null,
+                XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
 
-	loadOpenedCategories: function Tree_loadOpenedCategories(){
-		if(this._mode != MODE_BBSMENU) return;
-
-		var titles = decodeURIComponent(this._tree.getAttribute("openedCategories")).split(",");
-		var closedContainers = this._xpathEvaluate("descendant::*[@isContainer='true'][@isOpen='false']");
-		closedContainers.forEach(function(aElement){
-			var title = aElement.getAttribute("title");
-			if(titles.indexOf(title) != -1){
-				aElement.setAttribute("isOpen", "true");
-			}
-		});
-	},
+            node._parentIndex = this._visibleNodes.indexOf(node.parentNode);
+        }
+        this.rowCount = this._visibleNodes.length;
+    },
 
 
-	saveOpenedCategories: function Tree_saveOpenedCategories(){
-		if(this._mode != MODE_BBSMENU) return;
-		var opendContainers = this._xpathEvaluate("descendant::*[@isContainer='true'][@isOpen='true']");
-		var titles = opendContainers.map(function(aElement){
-			return encodeURIComponent(aElement.getAttribute("title"));
-		});
+    _xpathEvaluate: function Tree__xpathEvaluate(aXpath, aContextNode){
+        var contextNode = aContextNode || this._doc.documentElement;
 
-		if(titles.length > 0){
-			this._tree.setAttribute("openedCategories", titles.join(","));
-		}else{
-			this._tree.setAttribute("openedCategories", "");
-		}
-	},
+        var xpathResult = this._doc.evaluate(aXpath, contextNode, null,
+            XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
 
-
-	changeTreeSize: function Tree_changeTreeSize(){
-		this._tree.collapsed = true;
-		this._tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
-		setTimeout(function(){ Tree._tree.collapsed = false }, 0);
-	},
+        var result = [];
+        var node;
+        while(node = xpathResult.iterateNext()){
+            result.push(node);
+        }
+        return result;
+    },
 
 
-	click: function Tree_click(aEvent){
-		if(aEvent.originalTarget.localName != "treechildren") return;
+    loadOpenedCategories: function Tree_loadOpenedCategories(){
+        if(this._mode != MODE_BBSMENU) return;
 
-		var row = {}
-		var subElement = {};
-		this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
-		if(row.value == -1) return;	// ツリーのアイテム以外をクリック
-		if(subElement.value=="twisty") return;
-		if(aEvent.button > 1) return;
-
-		var singleClicked = aEvent.type == "click";
-
-		if(this.isContainer(row.value)){
-			if(singleClicked && aEvent.button == 0){
-				this.toggleOpenState(row.value);
-			}
-			return;
-		}
-
-		var openSingleClick = ChaikaCore.pref.getBool("bbsmenu.open_single_click");
-		var openNewTab = ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
-		var item = this.getURLItem(row.value);
-
-		if(aEvent.button==1 && singleClicked){
-			item.open(!openNewTab);
-		}else if(openSingleClick && singleClicked){
-			item.open(openNewTab);
-		}else if(!openSingleClick && !singleClicked){
-			item.open(openNewTab);
-		}
-	},
+        var titles = decodeURIComponent(this._tree.getAttribute("openedCategories")).split(",");
+        var closedContainers = this._xpathEvaluate("descendant::*[@isContainer='true'][@isOpen='false']");
+        closedContainers.forEach(function(aElement){
+            var title = aElement.getAttribute("title");
+            if(titles.indexOf(title) != -1){
+                aElement.setAttribute("isOpen", "true");
+            }
+        });
+    },
 
 
-	showContext: function Tree_showContext(aEvent){
-		var row = {}
-		var subElement = {};
-		this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
-		if(row.value == -1) return false;	// ツリーのアイテム以外をクリック
+    saveOpenedCategories: function Tree_saveOpenedCategories(){
+        if(this._mode != MODE_BBSMENU) return;
+        var opendContainers = this._xpathEvaluate("descendant::*[@isContainer='true'][@isOpen='true']");
+        var titles = opendContainers.map(function(aElement){
+            return encodeURIComponent(aElement.getAttribute("title"));
+        });
 
-		if(this.isContainer(row.value)) return false;
-
-		var item = this.getURLItem(row.value)
-		var treeContextMenu = document.getElementById("treeContextMenu");
-		treeContextMenu.items = [this.getURLItem(row.value)];
-		return true
-	},
-
-
-	getURLItem: function Tree_getURLItem(aRowIndex){
-		var node = this._visibleNodes[aRowIndex];
-
-		var title = node.getAttribute("title");
-		var urlSpec = node.getAttribute("url");
-		var boardType = parseInt(node.getAttribute("type"));
-		var itemType = "page";
-		if(boardType == ChaikaBoard.BOARD_TYPE_PAGE){
-			itemType = "page";
-		}else if(node.localName == "board"){
-			itemType = "board";
-		}else{
-			itemType = "thread";
-		}
-		return new ChaikaCore.ChaikaURLItem(title, urlSpec, itemType, boardType);
-	},
+        if(titles.length > 0){
+            this._tree.setAttribute("openedCategories", titles.join(","));
+        }else{
+            this._tree.setAttribute("openedCategories", "");
+        }
+    },
 
 
-	rowCount: 0,
-	selection: null,
+    changeTreeSize: function Tree_changeTreeSize(){
+        this._tree.collapsed = true;
+        this._tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+        setTimeout(function(){ Tree._tree.collapsed = false }, 0);
+    },
 
-	getRowProperties: function(aIndex, aProperties){},
-	getCellProperties: function(aRow, aCol, aProperties){
-		if (aCol.index == 0){
-			var type = "type-" + this._visibleNodes[aRow].getAttribute("type");
 
-			if(aProperties){
-				// Firefox 21-
-				aProperties.AppendElement(this._atomService.getAtom("title"));
-				aProperties.AppendElement(this._atomService.getAtom(type));
-			}else{
-				// Firefox 22+
-				return ['title', type].join(' ');
-			}
-		}
-	},
-	getColumnProperties: function(aCol, aProperties){},
-	isContainer: function(aIndex){
-		return this._visibleNodes[aIndex]._isContainer;
-	},
-	isContainerOpen: function(aIndex){
-		return this._visibleNodes[aIndex]._isContainerOpen;
-	},
-	isContainerEmpty: function(aIndex){ return false; },
-	isSeparator: function(aIndex){ return false; },
-	isSorted: function(){ return false; },
-	canDrop: function(targetIndex, aOrientation){ return false; },
-	drop: function(targetIndex, aOrientation){},
-	getParentIndex: function(aRowIndex){
-		return this._visibleNodes[aRowIndex]._parentIndex;
-	},
-	hasNextSibling: function(aRowIndex, aAfterIndex){
-		if(aRowIndex == aAfterIndex){
-			var l1 = this._visibleNodes[aRowIndex]._level;
-			var l2 = this._visibleNodes[aRowIndex+1]._level;
-			return l1 == l2;
-		}
-		return true;
-	},
-	getLevel: function(aRowIndex){
-		return this._visibleNodes[aRowIndex]._level;
-	},
-	getImageSrc: function(aRow, aCol){},
-	getProgressMode: function(aRow, aCol){},
-	getCellValue: function(aRow, aCol){},
-	getCellText: function(aRow, aCol){
-		return this._visibleNodes[aRow]._title;
-	},
-	setTree: function(aTree){
-		this._treeBoxObject = aTree;
-	},
-	toggleOpenState: function(aIndex){
-		var node =	this._visibleNodes[aIndex];
+    click: function Tree_click(aEvent){
+        if(aEvent.originalTarget.localName != "treechildren") return;
 
-		var lastRowCount = this.rowCount;
+        var row = {}
+        var subElement = {};
+        this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
+        if(row.value == -1) return;    // ツリーのアイテム以外をクリック
+        if(subElement.value=="twisty") return;
+        if(aEvent.button > 1) return;
 
-		var opened = (node.getAttribute("isOpen") == "true");
-		if(opened){
-			node.setAttribute("isOpen", "false");
-		}else{
-			if(this._mode == MODE_BBSMENU && ChaikaCore.pref.getBool("bbsmenu.toggle_open_container")){
-				var cNodeName = this._containerNodeName;
-				var containers = this._xpathEvaluate("descendant::*[@isContainer='true']");
-				for each(var container in containers){
-					container.setAttribute("isOpen", "false");
-				}
-				var ancestors = this._xpathEvaluate("ancestor::*[@isContainer='true']", node);
-				for each(var ancestor in ancestors){
-					ancestor.setAttribute("isOpen", "true");
-				}
-			}
-			node.setAttribute("isOpen", "true");
-		}
-		this.setVisivleData();
+        var singleClicked = aEvent.type == "click";
 
-		this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
-		this._treeBoxObject.invalidate();
+        if(this.isContainer(row.value)){
+            if(singleClicked && aEvent.button == 0){
+                this.toggleOpenState(row.value);
+            }
+            return;
+        }
 
-		var newIndex = this._visibleNodes.indexOf(node);
-		this._treeBoxObject.ensureRowIsVisible(newIndex)
-		this.selection.select(newIndex);
-	},
-	cycleHeader: function(aCol){},
-	selectionChanged: function(){},
-	cycleCell: function(aRow, aCol){},
-	isEditable: function(aRow, aCol){},
-	isSelectable: function(aRow, aCol){},
-	setCellValue: function(aRow, aCol, aValue){},
-	setCellText: function(aRow, aCol, aValue){},
-	performAction: function(aAction){},
-	performActionOnRow: function(aAction, aRow){},
-	performActionOnCell: function(aAction, aRow, aCol){},
+        var openSingleClick = ChaikaCore.pref.getBool("bbsmenu.open_single_click");
+        var openNewTab = ChaikaCore.pref.getBool("bbsmenu.open_new_tab");
+        var item = this.getURLItem(row.value);
+
+        if(aEvent.button==1 && singleClicked){
+            item.open(!openNewTab);
+        }else if(openSingleClick && singleClicked){
+            item.open(openNewTab);
+        }else if(!openSingleClick && !singleClicked){
+            item.open(openNewTab);
+        }
+    },
+
+
+    showContext: function Tree_showContext(aEvent){
+        var row = {}
+        var subElement = {};
+        this._treeBoxObject.getCellAt(aEvent.clientX, aEvent.clientY, row, {}, subElement);
+        if(row.value == -1) return false;    // ツリーのアイテム以外をクリック
+
+        if(this.isContainer(row.value)) return false;
+
+        var item = this.getURLItem(row.value)
+        var treeContextMenu = document.getElementById("treeContextMenu");
+        treeContextMenu.items = [this.getURLItem(row.value)];
+        return true
+    },
+
+
+    getURLItem: function Tree_getURLItem(aRowIndex){
+        var node = this._visibleNodes[aRowIndex];
+
+        var title = node.getAttribute("title");
+        var urlSpec = node.getAttribute("url");
+        var boardType = parseInt(node.getAttribute("type"));
+        var itemType = "page";
+        if(boardType == ChaikaBoard.BOARD_TYPE_PAGE){
+            itemType = "page";
+        }else if(node.localName == "board"){
+            itemType = "board";
+        }else{
+            itemType = "thread";
+        }
+        return new ChaikaCore.ChaikaURLItem(title, urlSpec, itemType, boardType);
+    },
+
+
+    rowCount: 0,
+    selection: null,
+
+    getRowProperties: function(aIndex){},
+    getCellProperties: function(aRow, aCol){
+        if (aCol.index == 0){
+            var type = "type-" + this._visibleNodes[aRow].getAttribute("type");
+
+            return ['title', type].join(' ');
+        }
+    },
+    getColumnProperties: function(aCol){},
+    isContainer: function(aIndex){
+        return this._visibleNodes[aIndex]._isContainer;
+    },
+    isContainerOpen: function(aIndex){
+        return this._visibleNodes[aIndex]._isContainerOpen;
+    },
+    isContainerEmpty: function(aIndex){ return false; },
+    isSeparator: function(aIndex){ return false; },
+    isSorted: function(){ return false; },
+    canDrop: function(targetIndex, aOrientation){ return false; },
+    drop: function(targetIndex, aOrientation){},
+    getParentIndex: function(aRowIndex){
+        return this._visibleNodes[aRowIndex]._parentIndex;
+    },
+    hasNextSibling: function(aRowIndex, aAfterIndex){
+        if(aRowIndex == aAfterIndex){
+            var l1 = this._visibleNodes[aRowIndex]._level;
+            var l2 = this._visibleNodes[aRowIndex+1]._level;
+            return l1 == l2;
+        }
+        return true;
+    },
+    getLevel: function(aRowIndex){
+        return this._visibleNodes[aRowIndex]._level;
+    },
+    getImageSrc: function(aRow, aCol){},
+    getProgressMode: function(aRow, aCol){},
+    getCellValue: function(aRow, aCol){},
+    getCellText: function(aRow, aCol){
+        return this._visibleNodes[aRow]._title;
+    },
+    setTree: function(aTree){
+        this._treeBoxObject = aTree;
+    },
+    toggleOpenState: function(aIndex){
+        var node =    this._visibleNodes[aIndex];
+
+        var lastRowCount = this.rowCount;
+
+        var opened = (node.getAttribute("isOpen") == "true");
+        if(opened){
+            node.setAttribute("isOpen", "false");
+        }else{
+            if(this._mode == MODE_BBSMENU && ChaikaCore.pref.getBool("bbsmenu.toggle_open_container")){
+                var cNodeName = this._containerNodeName;
+                var containers = this._xpathEvaluate("descendant::*[@isContainer='true']");
+                for each(var container in containers){
+                    container.setAttribute("isOpen", "false");
+                }
+                var ancestors = this._xpathEvaluate("ancestor::*[@isContainer='true']", node);
+                for each(var ancestor in ancestors){
+                    ancestor.setAttribute("isOpen", "true");
+                }
+            }
+            node.setAttribute("isOpen", "true");
+        }
+        this.setVisivleData();
+
+        this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
+        this._treeBoxObject.invalidate();
+
+        var newIndex = this._visibleNodes.indexOf(node);
+        this._treeBoxObject.ensureRowIsVisible(newIndex)
+        this.selection.select(newIndex);
+    },
+    cycleHeader: function(aCol){},
+    selectionChanged: function(){},
+    cycleCell: function(aRow, aCol){},
+    isEditable: function(aRow, aCol){},
+    isSelectable: function(aRow, aCol){},
+    setCellValue: function(aRow, aCol, aValue){},
+    setCellText: function(aRow, aCol, aValue){},
+    performAction: function(aAction){},
+    performActionOnRow: function(aAction, aRow){},
+    performActionOnCell: function(aAction, aRow, aCol){},
 
 };

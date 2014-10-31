@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *    flyson <flyson at users.sourceforge.jp>
+ *    nodaguti <nodaguti at gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -35,15 +36,45 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import('resource://chaika-modules/ChaikaSearch.js');
+
 
 var gBbsmenuPane = {
 
-	startup: function(){
-	},
+    startup: function(){
+        this._createEngineMenu();
+    },
 
-	resetBbsmenuURL: function(){
-		var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
-		pref.value = pref.defaultValue;
-	}
+    _createEngineMenu: function(){
+        let menulist = document.getElementById('searchEngineList');
+        let menupopup = document.createElement('menupopup');
+
+        ChaikaSearch.plugins.forEach(plugin => {
+            if(!plugin.search) return;
+
+            let menuitem = document.createElement('menuitem');
+
+            menuitem.setAttribute('label', plugin.name);
+            menuitem.setAttribute('value', plugin.id);
+
+            menupopup.appendChild(menuitem);
+        });
+
+        menulist.appendChild(menupopup);
+
+        let selectedItem = document.querySelector('menuitem[value="' + menulist.value + '"]');
+        menulist.selectedItem = selectedItem;
+    },
+
+    openSearchPluginDir: function(){
+        var pluginDir = ChaikaCore.getDataDir();
+        pluginDir.appendRelativePath("search");
+        ChaikaCore.io.revealDir(pluginDir);
+    },
+
+    resetBbsmenuURL: function(){
+        var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
+        pref.value = pref.defaultValue;
+    }
 
 };

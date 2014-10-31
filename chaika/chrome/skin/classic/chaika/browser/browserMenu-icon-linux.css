@@ -1,0 +1,12 @@
+/* See license.txt for terms of usage */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#chaika-toolbarbutton {
+    list-style-image: url('chrome://chaika/skin/browser/icon-linux.svg');
+}
+
+#chaika-toolbarbutton:-moz-lwtheme-brighttext:not([cui-areatype="menu-panel"]),
+toolbarpaletteitem:not([place="palette"]) > #chaika-toolbarbutton:-moz-lwtheme-brighttext{
+    list-style-image: url('chrome://chaika/skin/browser/icon-inverted.svg');
+}

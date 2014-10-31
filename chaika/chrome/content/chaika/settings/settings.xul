@@ -1,23 +1,29 @@
 <?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/settings/settings.css" type="text/css"?>
 <?xml-stylesheet href="chrome://mozapps/content/preferences/preferences.css"?>
 <?xml-stylesheet href="chrome://browser/skin/preferences/preferences.css" type="text/css"?>
 
-<prefwindow id="BrowserPreferences" title="設定 [chaika]" windowtype="chaika:settings"
-	onload="startup()" onunload="shutdown()"
-	style="min-width: 40em; min-height:32em;"
-	xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<prefwindow id="BrowserPreferences"
+            title="設定 [chaika]"
+            windowtype="chaika:settings"
+            onload="startup()"
+            onunload="shutdown()"
+            xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<prefpane id="paneGeneral" label="全般"     flex="1" src="chrome://chaika/content/settings/general-pane.xul"/>
-<prefpane id="paneBrowser" label="ブラウザ" flex="1" src="chrome://chaika/content/settings/browser-pane.xul"/>
+<prefpane id="paneGeneral"     label="全般"              flex="1" src="chrome://chaika/content/settings/general-pane.xul" />
+<prefpane id="paneAccounts"    label="アカウント"         flex="1" src="chrome://chaika/content/settings/accounts-pane.xul" />
+<prefpane id="paneBrowser"     label="ブラウザ"           flex="1" src="chrome://chaika/content/settings/browser-pane.xul" />
 <prefpane id="paneContextmenu" label="コンテキストメニュー" flex="1" src="chrome://chaika/content/settings/contextmenu-pane.xul" />
-<prefpane id="paneBbsmenu" label="板一覧"   flex="1" src="chrome://chaika/content/settings/bbsmenu-pane.xul"/>
-<prefpane id="paneBoard"   label="スレ一覧" flex="1" src="chrome://chaika/content/settings/board-pane.xul"/>
-<prefpane id="paneThread"  label="スレッド" flex="1" src="chrome://chaika/content/settings/thread-pane.xul"/>
-<prefpane id="panePost"    label="書き込み" flex="1" src="chrome://chaika/content/settings/post-pane.xul"/>
+<prefpane id="paneBbsmenu"     label="板一覧"             flex="1" src="chrome://chaika/content/settings/bbsmenu-pane.xul" />
+<prefpane id="paneBoard"       label="スレ一覧"           flex="1" src="chrome://chaika/content/settings/board-pane.xul" />
+<prefpane id="paneThread"      label="スレッド"           flex="1" src="chrome://chaika/content/settings/thread-pane.xul" />
+<prefpane id="panePost"        label="書き込み"           flex="1" src="chrome://chaika/content/settings/post-pane.xul" />
 
 <script type="application/x-javascript; version=1.7"
-	src="chrome://chaika/content/settings/settings.js"/>
+        src="chrome://chaika/content/settings/settings.js" />
 
 </prefwindow>

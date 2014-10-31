@@ -1,39 +1,74 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-		"http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
+
+<!-- See license.txt for terms of usage -->
+
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=Shift_JIS">
-	<meta http-equiv="Content-Style-Type" content="text/css">
-	<meta http-equiv="Content-Script-Type" content="application/javascript">
-	<title><THREADNAME/> [chaika]</title>
-	<link rel="stylesheet" type="text/css" href="<SKINPATH/>style.css">
-	<style type="text/css">
-		body {
-		  font: <FONTSIZE/> <FONTNAME/>;
-		}
-		.aaRes {
-		  font: <AAFONTSIZE/> <AAFONTNAME/>;
-		  line-height: <AALINEHEIGHT/>;
-		}
-	</style>
-	<script type="application/javascript;version=1.7" src="<SKINPATH/>script.js"></script>
+    <meta charset="Shift_JIS" />
+    <title><THREADNAME/> [chaika]</title>
+    <link rel="shortcut icon" href="<SKINPATH/>favicon.png" />
+    <link rel="stylesheet" type="text/css" href="<SKINPATH/>style.css">
+    <style>
+        body {
+          font: <FONTSIZE/> <FONTNAME/>;
+        }
+        .aaRes {
+          font: <AAFONTSIZE/> <AAFONTNAME/>;
+          line-height: <AALINEHEIGHT/>;
+        }
+    </style>
+    <script>
+        var SERVER_URL = "<SERVERURL/>";
+        var EXACT_URL  = "<THREADURL/>";
+    </script>
 </head>
 
-<body onload="">
+<body>
 
-<div id="header">
-	<h1 id="pageTitle"><THREADNAME/></h1>
+<header>
+    <h1 id="pageTitle"><THREADNAME/></h1>
 
-	<ul id="navMenu">
-		<li><span class="menuItem">MENU</span>
-			<ul>
-				<li><a href="chaika://board/<BOARDURL/>">スレッド一覧</a></li>
-				<li><a href="chaika://post/<THREADURL/>">書き込み</a></li>
-				<li><a href="<SERVERURL/><THREADURL/>">全件表示</a></li>
-				<li><a href="<SERVERURL/><THREADURL/>l50">新着50件</a></li>
-				<li><a href="#newMark">新着に移動</a></li>
-				<li><a href="<THREADURL/>l50">ブラウザ表示</a></li>
-			</ul>
-		</li>
-	</ul>
+    <ul id="navMenu">
+        <li><span class="menuItem">MENU</span>
+            <ul>
+                <li><a href="chaika://board/<BOARDURL/>">スレッド一覧</a></li>
+                <li><a href="chaika://post/<THREADURL/>">書き込み</a></li>
+                <li><a href="<SERVERURL/><THREADURL/>">全件表示</a></li>
+                <li><a href="<SERVERURL/><THREADURL/>l50">新着50件</a></li>
+                <li><a href="#newMark">新着に移動</a></li>
+                <li><a href="<SERVERURL/><THREADURL/>?chaika_disable_abone=1"
+                       title="あぼーん処理を一時的に無効化して再読み込みします">あぼーん無効化</a></li>
+                <li><a href="<THREADURL/>l50?chaika_force_browser=1">ブラウザ表示</a></li>
+                <hr />
+                <li><a href="#settings">オプション</a></li>
+            </ul>
+        </li>
+    </ul>
+</header>
+
+<div id="settings" class="popup">
+    <fieldset>
+        <legend>被参照</legend>
+        <label><input type="checkbox" id="pref-enable-referred-count" /> 被参照数を表示する</label>
+    </fieldset>
+    
+    <fieldset>
+        <legend>ID表示</legend>
+        <label><input type="checkbox" id="pref-enable-posts-count" /> 発言数を表示する</label>
+    </fieldset>
+    
+    <fieldset>
+        <legend>ポップアップ</legend>
+        <label><input type="checkbox" id="pref-include-self-post" /> ID ポップアップで自身のレスを含める</label>
+        <label><input type="checkbox" id="pref-disable-single-id-popup" /> 「このレスのみ」のポップアップを表示しない</label>
+        <label><input type="checkbox" id="pref-delay-popup" /> ポップアップ表示を遅延させる</label>
+        <label>
+			レスポップアップの最大表示レス数 (0で無制限):
+            <input type="text" size="5" id="pref-max-posts-in-popup" />
+        </label>
+    </fieldset>
+    
+    <div id="settings-buttonset">
+        <input type="button" value="OK" onclick="Prefs.close();" />
+    </div>
 </div>

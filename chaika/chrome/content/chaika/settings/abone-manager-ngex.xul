@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/settings/abone-manager.css" type="text/css"?>
+
+<dialog id="abonemanager-ngex"
+        buttons="accept, cancel"
+        buttoniconaccept="save"
+        ondialogaccept="onDialogAccept()"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        onload="startup()"
+        onunload="shutdown()"
+        persist="screenX screenY width height">
+
+    <script type="application/javascript; version=1.7"
+            src="chrome://chaika/content/settings/abone-manager-ngex.js"/>
+
+    <vbox id="ngex">
+        <hbox align="center" pack="start">
+            <label value="ラベル:" />
+            <textbox class="label" flex="1" />
+            <checkbox label="自動"
+                      checked="true"
+                      class="auto-naming" />
+        </hbox>
+
+        <groupbox flex="1">
+            <caption label="条件" />
+
+            <hbox align="center" pack="start">
+                <label value="次の" />
+
+                <menulist class="match">
+                    <menupopup>
+                        <menuitem label="すべて" value="all" />
+                        <menuitem label="いずれか" value="any" />
+                    </menupopup>
+                </menulist>
+
+                <label value="のルールに一致:" />
+            </hbox>
+
+            <vbox class="container rules" />
+            <vbox class="template">
+                <hbox align="center" pack="start">
+                    <menulist class="rule-target">
+                        <menupopup>
+                            <menuitem label="名前" value="name" />
+                            <menuitem label="メール" value="mail" />
+                            <menuitem label="日付" value="date" />
+                            <menuitem label="発信元" value="ip" />
+                            <menuitem label="ホスト" value="host" />
+                            <menuitem label="ID" value="id" />
+                            <menuitem label="BeID" value="be" />
+                            <menuitem label="Be基礎番号" value="baseBe" />
+                            <menuitem label="本文" value="msg" />
+                            <menuitem label="スレタイ" value="title" />
+                            <menuitem label="板URL" value="board_url" />
+                            <menuitem label="スレURL" value="thread_url" />
+                        </menupopup>
+                    </menulist>
+
+                    <label value="が" />
+
+                    <textbox class="rule-query" />
+
+                    <menulist class="rule-condition">
+                        <menupopup>
+                            <menuitem label="を含む" value="contains" />
+                            <menuitem label="を含まない" value="notContain" />
+                            <menuitem label="である" value="equals" />
+                            <menuitem label="でない" value="notEqual" />
+                            <menuitem label="で始まる" value="startsWith" />
+                            <menuitem label="で終わる" value="endsWith" />
+                        </menupopup>
+                    </menulist>
+
+                    <checkbox label="正規表現" class="rule-regexp" />
+                    <checkbox label="Aa" class="rule-case-sensitive" checked="true" />
+
+                    <spacer flex="1" />
+
+                    <button label="-" class="rule-button-remove" />
+                    <button label="+" class="rule-button-add" />
+                </hbox>
+            </vbox>
+        </groupbox>
+
+        <groupbox>
+            <caption label="オプション" />
+
+            <hbox align="center" pack="start">
+                <label value="対象:" />
+                <radiogroup class="target">
+                    <hbox>
+                        <radio label="レス" value="post" />
+                        <radio label="スレッド" value="thread" />
+                    </hbox>
+                </radiogroup>
+            </hbox>
+
+            <hbox align="center" pack="start">
+                <label value="透明あぼーん:" />
+                <radiogroup class="hide-abone">
+                    <hbox>
+                        <radio label="デフォルトの設定に従う" value="undefined" selected="true" />
+                        <radio label="する" value="true" />
+                        <radio label="しない" value="false" />
+                    </hbox>
+                </radiogroup>
+            </hbox>
+
+            <hbox align="center" pack="start">
+                <label value="連鎖あぼーん:" />
+                <radiogroup class="chain-abone">
+                    <hbox>
+                        <radio label="デフォルトの設定に従う" value="undefined" selected="true" />
+                        <radio label="する" value="true" />
+                        <radio label="しない" value="false" />
+                    </hbox>
+                </radiogroup>
+            </hbox>
+
+            <hbox align="center" pack="start">
+                <checkbox label="有効期限をつける: " class="set-expire" />
+                <datepicker class="expire-date" type="popup" />
+                <timepicker class="expire-time" hideseconds="true" />
+            </hbox>
+
+            <checkbox label="ヒットしたレスのIDを自動的にNGIDに追加する" class="autoNGID" />
+            <checkbox label="あぼーんせずにハイライトする" class="highlight" />
+        </groupbox>
+    </vbox>
+</dialog>

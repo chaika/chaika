@@ -1,15 +1,20 @@
-<dl id="res<PLAINNUMBER/>" class="resContainer resNew" 
-		resID="<ID/>" collapsed="false" isAbone="false">
-	<dt class="resHeader">
-		<span class="resNumber"><PLAINNUMBER/> </span>
-		<span class="resHeaderContent">
-			<span class="resName"><NAME/></span> 
-			[<span class="resMail"><MAIL/></span>] 
-			<span class="resDate"><DATE/></span> 
-			ID:<span class="resID" resID="<ID/>" resNumber="<PLAINNUMBER/>"><ID/></span> 
-			Be:<span class="resBeID"><BEID/></span>
-		</span>
-		<span class="resHeaderAboneContent"></span>
-	</dt>
-	<dd class="resBody"><MESSAGE/></dd>
-</dl>
+<article id="res<PLAINNUMBER/>"
+         class="resContainer resNew"
+         data-id="<ID/> <IP/> <HOST/> <BEBASEID/>"
+         data-number="<PLAINNUMBER/>"
+         data-aboned="false">
+    <h2 class="resHeader">
+        <span class="resNumber"><PLAINNUMBER/></span>
+        <span class="resHeaderContent">
+            <span class="resName"><NAME/></span>
+            <span class="resMail"><MAIL/></span>
+            <span class="resDate"><DATE/></span>
+            <span class="resID" data-id="<ID/>"><ID/></span>
+            <span class="resIP" data-id="<IP/>"><IP/></span>
+            <span class="resHost" data-id="<HOST/>"><HOST/></span>
+            <span class="resBeID" data-id="<BEBASEID/>"><BEID/></span>
+        </span>
+        <span class="resHeaderAboneContent"><NGDATA/></span>
+    </h2>
+    <p class="resBody"><MESSAGE/></p>
+</article>

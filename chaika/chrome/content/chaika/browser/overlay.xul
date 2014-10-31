@@ -1,116 +1,52 @@
 <?xml version="1.0"?>
 
+<!-- See license.txt for terms of usage -->
+
 <overlay id="ChaikaBrowserOverlay"
-		xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-	<script type="application/javascript" src="chrome://chaika/content/browser/overlay.js"/>
+    <script type="application/javascript" src="chrome://chaika/content/browser/overlay.js"/>
 
-	<!-- Toolbar Button -->
-	<toolbarpalette id="BrowserToolbarPalette">
-		<toolbarbutton id="chaika-toolbarbutton" tooltiptext="chaika" context="chaika-history-popup"
-			observes="viewChaikaSidebar" class="toolbarbutton-1 chromeclass-toolbar-additional"/>
-	</toolbarpalette>
+    <!-- PopupSet -->
+    <popupset id="mainPopupSet">
+        <menupopup id="chaika-history-popup" tooltiptext=""
+            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
+    </popupset>
 
-	<!-- PopupSet -->
-	<popupset id="mainPopupSet">
-		<menupopup id="chaika-history-popup" tooltiptext=""
-			style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
-	</popupset>
+    <!-- SideBar Menu -->
+    <menupopup id="viewSidebarMenu">
+        <menuitem key="key_viewChaikaSidebar" observes="viewChaikaSidebar"/>
+    </menupopup>
 
-	<!-- SideBar Menu -->
-	<menupopup id="viewSidebarMenu">
-		<menuitem key="key_viewChaikaSidebar" observes="viewChaikaSidebar"/>
-	</menupopup>
+    <!-- Open SideBar Shortcut Key -->
+    <keyset id="mainKeyset">
+        <key id="key_viewChaikaSidebar" command="viewChaikaSidebar"
+            key="&quot;" modifiers="accel"/>
+    </keyset>
 
-	<!-- Open SideBar Shortcut Key -->
-	<keyset id="mainKeyset">
-		<key id="key_viewChaikaSidebar" command="viewChaikaSidebar"
-			key="&quot;" modifiers="accel"/>
-	</keyset>
+    <!-- Open SideBar Command -->
+    <broadcasterset id="mainBroadcasterSet">
+        <broadcaster id="viewChaikaSidebar" autoCheck="false"
+            label="chaika" type="checkbox" group="sidebar"
+            sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
+            sidebartitle="chaika"
+            oncommand="toggleSidebar('viewChaikaSidebar');"/>
+    </broadcasterset>
 
-	<!-- Open SideBar Command -->
-	<broadcasterset id="mainBroadcasterSet">
-		<broadcaster id="viewChaikaSidebar"
-			autoCheck="false"
-			label="chaika"
-			type="checkbox" group="sidebar"
-			sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
-			sidebartitle="chaika"
-			oncommand="toggleSidebar('viewChaikaSidebar');"/>
-	</broadcasterset>
+    <!-- Toolbar Button -->
+    <toolbarpalette id="BrowserToolbarPalette">
+        <toolbarbutton id="chaika-toolbarbutton" class="toolbarbutton-1 chromeclass-toolbar-additional"
+                label="chaika" tooltiptext="chaika" type="menu">
+            <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+        </toolbarbutton>
+    </toolbarpalette>
 
-	<!-- Browser Context Menu -->
-	<popup id="contentAreaContextMenu">
-		<menu id="context-chaika" label="chaika" class="menu-iconic"
-				image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
-			<menupopup>
-				<menu label="あぼーん" id="context-chaika-abone">
-					<menupopup>
-						<menuitem label="名前" id="context-chaika-abone-name" />
-						<menuitem label="メール" id="context-chaika-abone-mail" />
-						<menuitem label="ID" id="context-chaika-abone-id" />
-						<menuitem label="ワード" id="context-chaika-abone-word" />
-						<menuseparator />
-						<menuitem label="あぼーんマネージャ..." id="context-chaika-abone-manager" />
-					</menupopup>
-				</menu>
-
-				<menu label="コピー" id="context-chaika-copy">
-					<menupopup>
-						<menuitem label="タイトル" id="context-chaika-copy-title" />
-						<menuitem label="URL" id="context-chaika-copy-url" />
-						<menuitem label="タイトルと URL" id="context-chaika-copy-title-url" />
-						<menuitem label="タイトルと URL と選択部分" id="context-chaika-copy-title-url-selection" />
-					</menupopup>
-				</menu>
-
-				<menu label="検索" id="context-chaika-search">
-					<menupopup>
-						<menuitem label="find.2ch.net で検索" id="context-chaika-search-find-2ch" />
-						<menuitem label="板で検索" id="context-chaika-search-in-board" />
-						<menuitem label="スレッド内を検索" id="context-chaika-search-in-thread" />
-					</menupopup>
-				</menu>
-
-				<menu label="スキン" id="context-chaika-skin">
-					<menupopup />
-				</menu>
-
-				<menuseparator id="context-chaika-skin-sep" />
-
-				<menuitem label="このスレッドに書き込む" id="context-chaika-write" />
-				<menuitem label="このスレッドのログを削除" id="context-chaika-delete-log" />
-
-				<menuseparator id="context-chaika-thread-sep" />
-
-				<menuitem label="chaika で開く" id="context-chaika-open-in-chaika" />
-				<menuitem label="ブラウザで開く" id="context-chaika-open-in-browser" />
-				<menuitem label="リンク先を chaika で開く" id="context-chaika-open-link-in-chaika" />
-				<menuitem label="リンク先をブラウザで開く" id="context-chaika-open-link-in-browser" />
-
-				<menuseparator id="context-chaika-open-in-sep" />
-
-				<menuitem label="すべてのレスを表示" id="context-chaika-show-all" />
-				<menuitem label="新着50件を表示" id="context-chaika-show-l50" />
-				<menuitem label="スレッド一覧を開く" id="context-chaika-open-board" />
-				<menuitem label="次のスレッドを検索する" id="context-chaika-find-next-thread" />
-
-				<menuseparator id="context-chaika-thread-show-sep" />
-
-				<menuitem label="サイドバーを表示" id="context-chaika-toggle-sidebar">
-					<observes element="viewChaikaSidebar" attribute="oncommand" />
-					<observes element="viewChaikaSidebar" attribute="type" />
-					<observes element="viewChaikaSidebar" attribute="checked" />
-				</menuitem>
-				<menuitem label="オプション..." id="context-chaika-open-settings" />
-			</menupopup>
-		</menu>
-	</popup>
-
-	<!-- NavigationBar -->
-    <hbox id="nav-bar">
-		<toolbaritem id="chaika-thread-toolbaritem" insertbefore="window-controls" hidden="true"
-			style="-moz-binding:url('chrome://chaika/content/browser/thread-toolbarbutton.xml#threadToolbarButton')"/>
-	</hbox>
+    <!-- Browser Context Menu -->
+    <popup id="contentAreaContextMenu">
+        <menu id="context-chaika" label="chaika" class="menu-iconic"
+                image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
+            <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+        </menu>
+    </popup>
 
 </overlay>

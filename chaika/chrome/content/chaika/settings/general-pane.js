@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *    flyson <flyson at users.sourceforge.jp>
+ *    nodaguti <nodaguti at gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -35,79 +36,45 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
-
 var gGeneralPane = {
 
-	startup: function(){
-		setCcontainerDisabled("extensions.chaika.appoint_data_dir",
-				"boxDataDir", true);
-		setCcontainerDisabled("extensions.chaika.http_proxy_mode",
-				"txtProxyValue", "2");
-	},
+    startup: function(){
+        setContainerDisabled("extensions.chaika.appoint_data_dir",
+                "boxDataDir", true);
+        setContainerDisabled("extensions.chaika.http_proxy_mode",
+                "txtProxyValue", 2);
+    },
 
-	selectDataDir: function(){
-		const nsIFilePicker = Components.interfaces.nsIFilePicker;
+    selectDataDir: function(){
+        const nsIFilePicker = Components.interfaces.nsIFilePicker;
 
-		var dataDirPref = document.getElementById("extensions.chaika.data_dir");
+        var dataDirPref = document.getElementById("extensions.chaika.data_dir");
 
-		var filePicker = Components.classes["@mozilla.org/filepicker;1"]
-				.createInstance(nsIFilePicker);
-		filePicker.init(window, "フォルダを選択してください", nsIFilePicker.modeGetFolder);
+        var filePicker = Components.classes["@mozilla.org/filepicker;1"]
+                .createInstance(nsIFilePicker);
+        filePicker.init(window, "フォルダを選択してください", nsIFilePicker.modeGetFolder);
 
-			// 初期表示フォルダ
-		var displayDirectory = Components.classes["@mozilla.org/file/local;1"]
-				.createInstance(Components.interfaces.nsIFile);
-		try{
-			displayDirectory.initWithPath(dataDirPref.value);
-			if(displayDirectory.exists()){
-				filePicker.displayDirectory = displayDirectory;
-			}
-		}catch(ex){}
+            // 初期表示フォルダ
+        var displayDirectory = Components.classes["@mozilla.org/file/local;1"]
+                .createInstance(Components.interfaces.nsIFile);
+        try{
+            displayDirectory.initWithPath(dataDirPref.value);
+            if(displayDirectory.exists()){
+                filePicker.displayDirectory = displayDirectory;
+            }
+        }catch(ex){}
 
-		if (filePicker.show() != nsIFilePicker.returnOK) return;
+        if (filePicker.show() != nsIFilePicker.returnOK) return;
 
-		var selectedDir = filePicker.file
-				.QueryInterface(Components.interfaces.nsIFile);
-		dataDirPref.value = selectedDir.path;
-	},
+        var selectedDir = filePicker.file
+                .QueryInterface(Components.interfaces.nsIFile);
+        dataDirPref.value = selectedDir.path;
+    },
 
-	readDataDirPref: function(){
-		var dataDirPref = document.getElementById("extensions.chaika.data_dir");
-		var txtDataDir = document.getElementById("txtDataDir");
-		if(!dataDirPref.value) return "";
-		return dataDirPref.value;
-	},
-
-	openMaruDialog: function(){
-		document.documentElement.openSubDialog(
-			"chrome://chaika/content/settings/maru.xul", "", null);
-	},
-
-	/**
-	 * ログインマネージャからパスワードを取得してセットする
-	 */
-	setPasswordBox: function(mode){
-		var account = mode == 'Be' ?
-							ChaikaBeLogin.getLoginInfo() :
-							ChaikaP2Login.getLoginInfo();
-
-		return account.password;
-	},
-
-	/**
-	 * パスワードをログインマネージャに登録し、設定値には空文字列を登録するようにする
-	 * 変更の反映処理等を効率的に行うためにダミーの設定項目(login.p2.idなど)を使用する
-	 */
-	setPasswordPref: function(mode, pass){
-		if(mode == 'Be'){
-			var id = document.getElementById('extensions.chaika.login.be.id').value;
-			ChaikaBeLogin.setLoginInfo(id, pass);
-		}else{
-			var id = document.getElementById('extensions.chaika.login.p2.id').value;
-			ChaikaP2Login.setLoginInfo(id, pass);
-		}
-
-		return '';
-	}
+    readDataDirPref: function(){
+        var dataDirPref = document.getElementById("extensions.chaika.data_dir");
+        var txtDataDir = document.getElementById("txtDataDir");
+        if(!dataDirPref.value) return "";
+        return dataDirPref.value;
+    }
 };

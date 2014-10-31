@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- See license.txt for terms of usage -->
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
@@ -7,200 +10,198 @@
     <link rel="shortcut icon" href="chrome://chaika/content/icon.png" />
 
 <style type="text/css"><![CDATA[
+    html {
+        background-color: #FFF;
+        color: #222;
+        font: message-box;
+    }
+    body {
+        text-align: justify;
+        width: 90%;
+        margin-left: 5%;
+        margin-right: 5%;
+    }
 
-	html {
-	  background-color: #FFF;
-	  color: #222;
-	  font: message-box;
-	}
-	body {
-	  text-align: justify;
-	  width: 90%;
-	  margin-left: 5%;
-	  margin-right: 5%;
-	}
+    h1 {
+        margin-bottom: 2em;
+    }
 
-	h1 {
-	  margin-bottom: 2em;
-	}
+    table {
+        background-color: #F0F0F0;
+        color: #111;
+        font: message-box;
+        text-align: start;
+        width: 100%;
+        border: 1px solid #333;
+        border-collapse: collapse;
+        margin-bottom: 2em;
+    }
 
-	table {
-	  background-color: #F0F0F0;
-	  color: #111;
-	  font: message-box;
-	  text-align: start;
-	  width: 100%;
-	  border: 1px solid #333;
-	  border-collapse: collapse;
-	  margin-bottom: 2em;
-	}
+    th, td {
+        border-right: 1px solid #999;
+        border-bottom: 1px dotted #999;
+        padding: 3px 5px;
+    }
 
-	th, td {
-	  border-right: 1px solid #999;
-	  border-bottom: 1px dotted #999;
-	  padding: 3px 5px;
-	}
+    th {
+        border-right: 1px solid #666;
+        border-bottom: 1px solid #333;
+        text-align: center;
+        background-color: #778DA8;
+        color: #FFF;
+    }
 
-	th {
-	  border-right: 1px solid #666;
-	  border-bottom: 1px solid #333;
-	  text-align: center;
-	  background-color: #778DA8;
-	  color: #FFF;
-	}
+    th.column {
+        border-right: 1px solid #333;
+        border-bottom: 1px dotted #333;
+        text-align: start;
+        white-space: nowrap;
+        width: 10em;
+    }
 
-	th.column {
-	  border-right: 1px solid #333;
-	  border-bottom: 1px dotted #333;
-	  text-align: start;
-	  white-space: nowrap;
-	  width: 10em; 
-	}
-
-	tr.userValue td{
-	  color: #B11;
-	  font-weight: bold;
-	}
-
+    tr.userValue td{
+        color: #B11;
+        font-weight: bold;
+    }
 ]]></style>
 
 <script type="application/javascript"><![CDATA[
-	Components.utils.import("resource://chaika-modules/ChaikaCore.js");
-	Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
+    Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+    Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
 
-	const Ci = Components.interfaces;
-	const Cc = Components.classes;
-	const Cr = Components.results;
+    const Ci = Components.interfaces;
+    const Cc = Components.classes;
+    const Cr = Components.results;
 
-	function startup(){
-		printBasic();
-		printDetails();
-		printPrefs();
-	}
+    function startup(){
+        printBasic();
+        printDetails();
+        printPrefs();
+    }
 
-	function shutdown(){
-	}
+    function shutdown(){
+    }
 
-	function printBasic(){
-		var basicInfoTable = '<table id="basicInfoTable">\
-			<tr>\
-				<th class="column">名前</th>\
-				<td>' + ChaikaAddonInfo.name + '</td>\
-			</tr>\
-			<tr>\
-				<th class="column">バージョン</th>\
-				<td>' + ChaikaAddonInfo.version + '</td>\
-			</tr>\
-			<tr>\
-				<th class="column">UserAgent</th>\
-				<td>' + ChaikaCore.getUserAgent() + '</td>\
-			</tr>\
-		</table>';
-		document.getElementById("basicInfoBox").innerHTML = basicInfoTable;
-	}
+    function printBasic(){
+        var basicInfoTable = '<table id="basicInfoTable">\
+            <tr>\
+                <th class="column">名前</th>\
+                <td>' + ChaikaAddonInfo.name + '</td>\
+            </tr>\
+            <tr>\
+                <th class="column">バージョン</th>\
+                <td>' + ChaikaAddonInfo.version + '</td>\
+            </tr>\
+            <tr>\
+                <th class="column">UserAgent</th>\
+                <td>' + ChaikaCore.getUserAgent() + '</td>\
+            </tr>\
+        </table>';
+        document.getElementById("basicInfoBox").innerHTML = basicInfoTable;
+    }
 
-	function printDetails(){
-		var skinName = ChaikaCore.pref.getUniChar("thread_skin") || "(Default)";
+    function printDetails(){
+        var skinName = ChaikaCore.pref.getUniChar("thread_skin") || "(Default)";
 
-		var detailsInfoTable = '<table id="detailsInfoTable">\
-			<tr>\
-				<th class="column">データフォルダ</th>\
-				<td>' + ChaikaCore.getDataDir().path + '</td>\
-			</tr>\
-			<tr>\
-				<th class="column">ログフォルダ</th>\
-				<td>' + ChaikaCore.getLogDir().path + '</td>\
-			</tr>\
-			<tr>\
-				<th class="column">ストレージファイル</th>\
-				<td>' + ChaikaCore.storage.databaseFile.path + '</td>\
-			</tr>\
+        var detailsInfoTable = '<table id="detailsInfoTable">\
+            <tr>\
+                <th class="column">データフォルダ</th>\
+                <td>' + ChaikaCore.getDataDir().path + '</td>\
+            </tr>\
+            <tr>\
+                <th class="column">ログフォルダ</th>\
+                <td>' + ChaikaCore.getLogDir().path + '</td>\
+            </tr>\
+            <tr>\
+                <th class="column">ストレージファイル</th>\
+                <td>' + ChaikaCore.storage.databaseFile.path + '</td>\
+            </tr>\
 \
-			<tr>\
-				<th class="column">デフォルトフォルダ</th>\
-				<td>' + ChaikaCore.getDefaultsDir().path + '</td>\
-			</tr>\
-			<tr>\
-				<th class="column">ServerURL</th>\
-				<td>' + ChaikaCore.getServerURL().spec + '</td>\
-			</tr>\
+            <tr>\
+                <th class="column">デフォルトフォルダ</th>\
+                <td>' + ChaikaCore.getDefaultsDir().path + '</td>\
+            </tr>\
+            <tr>\
+                <th class="column">ServerURL</th>\
+                <td>' + ChaikaCore.getServerURL().spec + '</td>\
+            </tr>\
 \
-			<tr>\
-				<th class="column">スレッド表示スキン</th>\
-				<td>' + skinName + '</td>\
-			</tr>\
+            <tr>\
+                <th class="column">スレッド表示スキン</th>\
+                <td>' + skinName + '</td>\
+            </tr>\
 \
-		</table>';
-		document.getElementById("detailsInfoBox").innerHTML = detailsInfoTable;
-	}
+        </table>';
+        document.getElementById("detailsInfoBox").innerHTML = detailsInfoTable;
+    }
 
-	function printPrefs(){
-		var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
-		var branch = prefService.getBranch("extensions.chaika.");
+    function printPrefs(){
+        var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+        var branch = prefService.getBranch("extensions.chaika.");
 
-		function getPrefValue(aPrefName){
-			var prefType = branch.getPrefType(aPrefName);
-			var value = "";
+        function getPrefValue(aPrefName){
+            var prefType = branch.getPrefType(aPrefName);
+            var value = "";
 
-			switch(prefType){
-				case Ci.nsIPrefBranch.PREF_STRING:
-					value = ChaikaCore.pref.getUniChar(aPrefName);
-					if(aPrefName.indexOf("pass") != -1){
-						value = value.replace(/./g, "•");
-					}
-					break;
-				case Ci.nsIPrefBranch.PREF_INT:
-					value = ChaikaCore.pref.getInt(aPrefName);
-					break;
-				case Ci.nsIPrefBranch.PREF_BOOL:
-					value = ChaikaCore.pref.getBool(aPrefName);
-					break;
-				default:
-					value = "(INVALID)";
-					break;
-			}
-			return value;
-		}
+            switch(prefType){
+                case Ci.nsIPrefBranch.PREF_STRING:
+                    value = ChaikaCore.pref.getUniChar(aPrefName);
+                    if(aPrefName.indexOf("pass") != -1){
+                        value = value.replace(/./g, "•");
+                    }
+                    break;
+                case Ci.nsIPrefBranch.PREF_INT:
+                    value = ChaikaCore.pref.getInt(aPrefName);
+                    break;
+                case Ci.nsIPrefBranch.PREF_BOOL:
+                    value = ChaikaCore.pref.getBool(aPrefName);
+                    break;
+                default:
+                    value = "(INVALID)";
+                    break;
+            }
+            return value;
+        }
 
-		var prefNames = branch.getChildList("", {});
-		prefNames.sort();
+        var prefNames = branch.getChildList("", {});
+        prefNames.sort();
 
-		var prefsInfoTable = document.createElement('table');
-		prefsInfoTable.setAttribute('id', 'prefsInfoTable');
+        var prefsInfoTable = document.createElement('table');
+        prefsInfoTable.setAttribute('id', 'prefsInfoTable');
 
-		//ヘッダー
-		var header = document.createElement('tr');
+        //ヘッダー
+        var header = document.createElement('tr');
 
-		var name = document.createElement('th');
-		name.textContent = '名前';
-		header.appendChild(name);
+        var name = document.createElement('th');
+        name.textContent = '名前';
+        header.appendChild(name);
 
-		var value = document.createElement('th');
-		value.textContent = '値';
-		header.appendChild(value);
+        var value = document.createElement('th');
+        value.textContent = '値';
+        header.appendChild(value);
 
-		prefsInfoTable.appendChild(header);
+        prefsInfoTable.appendChild(header);
 
-		//設定値
-		prefNames.forEach(function(aElement, aIndex, aArray){
-			var tr = document.createElement('tr');
-			if(branch.prefHasUserValue(aElement)){
-				tr.classList.add('userValue');
-			}
+        //設定値
+        prefNames.forEach(function(aElement, aIndex, aArray){
+            var tr = document.createElement('tr');
+            if(branch.prefHasUserValue(aElement)){
+                tr.classList.add('userValue');
+            }
 
-			var name = document.createElement('td');
-			name.textContent = aElement;
-			tr.appendChild(name);
+            var name = document.createElement('td');
+            name.textContent = aElement;
+            tr.appendChild(name);
 
-			var value = document.createElement('td');
-			value.textContent = getPrefValue(aElement);
-			tr.appendChild(value);
+            var value = document.createElement('td');
+            value.textContent = getPrefValue(aElement);
+            tr.appendChild(value);
 
-			prefsInfoTable.appendChild(tr);
-		});
+            prefsInfoTable.appendChild(tr);
+        });
 
-		document.getElementById("prefsInfoBox").appendChild(prefsInfoTable);
-	}
+        document.getElementById("prefsInfoBox").appendChild(prefsInfoTable);
+    }
 
 ]]></script>
 
@@ -208,16 +209,16 @@
 
 <body onload="startup()" onunload="shutdown()">
 
-	<h1>chaika トラブルシューティング情報</h1>
+    <h1>chaika トラブルシューティング情報</h1>
 
-	<h2>基本情報</h2>
-	<div id="basicInfoBox"></div>
+    <h2>基本情報</h2>
+    <div id="basicInfoBox"></div>
 
-	<h2>詳細情報</h2>
-	<div id="detailsInfoBox"></div>
+    <h2>詳細情報</h2>
+    <div id="detailsInfoBox"></div>
 
-	<h2>設定</h2>
-	<div id="prefsInfoBox"></div>
+    <h2>設定</h2>
+    <div id="prefsInfoBox"></div>
 
 </body>
 </html>

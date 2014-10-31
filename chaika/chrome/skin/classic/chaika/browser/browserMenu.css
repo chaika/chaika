@@ -1,0 +1,35 @@
+/* See license.txt for terms of usage */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+/** Icons for the toolbar button **/
+@import url('chrome://chaika/skin/browser/browserMenu-icon.css');
+
+#chaika-toolbarbutton {
+    -moz-box-orient: horizontal;
+}
+
+#chaika-toolbarbutton[cui-areatype="menu-panel"],
+toolbarpaletteitem[place="palette"] > #chaika-toolbarbutton{
+    -moz-box-orient: vertical;
+}
+
+
+/** menuitem's display setting **/
+
+.chaika-browser-menu:not(.chaika-status-text-selected) .chaika-shown-when-text-selected,
+.chaika-browser-menu:not(.chaika-status-on-bbs-link) .chaika-shown-on-bbs-link,
+.chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs,
+.chaika-browser-menu:not(.chaika-status-on-chaika) .chaika-shown-on-chaika,
+.chaika-browser-menu:not(.chaika-status-on-thread) .chaika-shown-on-thread,
+.chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs-not-chaika,
+.chaika-browser-menu.chaika-status-on-chaika .chaika-shown-on-bbs-not-chaika{
+    /*
+    レイアウトが崩れるのを防ぐため, XUL 要素を非表示にする場合には
+    visibility: collapse; と -moz-user-focus: ignore; を使用するのがよいと言われている.
+    しかし, Bug 313088 - -moz-user-focus problems for custom namespace element
+    の影響により XBL 内では -moz-user-focus: ignore; が正しく動作しないため,
+    display: none; を代わりに使用することとした.
+    */
+    display: none;
+}

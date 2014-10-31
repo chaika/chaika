@@ -1,23 +1,24 @@
 <?xml version="1.0"?>
 <RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	 xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
-	<Description about="urn:mozilla:install-manifest"
-			em:name="chaika"
-			em:version="1.6.3"
-			em:description="2ch.net(Japanese Web Forums) Browser"
-			em:id="chaika@chaika.xrea.jp"
-			em:type="2"
-			em:unpack="true"
-			em:homepageURL="http://chaika.xrea.jp/"
-			em:optionsURL="chrome://chaika/content/settings/settings.xul"
-			em:iconURL="chrome://chaika/content/icon.png"
-			em:creator="chaika.xrea.jp">
+    <Description about="urn:mozilla:install-manifest"
+                 em:name="chaika"
+                 em:version="1.7.0"
+                 em:description="2ch.net(Japanese Web Forums) Browser"
+                 em:id="chaika@chaika.xrea.jp"
+                 em:type="2"
+                 em:unpack="true"
+                 em:homepageURL="https://github.com/chaika/chaika"
+                 em:optionsURL="chrome://chaika/content/settings/settings.xul"
+                 em:iconURL="chrome://chaika/content/icon.png"
+                 em:creator="chaika.xrea.jp">
 
-		<em:targetApplication>
-			<!-- Firefox -->
-			<Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
-					em:minVersion="17.0" em:maxVersion="25.*"/>
-		</em:targetApplication>
-	</Description>
+        <em:targetApplication>
+            <!-- Firefox -->
+            <Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                         em:minVersion="24.0"
+                         em:maxVersion="32.*"/>
+        </em:targetApplication>
+    </Description>
 </RDF>

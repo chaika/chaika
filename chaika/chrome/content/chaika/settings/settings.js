@@ -20,6 +20,7 @@
  *
  * Contributor(s):
  *    flyson <flyson at users.sourceforge.jp>
+ *    nodaguti <nodaguti at gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -38,35 +39,47 @@
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
-var gIoService = Components.classes["@mozilla.org/network/io-service;1"]
-		.getService(Components.interfaces.nsIIOService);
-
 function startup(){
-	var paneID = window.location.hash.substring(1);
-	if(paneID){
-		var paneElement = document.getElementById(paneID);
-		if(paneElement && paneElement.localName=="prefpane"){
-			document.documentElement.showPane(paneElement);
-		}
-	}
+    var paneID = window.location.hash.substring(1);
 
-	window.addEventListener('paneload', sizeToContent, false);
+    if(paneID){
+        let paneElement = document.getElementById(paneID);
+
+        if(paneElement && paneElement.localName === "prefpane"){
+            document.documentElement.showPane(paneElement);
+        }
+    }
+
+    adjustWindowSize();
+    window.addEventListener('paneload', adjustWindowSize, false);
 }
+
 
 function shutdown(){
-	window.removeEventListener('paneload', sizeToContent, false);
+    window.removeEventListener('paneload', adjustWindowSize, false);
 }
 
 
-function setCcontainerDisabled(aPref, aCcontainerID, aEnabledValue){
-	var prefValue = document.getElementById(aPref).value;
-	var container = document.getElementById(aCcontainerID);
+function adjustWindowSize(){
+    //Mac ではタブ切り替えの際に自動的にウィンドウの高さが調節されるため, sizeToContent を毎回呼び出すと表示が崩れる.
+    //一方, Windows ではウィンドウの高さが調整されないため, 毎回 sizeToContent を呼ぶ必要がある.
+    //高さが自動調節されるかどうかは, タブを切り替える前後で高さが変わっているかどうかを調べることで判別できる.
+    if(!window._previousInnerHeight || window.innerHeight === window._previousInnerHeight){
+        window.sizeToContent();
+        window._previousInnerHeight = window.innerHeight;
+    }
+}
 
-	container.disabled = (prefValue != aEnabledValue);
 
-	var childNodes = container.getElementsByTagName("*");
-	for(let i=0; i<childNodes.length; i++){
-		var node = childNodes[i];
-		node.disabled = (prefValue != aEnabledValue);
-	}
+function setContainerDisabled(aPref, aContainerID, aEnabledValue){
+    var prefValue = document.getElementById(aPref).value;
+    var container = document.getElementById(aContainerID);
+
+    container.disabled = (prefValue !== aEnabledValue);
+
+    var childNodes = container.getElementsByTagName("*");
+
+    Array.slice(childNodes).forEach((node) => {
+        node.disabled = (prefValue !== aEnabledValue);
+    });
 }
