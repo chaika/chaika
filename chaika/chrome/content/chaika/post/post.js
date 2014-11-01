@@ -653,16 +653,10 @@ PostJBBSNewThread.prototype = Object.create(Post2chNewThread.prototype, {
             var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
             var bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
             var dir = this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
-            var postURI;
-
-            if(this._board.url.host.contains('jbbs.shitaraba.net')){
-                postURI = 'http://jbbs.shitaraba.net/bbs/write.cgi/';
-            }else{
-                postURI = 'http://jbbs.livedoor.jp/bbs/write.cgi/';
-            }
+            var postURI = ioService.newURI('http://jbbs.shitaraba.net/bbs/write.cgi/' +dir + '/' + bbs + '/new/', null, null);
 
             this._listener = aListener;
-            this._httpRequest = new HttpRequest(ioService.newURI(postURI + dir + '/' + bbs + '/new/', null, null), null, this);
+            this._httpRequest = new HttpRequest(postURI, this._board.url, this);
 
             var postData = [];
             postData.push("BBS="    + bbs);
