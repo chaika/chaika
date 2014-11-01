@@ -37,6 +37,8 @@ var gReplacementManager = {
         document.querySelector('.button-save').addEventListener('command', this);
 
         this._initList();
+
+        window.resizeTo(600, 500);
     },
 
 
