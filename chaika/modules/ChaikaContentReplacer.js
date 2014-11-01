@@ -79,7 +79,7 @@ var ChaikaContentReplacer = {
 
 
     /**
-     * あぼーんするべきかどうかを調べる
+     * ユーザー定義の置換を行う
      * @param {Object} aResData レスのデータ
      * @param {String} aResData.name 名前
      * @param {String} aResData.mail メール
