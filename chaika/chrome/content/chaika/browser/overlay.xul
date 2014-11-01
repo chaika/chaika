@@ -12,6 +12,10 @@
         <menupopup id="chaika-history-popup"
                    tooltiptext=""
                    style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
+
+        <menupopup id="chaika-browsermenu-popup"
+                   tooltiptext=""
+                   style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
     </popupset>
 
     <!-- SideBar Menu -->
@@ -47,6 +51,7 @@
                        label="chaika"
                        tooltiptext="chaika"
                        type="menu-button"
+                       contextmenu="chaika-browsermenu-popup"
                        oncommand="toggleSidebar('viewChaikaSidebar');">
             <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
         </toolbarbutton>
