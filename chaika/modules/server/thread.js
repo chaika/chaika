@@ -258,7 +258,7 @@ Thread2ch.prototype = {
             if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
                 this._headerResponded = true;
 
-                let title = UniConverter.toSJIS(this.thread.title);
+                let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                 let header = this.converter.getHeader(title);
                 this.write(header);
                 this.write(this.datLineParse(datLines[this.optionsOnes-1],
@@ -271,7 +271,7 @@ Thread2ch.prototype = {
             }else if(this.optionsEnd  && this.optionsEnd <= this._logLineCount){
                 this._headerResponded = true;
 
-                let title = UniConverter.toSJIS(this.thread.title);
+                let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                 let header = this.converter.getHeader(title);
                 this.write(header);
 
@@ -299,7 +299,7 @@ Thread2ch.prototype = {
                 }else if(this.thread.title){
                     this._headerResponded = true;
 
-                    let title = UniConverter.toSJIS(this.thread.title);
+                    let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                     let header = this.converter.getHeader(title);
                     this.write(header);
                 }else{
