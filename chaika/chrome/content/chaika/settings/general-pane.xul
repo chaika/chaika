@@ -58,6 +58,14 @@
         </hbox>
     </groupbox>
 
+    <groupbox>
+        <caption class="setting-description" label="置換" />
+        <vbox align="start">
+            <button label="置換マネージャ..."
+                    oncommand="gGeneralPane.openReplacementManager()" />
+        </vbox>
+    </groupbox>
+
     <vbox style="margin:0.5em 0px 0px 0.5em">
         <description>* 設定変更はブラウザ再起動後に反映されます</description>
     </vbox>

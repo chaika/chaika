@@ -1,0 +1,427 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<bindings id="chaikaReplacementManagerEditorBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="editor">
+    <content>
+        <xul:vbox flex="1" anonid="root">
+            <xul:hbox align="center" pack="start">
+                <xul:label value="ラベル:" />
+                <xul:textbox class="label" flex="1" />
+                <xul:checkbox label="自動" checked="true" anonid="auto-naming" class="auto-naming" />
+            </xul:hbox>
+
+            <xul:groupbox flex="1">
+                <xul:caption label="条件" />
+
+                <xul:hbox align="center" pack="start">
+                    <xul:description value="次の" />
+
+                    <xul:menulist class="match">
+                        <xul:menupopup>
+                            <xul:menuitem label="すべて" value="all" />
+                            <xul:menuitem label="いずれか" value="any" />
+                        </xul:menupopup>
+                    </xul:menulist>
+
+                    <xul:description value="のルールに一致する場合に置換を行う: (空欄にすると条件を未設定にできます)" />
+                </xul:hbox>
+
+                <xul:vbox class="container rules" flex="1" />
+                <xul:vbox class="template">
+                    <xul:hbox align="center" pack="start">
+                        <xul:menulist class="rule-target">
+                            <xul:menupopup>
+                                <xul:menuitem label="名前" value="name" />
+                                <xul:menuitem label="メール" value="mail" />
+                                <xul:menuitem label="日付" value="date" />
+                                <xul:menuitem label="発信元" value="ip" />
+                                <xul:menuitem label="ホスト" value="host" />
+                                <xul:menuitem label="ID" value="id" />
+                                <xul:menuitem label="BeID" value="be" />
+                                <xul:menuitem label="Be基礎番号" value="baseBe" />
+                                <xul:menuitem label="本文" value="msg" />
+                                <xul:menuitem label="スレタイ" value="title" />
+                                <xul:menuitem label="板URL" value="board_url" />
+                                <xul:menuitem label="スレURL" value="thread_url" />
+                            </xul:menupopup>
+                        </xul:menulist>
+
+                        <xul:label value="が" />
+
+                        <xul:textbox class="rule-query" />
+
+                        <xul:menulist class="rule-condition">
+                            <xul:menupopup>
+                                <xul:menuitem label="を含む" value="contains" />
+                                <xul:menuitem label="を含まない" value="notContain" />
+                                <xul:menuitem label="と一致する" value="equals" />
+                                <xul:menuitem label="と一致しない" value="notEqual" />
+                                <xul:menuitem label="で始まる" value="startsWith" />
+                                <xul:menuitem label="で終わる" value="endsWith" />
+                            </xul:menupopup>
+                        </xul:menulist>
+
+                        <xul:checkbox label="正規表現" class="rule-regexp" />
+                        <xul:checkbox label="Aa" class="rule-case-sensitive" checked="true" />
+
+                        <xul:spacer flex="1" />
+
+                        <xul:button label="-" anonid="rule-button-remove" />
+                        <xul:button label="+" anonid="rule-button-add" />
+                    </xul:hbox>
+                </xul:vbox>
+            </xul:groupbox>
+
+            <xul:groupbox>
+                <xul:caption label="置換" />
+
+                <xul:hbox align="center" pack="start">
+                    <xul:menulist class="target">
+                        <xul:menupopup>
+                            <xul:menuitem label="名前" value="name" />
+                            <xul:menuitem label="メール" value="mail" />
+                            <xul:menuitem label="日付" value="date" />
+                            <xul:menuitem label="発信元" value="ip" />
+                            <xul:menuitem label="ホスト" value="host" />
+                            <xul:menuitem label="本文" value="msg" />
+                            <xul:menuitem label="ID" value="id" />
+                            <xul:menuitem label="スレタイ (一覧)"
+                                          value="thread_title_on_list"
+                                          tooltiptext="スレッド一覧にて表示する場合のみ置換を行います." />
+                            <xul:menuitem label="スレタイ (subject.txt)"
+                                          value="thread_title_subjecttxt"
+                                          tooltiptext="subject.txt から受信したデータそのものを置換します(実験的機能)." />
+                        </xul:menupopup>
+                    </xul:menulist>
+                    <xul:description value="を次のように置換する:" />
+                </xul:hbox>
+
+                <xul:vbox>
+                    <xul:label value="検索文字列" />
+                    <xul:textbox class="search-text" multiline="true" flex="1" />
+                </xul:vbox>
+
+                <xul:vbox>
+                    <xul:label value="置換文字列" tooltip="special-replacement-patterns-desc" />
+                    <xul:textbox class="replace-text" multiline="true" flex="1" tooltip="special-replacement-patterns-desc" />
+
+                    <xul:tooltip id="special-replacement-patterns-desc" orient="vertical">
+                        <xul:description value="置換文字列には以下の特殊な文字を指定することができます:" />
+                        <xul:vbox style="margin-left: 1.5em;">
+                            <xul:hbox>
+                                <xul:description value="$$" class="dt" />
+                                <xul:description value=": $ そのものを表します." />
+                            </xul:hbox>
+                            <xul:hbox>
+                                <xul:description value="$&amp;" class="dt" />
+                                <xul:description value=": マッチした部分のテキストを表します." />
+                            </xul:hbox>
+                            <xul:hbox>
+                                <xul:description value="$`" class="dt" />
+                                <xul:description value=": マッチした部分より前の文字列を表します." />
+                            </xul:hbox>
+                            <xul:hbox>
+                                <xul:description value="$'" class="dt" />
+                                <xul:description value=": マッチした部分より後の文字列を表します." />
+                            </xul:hbox>
+                            <xul:hbox>
+                                <xul:description value="$n" class="dt" />
+                                <xul:description value=": n には自然数が入ります. n 番目のカッコでキャプチャされたサブマッチの文字列を表します. 正規表現の時のみ利用可能です." />
+                            </xul:hbox>
+                        </xul:vbox>
+                    </xul:tooltip>
+                </xul:vbox>
+            </xul:groupbox>
+
+            <xul:groupbox>
+                <xul:caption label="オプション" />
+
+                <xul:vbox>
+                    <xul:checkbox class="regexp" label="正規表現" />
+                    <xul:checkbox class="case-sensitive" label="大文字小文字を区別する" checked="true" />
+                    <xul:checkbox class="global" label="全て置換する" checked="true"
+                                  tooltiptext="OFF にすると初めに一致した文字列のみを置換します." />
+                </xul:vbox>
+            </xul:groupbox>
+        </xul:vbox>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://chaika/skin/settings/replacement-manager.css"/>
+    </resources>
+
+    <handlers>
+        <handler event="command" action="this.handleEvent(event)"/>
+        <handler event="change" action="this.handleEvent(event)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+            this._root = document.getAnonymousElementByAttribute(this, "anonid", "root");
+            this._labelbox = this._root.querySelector('.label');
+
+            this.insertRule();
+            this.setAutoNaming(true);
+        ]]></constructor>
+
+
+        <method name="handleEvent">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                switch(aEvent.type){
+                    case 'command':
+                        switch(aEvent.originalTarget.getAttribute('anonid')){
+                            case 'auto-naming':
+                                this.toggleAutoNaming();
+                                break;
+
+                            case 'rule-button-add':
+                                this.insertRule();
+                                break;
+
+                            case 'rule-button-remove':
+                                this.removeRule(aEvent);
+                                break;
+                        }
+                        break;
+
+                    case 'change':
+                        break;
+
+                    default:
+                        return;
+                }
+
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+            ]]></body>
+        </method>
+
+        <method name="adjustWindowSize">
+            <body><![CDATA[
+                let rules = this._root.querySelector('.rules');
+
+                //ディスプレイ高さの7.5割以上の高さになったら、
+                //そこでウィンドウサイズを大きくするのはやめて、
+                //かわりにルール表示部にスクロールバーを表示する
+                if(window.outerHeight > window.screen.availHeight * 0.75){
+                    window.resizeTo(window.outerWidth, window.screen.availHeight * 0.75);
+
+                    if(!rules.classList.contains('fixed-height')){
+                        rules.classList.add('fixed-height');
+                        rules.style.height = Math.floor(rules.clientHeight) + 'px';
+                    }
+                }
+
+
+                //ルール表示部の下部にまだ余裕がある場合には、
+                //ルール表示部の固定高さ表示を解除する
+                let lastRule = rules.querySelector('.rule:last-child');
+                let rulesBottomMargin = rules.getBoundingClientRect().bottom -
+                                        lastRule.getBoundingClientRect().bottom;
+
+                if(rulesBottomMargin > 0){
+                    rules.classList.remove('fixed-height');
+                    rules.style.height = 'auto';
+                }
+
+
+                //条件を削除するなどして content のサイズが小さくなった場合に
+                //ウィンドウ下部の空白部分が広がってしまう問題に対処する
+                let windowBottomMargin = document.documentElement.getBoundingClientRect().bottom -
+                                         this.getBoundingClientRect().bottom;
+
+                if(windowBottomMargin > 0){
+                    window.resizeBy(0, -windowBottomMargin);
+                }
+
+
+                //条件を追加したときにウィンドウサイズが広がらず、
+                //下部が見切れてしまう問題に対処する
+                //ウィンドウの再描画がうまく行われないことが原因？
+                window.resizeBy(0, 0);
+            ]]></body>
+        </method>
+
+        <method name="insertRule">
+            <parameter name=""/>
+            <body><![CDATA[
+                let template = this._root.querySelector('.template');
+                let newRule = template.cloneNode(true);
+
+                newRule.classList.remove('template');
+                newRule.classList.add('rule');
+
+                this._root.querySelector('.rules').appendChild(newRule);
+
+                this.adjustWindowSize();
+
+                return newRule;
+            ]]></body>
+        </method>
+
+        <method name="removeRule">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                let rule = aEvent.originalTarget.parentNode.parentNode;
+                let rules = rule.parentNode;
+
+                if(rules.childNodes.length > 1){
+                    rule.parentNode.removeChild(rule);
+                }
+
+                this.adjustWindowSize();
+            ]]></body>
+        </method>
+
+        <method name="clearRules">
+            <body><![CDATA[
+                let rules = this._root.querySelector('.rules');
+
+                while(rules.childNodes.length > 0){
+                    rules.removeChild(rules.firstChild);
+                }
+            ]]></body>
+        </method>
+
+        <method name="toggleAutoNaming">
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.auto-naming');
+
+                this._enableAutoNaming =
+                this._labelbox.disabled = checkbox.checked;
+            ]]></body>
+        </method>
+
+        <method name="setAutoNaming">
+            <parameter name="enable"/>
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.auto-naming');
+
+                checkbox.checked =
+                this._enableAutoNaming =
+                this._labelbox.disabled = enable;
+            ]]></body>
+        </method>
+
+        <method name="setLabel">
+            <body><![CDATA[
+                this._labelbox.value = this.getLabelText();
+            ]]></body>
+        </method>
+
+        <method name="getLabelText">
+            <parameter name=""/>
+            <body><![CDATA[
+                let rules = this._root.querySelectorAll('.rule');
+                let rulesText = '';
+                let target = this._root.querySelector('.target').selectedItem.label;
+                let searchText = this._root.querySelector('.search-text').value;
+
+
+                rulesText = Array.slice(rules).map((rule) => {
+                    let target = rule.querySelector('.rule-target').selectedItem.label;
+                    let query = rule.querySelector('.rule-query').value;
+                    let condition = rule.querySelector('.rule-condition').selectedItem.label;
+
+                    return query ? target + 'が' + query + condition : null;
+                }).filter((rule) => !!rule).join(', ');
+
+                if(rulesText){
+                    let match = this._root.querySelector('.match').selectedItem.label;
+
+                    rulesText += ' の' + match + 'に該当する ';
+                }
+
+
+                return rulesText + target + ' 内の ' + searchText;
+            ]]></body>
+        </method>
+
+        <method name="getReplaceData">
+            <body><![CDATA[
+                let replaceData = {};
+
+                replaceData.title = this._labelbox.value;
+                replaceData.match = this._root.querySelector('.match').value;
+                replaceData.target = this._root.querySelector('.target').value;
+                replaceData.regexp = this._root.querySelector('.regexp').checked;
+                replaceData.ignoreCase = ! this._root.querySelector('.case-sensitive').checked;
+                replaceData.global = this._root.querySelector('.global').checked;
+                replaceData.searchText = this._root.querySelector('.search-text').value;
+                replaceData.replaceText = this._root.querySelector('.replace-text').value;
+
+                let rules = this._root.querySelectorAll('.rule');
+
+                replaceData.rules = Array.slice(rules).map((rule) => {
+                    return {
+                        target: rule.querySelector('.rule-target').value,
+                        query: rule.querySelector('.rule-query').value,
+                        condition: rule.querySelector('.rule-condition').value,
+                        regexp: rule.querySelector('.rule-regexp').checked,
+                        ignoreCase: ! rule.querySelector('.rule-case-sensitive').checked
+                    };
+                }).filter((rule) => !!rule.query);
+
+                return replaceData;
+            ]]></body>
+        </method>
+
+        <method name="populateData">
+            <parameter name="replaceData"/>
+            <body><![CDATA[
+                this._labelbox.value = replaceData.title || '';
+                this._root.querySelector('.match').value = replaceData.match;
+                this._root.querySelector('.target').value = replaceData.target;
+                this._root.querySelector('.regexp').checked = replaceData.regexp;
+                this._root.querySelector('.case-sensitive').checked = ! replaceData.ignoreCase;
+                this._root.querySelector('.global').checked = replaceData.global;
+                this._root.querySelector('.search-text').value = replaceData.searchText;
+                this._root.querySelector('.replace-text').value = replaceData.replaceText;
+
+                this.clearRules();
+
+                replaceData.rules.forEach((rule) => {
+                    let node = this.insertRule();
+
+                    node.querySelector('.rule-target').value = rule.target;
+                    node.querySelector('.rule-query').value = rule.query;
+                    node.querySelector('.rule-condition').value = rule.condition;
+                    node.querySelector('.rule-regexp').checked = !!rule.regexp;
+                    node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
+                });
+
+                if(replaceData.rules.length < 1){
+                    this.insertRule();
+                }
+
+
+                //タイトルが設定されていないか、
+                //自動ネーミングと設定されているラベルが一致したら
+                //自動ネーミングが有効だと判断する
+                if(!replaceData.title || replaceData.title === this.getLabelText()){
+                    this.setAutoNaming(true);
+                }else{
+                    this.setAutoNaming(false);
+                }
+
+                //もし有効ならラベルをセットする
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+            ]]></body>
+        </method>
+
+    </implementation>
+</binding>
+
+</bindings>
