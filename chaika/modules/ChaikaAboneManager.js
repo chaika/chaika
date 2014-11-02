@@ -219,7 +219,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         value: function(aRule, aResData){
             let target = aResData[aRule.target];
 
-            if(!target){
+            if(typeof target !== 'string'){
                 return false;
             }
 
