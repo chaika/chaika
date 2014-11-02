@@ -530,21 +530,11 @@ var Bbsmenu = {
 
 
     getOutsideDoc: function Bbsmenu_getOutsideDoc(){
-        var outsideXMLFile = ChaikaCore.getDataDir();
+        var outsideXMLFile = ChaikaCore.getDefaultsDir();
         outsideXMLFile.appendRelativePath("outside.xml");
-
-        if(!outsideXMLFile.exists()){
-            var defaultOutsideFile = ChaikaCore.getDefaultsDir();
-            defaultOutsideFile.appendRelativePath("outside.xml");
-            defaultOutsideFile.copyTo(outsideXMLFile.parent, null);
-
-            outsideXMLFile = outsideXMLFile.clone();
-        }
-
 
         var outsideXMLString = ChaikaCore.io.readString(outsideXMLFile, 'UTF-8');
         var outsideDoc = (new DOMParser()).parseFromString(outsideXMLString, 'text/xml');
-
 
         var categoryNodes = outsideDoc.getElementsByTagName("category");
 
