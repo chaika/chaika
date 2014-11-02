@@ -110,8 +110,7 @@ Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBr
 ChaikaBrowserOverlay.browserMenu = {
 
     get _root(){
-        delete this._root;
-        return (this._root = document.getElementsByClassName('chaika-browser-menu')[0]);
+        return document.getElementsByClassName('chaika-browser-menu')[0];
     },
 
     /**
@@ -147,32 +146,31 @@ ChaikaBrowserOverlay.browserMenu = {
 
 ChaikaBrowserOverlay.contextMenu = {
 
+    get _browserMenu(){
+        return this._isFlattened ? document.getElementById("contentAreaContextMenu") :
+                                   document.getElementById('context-chaika').firstChild;
+    },
+
     start: function(){
-        this._contextMenu = document.getElementById('context-chaika');
+        this._isFlattened = false;
 
-        let enableContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("contextmenu.enabled");
+        if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool("contextmenu.enabled")){
+            this._show();
 
-        if(enableContextMenu){
-            this._contextMenu.hidden = false;
-
-            let flattenContextMenu = ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.flattened');
-            if(flattenContextMenu){
-                this._flattenContextMenu();
+            if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.flattened')){
+                this._flatten();
             }
 
-            let browserContextMenu = document.getElementById("contentAreaContextMenu");
-            browserContextMenu.addEventListener("popupshowing", this, false);
+            document.getElementById("contentAreaContextMenu").addEventListener("popupshowing", this, false);
         }else{
-            this._contextMenu.hidden = true;
+            this._hide();
         }
     },
 
 
     stop: function(){
-        this._contextMenu.hidden = true;
-
-        let browserContextMenu = document.getElementById("contentAreaContextMenu");
-        browserContextMenu.removeEventListener("popupshowing", this, false);
+        this._hide();
+        document.getElementById("contentAreaContextMenu").removeEventListener("popupshowing", this, false);
     },
 
 
@@ -190,26 +188,41 @@ ChaikaBrowserOverlay.contextMenu = {
     /**
      * コンテキストメニューをフラットにする
      */
-    _flattenContextMenu: function(){
-        // Remove menu#context-chaika
-        this._contextMenu.parentNode.removeChild(this._contextMenu);
+    _flatten: function(){
+        let contextMenu = document.getElementById('context-chaika');
 
-        // Create inline menu container
-        var vbox = document.createElement('vbox');
-        vbox.setAttribute('style', '-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)');
+        contextMenu.parentNode.removeChild(contextMenu);
+        contextMenu.removeAttribute('id');
 
-        // Insert the container at first of the contextmenu
         var browserContextMenu = document.getElementById('contentAreaContextMenu');
-        browserContextMenu.insertBefore(vbox, browserContextMenu.firstChild);
+        browserContextMenu.setAttribute('style', '-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)');
 
-        // Insert a separator after the container
-        var separator = document.createElement('menuseparator');
-        browserContextMenu.insertBefore(separator, vbox.nextSibling);
+        browserContextMenu.classList.add('chaika-status-flattened');
+        this._isFlattened = true;
+    },
 
-        this._contextMenu.removeAttribute('id');
-        vbox.setAttribute('id', 'context-chaika');
 
-        this._contextMenu = document.getElementById('context-chaika');
+    /**
+     * コンテキストメニューを非表示にする
+     */
+    _hide: function(){
+        if(!this._isFlattened){
+            document.getElementById('context-chaika').hidden = true;
+        }else{
+            this._browserMenu.classList.add('chaika-status-hidden');
+        }
+    },
+
+
+    /**
+     * コンテキストメニューを表示する
+     */
+    _show: function(){
+        if(!this._isFlattened){
+            document.getElementById('context-chaika').hidden = false;
+        }else{
+            this._browserMenu.classList.remove('chaika-status-hidden');
+        }
     },
 
 
@@ -232,28 +245,25 @@ ChaikaBrowserOverlay.contextMenu = {
                            // ii) - a)
                 }else{
                     // ii) - b)
-                    this._contextMenu.hidden = true;
+                    this._hide();
                     return;
                 }
             }
         }
 
 
-        this._contextMenu.hidden = false;
+        this._show();
 
 
         //設定で非表示にされているものを非表示にする
         let prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
         let prefNames = prefs.getChildList("", {});
-        let root = this._contextMenu.classList.contains('chaika-browser-menu') ?
-                        this._contextMenu :
-                        this._contextMenu.firstChild;
 
         prefNames.forEach((name) => {
             if(!name.endsWith('enabled')) return;
 
             var anonid = name.replace('.enabled', '');
-            var menuitem = document.getAnonymousElementByAttribute(root, 'anonid', anonid);
+            var menuitem = document.getAnonymousElementByAttribute(this._browserMenu, 'anonid', anonid);
 
             if(menuitem){
                 menuitem.hidden = !prefs.getBoolPref(name);

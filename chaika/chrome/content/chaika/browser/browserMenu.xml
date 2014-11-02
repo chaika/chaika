@@ -10,8 +10,7 @@
 
 <binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">
     <content>
-        <xul:arrowscrollbox orient="vertical" flex="1">
-            <children />
+        <xul:arrowscrollbox orient="vertical" flex="1" anonid="root" class="chaika-browser-menu-root">
             <xul:menu label="あぼーん" anonid="abone">
                 <xul:menupopup>
                     <xul:menuitem label="名前" anonid="abone-name" />
@@ -87,6 +86,10 @@
             <xul:menuseparator anonid="sidebar-sep" />
 
             <xul:menuitem label="オプション..." anonid="open-settings"/>
+
+            <xul:menuseparator anonid="chaika-sep" class="chaika-shown-when-flattened" />
+
+            <children />
         </xul:arrowscrollbox>
     </content>
 
