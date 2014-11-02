@@ -66,7 +66,7 @@ var ChaikaContentReplacer = {
 
 
     _saveData: function(){
-        if(this._rules && this._rules.length > 0){
+        if(this._rules){
             ChaikaCore.io.writeString(this._file, 'UTF-8', false,
                                       this._rules.map((rule) => JSON.stringify(rule)).join("\n"));
         }
