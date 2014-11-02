@@ -315,8 +315,6 @@
                 const isOnThread = this._isThread(currentURI);
                 const isOnBoard = this._isBoard(currentURI);
 
-                this.ChaikaCore.logger.debug(gContextMenu);
-
                 const isContextMenu = !!gContextMenu;
                 const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
                 const isOnBBSLink = isContextMenu && gContextMenu.onLink && this._isBBS(gContextMenu.linkURL);
