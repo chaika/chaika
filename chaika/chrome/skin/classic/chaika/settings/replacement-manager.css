@@ -2,6 +2,10 @@
 
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+window{
+    padding: 1em;
+}
+
 listbox{
     height: 150px;
 }
