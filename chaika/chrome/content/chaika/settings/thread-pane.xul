@@ -42,7 +42,7 @@
                     <menupopup style="-moz-binding:url(chrome://chaika/content/skinMenu.xml#skinMenuPopup)" />
                 </menulist>
 
-                <button label="ディレクトリを開く" oncommand="gThreadPane.openSkinDir()"/>
+                <button label="スキンフォルダを開く" oncommand="gThreadPane.openSkinDir()"/>
             </hbox>
             <checkbox label="Be アイコンの表示"
                     preference="extensions.chaika.thread_show_be_icon"/>

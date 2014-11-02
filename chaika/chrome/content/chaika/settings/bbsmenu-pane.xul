@@ -36,7 +36,7 @@
                           preference="extensions.chaika.bbsmenu.search.default_engine_name" />
             </hbox>
             <hbox>
-                <button label="ディレクトリを開く" oncommand="gBbsmenuPane.openSearchPluginDir()" />
+                <button label="プラグインフォルダを開く" oncommand="gBbsmenuPane.openSearchPluginDir()" />
                 <spacer flex="1" />
             </hbox>
         </vbox>
