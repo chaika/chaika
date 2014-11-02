@@ -175,7 +175,7 @@ AboneManagerView.prototype = {
 
         //テキストボックスにデータを入れてフォーカスを当てる
         this._textbox.value = aWord;
-        textbox.focus();
+        this._textbox.focus();
     },
 
 
