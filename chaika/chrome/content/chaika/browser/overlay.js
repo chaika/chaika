@@ -230,21 +230,18 @@ ChaikaBrowserOverlay.contextMenu = {
      * コンテキストメニューが表示された時に呼ばれる
      */
     _popupShowing: function(){
-        //掲示板上でのみ表示する設定の場合
-        // i) ページが掲示板上である -> 表示
-        // ii) ページが掲示板上でない
-        //     a) 設定が有効 かつ カーソルがリンク上 かつ リンク先が掲示板 -> 表示
-        //     b) それ以外の時は表示しない
+        //掲示板上でのみ表示する設定の場合の表示・非表示
         if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.show_only_on_bbs')){
             if(ChaikaBrowserOverlay.browserMenu._isBBS(gBrowser.currentURI)){
-                // i)
+                // i) ページが掲示板上である -> 表示
             }else{
-                // ii)
+                // ii) ページが掲示板上でない
                 if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('contextmenu.always_show_open_link') &&
-                   gContextMenu.onLink && ChaikaBrowserOverlay.browserMenu._isBBS(gContextMenu.linkURL)){
-                           // ii) - a)
+                   gContextMenu.onLink &&
+                   ChaikaBrowserOverlay.browserMenu._isBBS(gContextMenu.linkURL)){
+                        // ii) - a)「リンク先の項目は表示する」設定が有効, カーソルがリンク上, リンク先が掲示板 -> 表示
                 }else{
-                    // ii) - b)
+                    // ii) - b) それ以外 -> 非表示
                     this._hide();
                     return;
                 }
