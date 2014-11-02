@@ -101,6 +101,20 @@ var ChaikaContentReplacer = {
         let replaced = false;
 
         this._rules.forEach((rule) => {
+            // ルールが置換する対象のデータがそもそもなければ
+            // 条件に一致するかどうかを調べる必要はないのでまずはそれを調べる
+
+            let target = rule.target;
+
+            // スレタイ置換へのターゲット名の調整
+            if((target === 'thread_title_on_list' && aResData.isThreadList) ||
+               (target === 'thread_title_subjecttxt' && aResData.isSubjectTxt)){
+                target = 'title';
+            }
+
+            if(typeof aResData[target] !== 'string') return;
+
+
             let matched = false;
 
             if(rule.match === 'all'){
@@ -115,17 +129,6 @@ var ChaikaContentReplacer = {
 
                 if(rule.ignoreCase) replaceFlag += 'i';
                 if(rule.global) replaceFlag += 'g';
-
-
-                // スレタイ置換への調整
-                let target = rule.target;
-
-                if((target === 'thread_title_on_list' && aResData.isThreadList) ||
-                   (target === 'thread_title_subjecttxt' && aResData.isSubjectTxt)){
-                    target = 'title';
-                }
-
-                if(!aResData[target]) return;
 
 
                 // もともと置換対象に含まれている $ が特殊文字に変換されないようにする
