@@ -377,16 +377,17 @@ var BbsmenuUpdater = {
 var Bbsmenu = {
 
     initTree: function Bbsmenu_initTree(){
+        this._DOMParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
+
         var doc = this.getBbsmenuDoc();
         Tree.initTree(doc, MODE_BBSMENU);
     },
 
     update: function Bbsmenu_update(aHtmlSource){
         var parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
-        var domParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
         var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
 
-        var bbsmenuDoc = domParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
+        var bbsmenuDoc = this._DOMParser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
         var fragment = parserUtils.parseFragment(aHtmlSource, 0, false, null, bbsmenuDoc.documentElement);
         bbsmenuDoc.documentElement.appendChild(fragment);
 
@@ -478,7 +479,7 @@ var Bbsmenu = {
     },
 
     getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
-        var bbsmenuDoc = (new DOMParser()).parseFromString("<bbsmenu/>", "text/xml");
+        var bbsmenuDoc = this._DOMParser.parseFromString("<bbsmenu/>", "text/xml");
         var outsideDoc = this.getOutsideDoc();
 
         var nodes = outsideDoc.documentElement.childNodes;
@@ -534,7 +535,7 @@ var Bbsmenu = {
         outsideXMLFile.appendRelativePath("outside.xml");
 
         var outsideXMLString = ChaikaCore.io.readString(outsideXMLFile, 'UTF-8');
-        var outsideDoc = (new DOMParser()).parseFromString(outsideXMLString, 'text/xml');
+        var outsideDoc = this._DOMParser.parseFromString(outsideXMLString, 'text/xml');
 
         var categoryNodes = outsideDoc.getElementsByTagName("category");
 
