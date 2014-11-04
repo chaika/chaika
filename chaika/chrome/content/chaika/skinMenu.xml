@@ -128,9 +128,12 @@
             <parameter name="aSkinName" />
             <body><![CDATA[
                 this.ChaikaCore.pref.setUniChar('thread_skin', aSkinName);
-                this.ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
-                    'chaika-skin-changed', { name: aSkinName }
-                );
+
+                if(this.ChaikaCore.pref.getBool('browser.browsermenu.reload_when_skin_changed')){
+                    this.ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                        'chaika-skin-changed', { name: aSkinName }
+                    );
+                }
             ]]></body>
         </method>
 
