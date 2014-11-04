@@ -9,8 +9,8 @@ var ChaikaBrowserContent = {
     init: function(){
         addMessageListener('chaika-skin-changed', this.handleMessage.bind(this));
         addMessageListener('chaika-post-finished', this.handleMessage.bind(this));
-        addMessageListener('chaika-abone-data-added', this.handleMessage.bind(this));
-        addMessageListener('chaika-abone-data-removed', this.handleMessage.bind(this));
+        addMessageListener('chaika-abone-data-add', this.handleMessage.bind(this));
+        addMessageListener('chaika-abone-data-remove', this.handleMessage.bind(this));
     },
 
 
@@ -21,17 +21,24 @@ var ChaikaBrowserContent = {
 
         switch(message.name){
             case 'chaika-skin-changed':
-            case 'chaika-post-finished':
                 if(this.executeBrowserMenuCommand('_isThread', content.location.href)){
                     content.location.reload();
                 }
                 break;
 
-            case 'chaika-abone-data-added':
+            case 'chaika-post-finished':
+                let postedThreadURL = new content.URL(message.data.url);
+
+                if(content.location.pathname.contains(postedThreadURL.pathname)){
+                    content.location.reload();
+                }
+                break;
+
+            case 'chaika-abone-data-add':
 
                 break;
 
-            case 'chaika-abone-data-removed':
+            case 'chaika-abone-data-remove':
 
                 break;
 
@@ -46,7 +53,7 @@ var ChaikaBrowserContent = {
         })[0];
     }
 
-}
+};
 
 
 ChaikaBrowserContent.init();

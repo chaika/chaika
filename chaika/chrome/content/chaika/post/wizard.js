@@ -977,28 +977,13 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        var serverURL = ChaikaCore.getServerURL();
+        let serverURL = ChaikaCore.getServerURL();
 
-        var browserWindows = Cc["@mozilla.org/appshell/window-mediator;1"]
-                .getService(Ci.nsIWindowMediator).getEnumerator("navigator:browser");
-        while(browserWindows.hasMoreElements()){
-            var browserWindow = browserWindows.getNext();
-            if(!browserWindow.getBrowser) continue;
-
-            var browsers = browserWindow.getBrowser().browsers;
-            for(var i = 0; i < browsers.length; i++){
-                var currentURI = browsers[i].currentURI;
-                if(!(currentURI instanceof Ci.nsIURL)) continue;
-                try{
-                    if(serverURL.hostPort != currentURI.hostPort) continue;
-                    if(currentURI.filePath.indexOf(gThread.plainURL.spec) != -1){
-                        browsers[i].reload();
-                    }
-                }catch(ex){
-                    ChaikaCore.logger.error(ex);
-                }
-            }
-        }
+        ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            'chaika-post-finished', {
+                url: gThread.plainURL.spec,
+                host: serverURL.hostPort
+        });
     }
 
 };
