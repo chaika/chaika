@@ -352,7 +352,7 @@
                 let anonymousID = targetElement.getAttribute("anonid");
                 let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
                 let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-                let selection = content.getSelection();
+                let selection = document.defaultView.getSelection();
                 let selectedText = selection.toString();
 
 
@@ -577,7 +577,7 @@
                     try{
                         title = (new this.ChaikaBoard(uri)).getTitle();
                     }catch(ex2){
-                        title = content.document.title;
+                        title = getBrowser().contentTitle;
                     }
                 }
 
@@ -587,7 +587,7 @@
 
                 var text = template.replace("%TITLE%", title, "g")
                                    .replace("%URL%", uri.spec, "g")
-                                   .replace("%SEL%", content.getSelection().toString(), "g")
+                                   .replace("%SEL%", document.defaultView.getSelection().toString(), "g")
                                    .replace("%NEWLINE%", NEWLINE, "g");
 
                 var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);

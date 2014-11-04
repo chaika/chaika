@@ -12,6 +12,9 @@ var ChaikaBrowserOverlay = {
         }
 
         if(ChaikaBrowserOverlay.ChaikaCore.initialized){
+            ChaikaBrowserOverlay._messageManager =
+                ChaikaBrowserOverlay.ChaikaCore.browser.getGlobalMessageManager();
+
             ChaikaBrowserOverlay.browserMenu.start();
             ChaikaBrowserOverlay.contextMenu.start();
             ChaikaBrowserOverlay.toolbarButton.start();
@@ -122,24 +125,22 @@ ChaikaBrowserOverlay.browserMenu = {
 
 
     start: function(){
-        Services.obs.addObserver(this, "chaika-skin-changed", false);
+        ChaikaBrowserOverlay._messageManager
+                            .addMessageListener('chaika-browser-menu-command', this.listener);
     },
 
-    end: function(){
-        Services.obs.removeObserver(this, "chaika-skin-changed", false);
+
+    stop: function(){
+        ChaikaBrowserOverlay._messageManager
+                            .removeMessageListener('chaika-browser-menu-command', this.listener);
     },
 
-    observe: function(aSubject, aTopic, aData){
-        if(aTopic !== 'chaika-skin-changed') return;
 
-        let url = gBrowser.currentURI.spec;
-
-        if(ChaikaBrowserOverlay.ChaikaCore.pref.getBool('browser.browsermenu.reload_when_skin_changed') &&
-           ChaikaBrowserOverlay.browserMenu._isChaika(url) &&
-           ChaikaBrowserOverlay.browserMenu._isThread(url)){
-                   content.location.reload();
-        }
+    listener: function(message){
+        let self = ChaikaBrowserOverlay.browserMenu;
+        return self._root[message.data.name].apply(self._root, message.data.args);
     }
+
 
 };
 

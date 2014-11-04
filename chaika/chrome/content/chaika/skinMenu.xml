@@ -128,11 +128,9 @@
             <parameter name="aSkinName" />
             <body><![CDATA[
                 this.ChaikaCore.pref.setUniChar('thread_skin', aSkinName);
-
-                let os = Components.classes["@mozilla.org/observer-service;1"]
-                                    .getService(Components.interfaces.nsIObserverService);
-
-                os.notifyObservers(null, "chaika-skin-changed", aSkinName);
+                this.ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                    'chaika-skin-changed', { name: aSkinName }
+                );
             ]]></body>
         </method>
 
