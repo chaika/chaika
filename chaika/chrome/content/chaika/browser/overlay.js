@@ -11,7 +11,11 @@ var ChaikaBrowserOverlay = {
             return ChaikaCore.logger.error('Failed in initializing ChaikaCore.');
         }
 
-        if(ChaikaBrowserOverlay.ChaikaCore.initialized){
+        if(!ChaikaBrowserOverlay.ChaikaCore.initialized){
+            ChaikaBrowserOverlay._initCount++;
+            setTimeout(function(){ ChaikaBrowserOverlay.start(); }, 100);
+            return;
+        }else{
             ChaikaBrowserOverlay.browserMenu.start();
             ChaikaBrowserOverlay.contextMenu.start();
             ChaikaBrowserOverlay.toolbarButton.start();
@@ -19,11 +23,14 @@ var ChaikaBrowserOverlay = {
 
             gBrowser.addProgressListener(ChaikaBrowserOverlay.webProgress);
 
-            //リリースノートの表示
-            setTimeout(function(){ ChaikaBrowserOverlay._showReleaseNotes(); }, 0);
-        }else{
-            ChaikaBrowserOverlay._initCount++;
-            setTimeout(function(){ ChaikaBrowserOverlay.start(); }, 100);
+            setTimeout(function(){
+                ChaikaBrowserOverlay._showReleaseNotes();
+
+                // スタートページを about:blank にしていると
+                // 起動時にページ遷移が発火せずツールバーボタンの表示/非表示が正しく行われない
+                // そこで起動直後に擬似的にページ遷移を発火させる
+                ChaikaBrowserOverlay.webProgress.onLocationChange(null, null, gBrowser.currentURI);
+            }, 0);
         }
     },
 
