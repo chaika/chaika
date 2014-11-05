@@ -1255,6 +1255,14 @@ Popup.Image = {
 };
 
 
+function delayInit(){
+    Prefs.startup();
+    ResCommand.startup();
+    ShortcutHandler.startup();
+    AboneHandler.startup();
+    Popup.startup();
+    ResInfo.startup();
+}
 
 function init(){
     //レス指定がない場合は新着位置までスクロール
@@ -1262,12 +1270,9 @@ function init(){
         ThreadCommand.scrollToNewMark();
     }
 
-    Prefs.startup();
-    ResInfo.startup();
-    ResCommand.startup();
-    ShortcutHandler.startup();
-    AboneHandler.startup();
-    Popup.startup();
+    setTimeout(() => {
+        delayInit();
+    }, 0);
 }
 
 init();
