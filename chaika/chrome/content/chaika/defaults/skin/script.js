@@ -865,28 +865,8 @@ var Popup = {
     },
 
 
-    showPopup: function(aEvent, aPopupContent, aAddClassName, invertDirection){
-        if(aPopupContent.length === 0) return;
-
-        if(aEvent.relatedTarget && aEvent.relatedTarget.className === "popup"){
-            return;
-        }
-
-
-        let className = 'popupInner';
-
-        if(aAddClassName){
-            className += ' ' + aAddClassName;
-        }
-
-        var popupInnerNode = $.node({ 'div': { 'class': className, children: aPopupContent }});
-        var popupNode = $.node({ 'div': { 'class': 'popup', 'id': 'popup-' + Date.now(), children: popupInnerNode }});
-
-        document.body.appendChild(popupNode);
-
-
-        //ポップアップの位置を決定する
-        let baseRect = $.rect(aEvent.originalTarget);
+    _adjustPopupPosition: function(baseNode, popupNode, invertDirection){
+        let baseRect = $.rect(baseNode);
         let popupRect = $.rect(popupNode);
 
         let top = !invertDirection ? window.scrollY + baseRect.bottom - 2:
@@ -916,6 +896,35 @@ var Popup = {
             top: top + 'px',
             left: left + 'px'
         });
+    },
+
+
+    showPopup: function(aEvent, aPopupContent, aAddClassName, invertDirection){
+        if(aPopupContent.length === 0) return;
+
+        if(aEvent.relatedTarget && aEvent.relatedTarget.className === "popup"){
+            return;
+        }
+
+
+        let className = 'popupInner';
+
+        if(aAddClassName){
+            className += ' ' + aAddClassName;
+        }
+
+        var popupInnerNode = $.node({ 'div': { 'class': className, children: aPopupContent }});
+        var popupNode = $.node({ 'div': {
+            'class': 'popup',
+            'id': 'popup-' + Date.now(),
+            'data-inverted': !!invertDirection,
+            children: popupInnerNode
+        }});
+
+        document.body.appendChild(popupNode);
+
+
+        this._adjustPopupPosition(aEvent.originalTarget, popupNode, invertDirection);
 
 
         //親ポップアップがある場合は記録する
@@ -1179,9 +1188,9 @@ Popup.RefRes = {
         });
 
         if(Prefs.get('pref-delay-popup'))
-            Popup.showPopupDelay(aEvent, popupContent, "RefResPopup");
+            Popup.showPopupDelay(aEvent, popupContent, "RefResPopup", Prefs.get('pref-invert-refres-popup-dir'));
         else
-            Popup.showPopup(aEvent, popupContent, "RefResPopup");
+            Popup.showPopup(aEvent, popupContent, "RefResPopup", Prefs.get('pref-invert-refres-popup-dir'));
     }
 
 };
@@ -1226,9 +1235,9 @@ Popup.ID = {
 
 
         if(Prefs.get('pref-delay-popup'))
-            Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
+            Popup.showPopupDelay(aEvent, popupContent, "IDPopup", Prefs.get('pref-invert-id-popup-dir'));
         else
-            Popup.showPopup(aEvent, popupContent, "IDPopup");
+            Popup.showPopup(aEvent, popupContent, "IDPopup", Prefs.get('pref-invert-id-popup-dir'));
     }
 };
 
@@ -1236,28 +1245,35 @@ Popup.ID = {
 Popup.Image = {
 
     mouseover: function(aEvent){
-        var target = aEvent.target;
-        var linkURL = target.href;
+        var link = aEvent.target;
+        var linkURL = link.href;
 
         if(!this._isImageLink(linkURL)) return;
 
         var image = $.node({ img: { 'class': 'small', 'src': linkURL }});
 
         image.addEventListener('error', function(){
-            target.parentNode.classList.add('error');
+            this.parentNode.classList.add('error');
         }, false);
 
         image.addEventListener('click', function(){
-            target.classList.toggle('small');
+            this.classList.toggle('small');
+        }, false);
+
+        image.addEventListener('load', function(){
+            if(Prefs.get('pref-invert-image-popup-dir')){
+                let popupNode = $.parentByClass('popup', this);
+                Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted);
+            }
         }, false);
 
 
         var popupContent = $.node({ 'div': { children: image }});
 
         if(Prefs.get('pref-delay-popup')){
-            Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
+            Popup.showPopupDelay(aEvent, popupContent, "ImagePopup", Prefs.get('pref-invert-image-popup-dir'));
         }else{
-            Popup.showPopup(aEvent, popupContent, "ImagePopup");
+            Popup.showPopup(aEvent, popupContent, "ImagePopup", Prefs.get('pref-invert-image-popup-dir'));
         }
     },
 

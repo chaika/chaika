@@ -62,10 +62,18 @@
         <label><input type="checkbox" id="pref-include-self-post" /> ID ポップアップで自身のレスを含める</label>
         <label><input type="checkbox" id="pref-disable-single-id-popup" /> 「このレスのみ」のポップアップを表示しない</label>
         <label><input type="checkbox" id="pref-delay-popup" /> ポップアップ表示を遅延させる</label>
-        <label><input type="checkbox" id="pref-invert-res-popup-dir" /> レスポップアップを上方向に表示する</label>
-        <label title="リンク末尾だけでなくリンク中に画像拡張子のような文字列がある場合も画像と判定するようになります.">
+        <label title="リンク末尾だけでなく, リンク中に画像拡張子のような文字列がある場合も画像と判定するようになります.">
             <input type="checkbox" id="pref-enable-non-strict-image-detection"> 画像リンクの判定を緩くする
         </label>
+
+        <section>
+            <h1>次の種類のポップアップを上方向に表示する:</h1>
+            <label><input type="checkbox" id="pref-invert-res-popup-dir" /> アンカー</label>
+            <label><input type="checkbox" id="pref-invert-image-popup-dir" /> 画像</label>
+            <label><input type="checkbox" id="pref-invert-id-popup-dir" /> ID</label>
+            <label><input type="checkbox" id="pref-invert-refres-popup-dir" /> 逆参照</label>
+        </section>
+
         <label>
 			レスポップアップの最大表示レス数 (0で無制限):
             <input type="text" size="5" id="pref-max-posts-in-popup" />

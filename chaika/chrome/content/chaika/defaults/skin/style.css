@@ -3,6 +3,7 @@
 @charset 'utf-8';
 
 /* ***** ***** Animations ***** ***** */
+
 @keyframes fadeout{
     from{
         opacity: 1.0;
@@ -237,6 +238,7 @@ body {
 /* ***** ***** あぼーん レス ***** ***** */
 
 /** 折りたたみ時 **/
+
 .collapsed .resHeaderContent,
 .collapsed .resBody{
     display: none;
@@ -257,6 +259,7 @@ body {
 }
 
 /** 展開時 **/
+
 [data-aboned="true"]:not(.collapsed) .resHeaderContent{
     display: inline;
 }
@@ -273,6 +276,7 @@ body {
 
 
 /* ***** ***** ハイライトレス ***** ***** */
+
 .resDateImportant{
     color: red;
 }
@@ -292,6 +296,7 @@ body {
 
 
 /* ***** ***** ポップアップ ***** ***** */
+
 .popup {
     font-size: 0.8em;
     padding: 5px;
@@ -316,6 +321,7 @@ body {
 
 
 /* レスポップアップ */
+
 .popupInner > .resContainer {
     padding-left: 2.5em;
     padding-right: 1em;
@@ -331,6 +337,7 @@ body {
 
 
 /* 画像ポップアップ */
+
 .ImagePopup {
     min-width: 100px;
     min-height: 0;
@@ -351,13 +358,15 @@ body {
 }
 
 
-/** 設定画面 **/
+/* ***** ***** 設定画面 ***** ***** */
+
 #settings{
     display: none;
     position: fixed;
     top: 0;
     right: 0;
     line-height: 1.8;
+    padding: 1em;
 }
 
 #settings:target{
@@ -383,4 +392,22 @@ fieldset{
 fieldset > div{
     font-size: 90%;
     margin: 0.5em 0 0 1.5em;
+}
+
+fieldset > section{
+    margin: 0.5em 0;
+}
+
+fieldset > section > h1{
+    font-size: 100%;
+    font-weight: normal;
+    padding: 0; margin: 0;
+}
+
+fieldset > section > label{
+    display: inline-block;
+}
+
+fieldset > section > label:first-of-type{
+    margin-left: 1em;
 }
