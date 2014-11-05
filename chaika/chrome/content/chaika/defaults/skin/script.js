@@ -333,6 +333,7 @@ var Prefs = {
         'pref-disable-single-id-popup': false,
         'pref-delay-popup': false,
         'pref-invert-res-popup-dir': false,
+        'pref-enable-non-strict-image-detection': false,
         'pref-max-posts-in-popup': 20,
 
         // ショートカットキー
@@ -821,17 +822,17 @@ var Popup = {
 
         //本文中のIDリンク
         if(target.className.startsWith("mesID_")){
-            Popup.ID.mouseover.call(target, aEvent);
+            Popup.ID.mouseover(aEvent);
             return;
         }
 
         switch(target.className){
             case "resPointer":
-                Popup.Res.mouseover.call(target, aEvent);
+                Popup.Res.mouseover(aEvent);
                 break;
 
             case 'resNumber':
-                Popup.RefRes.mouseover.call(target, aEvent);
+                Popup.RefRes.mouseover(aEvent);
                 break;
 
             case "resID":
@@ -839,11 +840,11 @@ var Popup = {
             case 'resIP':
             case 'resHost':
             case 'resBeID':
-                Popup.ID.mouseover.call(target, aEvent);
+                Popup.ID.mouseover(aEvent);
                 break;
 
             case "outLink":
-                Popup.Image.mouseover.call(target, aEvent);
+                Popup.Image.mouseover(aEvent);
                 break;
 
             default:
@@ -1009,13 +1010,14 @@ var Popup = {
 Popup.Res = {
 
     mouseover: function(aEvent){
+        var target = aEvent.target;
         var startRes = 0;
         var endRes = 0;
 
-        if(this.textContent.match(/>>?(\d{1,4})-(\d{1,4})/)){
+        if(target.textContent.match(/>>?(\d{1,4})-(\d{1,4})/)){
             startRes = parseInt(RegExp.$1);
             endRes = parseInt(RegExp.$2);
-        }else if(this.textContent.match(/>>?(\d{1,4})/)){
+        }else if(target.textContent.match(/>>?(\d{1,4})/)){
             startRes = parseInt(RegExp.$1);
         }
 
@@ -1158,12 +1160,14 @@ Popup.Res = {
 Popup.RefRes = {
 
     mouseover: function(aEvent){
+        var target = aEvent.target;
+
         //逆参照がなかったら終了
-        if(!this.dataset.referred) return;
+        if(!target.dataset.referred) return;
 
         let popupContent = document.createDocumentFragment();
 
-        this.dataset.referred.split(',').forEach((refID) => {
+        target.dataset.referred.split(',').forEach((refID) => {
             let resNode = $.id(refID);
 
             if(resNode){
@@ -1186,11 +1190,12 @@ Popup.RefRes = {
 Popup.ID = {
 
     mouseover: function(aEvent){
-        var resID = this.dataset.id;
+        var target = aEvent.target;
+        var resID = target.dataset.id;
 
         //レス本文中のID: リンクの場合には、resID属性が存在しないため
         //class名からIDを取得する
-        if(!resID && this.className.match(/mesID_([^\s]+)/)){
+        if(!resID && target.className.match(/mesID_([^\s]+)/)){
             resID = RegExp.$1;
         }
 
@@ -1199,7 +1204,7 @@ Popup.ID = {
 
 
         //同じIDを持つレスを取得する
-        var selfNumber = $.parentByClass('resContainer', this).dataset.number;
+        var selfNumber = $.parentByClass('resContainer', target).dataset.number;
         var selector = Prefs.get('pref-include-self-post') ?
                 ".resContainer[data-id*='" + resID + "']" :
                 ".resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
@@ -1231,26 +1236,49 @@ Popup.ID = {
 Popup.Image = {
 
     mouseover: function(aEvent){
-        var imageURL = this.href;
-        if(!(/\.(?:gif|jpe?g|png|svg|bmp)$/i).test(imageURL)) return;
+        var target = aEvent.target;
+        var linkURL = target.href;
 
-        var image = $.node({ img: { 'class': 'small', 'src': imageURL }});
+        if(!this._isImageLink(linkURL)) return;
+
+        var image = $.node({ img: { 'class': 'small', 'src': linkURL }});
 
         image.addEventListener('error', function(){
-            this.parentNode.classList.add('error');
+            target.parentNode.classList.add('error');
         }, false);
 
         image.addEventListener('click', function(){
-            this.classList.toggle('small');
+            target.classList.toggle('small');
         }, false);
+
 
         var popupContent = $.node({ 'div': { children: image }});
 
-        if(Prefs.get('pref-delay-popup'))
+        if(Prefs.get('pref-delay-popup')){
             Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
-        else
+        }else{
             Popup.showPopup(aEvent, popupContent, "ImagePopup");
-    }
+        }
+    },
+
+
+    _isImageLink: function(url){
+        if(Prefs.get('pref-enable-non-strict-image-detection')){
+            return this._detectImageLinkRoughly(url);
+        }else{
+            return this._detectImageLink(url);
+        }
+    },
+
+
+    _detectImageLink: function(url){
+        return (/\.(?:gif|jpe?g|png|svg|bmp|tiff?)$/i).test(url);
+    },
+
+
+    _detectImageLinkRoughly: function(url){
+        return (/\.(?:gif|jpe?g|png|svg|bmp|tiff?)/i).test(url);
+    },
 
 };
 
