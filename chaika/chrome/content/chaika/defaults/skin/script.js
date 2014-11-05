@@ -331,7 +331,8 @@ var Prefs = {
         // ポップアップ
         'pref-include-self-post': false,
         'pref-disable-single-id-popup': false,
-        'pref-delay-popup': true,
+        'pref-delay-popup': false,
+        'pref-invert-res-popup-dir': false,
         'pref-max-posts-in-popup': 20,
 
         // ショートカットキー
@@ -802,7 +803,7 @@ var AboneHandler = {
 
 var Popup = {
 
-    POPUP_DELAY: 250,
+    POPUP_DELAY: 200,
 
     startup: function(){
         document.addEventListener('mouseover', this.mouseover, false);
@@ -863,7 +864,7 @@ var Popup = {
     },
 
 
-    showPopup: function(aEvent, aPopupContent, aAddClassName){
+    showPopup: function(aEvent, aPopupContent, aAddClassName, invertDirection){
         if(aPopupContent.length === 0) return;
 
         if(aEvent.relatedTarget && aEvent.relatedTarget.className === "popup"){
@@ -929,13 +930,13 @@ var Popup = {
     },
 
 
-    showPopupDelay: function(aEvent, aPopupContent, aAddClassName, aDelay){
+    showPopupDelay: function(aEvent, aPopupContent, aAddClassName, invertDirection, aDelay){
         if(this._popupTimeout){
             clearTimeout(this._popupTimeout);
         }
 
-        setTimeout(() => {
-            this.showPopup(aEvent, aPopupContent, aAddClassName);
+        this._popupTimeout = setTimeout(() => {
+            this.showPopup(aEvent, aPopupContent, aAddClassName, invertDirection);
         }, aDelay || this.POPUP_DELAY);
     },
 
@@ -1013,8 +1014,8 @@ Popup.Res = {
             startRes = parseInt(RegExp.$1);
         }
 
-        Popup.Res.createContent(startRes, endRes).then((popupContent) => {
-            if(Prefs.get('pref-enable-delay-popup'))
+        Popup.Res._createContent(startRes, endRes).then((popupContent) => {
+            if(Prefs.get('pref-delay-popup'))
                 Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
             else
                 Popup.showPopup(aEvent, popupContent, "ResPopup");
@@ -1022,7 +1023,7 @@ Popup.Res = {
     },
 
 
-    createContent: function(aStart, aEnd){
+    _createContent: function(aStart, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
         //単独ポップアップ
@@ -1168,7 +1169,7 @@ Popup.RefRes = {
             }
         });
 
-        if(Prefs.get('pref-enable-delay-popup'))
+        if(Prefs.get('pref-delay-popup'))
             Popup.showPopupDelay(aEvent, popupContent, "RefResPopup");
         else
             Popup.showPopup(aEvent, popupContent, "RefResPopup");
@@ -1214,7 +1215,7 @@ Popup.ID = {
         });
 
 
-        if(Prefs.get('pref-enable-delay-popup'))
+        if(Prefs.get('pref-delay-popup'))
             Popup.showPopupDelay(aEvent, popupContent, "IDPopup");
         else
             Popup.showPopup(aEvent, popupContent, "IDPopup");
@@ -1240,7 +1241,7 @@ Popup.Image = {
 
         var popupContent = $.node({ 'div': { children: image }});
 
-        if(Prefs.get('pref-enable-delay-popup'))
+        if(Prefs.get('pref-delay-popup'))
             Popup.showPopupDelay(aEvent, popupContent, "ImagePopup");
         else
             Popup.showPopup(aEvent, popupContent, "ImagePopup");
