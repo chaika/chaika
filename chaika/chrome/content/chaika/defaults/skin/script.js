@@ -852,8 +852,8 @@ var Popup = {
 
     mouseout: function(aEvent){
         var target = aEvent.originalTarget;
-        if(!(target instanceof HTMLElement)) return;
 
+        if(!(target instanceof HTMLElement)) return;
         if(target.className === "") return;
 
         if(target._popupTimeout){
@@ -870,16 +870,16 @@ var Popup = {
             return;
         }
 
-        try{
-            let className = 'popupInner';
-            if(aAddClassName){
-                className += ' ' + aAddClassName;
-            }
 
-            var popupInnerNode = $.node({ 'div': { 'class': className, children: aPopupContent }});
-        }catch(ex){}
+        let className = 'popupInner';
 
+        if(aAddClassName){
+            className += ' ' + aAddClassName;
+        }
+
+        var popupInnerNode = $.node({ 'div': { 'class': className, children: aPopupContent }});
         var popupNode = $.node({ 'div': { 'class': 'popup', 'id': 'popup-' + Date.now(), children: popupInnerNode }});
+
         document.body.appendChild(popupNode);
 
 
@@ -918,12 +918,14 @@ var Popup = {
             popupNode.dataset.parent = $.attrs(parent, 'id');
         }
 
-        //ポップアップからマウスが出た場合はそのポップアップを消去する
-        popupNode.addEventListener('mouseleave', this._fadeout, false);
 
         //ポップアップを出したけどそのポップアップに
         //乗らないでマウスアウトした時は, そのポップアップを消去する
-        aEvent.originalTarget.addEventListener('mouseleave', this._fadeout.bind(popupNode), false);
+        aEvent.originalTarget.dataset.popup = popupNode.id;
+        aEvent.originalTarget.addEventListener('mouseleave', this._fadeout, false);
+
+        //ポップアップからマウスが出た場合はそのポップアップを消去する
+        popupNode.addEventListener('mouseleave', this._fadeout, false);
     },
 
 
@@ -944,33 +946,50 @@ var Popup = {
             return;
         }
 
+        //消そうとしているポップアップ要素
+        let targetPopup = aEvent.originalTarget;
+
+        //ポップアップ元要素からポップアップを得る
+        if(!targetPopup.classList.contains('popup')){
+            if(aEvent.originalTarget.dataset.popup){
+                targetPopup = $.id(aEvent.originalTarget.dataset.popup);
+            }else{
+                return;
+            }
+        }
+
         //今マウスが乗っているポップアップ要素
         let hoveredPopup = $.parentByClass('popup', aEvent.relatedTarget, true);
 
 
         //自分自身が hovered の時は消さない
-        if(hoveredPopup && $.attrs(this, 'id') === $.attrs(hoveredPopup, 'id')){
+        if(hoveredPopup && targetPopup.id === hoveredPopup.id){
             return;
         }
 
         //親ポップアップ -> 子ポップアップへの遷移のときに親ポップアップを消さない
-        if(hoveredPopup && hoveredPopup.dataset.parent === $.attrs(this, 'id')){
+        if(hoveredPopup && hoveredPopup.dataset.parent === targetPopup.id){
+            return;
+        }
+
+        //親ポップアップ -> ポップアップ元要素への遷移の時に親ポップアップを消さない
+        if(targetPopup.id === aEvent.relatedTarget.dataset.popup){
             return;
         }
 
 
         //対象ポップアップを消去
-        Effects.fadeout(this, { remove: true });
+        Effects.fadeout(targetPopup, { remove: true });
 
         //消されたポップアップと現在マウスが乗っているポップアップ(またはその他の要素)
         //までの間にあるポップアップを消去する
-        let popup = this;
+        let popup = targetPopup;
 
         while(popup.dataset.parent){
             popup = $.id(popup.dataset.parent);
 
             //今マウスが乗っているところまできたら終了
-            if(hoveredPopup && $.attrs(popup, 'id') === $.attrs(hoveredPopup, 'id')){
+            if(hoveredPopup && popup.id === hoveredPopup.id){
                 break;
             }
 
