@@ -888,28 +888,33 @@ var Popup = {
         let baseRect = $.rect(aEvent.originalTarget);
         let popupRect = $.rect(popupNode);
 
-        let top = window.scrollY + baseRect.bottom;
+        let top = !invertDirection ? window.scrollY + baseRect.bottom - 2:
+                                     window.scrollY + baseRect.top - popupRect.height + 2;
         let left = window.scrollX + baseRect.left;
 
-        $.css(popupNode, {
-            top: (top-1) + 'px',
-            left: left + 'px'
-        });
 
-        //ウィンドウを突き出ないようにする補正
+        // ウィンドウを突き出ないようにする補正
+
         //右端
         if(left + popupRect.width > window.scrollX + window.innerWidth){
-            $.css(popupNode, {
-                left: (window.scrollX + window.innerWidth - popupRect.width) + 'px'
-            });
+            left = window.scrollX + window.innerWidth - popupRect.width;
         }
 
         //下端
         if(top + popupRect.height > window.scrollY + window.innerHeight){
-            $.css(popupNode, {
-                top: (window.scrollY + window.innerHeight - popupRect.height) + 'px'
-            });
+            top = window.scrollY + window.innerHeight - popupRect.height;
         }
+
+        //上端
+        if(top < window.scrollY){
+            top = window.scrollY;
+        }
+
+
+        $.css(popupNode, {
+            top: top + 'px',
+            left: left + 'px'
+        });
 
 
         //親ポップアップがある場合は記録する
@@ -1016,9 +1021,9 @@ Popup.Res = {
 
         Popup.Res._createContent(startRes, endRes).then((popupContent) => {
             if(Prefs.get('pref-delay-popup'))
-                Popup.showPopupDelay(aEvent, popupContent, "ResPopup");
+                Popup.showPopupDelay(aEvent, popupContent, "ResPopup", Prefs.get('pref-invert-res-popup-dir'));
             else
-                Popup.showPopup(aEvent, popupContent, "ResPopup");
+                Popup.showPopup(aEvent, popupContent, "ResPopup", Prefs.get('pref-invert-res-popup-dir'));
         }).catch((error) => { console.log(error); });
     },
 
