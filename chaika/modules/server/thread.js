@@ -1561,9 +1561,7 @@ ThreadConverter.prototype = {
             let ngData = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(aNGData.title || aNGData));
 
             //タグを置換する
-            return aRes.replace(/(?:\r|\n|\t)/g, "")
-                       .replace(/<!--.*?-->/g, "")
-                       .replace(/<PLAINNUMBER\/>/g, aNumber)
+            return aRes.replace(/<PLAINNUMBER\/>/g, aNumber)
                        .replace(/<NUMBER\/>/g, aNumber)
                        .replace(/<NAME\/>/g, aName)
                        .replace(/<MAIL\/>/g, aMail)
