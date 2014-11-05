@@ -869,31 +869,37 @@ var Popup = {
         let baseRect = $.rect(baseNode);
         let popupRect = $.rect(popupNode);
 
-        let top = !invertDirection ? window.scrollY + baseRect.bottom - 2:
-                                     window.scrollY + baseRect.top - popupRect.height + 2;
-        let left = window.scrollX + baseRect.left;
+        let scrollX = window.scrollX;
+        let scrollY = window.scrollY;
+        let innerWidth = window.innerWidth;
+        let innerHeight = window.innerHeight;
+
+        let top = scrollY + baseRect.bottom - 2;
+        let bottom = innerHeight - scrollY - baseRect.top - 2;
+        let left = scrollX + baseRect.left;
 
 
         // ウィンドウを突き出ないようにする補正
 
         //右端
-        if(left + popupRect.width > window.scrollX + window.innerWidth){
-            left = window.scrollX + window.innerWidth - popupRect.width;
+        if(left + popupRect.width > scrollX + innerWidth){
+            left = scrollX + innerWidth - popupRect.width;
         }
 
         //下端
-        if(top + popupRect.height > window.scrollY + window.innerHeight){
-            top = window.scrollY + window.innerHeight - popupRect.height;
+        if(top + popupRect.height > scrollY + innerHeight){
+            top = scrollY + innerHeight - popupRect.height;
         }
 
         //上端
-        if(top < window.scrollY){
-            top = window.scrollY;
+        if(innerHeight - (bottom + popupRect.height) < scrollY){
+            bottom = innerHeight - scrollY - popupRect.height;
         }
 
 
         $.css(popupNode, {
-            top: top + 'px',
+            top: !invertDirection ? top + 'px' : '',
+            bottom: invertDirection ? bottom + 'px' : '',
             left: left + 'px'
         });
     },
