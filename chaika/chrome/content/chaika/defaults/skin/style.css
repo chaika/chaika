@@ -294,7 +294,7 @@ body {
 /* ***** ***** ポップアップ ***** ***** */
 .popup {
     font-size: 0.8em;
-    padding: 8px;
+    padding: 5px;
     border-radius: 8px;
     box-shadow: #333 0 0 12px;
     background-color: rgba(60, 60, 60, 0.85);
@@ -317,7 +317,12 @@ body {
 
 /* レスポップアップ */
 .popupInner > .resContainer {
-    margin: 1px;
+    padding-left: 2.5em;
+    padding-right: 1em;
+}
+
+.popupInner .resBody{
+    padding-bottom: 5px;
 }
 
 .popupInner > .aaRes{
