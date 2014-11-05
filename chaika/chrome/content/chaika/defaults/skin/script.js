@@ -455,7 +455,7 @@ var ResInfo = {
 
             //逆参照
             if(enableRefCount){
-                let anchors = resNode.textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
+                let anchors = $.klass('resBody', resNode).textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
 
                 if(anchors){
                     anchors.forEach((anchor) => {
