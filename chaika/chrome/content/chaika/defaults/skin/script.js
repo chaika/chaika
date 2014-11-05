@@ -439,7 +439,7 @@ var ResInfo = {
         resNodes.forEach((resNode) => {
             // ID別発言数
             if(enablePostsCount){
-                let id = resNode.dataset.id;
+                let id = $.klass('resID', resNode).dataset.id;
 
                 if(id && !(id.startsWith('???'))){
                     if(!(id in idTable)){
