@@ -332,8 +332,11 @@ var Prefs = {
         'pref-include-self-post': false,
         'pref-disable-single-id-popup': false,
         'pref-delay-popup': false,
-        'pref-invert-res-popup-dir': false,
         'pref-enable-non-strict-image-detection': false,
+        'pref-invert-res-popup-dir': false,
+        'pref-invert-image-popup-dir': false,
+        'pref-invert-id-popup-dir': false,
+        'pref-invert-refres-popup-dir': false,
         'pref-max-posts-in-popup': 20,
 
         // ショートカットキー
