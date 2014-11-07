@@ -255,7 +255,7 @@ var $ = {
         let top = element.offsetTop;
 
         if(!ignoreHeader){
-            top -= $.rect($.id("pageTitle")).height;
+            top -= $.rect($.tag("header")[0]).height;
         }
 
         window.scrollTo(0, top - 30);
@@ -542,7 +542,7 @@ var ThreadCommand = {
      */
     _getCurrentRes: function(){
         let left = document.documentElement.clientWidth / 2;
-        let top = $.rect($.id("pageTitle")).bottom + 40;
+        let top = $.rect($.tag("header")[0]).bottom + 40;
         let res;
 
         while(!res){
