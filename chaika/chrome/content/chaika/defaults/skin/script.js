@@ -421,6 +421,25 @@ var Prefs = {
 };
 
 
+/**
+ * スレッドの情報を扱う
+ */
+var ThreadInfo = {
+
+    startup: function(){
+        let footer = $.tag('footer')[0];
+        let info = $.id('thread-info');
+
+        info.textContent = info.textContent.replace('%GETRESCOUNT%', footer.dataset.getres)
+                                           .replace('%NEWRESCOUNT%', footer.dataset.newres)
+                                           .replace('%ALLRESCOUNT%', footer.dataset.allres)
+                                           .replace('%SIZEKB%', footer.dataset.size);
+
+        info.dataset.populated = true;
+    }
+
+};
+
 
 /**
  * 全レスを走査しないと得られない情報を扱う
@@ -1314,6 +1333,7 @@ function delayInit(){
     ShortcutHandler.startup();
     AboneHandler.startup();
     Popup.startup();
+    ThreadInfo.startup();
     ResInfo.startup();
 }
 

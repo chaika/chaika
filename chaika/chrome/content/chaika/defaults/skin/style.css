@@ -95,6 +95,19 @@ header > h1{
     float: left;
 }
 
+#thread-info{
+    float: left;
+    margin-left: 1.5em;
+    padding: 2px 0;
+    font-size: 80%;
+    color: #ddd;
+    vertical-align: bottom;
+}
+
+#thread-info[data-populated="false"]{
+    display: none;
+}
+
 
 /* ナビゲーション */
 
