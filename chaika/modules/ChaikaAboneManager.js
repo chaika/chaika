@@ -168,6 +168,88 @@ AboneData.prototype = {
 };
 
 
+
+/**
+ * NGEx のあぼーんデータを表す.
+ */
+var NGExData = {
+    /**
+     * タイトル
+     * @type {String}
+     * @required
+     */
+    title: '',
+
+    /**
+     * あぼーんの対象
+     * @type {String}
+     * @note 'post' (レス), 'thread' (スレッド) の2通りのみが可
+     * @required
+     */
+    target: 'post',
+
+    /**
+     * マッチの方法
+     * @type {String}
+     * @note 'any' (いづれか), 'all' (全て) の2通りのみが可
+     * @required
+     */
+    match: 'all',
+
+    /**
+     * 連鎖あぼーんをするかどうか
+     * @type {Boolean|undefined}
+     * @note true: する, false: しない, undefined: デフォルトの設定に従う
+     */
+    chain: undefined,
+
+    /**
+     * 透明あぼーんをするかどうか
+     * @type {Boolean|undefined}
+     * @note true: する, false: しない, undefined: デフォルトの設定に従う
+     */
+    hide: undefined,
+
+    /**
+     * 有効期限
+     * @type {Number|undefined}
+     * @note UNIX時間を設定する. undefined の場合は期限なしを表す.
+     */
+    expire: undefined,
+
+    /**
+     * 自動NGIDをするかどうか
+     * @type {Boolean}
+     * @note true: する, false: しない
+     */
+    autoNGID: false,
+
+    /**
+     * あぼーんせずにハイライトするかどうか
+     * @type {Boolean}
+     * @note true: する, false: しない
+     */
+    highlight: false,
+
+
+    /**
+     * マッチする条件
+     * @type {Object} rule
+     *       {String} rule.target 条件の対象 'name', 'msg' など.
+     *                            詳細は abone-manager-ngex.xul の menulist.rule-target を参照.
+     *       {Boolean} rule.regexp 正規表現かどうか
+     *       {Boolean} rule.ignoreCase 大文字小文字を無視するかどうか
+     *       {String} rule.query NGワード
+     *       {String} rule.condition マッチの方法
+     *                               'contains': 含む, 'notContain': 含まない
+     *                               'equals': である(一致する), 'notEqual': でない(一致しない)
+     *                               'startsWith': で始まる, 'endsWith': で終わる
+     */
+    rules: [],
+};
+
+
+
 /**
  * あぼーんデータ (NGEx)
  */

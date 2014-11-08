@@ -68,10 +68,8 @@ var gAboneManager = {
         this.word = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_WORD);
         this.ex = new NGExAboneManagerView(ChaikaAboneManager.ABONE_TYPE_EX);
 
-
         Services.obs.addObserver(gAboneObserver, "chaika-abone-data-add", false);
         Services.obs.addObserver(gAboneObserver, "chaika-abone-data-remove", false);
-
 
         //右クリックあぼーんの時
         if('arguments' in window && window.arguments.length > 1 &&
@@ -82,6 +80,8 @@ var gAboneManager = {
 
             setTimeout(() => { this[ngType].populateData(ngData) }, 0);
         }
+
+        window.sizeToContent();
     },
 
 
@@ -212,16 +212,17 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
         value: function(aNGType){
             AboneManagerView.prototype._init.apply(this, arguments);
 
-            this._listbox.addEventListener('select', this, false);
-            this._tab.querySelector('.button-save').addEventListener('command', this, false);
+            this._editor = document.getElementById('ngex-editor');
 
-            this._info = this._tab.querySelector('#abone-ex-info');
-            this._view = new NGExView(this._info);
+            this._listbox.addEventListener('select', this, false);
+            this._tab.querySelector('.button-add').addEventListener('command', this, false);
+            this._tab.querySelector('.button-remove').addEventListener('command', this, false);
+            this._tab.querySelector('.button-save').addEventListener('command', this, false);
 
             if(this._listbox.getRowCount() > 0){
                 setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
             }else{
-                this._info.collapsed = true;
+                this._editor.collapsed = true;
             }
         }
     },
@@ -239,10 +240,10 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
                 this._listbox.appendItem(JSON.parse(aNGData).title, aNGData);
             });
 
-            if(this._listbox.getRowCount() === 0 && this._info){
-                //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
-                //NGデータ編集欄を非表示にしておく
-                this._info.collapsed = true;
+            //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
+            //NGデータ編集欄を非表示にしておく
+            if(this._listbox.getRowCount() === 0 && this._editor){
+                this._editor.collapsed = true;
             }
         }
     },
@@ -253,9 +254,9 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
             AboneManagerView.prototype.uninit.apply(this, arguments);
 
             this._listbox.removeEventListener('select', this, false);
+            this._tab.querySelector('.button-add').removeEventListener('command', this, false);
+            this._tab.querySelector('.button-remove').removeEventListener('command', this, false);
             this._tab.querySelector('.button-save').removeEventListener('command', this, false);
-
-            this._view.uninit();
         }
     },
 
@@ -308,8 +309,8 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
     populateData: {
         value: function(aData, inContext){
             if(inContext){
-                this._info.collapsed = false;
-                this._view.populateData(aData);
+                this._editor.collapsed = false;
+                this._editor.populateData(aData);
             }else{
                 //タブを選択
                 let tabbox = document.getElementById('aboneManagerTabBox');
@@ -328,7 +329,7 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
      */
     add: {
         value: function(dataToPopulate){
-            window.openDialog('chrome://chaika/content/settings/abone-manager-ngex.xul',
+            window.openDialog('chrome://chaika/content/settings/abone-manager-ngex-new.xul',
                               '', 'modal, resizable', dataToPopulate);
         }
     },
@@ -336,7 +337,7 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
 
     save: {
         value: function(){
-            ChaikaAboneManager.ex.change(this._listbox.selectedItem.value, this._view.getNgData());
+            ChaikaAboneManager.ex.change(this._listbox.selectedItem.value, this._editor.getNgData());
         }
     },
 
