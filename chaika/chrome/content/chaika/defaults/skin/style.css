@@ -394,6 +394,8 @@ nav > ul > li > ul > li > a:hover{
     right: 0;
     line-height: 1.8;
     padding: 1em;
+    max-height: 90%;
+    overflow: auto;
 }
 
 #settings:target{
