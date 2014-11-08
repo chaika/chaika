@@ -1230,8 +1230,8 @@ Popup.ID = {
         var target = aEvent.target;
         var resID = target.dataset.id;
 
-        //レス本文中のID: リンクの場合には、resID属性が存在しないため
-        //class名からIDを取得する
+        //レス本文中の ID: リンクの場合には data-id が存在しないため
+        //class 名から ID を取得する
         if(!resID && target.className.match(/mesID_([^\s]+)/)){
             resID = RegExp.$1;
         }
@@ -1243,8 +1243,8 @@ Popup.ID = {
         //同じIDを持つレスを取得する
         var selfNumber = $.parentByClass('resContainer', target).dataset.number;
         var selector = Prefs.get('pref-include-self-post') ?
-                ".resContainer[data-id*='" + resID + "']" :
-                ".resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
+                "body > .resContainer[data-id*='" + resID + "']" :
+                "body > .resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
         var sameIDPosts = $.selectorAll(selector);
 
 
