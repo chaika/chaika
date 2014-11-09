@@ -184,7 +184,8 @@
                     let condition = rule.querySelector('.rule-condition').selectedItem.label;
 
                     return target + 'が' + query + condition;
-                }).join(', ') + ' の' + match;
+                }).join(', ') +
+                ' の' + match;
             ]]></body>
         </method>
 

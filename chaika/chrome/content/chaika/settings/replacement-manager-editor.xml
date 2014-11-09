@@ -13,11 +13,12 @@
             <xul:hbox align="center" pack="start">
                 <xul:label value="ラベル:" />
                 <xul:textbox class="label" flex="1" />
-                <xul:checkbox label="自動" checked="true" anonid="auto-naming" class="auto-naming" />
+                <xul:checkbox label="自動" checked="true" class="auto-naming" />
             </xul:hbox>
 
             <xul:groupbox flex="1">
-                <xul:caption label="条件" tooltiptext="空欄にすると条件を未設定にできます" />
+                <xul:caption label="条件" />
+                <xul:checkbox label="置換する対象を以下の条件に限定する" class="enable-rules" />
                 <xul:vbox class="rule-editor" flex="1"
                           style="-moz-binding: url(chrome://chaika/content/settings/rule-editor.xml#editor)" />
             </xul:groupbox>
@@ -113,6 +114,7 @@
             this._ruleEditor = this._root.querySelector('.rule-editor');
 
             this.setAutoNaming(true);
+            this.setRulesEnabled(false);
         ]]></constructor>
 
 
@@ -125,9 +127,13 @@
             <body><![CDATA[
                 switch(aEvent.type){
                     case 'command':
-                        switch(aEvent.originalTarget.getAttribute('anonid')){
+                        switch(aEvent.originalTarget.className){
                             case 'auto-naming':
                                 this.toggleAutoNaming();
+                                break;
+
+                            case 'enable-rules':
+                                this.toggleRulesEnabled();
                                 break;
                         }
                         break;
@@ -165,6 +171,24 @@
             ]]></body>
         </method>
 
+        <method name="toggleRulesEnabled">
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.enable-rules');
+                this.setRulesEnabled(checkbox.checked);
+            ]]></body>
+        </method>
+
+        <method name="setRulesEnabled">
+            <parameter name="enable"/>
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.enable-rules');
+
+                checkbox.checked =
+                this._enableRules = enable;
+                this._ruleEditor.hidden = !enable;
+            ]]></body>
+        </method>
+
         <method name="setLabel">
             <body><![CDATA[
                 this._labelbox.value = this.getLabelText();
@@ -178,8 +202,10 @@
                 let target = this._root.querySelector('.target').selectedItem.label;
                 let searchText = this._root.querySelector('.search-text').value;
 
-                if(rulesText){
+                if(this._enableRules){
                     rulesText += 'に該当する ';
+                }else{
+                    rulesText = '';
                 }
 
                 return rulesText + target + ' 内の ' + searchText;
@@ -199,7 +225,7 @@
                 replaceData.global = this._root.querySelector('.global').checked;
                 replaceData.searchText = this._root.querySelector('.search-text').value;
                 replaceData.replaceText = this._root.querySelector('.replace-text').value;
-                replaceData.rules = ruleData.rules.filter((rule) => !!rule.query);
+                replaceData.rules = this._enableRules ? ruleData.rules : [];
 
                 return replaceData;
             ]]></body>
@@ -222,6 +248,10 @@
                 });
 
 
+                if(replaceData.rules.length < 1){
+                    this.setRulesEnabled(false);
+                }
+
                 //タイトルが設定されていないか、
                 //自動ネーミングと設定されているラベルが一致したら
                 //自動ネーミングが有効だと判断する
@@ -231,7 +261,6 @@
                     this.setAutoNaming(false);
                 }
 
-                //もし有効ならラベルをセットする
                 if(this._enableAutoNaming){
                     this.setLabel();
                 }
