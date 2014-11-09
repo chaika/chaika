@@ -12,7 +12,6 @@
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="startup()"
         onunload="shutdown()"
-        width="600" height="500"
         persist="screenX screenY width height">
 
     <vbox id="editor"></vbox>

@@ -15,7 +15,7 @@ function startup(){
             gEditor.populateData(window.arguments[0]);
     }
 
-    window.resizeTo(600, 500);
+    window.sizeToContent();
 }
 
 

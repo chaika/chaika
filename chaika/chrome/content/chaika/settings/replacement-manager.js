@@ -38,7 +38,7 @@ var gReplacementManager = {
 
         this._initList();
 
-        window.resizeTo(600, 500);
+        window.sizeToContent();
     },
 
 
