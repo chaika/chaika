@@ -58,7 +58,7 @@
 
                     <xul:tooltip id="special-replacement-patterns-desc" orient="vertical">
                         <xul:description value="置換文字列には以下の特殊な文字を指定することができます:" />
-                        <xul:vbox style="margin-left: 1.5em;">
+                        <xul:vbox>
                             <xul:hbox>
                                 <xul:description value="$$" class="dt" />
                                 <xul:description value=": $ そのものを表します." />
@@ -77,7 +77,7 @@
                             </xul:hbox>
                             <xul:hbox>
                                 <xul:description value="$n" class="dt" />
-                                <xul:description value=": n には自然数が入ります. n 番目のカッコでキャプチャされたサブマッチの文字列を表します. 正規表現の時のみ利用可能です." />
+                                <xul:description value=": n 番目にキャプチャされたサブマッチの文字列を表します. (正規表現のみ)" />
                             </xul:hbox>
                         </xul:vbox>
                     </xul:tooltip>
