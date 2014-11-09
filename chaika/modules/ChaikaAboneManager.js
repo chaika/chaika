@@ -234,16 +234,8 @@ var NGExData = {
 
     /**
      * マッチする条件
-     * @type {Object} rule
-     *       {String} rule.target 条件の対象 'name', 'msg' など.
-     *                            詳細は abone-manager-ngex.xul の menulist.rule-target を参照.
-     *       {Boolean} rule.regexp 正規表現かどうか
-     *       {Boolean} rule.ignoreCase 大文字小文字を無視するかどうか
-     *       {String} rule.query NGワード
-     *       {String} rule.condition マッチの方法
-     *                               'contains': 含む, 'notContain': 含まない
-     *                               'equals': である(一致する), 'notEqual': でない(一致しない)
-     *                               'startsWith': で始まる, 'endsWith': で終わる
+     * @type {Object} ruleData
+     * @see getRuleData in chrome://chaika/content/settings/rule-editor.xml#editor
      */
     rules: [],
 };
@@ -288,11 +280,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                     return false;
                 }
 
-                if(ngData.match === 'all')
-                    return ngData.rules.every((rule) => this._matchRule(rule, aResData));
-
-                else if(ngData.match === 'any')
-                    return ngData.rules.some((rule) => this._matchRule(rule, aResData));
+                return this._matchRule(ngData, aResData);
             });
         }
     },
@@ -300,6 +288,17 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
     _matchRule: {
         value: function(aRule, aResData){
+            if(aRule.match && aRule.rules){
+                switch(aRule.match){
+                    case 'all':
+                        return aRule.rules.every((rule) => this._matchRule(rule, aResData));
+
+                    case 'any':
+                        return aRule.rules.some((rule) => this._matchRule(rule, aResData));
+                }
+            }
+
+
             let target = aResData[aRule.target];
 
             if(typeof target !== 'string'){
