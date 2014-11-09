@@ -14,7 +14,7 @@
         onunload="shutdown()"
         persist="screenX screenY width height">
 
-    <vbox id="ngex-editor"></vbox>
+    <vbox id="ngex-editor" flex="1"></vbox>
 
     <script type="application/javascript; version=1.7"
             src="chrome://chaika/content/settings/abone-manager-ngex-new.js"/>

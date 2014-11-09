@@ -18,7 +18,7 @@
 
             <xul:groupbox flex="1">
                 <xul:caption label="条件" />
-                <xul:vbox class="rule-editor"
+                <xul:vbox class="rule-editor" flex="1"
                           style="-moz-binding: url(chrome://chaika/content/settings/rule-editor.xml#editor)" />
             </xul:groupbox>
 

@@ -69,7 +69,7 @@
                 <button label="削除" class="button-remove" />
             </hbox>
 
-            <vbox id="ngex-editor"></vbox>
+            <vbox id="ngex-editor" flex="1"></vbox>
         </tabpanel>
     </tabpanels>
 </tabbox>

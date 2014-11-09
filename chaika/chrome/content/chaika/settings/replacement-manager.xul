@@ -24,7 +24,7 @@
         <button label="削除" class="button-remove" />
     </hbox>
 
-    <vbox id="editor"></vbox>
+    <vbox id="editor" flex="1"></vbox>
 
     <script type="application/javascript; version=1.7"
             src="chrome://chaika/content/settings/replacement-manager.js"/>
