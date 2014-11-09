@@ -44,12 +44,3 @@ tab[selected="true"] {
 #ngex-editor{
     -moz-binding: url(chrome://chaika/content/settings/abone-manager-ngex-editor.xml#editor);
 }
-
-
-.template{
-    display: none;
-}
-
-.fixed-height{
-    overflow: auto;
-}

@@ -18,64 +18,8 @@
 
             <xul:groupbox flex="1">
                 <xul:caption label="条件" />
-
-                <xul:hbox align="center" pack="start">
-                    <xul:description value="次の" />
-
-                    <xul:menulist class="match">
-                        <xul:menupopup>
-                            <xul:menuitem label="すべて" value="all" />
-                            <xul:menuitem label="いずれか" value="any" />
-                        </xul:menupopup>
-                    </xul:menulist>
-
-                    <xul:description value="のルールに一致:" />
-                </xul:hbox>
-
-                <xul:vbox class="container rules" flex="1" />
-                <xul:vbox class="template">
-                    <xul:hbox align="center" pack="start">
-                        <xul:menulist class="rule-target">
-                            <xul:menupopup>
-                                <xul:menuitem label="名前" value="name" />
-                                <xul:menuitem label="メール" value="mail" />
-                                <xul:menuitem label="日付" value="date" />
-                                <xul:menuitem label="発信元" value="ip" />
-                                <xul:menuitem label="ホスト" value="host" />
-                                <xul:menuitem label="ID" value="id" />
-                                <xul:menuitem label="BeID" value="be" />
-                                <xul:menuitem label="Be基礎番号" value="baseBe" />
-                                <xul:menuitem label="本文" value="msg" />
-                                <xul:menuitem label="スレタイ" value="title" />
-                                <xul:menuitem label="板URL" value="board_url" />
-                                <xul:menuitem label="スレURL" value="thread_url" />
-                            </xul:menupopup>
-                        </xul:menulist>
-
-                        <xul:label value="が" />
-
-                        <xul:textbox class="rule-query" />
-
-                        <xul:menulist class="rule-condition">
-                            <xul:menupopup>
-                                <xul:menuitem label="を含む" value="contains" />
-                                <xul:menuitem label="を含まない" value="notContain" />
-                                <xul:menuitem label="と一致する" value="equals" />
-                                <xul:menuitem label="と一致しない" value="notEqual" />
-                                <xul:menuitem label="で始まる" value="startsWith" />
-                                <xul:menuitem label="で終わる" value="endsWith" />
-                            </xul:menupopup>
-                        </xul:menulist>
-
-                        <xul:checkbox label="正規表現" class="rule-regexp" />
-                        <xul:checkbox label="Aa" class="rule-case-sensitive" checked="true" />
-
-                        <xul:spacer flex="1" />
-
-                        <xul:button label="-" anonid="rule-button-remove" />
-                        <xul:button label="+" anonid="rule-button-add" />
-                    </xul:hbox>
-                </xul:vbox>
+                <xul:vbox class="rule-editor"
+                          style="-moz-binding: url(chrome://chaika/content/settings/rule-editor.xml#editor)" />
             </xul:groupbox>
 
             <xul:groupbox>
@@ -138,10 +82,9 @@
         <constructor><![CDATA[
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
 
-            this._root = document.getAnonymousElementByAttribute(this, "anonid", "root");
             this._labelbox = this._root.querySelector('.label');
+            this._ruleEditor = this._root.querySelector('.rule-editor');
 
-            this.insertRule();
             this.setAutoNaming(true);
 
             setTimeout(() => {
@@ -149,6 +92,10 @@
                 this._populateExpire(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
             }, 0);
         ]]></constructor>
+
+
+        <property name="_root"
+                  onget="return document.getAnonymousElementByAttribute(this, 'anonid', 'root')" />
 
 
         <method name="handleEvent">
@@ -159,14 +106,6 @@
                         switch(aEvent.originalTarget.getAttribute('anonid')){
                             case 'auto-naming':
                                 this.toggleAutoNaming();
-                                break;
-
-                            case 'rule-button-add':
-                                this.insertRule();
-                                break;
-
-                            case 'rule-button-remove':
-                                this.removeRule(aEvent);
                                 break;
                         }
                         break;
@@ -180,93 +119,6 @@
 
                 if(this._enableAutoNaming){
                     this.setLabel();
-                }
-            ]]></body>
-        </method>
-
-        <method name="adjustWindowSize">
-            <body><![CDATA[
-                let rules = this._root.querySelector('.rules');
-
-                //ディスプレイ高さの7.5割以上の高さになったら、
-                //そこでウィンドウサイズを大きくするのはやめて、
-                //かわりにルール表示部にスクロールバーを表示する
-                if(window.outerHeight > window.screen.availHeight * 0.75){
-                    window.resizeTo(window.outerWidth, window.screen.availHeight * 0.75);
-
-                    if(!rules.classList.contains('fixed-height')){
-                        rules.classList.add('fixed-height');
-                        rules.style.height = Math.floor(rules.clientHeight) + 'px';
-                    }
-                }
-
-
-                //ルール表示部の下部にまだ余裕がある場合には、
-                //ルール表示部の固定高さ表示を解除する
-                let lastRule = rules.querySelector('.rule:last-child');
-                let rulesBottomMargin = rules.getBoundingClientRect().bottom -
-                                        lastRule.getBoundingClientRect().bottom;
-
-                if(rulesBottomMargin > 0){
-                    rules.classList.remove('fixed-height');
-                    rules.style.height = 'auto';
-                }
-
-
-                //条件を削除するなどして content のサイズが小さくなった場合に
-                //ウィンドウ下部の空白部分が広がってしまう問題に対処する
-                let windowBottomMargin = document.documentElement.getBoundingClientRect().bottom -
-                                         this.getBoundingClientRect().bottom;
-
-                if(windowBottomMargin > 0){
-                    window.resizeBy(0, -windowBottomMargin);
-                }
-
-
-                //条件を追加したときにウィンドウサイズが広がらず、
-                //下部が見切れてしまう問題に対処する
-                //ウィンドウの再描画がうまく行われないことが原因？
-                window.resizeBy(0, 0);
-            ]]></body>
-        </method>
-
-        <method name="insertRule">
-            <parameter name=""/>
-            <body><![CDATA[
-                let template = this._root.querySelector('.template');
-                let newRule = template.cloneNode(true);
-
-                newRule.classList.remove('template');
-                newRule.classList.add('rule');
-
-                this._root.querySelector('.rules').appendChild(newRule);
-
-                this.adjustWindowSize();
-
-                return newRule;
-            ]]></body>
-        </method>
-
-        <method name="removeRule">
-            <parameter name="aEvent"/>
-            <body><![CDATA[
-                let rule = aEvent.originalTarget.parentNode.parentNode;
-                let rules = rule.parentNode;
-
-                if(rules.childNodes.length > 1){
-                    rule.parentNode.removeChild(rule);
-                }
-
-                this.adjustWindowSize();
-            ]]></body>
-        </method>
-
-        <method name="clearRules">
-            <body><![CDATA[
-                let rules = this._root.querySelector('.rules');
-
-                while(rules.childNodes.length > 0){
-                    rules.removeChild(rules.firstChild);
                 }
             ]]></body>
         </method>
@@ -298,24 +150,11 @@
         </method>
 
         <method name="getLabelText">
-            <parameter name=""/>
             <body><![CDATA[
-                let rules = this._root.querySelectorAll('.rule');
-
-                if(!rules.length) return '';
-
-                let rulesText = Array.slice(rules).map((rule) => {
-                    let target = rule.querySelector('.rule-target').selectedItem.label;
-                    let query = rule.querySelector('.rule-query').value;
-                    let condition = rule.querySelector('.rule-condition').selectedItem.label;
-
-                    return target + 'が' + query + condition;
-                });
-
-                let match = this._root.querySelector('.match').selectedItem.label;
+                let rulesText = this._ruleEditor.getLabelText();
                 let target = this._root.querySelector('.target').selectedItem.label;
 
-                return rulesText.join(', ') + ' の' + match + 'に一致する' + target;
+                return rulesText + 'に一致する' + target;
             ]]></body>
         </method>
 
@@ -337,9 +176,10 @@
 
 
                 let ngData = {};
+                let ruleData = this._ruleEditor.getRuleData();
 
                 ngData.title = this._labelbox.value;
-                ngData.match = this._root.querySelector('.match').value;
+                ngData.match = ruleData.match;
                 ngData.target = this._root.querySelector('.target').value;
                 ngData.autoNGID = this._root.querySelector('.autoNGID').checked;
                 ngData.highlight = this._root.querySelector('.highlight').checked;
@@ -356,18 +196,7 @@
                     ngData.expire = expire.getTime();
                 }
 
-                let rules = this._root.querySelectorAll('.rule');
-
-                ngData.rules = Array.slice(rules).map((rule) => {
-                    return {
-                        target: rule.querySelector('.rule-target').value,
-                        query: rule.querySelector('.rule-query').value,
-                        condition: rule.querySelector('.rule-condition').value,
-                        regexp: rule.querySelector('.rule-regexp').checked,
-                        ignoreCase: ! rule.querySelector('.rule-case-sensitive').checked
-                    };
-                });
-
+                ngData.rules = ruleData.rules;
 
                 return ngData;
             ]]></body>
@@ -377,7 +206,6 @@
             <parameter name="ngData"/>
             <body><![CDATA[
                 this._labelbox.value = ngData.title || '';
-                this._root.querySelector('.match').value = ngData.match;
                 this._root.querySelector('.target').value = ngData.target;
                 this._root.querySelector('.autoNGID').checked = !!ngData.autoNGID;
                 this._root.querySelector('.highlight').checked = !!ngData.highlight;
@@ -392,17 +220,9 @@
                 this._root.querySelector('.set-expire').checked = !!ngData.expire;
                 this._populateExpire(expire);
 
-
-                this.clearRules();
-
-                ngData.rules.forEach((rule) => {
-                    let node = this.insertRule();
-
-                    node.querySelector('.rule-target').value = rule.target;
-                    node.querySelector('.rule-query').value = rule.query;
-                    node.querySelector('.rule-condition').value = rule.condition;
-                    node.querySelector('.rule-regexp').checked = !!rule.regexp;
-                    node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
+                this._ruleEditor.populateData({
+                    match: ngData.match,
+                    rules: ngData.rules
                 });
 
 

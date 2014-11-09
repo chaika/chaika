@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<bindings id="chaikaRuleEditorBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="editor">
+    <content>
+        <xul:vbox flex="1" anonid="root">
+            <xul:hbox align="center" pack="start">
+                <xul:description value="次の" />
+
+                <xul:menulist class="match">
+                    <xul:menupopup>
+                        <xul:menuitem label="すべて" value="all" />
+                        <xul:menuitem label="いずれか" value="any" />
+                    </xul:menupopup>
+                </xul:menulist>
+
+                <xul:description value="のルールに一致:" />
+            </xul:hbox>
+
+            <xul:vbox class="container rules" flex="1" />
+
+            <xul:vbox class="template">
+                <xul:hbox align="center" pack="start">
+                    <xul:menulist class="rule-target">
+                        <xul:menupopup>
+                            <xul:menuitem label="名前" value="name" />
+                            <xul:menuitem label="メール" value="mail" />
+                            <xul:menuitem label="日付" value="date" />
+                            <xul:menuitem label="発信元" value="ip" />
+                            <xul:menuitem label="ホスト" value="host" />
+                            <xul:menuitem label="ID" value="id" />
+                            <xul:menuitem label="BeID" value="be" />
+                            <xul:menuitem label="Be基礎番号" value="baseBe" />
+                            <xul:menuitem label="本文" value="msg" />
+                            <xul:menuitem label="スレタイ" value="title" />
+                            <xul:menuitem label="板URL" value="board_url" />
+                            <xul:menuitem label="スレURL" value="thread_url" />
+                        </xul:menupopup>
+                    </xul:menulist>
+
+                    <xul:label value="が" />
+
+                    <xul:textbox class="rule-query" flex="1" size="10" />
+
+                    <xul:menulist class="rule-condition">
+                        <xul:menupopup>
+                            <xul:menuitem label="を含む" value="contains" />
+                            <xul:menuitem label="を含まない" value="notContain" />
+                            <xul:menuitem label="と一致する" value="equals" />
+                            <xul:menuitem label="と一致しない" value="notEqual" />
+                            <xul:menuitem label="で始まる" value="startsWith" />
+                            <xul:menuitem label="で終わる" value="endsWith" />
+                        </xul:menupopup>
+                    </xul:menulist>
+
+                    <xul:checkbox label="/a/"
+                                  tooltiptext="正規表現"
+                                  class="rule-regexp" />
+                    <xul:checkbox label="Aa"
+                                  tooltiptext="大文字小文字を区別する"
+                                  class="rule-case-sensitive"
+                                  checked="true" />
+
+                    <xul:button label="-" anonid="rule-button-remove" />
+                    <xul:button label="+" anonid="rule-button-add" />
+                </xul:hbox>
+            </xul:vbox>
+        </xul:vbox>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://chaika/skin/settings/rule-editor.css"/>
+    </resources>
+
+    <handlers>
+        <handler event="command" action="this.handleEvent(event)"/>
+        <handler event="change" action="this.handleEvent(event)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+            this.appendRule();
+        ]]></constructor>
+
+
+        <property name="_root"
+                  onget="return document.getAnonymousElementByAttribute(this, 'anonid', 'root')" />
+
+
+        <method name="handleEvent">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                switch(aEvent.type){
+                    case 'command':
+                        switch(aEvent.originalTarget.getAttribute('anonid')){
+                            case 'rule-button-add':
+                                this.appendRule();
+                                break;
+
+                            case 'rule-button-remove':
+                                this.removeRule(aEvent);
+                                break;
+                        }
+                        break;
+
+                    case 'change':
+                        break;
+
+                    default:
+                        return;
+                }
+            ]]></body>
+        </method>
+
+        <method name="adjustWindowSize">
+            <body><![CDATA[
+                let rules = this._root.querySelector('.rules');
+
+                //ディスプレイ高さの7.5割以上の高さになったら、
+                //そこでウィンドウサイズを大きくするのはやめて、
+                //かわりにルール表示部にスクロールバーを表示する
+                if(window.outerHeight > window.screen.availHeight * 0.75){
+                    window.resizeTo(window.outerWidth, window.screen.availHeight * 0.75);
+
+                    if(!rules.classList.contains('fixed-height')){
+                        rules.classList.add('fixed-height');
+                        rules.style.height = Math.floor(rules.clientHeight) + 'px';
+                    }
+                }
+
+
+                //ルール表示部の下部にまだ余裕がある場合には、
+                //ルール表示部の固定高さ表示を解除する
+                let lastRule = rules.querySelector('.rule:last-child');
+                let rulesBottomMargin = rules.getBoundingClientRect().bottom -
+                                        lastRule.getBoundingClientRect().bottom;
+
+                if(rulesBottomMargin > 0){
+                    rules.classList.remove('fixed-height');
+                    rules.style.height = 'auto';
+                }
+
+
+                //条件を削除するなどして content のサイズが小さくなった場合に
+                //ウィンドウ下部の空白部分が広がってしまう問題に対処する
+                let windowBottomMargin = document.documentElement.getBoundingClientRect().bottom -
+                                         this.getBoundingClientRect().bottom;
+
+                if(windowBottomMargin > 0){
+                    window.resizeBy(0, -windowBottomMargin);
+                }
+
+
+                //条件を追加したときにウィンドウサイズが広がらず、
+                //下部が見切れてしまう問題に対処する
+                //ウィンドウの再描画がうまく行われないことが原因？
+                window.resizeBy(0, 0);
+            ]]></body>
+        </method>
+
+        <method name="appendRule">
+            <body><![CDATA[
+                let template = this._root.querySelector('.template');
+                let newRule = template.cloneNode(true);
+
+                newRule.classList.remove('template');
+                newRule.classList.add('rule');
+
+                this._root.querySelector('.rules').appendChild(newRule);
+
+                this.adjustWindowSize();
+
+                return newRule;
+            ]]></body>
+        </method>
+
+        <method name="removeRule">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                let rule = aEvent.originalTarget.parentNode.parentNode;
+                let rules = rule.parentNode;
+
+                if(rules.childNodes.length > 1){
+                    rule.parentNode.removeChild(rule);
+                }
+
+                this.adjustWindowSize();
+            ]]></body>
+        </method>
+
+        <method name="clearAll">
+            <body><![CDATA[
+                let rules = this._root.querySelector('.rules');
+
+                while(rules.childNodes.length > 0){
+                    rules.removeChild(rules.firstChild);
+                }
+            ]]></body>
+        </method>
+
+        <method name="getLabelText">
+            <body><![CDATA[
+                let rules = this._root.querySelectorAll('.rule');
+
+                if(!rules.length) return '';
+
+
+                let match = this._root.querySelector('.match').selectedItem.label;
+
+                return Array.slice(rules).map((rule) => {
+                    let target = rule.querySelector('.rule-target').selectedItem.label;
+                    let query = rule.querySelector('.rule-query').value;
+                    let condition = rule.querySelector('.rule-condition').selectedItem.label;
+
+                    return target + 'が' + query + condition;
+                }).join(', ') + ' の' + match;
+            ]]></body>
+        </method>
+
+        <method name="getRuleData">
+            <body><![CDATA[
+                let ruleData = {};
+                let match = this._root.querySelector('.match').value;
+                let rules = this._root.querySelectorAll('.rule');
+
+                ruleData.match = match;
+
+                ruleData.rules = Array.slice(rules).map((rule) => {
+                    return {
+                        target: rule.querySelector('.rule-target').value,
+                        query: rule.querySelector('.rule-query').value,
+                        condition: rule.querySelector('.rule-condition').value,
+                        regexp: rule.querySelector('.rule-regexp').checked,
+                        ignoreCase: ! rule.querySelector('.rule-case-sensitive').checked
+                    };
+                });
+
+                return ruleData;
+            ]]></body>
+        </method>
+
+        <method name="populateData">
+            <parameter name="ruleData" />
+            <body><![CDATA[
+                this._root.querySelector('.match').value = ruleData.match;
+
+                this.clearAll();
+
+                ruleData.rules.forEach((rule) => {
+                    let node = this.appendRule();
+
+                    node.querySelector('.rule-target').value = rule.target;
+                    node.querySelector('.rule-query').value = rule.query;
+                    node.querySelector('.rule-condition').value = rule.condition;
+                    node.querySelector('.rule-regexp').checked = !!rule.regexp;
+                    node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
+                });
+
+                if(ruleData.rules.length < 1){
+                    this.appendRule();
+                }
+            ]]></body>
+        </method>
+
+    </implementation>
+</binding>
+
+</bindings>
