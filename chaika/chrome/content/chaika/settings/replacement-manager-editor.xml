@@ -248,18 +248,12 @@
                 });
 
 
-                if(replaceData.rules.length < 1){
-                    this.setRulesEnabled(false);
-                }
+                this.setRulesEnabled(replaceData.rules.length > 0);
 
                 //タイトルが設定されていないか、
                 //自動ネーミングと設定されているラベルが一致したら
                 //自動ネーミングが有効だと判断する
-                if(!replaceData.title || replaceData.title === this.getLabelText()){
-                    this.setAutoNaming(true);
-                }else{
-                    this.setAutoNaming(false);
-                }
+                this.setAutoNaming(!replaceData.title || replaceData.title === this.getLabelText());
 
                 if(this._enableAutoNaming){
                     this.setLabel();
