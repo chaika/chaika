@@ -48,12 +48,27 @@
                 </xul:hbox>
 
                 <xul:vbox>
-                    <xul:label value="検索文字列" />
+                    <xul:hbox align="center" pack="start">
+                        <xul:label value="検索文字列" />
+                        <xul:checkbox class="regexp"
+                                      label="/a/"
+                                      tooltiptext="正規表現" />
+                        <xul:checkbox class="case-sensitive"
+                                      label="Aa"
+                                      tooltiptext="大文字小文字を区別する"
+                                      checked="true" />
+                    </xul:hbox>
                     <xul:textbox class="search-text" multiline="true" flex="1" />
                 </xul:vbox>
 
                 <xul:vbox>
-                    <xul:label value="置換文字列" tooltip="special-replacement-patterns-desc" />
+                    <xul:hbox align="center" pack="start">
+                        <xul:label value="置換文字列" tooltip="special-replacement-patterns-desc" />
+                        <xul:checkbox class="global"
+                                      label="全て置換する"
+                                      checked="true"
+                                      tooltiptext="OFF にすると初めに一致した文字列のみを置換します." />
+                    </xul:hbox>
                     <xul:textbox class="replace-text" multiline="true" flex="1" tooltip="special-replacement-patterns-desc" />
 
                     <xul:tooltip id="special-replacement-patterns-desc" orient="vertical">
@@ -81,17 +96,6 @@
                             </xul:hbox>
                         </xul:vbox>
                     </xul:tooltip>
-                </xul:vbox>
-            </xul:groupbox>
-
-            <xul:groupbox>
-                <xul:caption label="オプション" />
-
-                <xul:vbox>
-                    <xul:checkbox class="regexp" label="正規表現" />
-                    <xul:checkbox class="case-sensitive" label="大文字小文字を区別する" checked="true" />
-                    <xul:checkbox class="global" label="全て置換する" checked="true"
-                                  tooltiptext="OFF にすると初めに一致した文字列のみを置換します." />
                 </xul:vbox>
             </xul:groupbox>
         </xul:vbox>
