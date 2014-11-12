@@ -488,7 +488,7 @@ var ResInfo = {
                     anchors.forEach((anchor) => {
                         let [begin, end] = anchor.split('-');
 
-                        begin = begin.substring(2) - 0;
+                        begin = begin - 0;
                         end = end ? end - 0 : begin;
 
                         if(begin < 1) begin = 1;
@@ -1058,7 +1058,7 @@ Popup.Res = {
             let [begin, end] = anchor.split('-');
             if(!end) end = begin;
 
-            return this._createContent(begin, end);
+            return this._createContent(begin-0, end-0);
         })).then((popupContents) => {
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
