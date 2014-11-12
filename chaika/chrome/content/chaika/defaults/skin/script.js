@@ -482,15 +482,15 @@ var ResInfo = {
 
                 if(anchors){
                     anchors.forEach((anchor) => {
-                        let [startRes, endRes] = anchor.split('-');
+                        let [begin, end] = anchor.split('-');
 
-                        startRes = startRes.substring(2) - 0;
-                        endRes = endRes ? endRes - 0 : startRes;
+                        begin = begin.substring(2) - 0;
+                        end = end ? end - 0 : begin;
 
-                        if(startRes < 1) startRes = 1;
-                        if(endRes > 1001) endRes = 1001;
+                        if(begin < 1) begin = 1;
+                        if(end > 1001) end = 1001;
 
-                        for(let i = startRes; i <= endRes; i++){
+                        for(let i = begin; i <= end; i++){
                             let refNode = $.id('res' + i);
 
                             //範囲外レスはスキップ
@@ -1074,31 +1074,31 @@ Popup.Res = {
 
     /**
      * ポップアップの内容を作成する
-     * @param {Number} aStart アンカの開始番号
+     * @param {Number} aBegin アンカの開始番号
      * @param {Number} aEnd アンカの終了番号
      */
-    _createContent: function(aStart, aEnd){
+    _createContent: function(aBegin, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
         //降順アンカ補正
-        if(aStart > aEnd) [aEnd, aStart] = [aStart, aEnd];
+        if(aBegin > aEnd) [aEnd, aBegin] = [aBegin, aEnd];
 
         //枠外補正
-        if(aStart < 1) aStart = 1;
+        if(aBegin < 1) aBegin = 1;
         if(aEnd > 1001) aEnd = 1001;
 
         //POPUP_LIMIT より多い時は省略する
-        let tmpStart = aStart;
+        let tmpStart = aBegin;
         let omitRes = 0;
-        if(POPUP_LIMIT && (aEnd - aStart) > POPUP_LIMIT){
-            aStart = aEnd - POPUP_LIMIT;
-            omitRes = aStart - tmpStart;
+        if(POPUP_LIMIT && (aEnd - aBegin) > POPUP_LIMIT){
+            aBegin = aEnd - POPUP_LIMIT;
+            omitRes = aBegin - tmpStart;
         }
 
         var resNodes = document.createDocumentFragment();
 
         var promise = new Promise((resolve, reject) => {
-            this._fetchResNodes(aStart, aEnd).then(
+            this._fetchResNodes(aBegin, aEnd).then(
                 (posts) => {
                     resNodes.appendChild(posts);
 
@@ -1115,7 +1115,7 @@ Popup.Res = {
 
                     resNodes.appendChild(
                         $.node({ 'p': {
-                            text: '>>' + aStart + '-' + failedRangeEnd + ' の取得中にエラーが発生しました'
+                            text: '>>' + aBegin + '-' + failedRangeEnd + ' の取得中にエラーが発生しました'
                         }})
                     );
 
@@ -1134,14 +1134,19 @@ Popup.Res = {
     },
 
 
-    _fetchResNodes: function(aStart, aEnd){
+    /**
+     * レスの内容を取得する
+     * @param {Number} aBegin アンカの開始番号
+     * @param {Number} aEnd アンカの終了番号
+     */
+    _fetchResNodes: function(aBegin, aEnd){
         var promise = new Promise((resolve, reject) => {
             let resNodes = document.createDocumentFragment();
 
             //表示域内にある場合はそこから取ってくる
             //通常, 表示域外にある可能性が高いのは, アンカ範囲のうち先頭部分であるから,
             //後ろから順に取得していくことにする
-            for(var i = aEnd; i >= aStart; i--){
+            for(var i = aEnd; i >= aBegin; i--){
                 let resNode = $.id('res' + i);
                 if(!resNode) break;
 
@@ -1151,7 +1156,7 @@ Popup.Res = {
             }
 
             //すべて域内だった場合はこれで終了
-            if(i < aStart){
+            if(i < aBegin){
                 return resolve(resNodes);
             }else{
                 aEnd = i;
@@ -1164,7 +1169,7 @@ Popup.Res = {
             req.addEventListener('load', (event) => {
 
                 if(req.status !== 200 || !req.responseText){
-                    console.error('Fail in getting >>' + aStart + '-' + aEnd, 'status:', req.status);
+                    console.error('Fail in getting >>' + aBegin + '-' + aEnd, 'status:', req.status);
                     return reject([resNodes, aEnd]);
                 }
 
@@ -1193,7 +1198,7 @@ Popup.Res = {
                 return resolve(resNodes);
             }, false);
 
-            req.open('GET', SERVER_URL + EXACT_URL + aStart + "-" + aEnd + "n", true);
+            req.open('GET', SERVER_URL + EXACT_URL + aBegin + "-" + aEnd + "n", true);
             req.overrideMimeType('text/html; charset=Shift_JIS');
             req.send(null);
         });
