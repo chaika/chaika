@@ -1047,31 +1047,41 @@ var Popup = {
 Popup.Res = {
 
     mouseover: function(aEvent){
-        var target = aEvent.target;
-        var startRes = 0;
-        var endRes = 0;
+        let target = aEvent.target;
+        let anchors = target.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g);
 
-        if(target.textContent.match(/>>?(\d{1,4})-(\d{1,4})/)){
-            startRes = parseInt(RegExp.$1);
-            endRes = parseInt(RegExp.$2);
-        }else if(target.textContent.match(/>>?(\d{1,4})/)){
-            startRes = parseInt(RegExp.$1);
-        }
+        Promise.all(anchors.map((anchor) => {
+            let [begin, end] = anchor.split('-');
+            if(!end) end = begin;
 
-        Popup.Res._createContent(startRes, endRes).then((popupContent) => {
-            if(Prefs.get('pref-delay-popup'))
-                Popup.showPopupDelay(aEvent, popupContent, "ResPopup", Prefs.get('pref-invert-res-popup-dir'));
-            else
-                Popup.showPopup(aEvent, popupContent, "ResPopup", Prefs.get('pref-invert-res-popup-dir'));
-        }).catch((error) => { console.log(error); });
+            return this._createContent(begin, end);
+        })).then((popupContents) => {
+            console.log(popupContents);
+
+            let fragment = document.createDocumentFragment();
+            let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
+
+            popupContents.forEach((content) => fragment.appendChild(content));
+
+            if(Prefs.get('pref-delay-popup')){
+                Popup.showPopupDelay(aEvent, fragment, "ResPopup", shouldInvert);
+            }else{
+                Popup.showPopup(aEvent, fragment, "ResPopup", shouldInvert);
+            }
+        });
     },
 
 
+    /**
+     * ポップアップの内容を作成する
+     * @param {Number} aStart アンカの開始番号
+     * @param {Number} aEnd アンカの終了番号
+     */
     _createContent: function(aStart, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
-        //単独ポップアップ
-        if(aStart > aEnd) aEnd = aStart;
+        //降順アンカ補正
+        if(aStart > aEnd) [aEnd, aStart] = [aStart, aEnd];
 
         //枠外補正
         if(aStart < 1) aStart = 1;
