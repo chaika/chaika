@@ -478,9 +478,13 @@ var ResInfo = {
 
             //逆参照
             if(enableRefCount){
-                let anchors = $.klass('resBody', resNode).textContent.match(/>>?\d{1,4}(?:-\d{1,4})?/g);
+                let anchors = $.klass('resPointer', resNode, true);
 
-                if(anchors){
+                if(anchors && anchors.length > 0){
+                    anchors = anchors.reduce((ary, node) => {
+                        return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
+                    }, []);
+
                     anchors.forEach((anchor) => {
                         let [begin, end] = anchor.split('-');
 
@@ -1056,8 +1060,6 @@ Popup.Res = {
 
             return this._createContent(begin, end);
         })).then((popupContents) => {
-            console.log(popupContents);
-
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
 
