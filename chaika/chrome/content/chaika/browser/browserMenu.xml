@@ -28,7 +28,9 @@
                     <xul:menuitem label="タイトル" anonid="copy-title" />
                     <xul:menuitem label="URL" anonid="copy-url" />
                     <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
-                    <xul:menuitem label="タイトルと URL と選択部分" anonid="copy-title-url-selection" class="chaika-shown-when-text-selected" />
+                    <xul:menuitem label="タイトルと URL と選択部分"
+                                  anonid="copy-title-url-selection"
+                                  class="chaika-shown-when-text-selected" />
                 </xul:menupopup>
             </xul:menu>
 
@@ -67,15 +69,19 @@
             <xul:menuseparator anonid="open-link-in-sep" class="chaika-shown-on-bbs-link" />
 
             <xul:menuitem label="すべてのレスを表示" anonid="change-limit-all" class="chaika-shown-on-thread" />
-            <xul:menuitem label="新着50件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
+            <xul:menuitem label="新着 50 件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
             <xul:menuitem label="スレッド一覧を開く" anonid="go-to-board" class="chaika-shown-on-thread" />
             <xul:menuitem label="次のスレッドを検索する" anonid="find-next-thread" class="chaika-shown-on-thread" />
 
             <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
+            <xul:menuitem label="選択部分を AA として登録する"
+                          anonid="register-selection-as-aa"
+                          class="chaika-shown-when-text-selected" />
 
-            <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
+            <xul:menuitem label="置換マネージャ..." anonid="open-replacement-manager" />
+
+            <xul:menuseparator anonid="extra-utils-sep" />
 
             <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
                 <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
@@ -452,6 +458,10 @@
 
                     case "register-selection-as-aa":
                         this.registerAsAA(selectedText);
+                        break;
+
+                    case 'open-replacement-manager':
+                        this.openReplacementManager();
                         break;
 
                     case "open-settings":
@@ -913,6 +923,19 @@
             <body><![CDATA[
                 window.openDialog("chrome://chaika/content/settings/aa-manager.xul",
                                   "_blank", "chrome, resizable, minimazable, toolbar", aaStr);
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 置換マネージャを開く
+         */
+        -->
+        <method name="openReplacementManager">
+            <body><![CDATA[
+                window.openDialog("chrome://chaika/content/settings/replacement-manager.xul",
+                                  "_blank", "chrome, resizable, minimazable, toolbar");
             ]]></body>
         </method>
 
