@@ -13,7 +13,7 @@
             <xul:hbox align="center" pack="start">
                 <xul:label value="ラベル:" />
                 <xul:textbox class="label" flex="1" />
-                <xul:checkbox label="自動" checked="true" anonid="auto-naming" class="auto-naming" />
+                <xul:checkbox label="自動" checked="true" class="auto-naming" />
             </xul:hbox>
 
             <xul:groupbox flex="1">
@@ -61,6 +61,17 @@
                     <xul:checkbox label="有効期限をつける: " class="set-expire" />
                     <xul:datepicker class="expire-date" type="popup" />
                     <xul:timepicker class="expire-time" hideseconds="true" />
+                    <xul:button label="プリセット" type="menu" class="expire-preset">
+                        <xul:menupopup>
+                            <xul:menuitem label="1 時間後" value="3600000" />
+                            <xul:menuitem label="3 時間後" value="10800000" />
+                            <xul:menuitem label="12 時間後" value="43200000" />
+                            <xul:menuitem label="今日いっぱい" value="today" />
+                            <xul:menuitem label="明日いっぱい" value="tomorrow" />
+                            <xul:menuitem label="1 週間後" value="1week" />
+                            <xul:menuitem label="1 ヶ月後" value="1month" />
+                        </xul:menupopup>
+                    </xul:button>
                 </xul:hbox>
 
                 <xul:checkbox label="ヒットしたレスのIDを自動的にNGIDに追加する" class="autoNGID" />
@@ -88,8 +99,7 @@
             this.setAutoNaming(true);
 
             setTimeout(() => {
-                let now = new Date();
-                this._populateExpire(new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1));
+                this._setExpirePreset('today');
             }, 0);
         ]]></constructor>
 
@@ -101,12 +111,20 @@
         <method name="handleEvent">
             <parameter name="aEvent"/>
             <body><![CDATA[
+                let target = aEvent.originalTarget;
+
                 switch(aEvent.type){
                     case 'command':
-                        switch(aEvent.originalTarget.getAttribute('anonid')){
+                        switch(target.getAttribute('class')){
                             case 'auto-naming':
                                 this.toggleAutoNaming();
                                 break;
+
+                            default:
+                                if(target.matches && target.matches('.expire-preset menuitem') ||
+                                   target.mozMatchesSelector && target.mozMatchesSelector('.expire-preset menuitem')){
+                                        this._setExpirePreset(target.value);
+                                }
                         }
                         break;
 
@@ -213,12 +231,13 @@
                 this._root.querySelector('.hide-abone').value = ngData.hide + '';
                 this._root.querySelector('.chain-abone').value = ngData.chain + '';
 
-                let now = new Date();
-                let expire = ngData.expire ? new Date(ngData.expire) :
-                                             new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-
                 this._root.querySelector('.set-expire').checked = !!ngData.expire;
-                this._populateExpire(expire);
+
+                if(ngData.expire){
+                    this._populateExpire(expire);
+                }else{
+                    this._setExpirePreset('today');
+                }
 
                 this._ruleEditor.populateData({
                     match: ngData.match,
@@ -234,6 +253,43 @@
                 //もし有効ならラベルをセットする
                 if(this._enableAutoNaming){
                     this.setLabel();
+                }
+            ]]></body>
+        </method>
+
+        <method name="_setExpirePreset">
+            <parameter name="relativeExpire" />
+            <body><![CDATA[
+                this._root.querySelector('.set-expire').checked = true;
+
+                if(Number.isInteger(relativeExpire - 0)){
+                    let expire = Date.now() + (relativeExpire - 0);
+                    this._populateExpire(new Date(expire));
+                }else{
+                    let now = new Date();
+                    let expire;
+
+                    switch(relativeExpire){
+                        case 'today':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                            break;
+
+                        case 'tomorrow':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2);
+                            break;
+
+                        case '1week':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
+                            break;
+
+                        case '1month':
+                            expire = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                            break;
+                    }
+
+                    if(expire){
+                        this._populateExpire(expire);
+                    }
                 }
             ]]></body>
         </method>
