@@ -42,22 +42,6 @@ Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-var gAboneObserver = {
-    observe: function(aSubject, aTopic, aData){
-        let aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
-
-        switch(aTopic){
-            case "chaika-abone-data-add":
-            case "chaika-abone-data-remove":
-                gAboneManager[aboneType].update(aData);
-                break;
-
-            default:
-                return;
-        }
-    }
-};
-
 
 var gAboneManager = {
 
@@ -68,9 +52,10 @@ var gAboneManager = {
         this.word = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_WORD);
         this.ex = new NGExAboneManagerView(ChaikaAboneManager.ABONE_TYPE_EX);
 
+        this._messageManager = ChaikaCore.browser.getGlobalMessageManager();
 
-        Services.obs.addObserver(gAboneObserver, "chaika-abone-data-add", false);
-        Services.obs.addObserver(gAboneObserver, "chaika-abone-data-remove", false);
+        this._messageManager.addMessageListener('chaika-abone-add', this.listener);
+        this._messageManager.addMessageListener('chaika-abone-remove', this.listener);
 
 
         //右クリックあぼーんの時
@@ -92,9 +77,14 @@ var gAboneManager = {
         this.word.uninit();
         this.ex.uninit();
 
-        Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-add", false);
-        Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-remove", false);
+        this._messageManager.removeMessageListener('chaika-abone-add', this.listener);
+        this._messageManager.removeMessageListener('chaika-abone-remove', this.listener);
     },
+
+
+    listener: function(message){
+        gAboneManager[message.data.type].update(message.data.data);
+    }
 
 }
 

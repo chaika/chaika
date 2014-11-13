@@ -18,7 +18,6 @@ var ChaikaBrowserOverlay = {
             ChaikaBrowserOverlay.browserMenu.start();
             ChaikaBrowserOverlay.contextMenu.start();
             ChaikaBrowserOverlay.toolbarButton.start();
-            ChaikaBrowserOverlay.aboneEvent.start();
 
             gBrowser.addProgressListener(ChaikaBrowserOverlay.webProgress);
 
@@ -34,7 +33,6 @@ var ChaikaBrowserOverlay = {
     stop: function(){
         ChaikaBrowserOverlay.browserMenu.stop();
         ChaikaBrowserOverlay.contextMenu.stop();
-        ChaikaBrowserOverlay.aboneEvent.stop();
 
         gBrowser.removeProgressListener(ChaikaBrowserOverlay.webProgress);
     },
@@ -299,100 +297,6 @@ ChaikaBrowserOverlay.toolbarButton = {
         this._toolbarbutton.hidden = aLocation.spec !== 'about:customizing' &&
                                      !ChaikaBrowserOverlay.browserMenu._isBBS(aLocation.spec);
     }
-};
-
-
-ChaikaBrowserOverlay.aboneEvent = {
-
-    start: function(){
-        Services.obs.addObserver(this, "chaika-abone-data-add", false);
-        Services.obs.addObserver(this, "chaika-abone-data-remove", false);
-    },
-
-
-    stop: function(){
-        Services.obs.removeObserver(this, "chaika-abone-data-add", false);
-        Services.obs.removeObserver(this, "chaika-abone-data-remove", false);
-    },
-
-
-    observe: function(aSubject, aTopic, aData){
-        let aboneType,
-            legacyAboneType,  // b2r/chaika 1.6.3互換のあぼーんタイプ値
-            eventType;
-
-        switch(aTopic){
-            case "chaika-abone-data-add":
-                aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
-                eventType = 'chaika-abone-add';
-                break;
-
-            case 'chaika-abone-data-remove':
-                aboneType = aSubject.QueryInterface(Ci.nsISupportsString).data;
-                eventType = 'chaika-abone-remove';
-                break;
-
-            default:
-                return;
-        }
-
-
-        switch(aboneType){
-            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_NAME:
-                legacyAboneType = 0;
-                break;
-
-            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_MAIL:
-                legacyAboneType = 1;
-                break;
-
-            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_TYPE_ID:
-                legacyAboneType = 2;
-                break;
-
-            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_WORD:
-                legacyAboneType = 3;
-                break;
-
-            case ChaikaBrowserOverlay.ChaikaAboneManager.ABONE_EX:
-                legacyAboneType = 99;  //Chaika Abone Helper 互換
-                break;
-        }
-
-
-        //各タブに対して通知する
-        for(let i = 0, iz = gBrowser.mPanelContainer.childNodes.length; i < iz; i++){
-            let tabBrowser = gBrowser.getBrowserAtIndex(i);
-            let tabURI = tabBrowser.currentURI;
-
-            if(ChaikaBrowserOverlay.browserMenu._isChaika(tabURI)){
-                let win = tabBrowser.contentWindow;
-                let doc = tabBrowser.contentDocument;
-
-                let sourceEvent = doc.createEvent("CustomEvent");
-                sourceEvent.initCustomEvent(aboneType, false, false, aData);
-
-                let event = doc.createEvent('XULCommandEvents');
-                event.initCommandEvent(eventType, true, false, win, null,
-                                        false, false, false, false, sourceEvent);
-
-                doc.dispatchEvent(event);
-
-                //chaika-abone-add については b2r/chaika 1.6.3 互換のイベントも発行する
-                if(eventType === 'chaika-abone-add'){
-                    let legacySourceEvent = doc.createEvent('Events');
-                    legacySourceEvent.initEvent(aData, false, false);
-
-                    let legacyEvent = doc.createEvent('XULCommandEvents');
-                    legacyEvent.initCommandEvent('b2raboneadd', true, false, win, legacyAboneType,
-                                                 false, false, false, false, legacySourceEvent);
-
-                    doc.dispatchEvent(event);
-                }
-            }
-        }
-    }
-
 };
 
 

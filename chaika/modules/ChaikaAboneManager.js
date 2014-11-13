@@ -145,10 +145,12 @@ AboneData.prototype = {
         this._data.push(aWord);
 
         //通知する
-        let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-        type.data = this._ngType;
-
-        Services.obs.notifyObservers(type, "chaika-abone-data-add", aWord);
+        ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            'chaika-abone-add', {
+                type: this._ngType,
+                data: aWord
+            }
+        );
     },
 
     remove: function(aWord){
@@ -158,10 +160,12 @@ AboneData.prototype = {
             this._data.splice(index, 1);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-remove", aWord);
+            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-remove', {
+                    type: this._ngType,
+                    data: aWord
+                }
+            );
         }
     },
 
@@ -297,10 +301,12 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj.push(aNGData);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonData);
+            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-add', {
+                    type: this._ngType,
+                    data: jsonData
+                }
+            );
         }
     },
 
@@ -318,10 +324,12 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                 this._dataObj.splice(index, 1);
 
                 //通知する
-                let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-                type.data = this._ngType;
-
-                Services.obs.notifyObservers(type, "chaika-abone-data-remove", aNGData);
+                ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                    'chaika-abone-remove', {
+                        type: this._ngType,
+                        data: aNGData
+                    }
+                );
             }
         }
     },
@@ -355,12 +363,19 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj[index] = newData;
 
 
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
+            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-remove', {
+                    type: this._ngType,
+                    data: oldData
+                }
+            );
 
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-remove", oldData);
-            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonNewData);
+            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-add', {
+                    type: this._ngType,
+                    data: jsonNewData
+                }
+            );
         }
     },
 
