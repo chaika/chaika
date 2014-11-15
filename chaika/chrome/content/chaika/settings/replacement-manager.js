@@ -32,9 +32,7 @@ var gReplacementManager = {
         this._listbox = document.getElementById('rulelist');
 
         this._listbox.addEventListener('select', this);
-        document.querySelector('.button-add').addEventListener('command', this);
-        document.querySelector('.button-remove').addEventListener('command', this);
-        document.querySelector('.button-save').addEventListener('command', this);
+        document.addEventListener('command', this);
 
         this._initList();
 
@@ -47,9 +45,7 @@ var gReplacementManager = {
         Services.obs.removeObserver(gReplacerObserver, "chaika-replace-rule-remove", false);
 
         this._listbox.removeEventListener('select', this);
-        document.querySelector('.button-add').removeEventListener('command', this);
-        document.querySelector('.button-remove').removeEventListener('command', this);
-        document.querySelector('.button-save').removeEventListener('command', this);
+        document.removeEventListener('command', this);
     },
 
 
@@ -85,6 +81,10 @@ var gReplacementManager = {
                 switch(aEvent.originalTarget.className){
                     case 'button-add':
                         this.add();
+                        break;
+
+                    case 'button-import':
+                        this.import();
                         break;
 
                     case 'button-remove':
@@ -133,6 +133,12 @@ var gReplacementManager = {
     add: function(dataToPopulate){
         window.openDialog('chrome://chaika/content/settings/replacement-manager-new.xul',
                           '_blank', 'modal, resizable', dataToPopulate);
+    },
+
+
+    import: function(){
+        window.openDialog('chrome://chaika/content/settings/replacestr.xul',
+                          '_blank', 'modal, resizable');
     },
 
 

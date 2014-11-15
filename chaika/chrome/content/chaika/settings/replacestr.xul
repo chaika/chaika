@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<dialog id="chaikaReplaceStr"
+        buttons="accept, cancel"
+        buttoniconaccept="save"
+        ondialogaccept="onDialogAccept()"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        onload="startup()"
+        onunload="shutdown()"
+        persist="screenX screenY width height">
+
+    <description>
+        Jane Style/Jane Xeno/Jane View/V2C 互換の ReplaceStr.txt を読み込むことができます.
+    </description>
+
+    <vbox style="margin-top: 1em;" flex="1">
+        <checkbox id="replace-tab"
+                  label="[TAB] や 【TAB】をタブ文字に置換する"
+                  tooltiptext="2ch に貼り付けられた ReplaceStr.txt 形式のルールをそのままインポートする場合に有用です." />
+
+        <radiogroup flex="1">
+            <radio id="importFromFile" label="ReplaceStr.txt の場所を指定する" accesskey="R" selected="true" />
+            <hbox>
+                <textbox id="replacestr-path" flex="1" />
+                <button id="select-file-btn" label="参照..." />
+            </hbox>
+
+            <radio id="importFromText" label="テキストを直接指定する" accesskey="T" />
+            <textbox id="replacestr-text" multiline="true" flex="1" />
+        </radiogroup>
+    </vbox>
+
+    <script type="application/javascript; version=1.7"
+            src="chrome://chaika/content/settings/replacestr.js"/>
+</dialog>

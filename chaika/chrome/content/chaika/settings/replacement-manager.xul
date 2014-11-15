@@ -12,8 +12,9 @@
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <hbox>
-        <spacer flex="1" />
         <button label="新規" class="button-add" />
+        <button label="ReplaceStr.txt 形式のデータを読み込む..." class="button-import" />
+        <spacer flex="1" />
     </hbox>
 
     <listbox id="rulelist" />
