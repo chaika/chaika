@@ -14,13 +14,13 @@
         persist="screenX screenY width height">
 
     <description>
-        Jane Style/Jane Xeno/Jane View/V2C 互換の ReplaceStr.txt を読み込むことができます.
+        Jane Style/V2C/Jane View 形式の ReplaceStr.txt を読み込みます.
     </description>
 
     <vbox style="margin-top: 1em;" flex="1">
         <checkbox id="replace-tab"
-                  label="[TAB] や 【TAB】をタブ文字に置換する"
-                  tooltiptext="2ch に貼り付けられた ReplaceStr.txt 形式のルールをそのままインポートする場合に有用です." />
+                  label="[TAB] や【TAB】をタブ文字に置換する"
+                  tooltiptext="掲示板に貼り付けられた ReplaceStr.txt 形式のルールをそのままインポートする場合に有用です." />
 
         <radiogroup flex="1">
             <radio id="importFromFile" label="ReplaceStr.txt の場所を指定する" accesskey="R" selected="true" />
