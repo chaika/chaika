@@ -2,6 +2,10 @@
 
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+textbox[flex]{
+    min-width: 3em;
+}
+
 .template{
     display: none;
 }
