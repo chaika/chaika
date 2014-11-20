@@ -6,6 +6,11 @@ textbox[flex]{
     min-width: 3em;
 }
 
+.groups{
+    overflow: auto;
+    min-height: 3em;
+}
+
 .template{
     display: none;
 }

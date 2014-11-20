@@ -149,15 +149,6 @@
             ]]></body>
         </method>
 
-        <method name="adjustWindowSize">
-            <body><![CDATA[
-                //条件を追加したときにウィンドウサイズが広がらず、
-                //下部が見切れてしまう問題に対処する
-                //ウィンドウの再描画がうまく行われないことが原因？
-                window.resizeBy(0, 0);
-            ]]></body>
-        </method>
-
         <method name="appendGroupTo">
             <parameter name="parentNode" />
             <parameter name="empty" />
@@ -172,8 +163,6 @@
                     this.appendRuleToGroup(newGroup);
                 }
 
-                this.adjustWindowSize();
-
                 return newGroup;
             ]]></body>
         </method>
@@ -186,8 +175,6 @@
 
                 newItem.classList.remove('template');
                 parentNode.appendChild(newItem);
-
-                this.adjustWindowSize();
 
                 return newItem;
             ]]></body>
@@ -207,7 +194,6 @@
 
                 if(item.parentNode.querySelectorAll(selector).length !== 1){
                     item.parentNode.removeChild(item);
-                    this.adjustWindowSize();
                 }
             ]]></body>
         </method>
