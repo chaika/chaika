@@ -36,6 +36,10 @@ var gReplacementManager = {
 
         this._initList();
 
+        if(this._listbox.getRowCount() > 0){
+            setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
+        }
+
         window.sizeToContent();
     },
 
@@ -64,9 +68,6 @@ var gReplacementManager = {
             //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
             //データ編集欄を非表示にしておく
             this._editor.collapsed = true;
-        }else{
-            //先頭を選択
-            setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
         }
     },
 
