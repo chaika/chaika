@@ -17,7 +17,7 @@ const MODE_SEARCH = 1;
 
 var Page = {
 
-    startup: function Page_startup(){
+    startup: function(){
         var tree = document.getElementById("bookmarks-view");
         tree.collapsed = true;
         tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
@@ -29,7 +29,7 @@ var Page = {
         setTimeout(function(){ Page.delayStartup(); }, 0);
     },
 
-    delayStartup: function Page_delayStartup(){
+    delayStartup: function(){
         var tree = document.getElementById("bookmarks-view");
         tree.collapsed = false;
 
@@ -40,14 +40,15 @@ var Page = {
         }
     },
 
-    shutdown: function Page_shutdown(){
+    shutdown: function(){
         PrefObserver.stop();
         Tree.saveOpenedCategories();
     },
 
 
-    showViewFoxAge2chMenu: function Page_showViewFoxAge2chMenu(){
+    showViewFoxAge2chMenu: function(){
         var browser = ChaikaCore.browser.getBrowserWindow();
+
         if(browser && browser.document.getElementById("viewFoxAge2chSidebar")){
             document.getElementById("viewFoxAge2chMenu").hidden = false;
             document.getElementById('viewFoxAge2chMenu-separator').hidden = false;
@@ -55,51 +56,112 @@ var Page = {
     },
 
 
-    openLogManager: function Page_openLogManager(){
-        ChaikaCore.browser.openURL(Services.io.newURI("chaika://log-manager/", null, null), true);
+    /**
+     * URL を新しいタブで開く
+     * @param {String} aURL 開く URL
+     */
+    _openURL: function(aURL){
+        ChaikaCore.browser.openURL(Services.io.newURI(aURL, null, null), true);
     },
 
 
-    openDataFolder: function Page_openDataFolder(){
-        var logDir = ChaikaCore.getDataDir();
-        ChaikaCore.io.revealDir(logDir);
+    /**
+     * フォルダを開く
+     * @param {nsIFile} aDir 開くフォルダ
+     */
+    _openFolder: function(aDir){
+        ChaikaCore.io.revealDir(aDir);
     },
 
 
-    openSupport: function Page_openSupport(){
-        ChaikaCore.browser.openURL(Services.io.newURI("chaika://support/", null, null), true);
+    /**
+     * ダイアログを開く
+     * @param {String} aURL 開くダイアログの URL
+     * @param {String} [aType] 開くダイアログのタイプ (windowtype)
+     */
+    _openDialog: function(aURL, aType){
+        if(aType){
+            let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+            let win = wm.getMostRecentWindow(aType);
+
+            if(win){
+                win.focus();
+                return;
+            }
+        }
+
+        window.openDialog(aURL, "_blank", "chrome, resizable, minimizable, toolbar");
     },
 
 
-    openReleaseNotes: function Page_openReleaseNotes(){
-        ChaikaCore.browser.openURL(Services.io.newURI("chaika://releasenotes/", null, null), true);
+    openLogManager: function(){
+        this._openURL("chaika://log-manager/");
+    },
+
+
+    openAboneManager: function(){
+        this._openDialog("chrome://chaika/content/settings/abone-manager.xul");
+    },
+
+
+    openAAManager: function(){
+        this._openDialog("chrome://chaika/content/settings/aa-manager.xul");
+    },
+
+
+    openReplacementManager: function(){
+        this._openDialog("chrome://chaika/content/settings/replacement-manager.xul");
+    },
+
+
+    openDataFolder: function(){
+        this._openFolder(ChaikaCore.getDataDir());
+    },
+
+
+    openSkinFolder: function(){
+        let skinDir = ChaikaCore.getDataDir();
+
+        skinDir.appendRelativePath('skin');
+        this._openFolder(skinDir);
+    },
+
+
+    openSearchPluginFolder: function(){
+        let pluginFolder = ChaikaCore.getDataDir();
+
+        pluginFolder.appendRelativePath('search');
+        this._openFolder(pluginFolder);
+    },
+
+
+    openLogFolder: function(){
+        this._openFolder(ChaikaCore.getLogDir());
+    },
+
+
+    openSupport: function(){
+        this._openURL("chaika://support/");
+    },
+
+
+    openReleaseNotes: function(){
+        this._openURL("chaika://releasenotes/");
     },
 
 
     openOnlineHelp: function(){
-        ChaikaCore.browser.openURL(Services.io.newURI("https://github.com/chaika/chaika/wiki", null, null), true);
+        this._openURL("https://github.com/chaika/chaika/wiki");
     },
 
 
-    openSettings: function Page_openSettings(){
-        var winMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
-            .getService(Ci.nsIWindowMediator);
-        var settingdWin = winMediator.getMostRecentWindow("chaika:settings");
-        if(settingdWin){
-            settingdWin.focus();
-            return;
-        }
+    openHomePage: function(){
+        this._openURL("https://github.com/chaika/chaika");
+    },
 
-        var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
-        var features = "";
-        try{
-            var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-            var instantApply = pref.getBoolPref("browser.preferences.instantApply");
-            features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-        }catch(ex){
-            features = "chrome,titlebar,toolbar,centerscreen,modal";
-        }
-        window.openDialog(settingDialogURL, "", features);
+
+    openSettings: function(){
+        this._openDialog("chrome://chaika/content/settings/settings.xul", "chaika:settings");
     },
 
 
@@ -109,7 +171,6 @@ var Page = {
             browser.document.getElementById("viewFoxAge2chSidebar").doCommand();
         }
     }
-
 };
 
 
@@ -137,7 +198,6 @@ var PrefObserver = {
         if(aData == "tree_size"){
             Tree.changeTreeSize();
         }
-
     }
 
 };
