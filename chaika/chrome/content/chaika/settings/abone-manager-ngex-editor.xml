@@ -234,7 +234,7 @@
                 this._root.querySelector('.set-expire').checked = !!ngData.expire;
 
                 if(ngData.expire){
-                    this._populateExpire(expire);
+                    this._populateExpire(new Date(ngData.expire));
                 }else{
                     this._setExpirePreset('today');
                 }
