@@ -842,7 +842,7 @@ ChaikaBrowser.prototype = {
 
         // For Firefox 26-
         // (Spread Operator for function calls is supported on Firefox 27+)
-        let _args = [aURL, "_blank", "chrome, resizable, minimizable, toolbar", ...args];
+        let _args = [aURL, "_blank", "chrome, toolbar, centerscreen, resizable, minimizable", ...args];
 
         this.getBrowserWindow().openDialog.apply(null, _args);
     },
