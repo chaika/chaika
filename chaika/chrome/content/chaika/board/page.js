@@ -599,31 +599,15 @@ function showBrowser(aTab){
 }
 
 function openLogsDir(){
-    var logDir = gBoard.subjectFile.parent;
-    ChaikaCore.io.revealDir(logDir);
+    ChaikaCore.io.revealDir(gBoard.subjectFile.parent);
 }
 
 function postNewThread(){
-    var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-
-    var browserWindow = ChaikaCore.browser.getBrowserWindow();
-    browserWindow.openDialog(postWizardURLSpec, "_blank",
-        "chrome, resizable, dialog", gBoard.url.spec, true);
+    ChaikaCore.browser.openWindow("chrome://chaika/content/post/wizard.xul", null, gBoard.url.spec, true);
 }
 
 function openSettings(){
-    var settingDialogURL = "chrome://chaika/content/settings/settings.xul#paneBoard";
-
-    var features = "";
-    try{
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-        var instantApply = pref.getBoolPref("browser.preferences.instantApply");
-        features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-    }catch(ex){
-        features = "chrome,titlebar,toolbar,centerscreen,modal";
-    }
-    var browserWindow = ChaikaCore.browser.getBrowserWindow();
-    browserWindow.openDialog(settingDialogURL, "", features);
+    ChaikaCore.browser.openWindow("chrome://chaika/content/settings/settings.xul#paneBoard", "chaika:settings");
 }
 
 function showBanner(aEvent){

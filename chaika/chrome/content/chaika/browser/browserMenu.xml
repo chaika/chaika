@@ -553,9 +553,11 @@
             <parameter name="ngType" />
             <parameter name="ngWord" />
             <body><![CDATA[
-                window.openDialog("chrome://chaika/content/settings/abone-manager.xul",
-                                  "_blank", "chrome, resizable, minimazable, toolbar",
-                                  ngType, ngWord);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/abone-manager.xul",
+                    null,
+                    ngType, ngWord
+                );
             ]]></body>
         </method>
 
@@ -710,13 +712,16 @@
         -->
         <method name="write">
             <body><![CDATA[
-                var threadURL = this._getCurrentThreadURL();
+                let threadURL = this._getCurrentThreadURL();
                 if(!threadURL) return;
 
-                var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-                var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
-                window.openDialog(postWizardURLSpec, "_blank",
-                            "chrome, resizable, minimizable, dialog", threadPlainURL.spec);
+                let threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/post/wizard.xul",
+                    null,
+                    threadPlainURL.spec
+                );
             ]]></body>
         </method>
 
@@ -878,9 +883,10 @@
                     let item = FoxAge2chUtils.service.getItem(threadID);
 
                     if(item){
-                        window.openDialog(
-                            "chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
-                            "chrome,centerscreen,modal,dialog=no,all", threadID
+                        this.ChaikaCore.browser.openWindow(
+                            "chrome://foxage2ch/content/findThread.xul",
+                            "FoxAge2ch:FindThread",
+                            threadID
                         );
                         return;
                     }
@@ -921,8 +927,11 @@
         <method name="registerAsAA">
             <parameter name="aaStr" />
             <body><![CDATA[
-                window.openDialog("chrome://chaika/content/settings/aa-manager.xul",
-                                  "_blank", "chrome, resizable, minimazable, toolbar", aaStr);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/aa-manager.xul",
+                    null,
+                    aaStr
+                );
             ]]></body>
         </method>
 
@@ -934,8 +943,7 @@
         -->
         <method name="openReplacementManager">
             <body><![CDATA[
-                window.openDialog("chrome://chaika/content/settings/replacement-manager.xul",
-                                  "_blank", "chrome, resizable, minimazable, toolbar");
+                this.ChaikaCore.browser.openWindow("chrome://chaika/content/settings/replacement-manager.xul");
             ]]></body>
         </method>
 
@@ -947,15 +955,10 @@
         -->
         <method name="openSettings">
             <body><![CDATA[
-                var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
-                var features = "";
-                try{
-                    var instantApply = Services.prefs.getBoolPref("browser.preferences.instantApply");
-                    features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-                }catch(ex){
-                    features = "chrome,titlebar,toolbar,centerscreen,modal,minimazable";
-                }
-                window.openDialog(settingDialogURL, "", features);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/settings.xul",
+                    "chaika:settings"
+                );
             ]]></body>
         </method>
     </implementation>

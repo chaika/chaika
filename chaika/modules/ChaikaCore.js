@@ -824,13 +824,38 @@ ChaikaBrowser.prototype = {
 
 
     /**
+     * 新しいウィンドウを開く
+     * @param {String} aURL 開くウィンドウの URL
+     * @param {String} [aType] 開くウィンドウのタイプ (windowtype) 指定すると該当ウィンドウがある場合に再利用する
+     * @param {Any} [args] ウィンドウに渡す引数
+     */
+    openWindow: function(aURL, aType, ...args){
+        if(aType){
+            let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+            let win = wm.getMostRecentWindow(aType);
+
+            if(win){
+                win.focus();
+                return;
+            }
+        }
+
+        // For Firefox 26-
+        // (Spread Operator for function calls is supported on Firefox 27+)
+        let _args = [aURL, "_blank", "chrome, resizable, minimizable, toolbar", ...args];
+
+        this.getBrowserWindow().openDialog.apply(null, _args);
+    },
+
+
+    /**
      * ブラウザウィンドウを返す。
      * @return {ChromeWindow} ブラウザウィンドウ
      */
     getBrowserWindow: function ChaikaBrowser_getBrowserWindow(){
-        var windowMediator = Cc["@mozilla.org/appshell/window-mediator;1"]
-                .getService(Ci.nsIWindowMediator);
-        return windowMediator.getMostRecentWindow("navigator:browser");
+        var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+
+        return wm.getMostRecentWindow("navigator:browser");
     },
 
 

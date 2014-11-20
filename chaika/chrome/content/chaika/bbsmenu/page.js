@@ -80,17 +80,7 @@ var Page = {
      * @param {String} [aType] 開くダイアログのタイプ (windowtype)
      */
     _openDialog: function(aURL, aType){
-        if(aType){
-            let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-            let win = wm.getMostRecentWindow(aType);
-
-            if(win){
-                win.focus();
-                return;
-            }
-        }
-
-        window.openDialog(aURL, "_blank", "chrome, resizable, minimizable, toolbar");
+        ChaikaCore.browser.openWindow(aURL, aType);
     },
 
 

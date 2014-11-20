@@ -39,10 +39,8 @@
 var gGeneralPane = {
 
     startup: function(){
-        setContainerDisabled("extensions.chaika.appoint_data_dir",
-                "boxDataDir", true);
-        setContainerDisabled("extensions.chaika.http_proxy_mode",
-                "txtProxyValue", 2);
+        setContainerDisabled("extensions.chaika.appoint_data_dir", "boxDataDir", true);
+        setContainerDisabled("extensions.chaika.http_proxy_mode", "txtProxyValue", 2);
     },
 
     selectDataDir: function(){
@@ -79,6 +77,6 @@ var gGeneralPane = {
     },
 
     openReplacementManager: function(){
-        document.documentElement.openWindow("", "chrome://chaika/content/settings/replacement-manager.xul");
+        ChaikaCore.browser.openWindow("chrome://chaika/content/settings/replacement-manager.xul");
     }
 };
