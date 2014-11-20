@@ -11,8 +11,7 @@
         ondialogaccept="onDialogAccept()"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
         onload="startup()"
-        onunload="shutdown()"
-        persist="screenX screenY width height">
+        onunload="shutdown()">
 
     <vbox id="editor" flex="1"></vbox>
 
