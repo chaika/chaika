@@ -126,6 +126,11 @@ AboneData.prototype = {
     },
 
 
+    /**
+     * NGワードに該当するレスかどうかを返す
+     * @param {ResData} aResData
+     * @see ChaikaAboneManager.shouldAbone
+     */
     shouldAbone: function(aResData){
         return aResData && this._data.find((ngData) => aResData.contains(ngData));
     },
@@ -234,7 +239,7 @@ var NGExData = {
 
     /**
      * マッチする条件
-     * @type {Object} ruleData
+     * @type {Array.<Group, Rule>}
      * @see getRuleData in chrome://chaika/content/settings/rule-editor.xml#editor
      */
     rules: [],
@@ -272,6 +277,11 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     },
 
 
+    /**
+     * NGワードに該当するレスかどうかを返す
+     * @param {ResData} aResData
+     * @see ChaikaAboneManager.shouldAbone
+     */
     shouldAbone: {
         value: function(aResData){
             return this._dataObj.find((ngData) => {
@@ -286,6 +296,15 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     },
 
 
+    /**
+     * 条件に一致するレスかどうかを返す
+     * @param {RuleData} aRule 条件
+     * @param {ResData} aResData レスデータ
+     * @see ChaikaAboneManager.shouldAbone
+     * @see getRuleData in chrome://chaika/content/settings/rule-editor.xml#editor
+     * @note ChaikaContentReplacer からも呼ばれる
+     * @todo 条件に一致するかどうかという処理は置換処理でも使われているため別のクラスとして抽出するべき
+     */
     _matchRule: {
         value: function(aRule, aResData){
             if(aRule.match && aRule.rules){
