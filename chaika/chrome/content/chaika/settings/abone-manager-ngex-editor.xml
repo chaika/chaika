@@ -193,6 +193,10 @@
                 }
 
 
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+
                 let ngData = {};
                 let ruleData = this._ruleEditor.getRuleData();
 

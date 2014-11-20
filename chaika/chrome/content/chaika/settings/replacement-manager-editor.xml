@@ -218,6 +218,10 @@
 
         <method name="getReplaceData">
             <body><![CDATA[
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+
                 let replaceData = {};
                 let ruleData = this._ruleEditor.getRuleData();
 
