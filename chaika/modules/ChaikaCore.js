@@ -820,43 +820,6 @@ ChaikaBrowser.prototype = {
             }
             return;
         }
-
-        // Firefox/Seamonkey 以外のブラウザでの処理はここに書く
-
-        ChaikaCore.logger.warning("Acquisition of browser window failed");
-        this.openNewWindow(aURI);
-    },
-
-
-    /**
-     * 新しいブラウザウィンドウで指定した URI を開く。
-     * @param {nsIURI} aURI 新しいウィンドウで開くページの URI
-     */
-    openNewWindow: function ChaikaBrowser_openNewWindow(aURI){
-        if(!(aURI instanceof Ci.nsIURI)){
-            throw makeException(Cr.NS_ERROR_INVALID_POINTER);
-        }
-
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-        try{
-            var browserURL = pref.getCharPref("browser.chromeURL");
-        }catch(ex){
-            ChaikaCore.logger.error(ex);
-            throw makeException(ex.result);
-        }
-
-        var argString = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-        argString.data = aURI.spec;
-
-        var winWatcher = Cc["@mozilla.org/embedcomp/window-watcher;1"]
-                .getService(Ci.nsIWindowWatcher);
-        try{
-            winWatcher.openWindow(null, browserURL, "_blank",
-                    "chrome,all,dialog=no", argString);
-        }catch(ex){
-            ChaikaCore.logger.error(ex);
-            throw makeException(ex.result);
-        }
     },
 
 
