@@ -314,6 +314,10 @@
                             node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
                         }
                     });
+
+                    if(group.rules.length < 1){
+                        this.appendRuleToGroup(groupNode);
+                    }
                 }.bind(this);
 
                 populateGroup(ruleData, this._root.querySelector('.groups'));
