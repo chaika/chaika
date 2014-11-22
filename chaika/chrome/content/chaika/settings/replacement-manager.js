@@ -81,6 +81,7 @@ var gReplacementManager = {
             case 'command':
                 switch(aEvent.originalTarget.className){
                     case 'button-add':
+                    case 'context-add':
                         this.add();
                         break;
 
@@ -88,8 +89,8 @@ var gReplacementManager = {
                         this.import();
                         break;
 
-                    case 'button-remove':
-                        this.remove();
+                    case 'context-remove-selected':
+                        this.removeSelected();
                         break;
 
                     case 'button-save':
@@ -143,13 +144,21 @@ var gReplacementManager = {
     },
 
 
-    /**
-     * 選択されているデータを削除する
-     */
-    remove: function(){
+    removeSelected: function(){
         if(this._listbox.selectedIndex === -1) return;
 
-        ChaikaContentReplacer.remove(JSON.parse(this._listbox.selectedItem.value));
+        let rv;
+
+        if(this._listbox.selectedItems.length > 1){
+            rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+        }else{
+            rv = window.confirm(JSON.parse(this._listbox.selectedItem.value).title + ' を削除してもよろしいですか？');
+        }
+
+        if(rv){
+            this._listbox.selectedItems.map((node) => JSON.parse(node.value))
+                                       .forEach((item) => ChaikaContentReplacer.remove(item));
+        }
     },
 
 

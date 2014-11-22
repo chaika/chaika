@@ -11,18 +11,24 @@
         persist="screenX screenY width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+    <popupset>
+        <menupopup id="contextMenu">
+            <menuitem label="選択項目を削除" class="context-remove-selected" />
+            <menuitem label="新規" class="context-add" />
+        </menupopup>
+    </popupset>
+
     <hbox>
         <button label="新規" class="button-add" />
         <button label="ReplaceStr.txt 形式のデータを読み込む..." class="button-import" />
         <spacer flex="1" />
     </hbox>
 
-    <listbox id="rulelist" />
+    <listbox id="rulelist" seltype="multiple" context="contextMenu" />
 
     <hbox>
         <spacer flex="1" />
         <button label="保存" class="button-save" />
-        <button label="削除" class="button-remove" />
     </hbox>
 
     <vbox id="editor" flex="1"></vbox>
