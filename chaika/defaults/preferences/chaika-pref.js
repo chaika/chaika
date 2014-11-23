@@ -9,6 +9,14 @@ pref("extensions.chaika.server_port.firefox", 8823);
 pref("extensions.chaika.server_port.seamonkey", 8824);
 pref("extensions.chaika.server_port.other", 8825);
 
+pref("extensions.chaika.historymenu.board_max", 6);
+pref("extensions.chaika.historymenu.thread_max", 6);
+
+pref("extensions.chaika.browser.redirector.enabled", false);
+pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
+pref("extensions.chaika.browser.redirector.replace_view_limit", true);
+pref('extensions.chaika.browser.redirector.ivur.behavior', 0);
+
 pref('extensions.chaika.browser.browsermenu.open_in_new_tab', false);
 pref('extensions.chaika.browser.browsermenu.disregard_url_limit', false);
 pref('extensions.chaika.browser.browsermenu.remove_limit_when_copy', false);
@@ -67,13 +75,6 @@ pref("extensions.chaika.login.p2.csrfid_url", "http://p2.2ch.net/p2/post_form.ph
 pref("extensions.chaika.login.p2.cookie_domain", ".p2.2ch.net");
 pref("extensions.chaika.login.p2.id", "");
 pref("extensions.chaika.login.p2.password", "");
-
-pref("extensions.chaika.browser.redirector.enabled", false);
-pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
-pref("extensions.chaika.browser.redirector.replace_view_limit", true);
-
-pref("extensions.chaika.historymenu.board_max", 6);
-pref("extensions.chaika.historymenu.thread_max", 6);
 
 pref('extensions.chaika.bbsmenu.search.default_engine_name', '00.search.2ch.net');
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");

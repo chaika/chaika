@@ -65,8 +65,14 @@ var ChaikaBrowserOverlay = {
     checkIvurRedirection: function(aLocation){
         if(!aLocation.spec.startsWith('chaika://ivur/')) return;
 
+        let pref = ChaikaBrowserOverlay.ChaikaCore.pref;
         let originalURI = aLocation.spec.replace('chaika://ivur/', '')
                                         .replace('?dummy_ext=.jpg', '');
+
+        if(pref.getInt('browser.redirector.ivur.behavior') === 1){
+            openUILinkIn(originalURI, 'current');
+            return;
+        }
 
         PopupNotifications.show(
             gBrowser.selectedBrowser,
@@ -75,14 +81,33 @@ var ChaikaBrowserOverlay = {
             null,
             {
                 label: '元のリンク先へ移動する',
-                accessKey: 'O',
+                accessKey: 'M',
                 callback: function(){
+                    pref.setInt('browser.redirector.ivur.behavior', 0);
                     openUILinkIn(originalURI, 'current');
                 }
             },
-            null,
+            [
+                {
+                    label: '今後は必ず元のリンク先へ移動する',
+                    accessKey: 'F',
+                    callback: function(){
+                        pref.setInt('browser.redirector.ivur.behavior', 1);
+                        openUILinkIn(originalURI, 'current');
+                    }
+                },
+                {
+                    label: '今後一切この通知を表示しない',
+                    accessKey: 'I',
+                    callback: function(){
+                        pref.setInt('browser.redirector.ivur.behavior', 2);
+                    }
+                }
+
+            ],
             {
-                popupIconURL: 'chrome://chaika/content/icon.png'
+                popupIconURL: 'chrome://chaika/content/icon.png',
+                dismissed: pref.getInt('browser.redirector.ivur.behavior') > 0
             }
         );
     },
