@@ -89,8 +89,8 @@ var gReplacementManager = {
                         this.import();
                         break;
 
-                    case 'context-remove-selected':
-                        this.removeSelected();
+                    case 'context-remove':
+                        this.remove();
                         break;
 
                     case 'button-save':
@@ -144,7 +144,7 @@ var gReplacementManager = {
     },
 
 
-    removeSelected: function(){
+    remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
         let rv;
@@ -152,7 +152,7 @@ var gReplacementManager = {
         if(this._listbox.selectedItems.length > 1){
             rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
         }else{
-            rv = window.confirm(JSON.parse(this._listbox.selectedItem.value).title + ' を削除してもよろしいですか？');
+            rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
         }
 
         if(rv){

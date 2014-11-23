@@ -13,7 +13,7 @@
 
     <popupset>
         <menupopup id="contextMenu">
-            <menuitem label="選択項目を削除" class="context-remove-selected" />
+            <menuitem label="選択項目を削除" class="context-remove" />
             <menuitem label="新規" class="context-add" />
         </menupopup>
     </popupset>
