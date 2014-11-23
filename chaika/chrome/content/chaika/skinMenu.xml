@@ -119,7 +119,7 @@
                 var skinDir = this.ChaikaCore.getDataDir();
                 skinDir.appendRelativePath("skin");
 
-                this.ChaikaCore.io.revealDir(skinDir);
+                this.ChaikaCore.io.reveal(skinDir);
             ]]></body>
         </method>
 

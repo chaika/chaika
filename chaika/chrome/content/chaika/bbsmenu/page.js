@@ -58,7 +58,7 @@ var Page = {
      * @param {nsIFile} aDir 開くフォルダ
      */
     _openFolder: function(aDir){
-        ChaikaCore.io.revealDir(aDir);
+        ChaikaCore.io.reveal(aDir);
     },
 
 

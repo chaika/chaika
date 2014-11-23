@@ -622,7 +622,7 @@ function showBrowser(aTab){
 }
 
 function openLogsDir(){
-    ChaikaCore.io.revealDir(gBoard.subjectFile.parent);
+    ChaikaCore.io.reveal(gBoard.subjectFile.parent);
 }
 
 function postNewThread(){

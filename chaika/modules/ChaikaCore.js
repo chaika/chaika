@@ -1111,7 +1111,7 @@ ChaikaIO.prototype = {
 
     /**
      * ファイラでファイルやディレクトリを開く
-     * @param {nsIFile} aDir 開くディレクトリ
+     * @param {nsIFile} aFile 開くファイルまたはディレクトリ
      * @return {Boolean} 成功したら真を返す
      */
     reveal: function(aFile){
@@ -1127,6 +1127,7 @@ ChaikaIO.prototype = {
 
         try{
             // OS の機能で開く
+            // aFile がファイルの場合にはファイルを内包しているフォルダを開く
             aFile.reveal();
             return true;
         }catch(ex){}
@@ -1144,26 +1145,6 @@ ChaikaIO.prototype = {
         }
 
         return false;
-    },
-
-
-    /**
-     * ファイラで指定したディレクトリを開く
-     * @deprecated
-     * @param {nsIFile} aDir 開くディレクトリ
-     * @return {Boolean} 成功したら真を返す
-     * @note 後方互換性のために残っている. 通常は ChaikaIO#reveal をつかうこと.
-     */
-    revealDir: function ChaikaIO_revealDir(aDir){
-        if(!(aDir instanceof Ci.nsIFile)){
-            throw makeException(Cr.NS_ERROR_INVALID_POINTER);
-        }
-
-        if(!aDir.isDirectory()){
-            throw makeException(Cr.NS_ERROR_INVALID_ARG);
-        }
-
-        this.reveal(aDir);
     },
 
 
