@@ -28,8 +28,6 @@
                 onchange="setContainerDisabled(this.name, 'redirectorSubBox', true)"/>
         <preference id="extensions.chaika.thread_redirector.ask"
                 name="extensions.chaika.thread_redirector.ask" type="bool"/>
-        <preference id="extensions.chaika.browser.redirector.throw_bookmarks"
-                name="extensions.chaika.browser.redirector.throw_bookmarks" type="bool"/>
         <preference id="extensions.chaika.browser.redirector.replace_view_limit"
                 name="extensions.chaika.browser.redirector.replace_view_limit" type="bool"/>
         <preference id="extensions.chaika.tab_load_in_foreground"
@@ -80,8 +78,6 @@
             <checkbox label="2ch スレッド URL を自動的に chaika で開く *"
                     preference="extensions.chaika.browser.redirector.enabled"/>
             <vbox id="redirectorSubBox" class="indent">
-                <checkbox label="ブックマークやスレッド表示からはそのまま開く"
-                        preference="extensions.chaika.browser.redirector.throw_bookmarks"/>
                 <checkbox label="URL の表示制限を書き換えて開く"
                         preference="extensions.chaika.browser.redirector.replace_view_limit"/>
             </vbox>

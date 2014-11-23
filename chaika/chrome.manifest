@@ -23,10 +23,6 @@ component {1a48801d-18c1-4d5f-9fed-03b2aeded9f9} components/chChaikaService.js
 contract @chaika.xrea.jp/chaika-service;1 {1a48801d-18c1-4d5f-9fed-03b2aeded9f9}
 category profile-after-change chChaikaService @chaika.xrea.jp/chaika-service;1
 
-component {a0f48aef-8a53-4bab-acd5-9618cbb67e14} components/chRedirector.js
-contract @chaika.xrea.jp/redirector;1 {a0f48aef-8a53-4bab-acd5-9618cbb67e14}
-category profile-after-change chRedirector @chaika.xrea.jp/redirector;1
-
 component {5b0cd1b2-2f16-4472-bdd2-1416380ab3d4} components/chProtocolHandler.js
 contract @mozilla.org/network/protocol;1?name=chaika {5b0cd1b2-2f16-4472-bdd2-1416380ab3d4}
 

@@ -68,7 +68,6 @@ pref("extensions.chaika.login.p2.id", "");
 pref("extensions.chaika.login.p2.password", "");
 
 pref("extensions.chaika.browser.redirector.enabled", false);
-pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
 pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 
 pref("extensions.chaika.historymenu.board_max", 6);
