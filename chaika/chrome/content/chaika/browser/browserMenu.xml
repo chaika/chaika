@@ -157,14 +157,16 @@
         -->
         <method name="_getCurrentBoardURL">
             <body><![CDATA[
-                var currentURI = null;
+                let currentURI = null;
+
                 try{
                     currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
                 }catch(ex){
                     return null;
                 }
 
-                var threadURI = this._getCurrentThreadURL();
+                let threadURI = this._getCurrentThreadURL();
+
                 if(threadURI){
                     return this.ChaikaThread.getBoardURL(threadURI);
                 }else if(this._isBoard(currentURI)){
@@ -186,6 +188,8 @@
         <method name="_getPlainURL">
             <parameter name="aURI"/>
             <body><![CDATA[
+                if(!aURI) return;
+
                 let spec = aURI instanceof Components.interfaces.nsIURI ? aURI.spec : aURI;
 
                 // Google リダイレクタ対策
@@ -765,15 +769,17 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit"/>
             <body><![CDATA[
-                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                var url = this._getPlainURL(aURI) ||
+                          this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL();
+
                 if(!url) return;
 
                 try{
                     if(this._isBoard(url)){
                         this.ChaikaCore.browser.openBoard(url, aAddTab);
                     }else{
-                        var threadURL = this._getPlainURL(url);
-                        this.ChaikaCore.browser.openThread(threadURL, aAddTab, disregardLimit, false);
+                        this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, false);
                     }
                 }catch(ex){
                     this.ChaikaCore.logger.error(ex);
@@ -796,14 +802,13 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit" />
             <body><![CDATA[
-                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                var url = this._getPlainURL(aURI) ||
+                          this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL();
+
                 if(!url) return;
 
-                url = this._getPlainURL(url);
-
-                if(url){
-                    this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
-                }
+                this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
             ]]></body>
         </method>
 
