@@ -19,26 +19,14 @@ var Page = {
 
     startup: function(){
         var tree = document.getElementById("bookmarks-view");
-        tree.collapsed = true;
         tree.setAttribute("treesize", ChaikaCore.pref.getChar("bbsmenu.tree_size"));
 
         this.showViewFoxAge2chMenu();
         SearchBox.init();
         PrefObserver.start();
-
-        setTimeout(function(){ Page.delayStartup(); }, 0);
+        Bbsmenu.init();
     },
 
-    delayStartup: function(){
-        var tree = document.getElementById("bookmarks-view");
-        tree.collapsed = false;
-
-        if(Bbsmenu.getItemCount() == 0){
-            BbsmenuUpdater.update();
-        }else{
-            Bbsmenu.initTree();
-        }
-    },
 
     shutdown: function(){
         PrefObserver.stop();
@@ -426,9 +414,17 @@ var BbsmenuUpdater = {
 
 var Bbsmenu = {
 
-    initTree: function Bbsmenu_initTree(){
+    init: function(){
         this._DOMParser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
 
+        if(this.getItemCount() === 0){
+            BbsmenuUpdater.update();
+        }else{
+            this.initTree();
+        }
+    },
+
+    initTree: function Bbsmenu_initTree(){
         var doc = this.getBbsmenuDoc();
         Tree.initTree(doc, MODE_BBSMENU);
     },
