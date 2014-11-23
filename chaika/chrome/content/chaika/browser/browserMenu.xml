@@ -106,6 +106,7 @@
 
     <handlers>
         <handler event="popupshowing" action="this._onPopupshowing(event)" />
+        <handler event="popuphiding" action="this._onPopuphiding(event)" />
         <handler event="command" action="this._doCommand(event, false)"/>
         <handler event="click" button="1" action="this._doCommand(event, true)"/>
     </handlers>
@@ -312,6 +313,25 @@
             <body><![CDATA[
                 //表示・非表示を制御するためのステータスを設定する
                 this._setStatus();
+
+                // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
+                // への対処のため、gContextMenu をストアしておく
+                this._gContextMenu = gContextMenu;
+            ]]></body>
+        </method>
+
+
+        <method name="_onPopuphiding">
+            <parameter name="aEvent" />
+            <body><![CDATA[
+                // コンテキストメニューをフラットにしている場合,
+                // browserMenu.xml 内のサブメニュー (menu) を閉じた際に
+                // #contentAreaContextMenu の onpopuphiding が動作してしまい,
+                // gContextMenu = null となってしまう
+                // これを回避するため, サブメニューを閉じた時に gContextMenu を復元する
+                if(aEvent.originalTarget.nodeName === 'xul:menupopup'){
+                    gContextMenu = this._gContextMenu;
+                }
             ]]></body>
         </method>
 
