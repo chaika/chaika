@@ -10,6 +10,13 @@
     persist="screenX screenY width height"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
+<popupset>
+    <menupopup id="contextMenu">
+        <menuitem label="選択項目を削除" class="context-remove" />
+        <menuitem label="新規" class="context-add" />
+    </menupopup>
+</popupset>
+
 <tabbox id="aboneManagerTabBox" flex="1">
     <tabs>
         <tab label="名前"/>
@@ -25,7 +32,7 @@
                 <button label="追加" class="button-add" />
                 <button label="削除" class="button-remove" />
             </hbox>
-            <listbox flex="1"/>
+            <listbox flex="1" seltype="multiple" context="contextMenu" />
         </tabpanel>
 
         <tabpanel orient="vertical" id="abone-mail">
@@ -34,7 +41,7 @@
                 <button label="追加" class="button-add" />
                 <button label="削除" class="button-remove" />
             </hbox>
-            <listbox flex="1"/>
+            <listbox flex="1" seltype="multiple" context="contextMenu" />
         </tabpanel>
 
         <tabpanel orient="vertical" id="abone-id">
@@ -43,7 +50,7 @@
                 <button label="追加" class="button-add" />
                 <button label="削除" class="button-remove" />
             </hbox>
-            <listbox flex="1"/>
+            <listbox flex="1" seltype="multiple" context="contextMenu" />
         </tabpanel>
 
         <tabpanel orient="vertical" id="abone-word">
@@ -52,21 +59,20 @@
                 <button label="追加" class="button-add" />
                 <button label="削除" class="button-remove" />
             </hbox>
-            <listbox flex="1"/>
+            <listbox flex="1" seltype="multiple" context="contextMenu" />
         </tabpanel>
 
         <tabpanel orient="vertical" id="abone-ex">
             <hbox>
-                <spacer flex="1" />
                 <button label="新規" class="button-add" />
+                <spacer flex="1" />
             </hbox>
 
-            <listbox style="height: 150px;" />
+            <listbox style="height: 150px;" seltype="multiple" context="contextMenu" />
 
             <hbox>
                 <spacer flex="1" />
                 <button label="保存" class="button-save" />
-                <button label="削除" class="button-remove" />
             </hbox>
 
             <vbox id="ngex-editor" flex="1"></vbox>
@@ -75,8 +81,8 @@
 </tabbox>
 
 <script type="application/javascript; version=1.7"
-            src="chrome://chaika/content/settings/abone-manager-ngex.js"/>
+        src="chrome://chaika/content/settings/abone-manager-ngex.js"/>
 <script type="application/javascript; version=1.7"
-            src="chrome://chaika/content/settings/abone-manager.js"/>
+        src="chrome://chaika/content/settings/abone-manager.js"/>
 
 </window>

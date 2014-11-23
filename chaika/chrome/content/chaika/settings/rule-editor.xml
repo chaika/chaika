@@ -288,7 +288,7 @@
                     groupNode.querySelector(':scope > caption > .match').value = group.match;
 
                     group.rules.forEach((rule) => {
-                        if(rule.rules instanceof Array){
+                        if(rule.rules instanceof Array && rule.rules.length){
                             populateGroup(rule, groupNode.querySelector(':scope > .rules'));
                         }else{
                             let node = this.appendRuleToGroup(groupNode);

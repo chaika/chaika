@@ -36,11 +36,12 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-Components.utils.import('resource://gre/modules/Services.jsm');
-Components.utils.import('resource://chaika-modules/ChaikaCore.js');
-Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
-
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+
+Cu.import('resource://gre/modules/Services.jsm');
+Cu.import('resource://chaika-modules/ChaikaCore.js');
+Cu.import("resource://chaika-modules/ChaikaAboneManager.js");
+
 
 var gAboneObserver = {
     observe: function(aSubject, aTopic, aData){
@@ -71,6 +72,9 @@ var gAboneManager = {
         Services.obs.addObserver(gAboneObserver, "chaika-abone-data-add", false);
         Services.obs.addObserver(gAboneObserver, "chaika-abone-data-remove", false);
 
+        window.addEventListener('select', this, false);
+        window.addEventListener('command', this, false);
+
         //右クリックあぼーんの時
         if('arguments' in window && window.arguments.length > 1 &&
            window.arguments[0] && window.arguments[1]){
@@ -94,7 +98,29 @@ var gAboneManager = {
 
         Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-add", false);
         Services.obs.removeObserver(gAboneObserver, "chaika-abone-data-remove", false);
+
+        window.removeEventListener('select', this, false);
+        window.removeEventListener('command', this, false);
     },
+
+
+    handleEvent: function(aEvent){
+        let panel = document.getElementById('aboneManagerTabBox').selectedPanel;
+        let type = panel.getAttribute('id').replace('abone-', '');
+        let target = aEvent.originalTarget;
+
+        switch(aEvent.type){
+            case 'select':
+                if(target.nodeName === 'listbox'){
+                    this[type].populateData(this[type]._listbox.selectedItem.value, true);
+                }
+                break;
+
+            case 'command':
+                this[type].doCommand(target.className);
+                break;
+        }
+    }
 
 }
 
@@ -111,9 +137,6 @@ AboneManagerView.prototype = {
         this._tab = document.getElementById('abone-' + this._type);
         this._textbox = this._tab.querySelector('textbox');
         this._listbox = this._tab.querySelector('listbox');
-
-        this._tab.querySelector('.button-add').addEventListener('command', this, false);
-        this._tab.querySelector('.button-remove').addEventListener('command', this, false);
 
         this._initList();
     },
@@ -133,24 +156,23 @@ AboneManagerView.prototype = {
 
 
     uninit: function(){
-        this._tab.querySelector('.button-add').removeEventListener('command', this, false);
-        this._tab.querySelector('.button-remove').removeEventListener('command', this, false);
     },
 
 
-    handleEvent: function(aEvent){
-        if(aEvent.type !== 'command') return;
-
-        switch(aEvent.originalTarget.className){
+    doCommand: function(name){
+        switch(name){
             case 'button-add':
                 this.add();
                 break;
 
-            case 'button-remove':
-                this.remove();
+            case 'context-add':
+                this._textbox.focus();
                 break;
 
-            default:
+            case 'button-remove':
+            case 'context-remove':
+                this.remove();
+                break;
         }
     },
 
@@ -159,8 +181,13 @@ AboneManagerView.prototype = {
      * あぼーんデータが更新された時に呼ばれる
      * (オブザーバから通知された時に表示を更新する)
      */
-    update: function(){
+    update: function(updatedData){
         this._initList();
+
+        this._listbox.value = updatedData;
+
+        if(this._listbox.selectedIndex === -1)
+            this._listbox.selectedIndex = 0;
     },
 
 
@@ -195,7 +222,18 @@ AboneManagerView.prototype = {
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
-        ChaikaAboneManager[this._type].remove(this._listbox.selectedItem.value);
+        let rv;
+
+        if(this._listbox.selectedItems.length > 1){
+            rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+        }else{
+            rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
+        }
+
+        if(rv){
+            this._listbox.selectedItems.map((node) => node.value)
+                                       .forEach((item) => ChaikaAboneManager[this._type].remove(item));
+        }
     }
 
 };
@@ -213,11 +251,6 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
             AboneManagerView.prototype._init.apply(this, arguments);
 
             this._editor = document.getElementById('ngex-editor');
-
-            this._listbox.addEventListener('select', this, false);
-            this._tab.querySelector('.button-add').addEventListener('command', this, false);
-            this._tab.querySelector('.button-remove').addEventListener('command', this, false);
-            this._tab.querySelector('.button-save').addEventListener('command', this, false);
 
             if(this._listbox.getRowCount() > 0){
                 setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
@@ -249,39 +282,20 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
     },
 
 
-    uninit: {
-        value: function(){
-            AboneManagerView.prototype.uninit.apply(this, arguments);
-
-            this._listbox.removeEventListener('select', this, false);
-            this._tab.querySelector('.button-add').removeEventListener('command', this, false);
-            this._tab.querySelector('.button-remove').removeEventListener('command', this, false);
-            this._tab.querySelector('.button-save').removeEventListener('command', this, false);
-        }
-    },
-
-
-    handleEvent: {
-        value: function(aEvent){
-            switch(aEvent.type){
-                case 'select':
-                    this.populateData(JSON.parse(this._listbox.selectedItem.value), true);
+    doCommand: {
+        value: function(name){
+            switch(name){
+                case 'button-add':
+                case 'context-add':
+                    this.add();
                     break;
 
-                case 'command':
-                    switch(aEvent.originalTarget.className){
-                        case 'button-add':
-                            this.add();
-                            break;
+                case 'context-remove':
+                    this.remove();
+                    break;
 
-                        case 'button-remove':
-                            this.remove();
-                            break;
-
-                        case 'button-save':
-                            this.save();
-                            break;
-                    }
+                case 'button-save':
+                    this.save();
                     break;
             }
         }
@@ -289,25 +303,15 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
 
 
     /**
-     * @param {String} updatedData 更新されたデータ (JSON)
-     */
-    update: {
-        value: function(updatedData){
-            this._initList();
-            this._listbox.value = updatedData;
-
-            if(this._listbox.selectedIndex === -1)
-                this._listbox.selectedIndex = 0;
-        }
-    },
-
-
-    /**
-     * @param {NGExData} aData 表示するデータ
+     * @param {NGExData|String} aData 表示するデータ
      * @param {Boolean} inContext ページ内表示かどうか
      */
     populateData: {
         value: function(aData, inContext){
+            if((typeof aData) === 'string'){
+                aData = JSON.parse(aData);
+            }
+
             if(inContext){
                 this._editor.collapsed = false;
                 this._editor.populateData(aData);
