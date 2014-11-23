@@ -6,10 +6,13 @@
 <?xml-stylesheet href="chrome://chaika/content/board/marble.css" type="text/css"?>
 <?xml-stylesheet href="chrome://chaika/skin/board/page.css" type="text/css"?>
 
-<page id="chaikaBoardPage" onload="startup()" onunload="shutdown()"
-        onmousedown="eventBubbleCheck(event)" onkeypress="eventBubbleCheck(event)"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+<page id="chaikaBoardPage"
+      onload="startup()"
+      onunload="shutdown()"
+      onmousedown="eventBubbleCheck(event)"
+      onkeypress="eventBubbleCheck(event)"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
 <script type="application/javascript" src="chrome://chaika/content/board/page.js"/>
 <script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js"/>
@@ -18,8 +21,8 @@
 
 <popupset>
     <menupopup id="boardTreeContextMenu"
-            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-            onpopupshowing="return BoardTree.showContext(event)"/>
+               style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
+               onpopupshowing="return BoardTree.showContext(event)"/>
 </popupset>
 
 
@@ -34,7 +37,8 @@
     </deck>
 
     <marbletextbox id="searchTextBox" value="" emptytext="フィルタ" type="search"
-            timeout="500" oncommand="BoardTree.initTree(true)"/>
+                   timeout="500" oncommand="BoardTree.initTree(true)"/>
+
     <marblebuttongroup id="filterGroup" value="0" persist2="value">
         <marblebutton label="すべて" value="0" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
         <marblebutton label="TOP200" value="200" oncommand="setTimeout(function(){ BoardTree.initTree(); }, 0)"/>
@@ -46,8 +50,9 @@
 
     <marblebutton label="ツール" type="menu">
         <menupopup id="popTools" position="after_end">
-            <menuitem label="ブラウザで表示" oncommand="showBrowser(false)"
-                onclick="if(event.button==1)showBrowser(true)"/>
+            <menuitem label="ブラウザで表示"
+                      oncommand="showBrowser(false)"
+                      onclick="if(event.button === 1) showBrowser(true)"/>
             <menuitem label="ログディレクトリの表示" oncommand="openLogsDir()"/>
             <menuitem label="板情報の更新" oncommand="settingUpdate()"/>
             <menuitem label="新規スレッド作成" oncommand="postNewThread()"/>
@@ -56,7 +61,7 @@
         </menupopup>
     </marblebutton>
 
-    <marblebutton id="Update"     label="更新" oncommand="subjectUpdate(event)" />
+    <marblebutton id="Update" label="更新" oncommand="subjectUpdate()" />
 </marbletoolbar>
 
 
