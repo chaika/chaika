@@ -524,16 +524,45 @@ var Bbsmenu = {
         return result;
     },
 
-    getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
-        var bbsmenuDoc = this._DOMParser.parseFromString("<bbsmenu/>", "text/xml");
-        var outsideDoc = this.getOutsideDoc();
 
-        var nodes = outsideDoc.documentElement.childNodes;
-        for(var i=0; i<nodes.length; i++){
-            var node = nodes[i];
-            var newNode = bbsmenuDoc.importNode(node, true);
-            bbsmenuDoc.documentElement.appendChild(newNode);
+    openOutsideXML: function(){
+        let userOutsideFile = ChaikaCore.getDataDir();
+        userOutsideFile.appendRelativePath('favorite_boards.xml');
+
+        ChaikaCore.io.reveal(userOutsideFile);
+    },
+
+
+    getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
+        let bbsmenuDoc = this._DOMParser.parseFromString("<bbsmenu/>", "text/xml");
+
+        let importOutsideDoc = function(file){
+            let doc = this.getOutsideDoc(file);
+
+            Array.slice(doc.documentElement.childNodes).forEach((node) => {
+                let bbsmenuNode = bbsmenuDoc.importNode(node, true);
+                bbsmenuDoc.documentElement.appendChild(bbsmenuNode);
+            });
+        }.bind(this);
+
+
+        let defaultOutsideFile = ChaikaCore.getDefaultsDir();
+        defaultOutsideFile.appendRelativePath("outside.xml");
+
+        importOutsideDoc(defaultOutsideFile);
+
+        let userOutsideFile = ChaikaCore.getDataDir();
+        userOutsideFile.appendRelativePath('favorite_boards.xml');
+
+        if(!userOutsideFile.exists()){
+            let defaultUserOutside = ChaikaCore.getDefaultsDir();
+            defaultUserOutside.appendRelativePath('favorite_boards.xml');
+
+            defaultUserOutside.copyTo(userOutsideFile.parent, null);
         }
+
+        importOutsideDoc(userOutsideFile);
+
 
         var storage = ChaikaCore.storage;
         var sql = "SELECT title, url, path, board_type, is_category FROM bbsmenu;";
@@ -576,20 +605,14 @@ var Bbsmenu = {
     },
 
 
-    getOutsideDoc: function Bbsmenu_getOutsideDoc(){
-        var outsideXMLFile = ChaikaCore.getDefaultsDir();
-        outsideXMLFile.appendRelativePath("outside.xml");
+    getOutsideDoc: function Bbsmenu_getOutsideDoc(file){
+        let outsideXMLString = ChaikaCore.io.readString(file, 'UTF-8');
+        let outsideDoc = this._DOMParser.parseFromString(outsideXMLString, 'text/xml');
 
-        var outsideXMLString = ChaikaCore.io.readString(outsideXMLFile, 'UTF-8');
-        var outsideDoc = this._DOMParser.parseFromString(outsideXMLString, 'text/xml');
-
-        var categoryNodes = outsideDoc.getElementsByTagName("category");
-
-        for(var i=0; i<categoryNodes.length; i++){
-            let node = categoryNodes[i];
-            node.setAttribute("isContainer", "true");
-            node.setAttribute("isOpen", "false");
-        }
+        Array.slice(outsideDoc.getElementsByTagName('category')).forEach((category) => {
+            category.setAttribute('isContainer', 'true');
+            category.setAttribute('isOpen', 'false');
+        });
 
         return outsideDoc;
     }

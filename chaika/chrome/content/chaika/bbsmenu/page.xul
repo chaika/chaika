@@ -53,6 +53,7 @@
         <menu id="toolsMenu" label="ツール" class="plain menu-iconic">
             <menupopup id="toolsMenuPopup" position="after_end">
                 <menuitem label="BBSMENU を更新" oncommand="BbsmenuUpdater.update()" />
+                <menuitem label="外部板を追加" oncommand="Bbsmenu.openOutsideXML()" />
                 <menuseparator />
                 <menu label="マネージャを開く">
                     <menupopup>

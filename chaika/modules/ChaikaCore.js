@@ -4,6 +4,7 @@
 EXPORTED_SYMBOLS = ["ChaikaCore"];
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
 
@@ -1109,40 +1110,60 @@ ChaikaIO.prototype = {
 
 
     /**
-     * ファイラで指定したディレクトリを開く
+     * ファイラでファイルやディレクトリを開く
      * @param {nsIFile} aDir 開くディレクトリ
      * @return {Boolean} 成功したら真を返す
      */
-    revealDir: function ChaikaIO_revealDir(aDir){
-        if(!(aDir instanceof Ci.nsIFile)){
+    reveal: function(aFile){
+        if(!(aFile instanceof Ci.nsIFile)){
             throw makeException(Cr.NS_ERROR_INVALID_POINTER);
         }
-        if(!aDir.isDirectory()){
-            throw makeException(Cr.NS_ERROR_INVALID_ARG);
-        }
 
-        try{ // ディレクトリに関連づけられたファイラで開く
-            aDir.launch();
+        try{
+            // 関連づけられたファイラで開く
+            aFile.launch();
             return true;
         }catch(ex){}
 
-        try{ // OS の機能でディレクトリを開く
-            aDir.reveal();
+        try{
+            // OS の機能で開く
+            aFile.reveal();
             return true;
         }catch(ex){}
 
-        try{ // file: プロトコルで開く
-            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-            var dirURI = ioService.newFileURI(aDir);
-            var protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
-                        .getService(Ci.nsIExternalProtocolService);
-            protocolService.loadUrl(dirURI);
+        try{
+            // file: プロトコルで開く
+            let uri = Services.io.newFileURI(aFile);
+            let protocolService = Cc["@mozilla.org/uriloader/external-protocol-service;1"]
+                                    .getService(Ci.nsIExternalProtocolService);
+            protocolService.loadUrl(uri);
+
             return true;
         }catch(ex){
             ChaikaCore.logger.error(ex);
         }
 
         return false;
+    },
+
+
+    /**
+     * ファイラで指定したディレクトリを開く
+     * @deprecated
+     * @param {nsIFile} aDir 開くディレクトリ
+     * @return {Boolean} 成功したら真を返す
+     * @note 後方互換性のために残っている. 通常は ChaikaIO#reveal をつかうこと.
+     */
+    revealDir: function ChaikaIO_revealDir(aDir){
+        if(!(aDir instanceof Ci.nsIFile)){
+            throw makeException(Cr.NS_ERROR_INVALID_POINTER);
+        }
+
+        if(!aDir.isDirectory()){
+            throw makeException(Cr.NS_ERROR_INVALID_ARG);
+        }
+
+        this.reveal(aDir);
     },
 
 
