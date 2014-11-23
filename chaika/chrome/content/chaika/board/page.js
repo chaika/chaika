@@ -280,7 +280,7 @@ var BoardTree = {
                 title: thread.getAttribute('title'),
                 date: thread.getAttribute('created'),
                 thread_url: thread.getAttribute('url'),
-                board_url: gBoard.url,
+                board_url: gBoard.url.spec,
                 isThread: true
             });
 

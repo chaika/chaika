@@ -188,7 +188,7 @@ var NGExData = {
     /**
      * あぼーんの対象
      * @type {String}
-     * @note 'post' (レス), 'thread' (スレッド) の2通りのみが可
+     * @note 'post' (レス), 'thread' (スレッド) のみが可
      * @required
      */
     target: 'post',
@@ -196,7 +196,7 @@ var NGExData = {
     /**
      * マッチの方法
      * @type {String}
-     * @note 'any' (いづれか), 'all' (全て) の2通りのみが可
+     * @note 'any' (いづれか), 'all' (全て) のみが可
      * @required
      */
     match: 'all',
