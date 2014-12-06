@@ -10,8 +10,7 @@
 
 <binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">
     <content>
-        <xul:arrowscrollbox orient="vertical" flex="1">
-            <children />
+        <xul:arrowscrollbox orient="vertical" flex="1" anonid="root" class="chaika-browser-menu-root">
             <xul:menu label="あぼーん" anonid="abone">
                 <xul:menupopup>
                     <xul:menuitem label="名前" anonid="abone-name" />
@@ -87,6 +86,10 @@
             <xul:menuseparator anonid="sidebar-sep" />
 
             <xul:menuitem label="オプション..." anonid="open-settings"/>
+
+            <xul:menuseparator anonid="chaika-sep" class="chaika-shown-when-flattened" />
+
+            <children />
         </xul:arrowscrollbox>
     </content>
 
@@ -177,21 +180,28 @@
         <method name="_getPlainURL">
             <parameter name="aURI"/>
             <body><![CDATA[
-                if(!(aURI instanceof Components.interfaces.nsIURI)){
-                    aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
+                let spec = aURI instanceof Components.interfaces.nsIURI ? aURI.spec : aURI;
+
+                // Google リダイレクタ対策
+                if(spec.contains('google') && spec.contains('/url?')){
+                    spec = decodeURIComponent(spec.match(/url=([^&]*)/i)[1]);
                 }
 
-                if(!this._isChaika(aURI)) return aURI;
+                let uri = Services.io.newURI(spec, null, null).QueryInterface(Ci.nsIURI);
 
-                var plainURL = aURI.path.substring(1).replace(/^thread\//, "");
+                if(!this._isChaika(uri)){
+                    return uri;
+                }else{
+                    let plainURL = uri.path.substring(1)
+                                           .replace(/^thread\//, "")
+                                           .replace("/test/read.html/", "/test/read.cgi/")
+                                           .replace("/test/mread.cgi/", "/test/read.cgi/");
 
-                plainURL = plainURL.replace("/test/read.html/", "/test/read.cgi/")
-                                    .replace("/test/mread.cgi/", "/test/read.cgi/");
-
-                try{
-                    return Services.io.newURI(plainURL, null, null);
-                }catch(ex){
-                    return null;
+                    try{
+                        return Services.io.newURI(plainURL, null, null);
+                    }catch(ex){
+                        return null;
+                    }
                 }
             ]]></body>
         </method>
@@ -305,6 +315,8 @@
                 const isOnThread = this._isThread(currentURI);
                 const isOnBoard = this._isBoard(currentURI);
 
+                this.ChaikaCore.logger.debug(gContextMenu);
+
                 const isContextMenu = !!gContextMenu;
                 const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
                 const isOnBBSLink = isContextMenu && gContextMenu.onLink && this._isBBS(gContextMenu.linkURL);
@@ -338,18 +350,17 @@
             <parameter name="aEvent"/>
             <parameter name="aMiddleClicked"/>
             <body><![CDATA[
-                var targetElement = aEvent.originalTarget;
-                var anonymousID = targetElement.getAttribute("anonid");
+                let targetElement = aEvent.originalTarget;
+                let anonymousID = targetElement.getAttribute("anonid");
+                let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
+                let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
+                let selection = content.getSelection();
+                let selectedText = selection.toString();
 
-                var addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
+
                 if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
                     addTab = !addTab;
                 }
-
-                var disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-
-                var selection = content.getSelection();
-                var selectedText = selection.toString();
 
 
                 switch(anonymousID){
@@ -456,13 +467,20 @@
                         }
                 }
 
+
+                //メニューの項目を実行した時にサイドバー開閉コマンドが動作しないようにする
+                aEvent.stopPropagation();
+
+
                 //中クリックの場合にポップアップが閉じないのに対処する
                 if(aMiddleClicked){
                     let contextMenu = document.getElementById('contentAreaContextMenu');
                     let menupopup = this.parentNode.getElementsByTagName('menupopup')[0];
 
+                    //コンテキストメニューの場合
                     contextMenu.hidePopup();
 
+                    //ツールバーボタンの場合
                     if(menupopup){
                         menupopup.hidePopup();
                     }

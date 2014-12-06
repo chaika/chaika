@@ -76,5 +76,9 @@ var gGeneralPane = {
         var txtDataDir = document.getElementById("txtDataDir");
         if(!dataDirPref.value) return "";
         return dataDirPref.value;
+    },
+
+    openReplacementManager: function(){
+        document.documentElement.openWindow("", "chrome://chaika/content/settings/replacement-manager.xul");
     }
 };

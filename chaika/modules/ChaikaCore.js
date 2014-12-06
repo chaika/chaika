@@ -1161,26 +1161,52 @@ ChaikaIO.prototype = {
     /**
      * HTML実体参照にエンコードする
      * @param {String} aStr エンコードする文字列
-     * @return {String}　エンコード後の文字列
+     * @return {String} エンコード後の文字列
      */
     escapeHTML: function ChaikaCore_escapeHTML(aStr){
-        return aStr.split('&').join('&amp;')
-                    .split('<').join('&lt;')
-                    .split('>').join('&gt;')
-                    .split('"').join('&quot;');
+        return aStr.replace(/&/g, '&amp;')
+                   .replace(/</g, '&lt;')
+                   .replace(/>/g, '&gt;')
+                   .replace(/"/g, '&quot;')
+                   .replace(/'/g, '&#039;')
+                   .replace(/\u00a9/g, '&copy;');
     },
 
 
     /**
      * HTML実体参照をデコードする
      * @param {String} aStr デコードする文字列
-     * @return {String}　デコード後の文字列
+     * @return {String} デコード後の文字列
      */
     unescapeHTML: function ChaikaCore_unescapeHTML(aStr){
-        return aStr.split('&lt;').join('<')
-                    .split('&gt;').join('>')
-                    .split('&quot;').join('"')
-                    .split('&amp;').join('&');
+        return aStr.replace(/&lt;/g, '<')
+                   .replace(/&gt;/g, '>')
+                   .replace(/&quot;/g, '"')
+                   .replace(/&#039;/g, "'")
+                   .replace(/&amp;/g, '&')
+                   .replace(/&copy;/g, this.fromUTF8Octets('©'));
+    },
+
+
+    /**
+     * UTF-8 バイト列から文字列へ変換する
+     * @param {Octets} octets UTF-8 バイト列
+     * @return 文字列
+     * @note http://nanto.asablo.jp/blog/2006/10/23/572458 より
+     */
+    fromUTF8Octets: function(octets){
+        return decodeURIComponent(escape(octets));
+    },
+
+
+    /**
+     * 文字列から UTF-8 バイト列へ変換する
+     * @param {String} string 文字列
+     * @return UTF-8 バイト列
+     * @note http://nanto.asablo.jp/blog/2006/10/23/572458 より
+     */
+    toUTF8Octets: function(string){
+        return unescape(encodeURIComponent(string));
     }
 };
 

@@ -3,6 +3,7 @@
 
 EXPORTED_SYMBOLS = ["ChaikaBoard"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
 
 const Ci = Components.interfaces;
@@ -634,13 +635,29 @@ ChaikaBoard.prototype = {
                 let count = Number(RegExp.$3);
                 let title = RegExp.$2;
 
+
                 title = ChaikaCore.io.unescapeHTML(title);
+
 
                 // JBBS では , が ＠｀ に置換されている
                 if(this.type === ChaikaBoard.BOARD_TYPE_JBBS){
                     //\uff20\uff40 = ＠｀
                     title = title.replace(/\uff20\uff40/g, ',');
                 }
+
+
+                // ユーザー定義の置換
+                let replacedThreadData = ChaikaContentReplacer.replace({
+                    title: title,
+                    board_url: this.url.spec,
+                    isThreadList: false,
+                    isSubjectTxt: true
+                });
+
+                if(replacedThreadData){
+                    title = replacedThreadData.title;
+                }
+
 
                 statement.bindStringParameter(0, threadID);
                 statement.bindStringParameter(1, boardID);

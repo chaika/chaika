@@ -17,6 +17,8 @@ toolbarpaletteitem[place="palette"] > #chaika-toolbarbutton{
 
 /** menuitem's display setting **/
 
+.chaika-browser-menu.chaika-status-hidden .chaika-browser-menu-root > :-moz-any(menu, menuitem, menuseparator),
+.chaika-browser-menu:not(.chaika-status-flattened) .chaika-shown-when-flattened,
 .chaika-browser-menu:not(.chaika-status-text-selected) .chaika-shown-when-text-selected,
 .chaika-browser-menu:not(.chaika-status-on-bbs-link) .chaika-shown-on-bbs-link,
 .chaika-browser-menu:not(.chaika-status-on-bbs) .chaika-shown-on-bbs,

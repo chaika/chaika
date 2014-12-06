@@ -3,48 +3,67 @@
 <!-- See license.txt for terms of usage -->
 
 <overlay id="ChaikaBrowserOverlay"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
     <script type="application/javascript" src="chrome://chaika/content/browser/overlay.js"/>
 
     <!-- PopupSet -->
     <popupset id="mainPopupSet">
-        <menupopup id="chaika-history-popup" tooltiptext=""
-            style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
+        <menupopup id="chaika-history-popup"
+                   tooltiptext=""
+                   style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"/>
+
+        <menupopup id="chaika-browsermenu-popup"
+                   tooltiptext=""
+                   style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
     </popupset>
 
     <!-- SideBar Menu -->
     <menupopup id="viewSidebarMenu">
-        <menuitem key="key_viewChaikaSidebar" observes="viewChaikaSidebar"/>
+        <menuitem key="key_viewChaikaSidebar"
+                  observes="viewChaikaSidebar"/>
     </menupopup>
 
     <!-- Open SideBar Shortcut Key -->
     <keyset id="mainKeyset">
-        <key id="key_viewChaikaSidebar" command="viewChaikaSidebar"
-            key="&quot;" modifiers="accel"/>
+        <key id="key_viewChaikaSidebar"
+             command="viewChaikaSidebar"
+             key="&quot;"
+             modifiers="accel"/>
     </keyset>
 
     <!-- Open SideBar Command -->
     <broadcasterset id="mainBroadcasterSet">
-        <broadcaster id="viewChaikaSidebar" autoCheck="false"
-            label="chaika" type="checkbox" group="sidebar"
-            sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
-            sidebartitle="chaika"
-            oncommand="toggleSidebar('viewChaikaSidebar');"/>
+        <broadcaster id="viewChaikaSidebar"
+                     autoCheck="false"
+                     label="chaika"
+                     type="checkbox"
+                     group="sidebar"
+                     sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
+                     sidebartitle="chaika"
+                     oncommand="toggleSidebar('viewChaikaSidebar');"/>
     </broadcasterset>
 
     <!-- Toolbar Button -->
     <toolbarpalette id="BrowserToolbarPalette">
-        <toolbarbutton id="chaika-toolbarbutton" class="toolbarbutton-1 chromeclass-toolbar-additional"
-                label="chaika" tooltiptext="chaika" type="menu">
+        <toolbarbutton id="chaika-toolbarbutton"
+                       class="toolbarbutton-1 chromeclass-toolbar-additional"
+                       label="chaika"
+                       tooltiptext="chaika"
+                       type="menu-button"
+                       contextmenu="chaika-browsermenu-popup"
+                       oncommand="toggleSidebar('viewChaikaSidebar');">
             <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
         </toolbarbutton>
     </toolbarpalette>
 
     <!-- Browser Context Menu -->
     <popup id="contentAreaContextMenu">
-        <menu id="context-chaika" label="chaika" class="menu-iconic"
-                image="chrome://chaika/content/icon.png" insertafter="context-sep-stop">
+        <menu id="context-chaika"
+              label="chaika"
+              class="menu-iconic"
+              image="chrome://chaika/content/icon.png"
+              insertafter="context-sep-stop">
             <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
         </menu>
     </popup>

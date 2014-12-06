@@ -58,10 +58,15 @@ var $ = {
      * class から親要素を取得
      * @param {String} className class 名
      * @param {Node} element 起点の要素
+     * @param {Boolean} [includeSelf=false] 自分自身を対象に含めるか否か
      * @return {Node}
      */
-    parentByClass: function(className, element){
+    parentByClass: function(className, element, includeSelf){
         if(!element) return null;
+
+        if(includeSelf && element.classList.contains(className)){
+            return element;
+        }
 
         while(element = element.parentNode){
             if(element.classList && element.classList.contains(className)){
@@ -237,6 +242,24 @@ var $ = {
 
         return template;
     },
+
+
+    /**
+     * 指定した要素までスクロールする
+     * @param {Element} element スクロール先の要素
+     * @param {Boolean} [ignoreHeader=false] ページヘッダーの分を考慮しないようにする
+     */
+    scrollToElement: function(element, ignoreHeader){
+        if(!element) return;
+
+        let top = element.offsetTop;
+
+        if(!ignoreHeader){
+            top -= $.rect($.id("pageTitle")).height;
+        }
+
+        window.scrollTo(0, top - 30);
+    }
 };
 
 
@@ -292,25 +315,6 @@ var Effects = {
 };
 
 
-function init(){
-    //新着位置までスクロール
-    if(!location.hash){
-        var newMark = $.id("newMark");
-        var pageTitle = $.id("pageTitle");
-
-        if(newMark && pageTitle){
-            window.scrollTo(0, (newMark.offsetTop - $.rect(pageTitle).height - 30));
-        }
-    }
-
-    Prefs.startup();
-    ResInfo.startup();
-    ResCollapse.startup();
-    AboneHandler.startup();
-    Popup.startup();
-}
-
-
 
 /**
  * 設定項目を扱う
@@ -318,16 +322,21 @@ function init(){
 var Prefs = {
 
     defaultValue: {
-
+        // 被参照
         'pref-enable-referred-count': true,
 
+        // ID 表示
         'pref-enable-posts-count': true,
 
+        // ポップアップ
         'pref-include-self-post': false,
         'pref-disable-single-id-popup': false,
         'pref-delay-popup': true,
         'pref-max-posts-in-popup': 20,
 
+        // ショートカットキー
+        'pref-enable-shortcut': true,
+        'pref-enable-resjump': true,
     },
 
 
@@ -353,10 +362,16 @@ var Prefs = {
 
     /**
      * 設定項目を取得する
-     * localStorage.getItem へのシンタックスシュガー
      */
     get: function(key){
-        let value = JSON.parse(localStorage.getItem(key));
+        let value;
+
+        try{
+            value = JSON.parse(localStorage.getItem(key));
+        }catch(ex){
+            // localStorage へのアクセスが拒否された場合
+            value = this.defaultValue[key];
+        }
 
         if(value === null){
             value = this.defaultValue[key];
@@ -368,10 +383,14 @@ var Prefs = {
 
     /**
      * 設定項目を設定する
-     * localStorage.setItem へのシンタックスシュガー
      */
     set: function(key, value){
-        localStorage.setItem(key, JSON.stringify(value));
+        try{
+            localStorage.setItem(key, JSON.stringify(value));
+        }catch(ex){
+            console.warn('The change is ignored and will not be saved ' +
+                         'because writing to the local storage is prohibited by the user.');
+        }
     },
 
 
@@ -395,6 +414,7 @@ var Prefs = {
         this.set(key, value);
     }
 };
+
 
 
 /**
@@ -490,41 +510,225 @@ var ResInfo = {
 
 
 
-var ResCollapse = {
+/**
+ * スレッドに対するコマンドの実装
+ */
+var ThreadCommand = {
 
-    startup: function(){
-        document.addEventListener('click', this.toggleCollapse, false);
+    /**
+     * スレッドに書き込む
+     */
+    write: function(){
+        location.href = 'chaika://post/' + EXACT_URL;
     },
 
 
-    toggleCollapse: function(aEvent){
-        var target = aEvent.originalTarget;
+    /**
+     * 新着レスへ移動する
+     */
+    scrollToNewMark: function(){
+        $.scrollToElement($.id("newMark"));
+    },
 
-        //HTML外要素の場合
-        if(!(target instanceof HTMLElement)) return;
 
-        if(target.className !== "resHeader"){
-            target = $.parentByClass('resHeader', target);
-            if(!target) return;
+    /**
+     * 現在ウィンドウの表示領域にあるレスのうち, もっとも上にあるものを取得する
+     * @return {Element}
+     */
+    _getCurrentRes: function(){
+        let left = document.documentElement.clientWidth / 2;
+        let top = $.rect($.id("pageTitle")).bottom + 40;
+        let res;
+
+        while(!res){
+            let element = document.elementFromPoint(left, top);
+
+            res = $.parentByClass('resContainer', element, true);
+            top += 8;
         }
 
-        var resContainer = target.parentNode;
+        return res;
+    },
 
-        //あぼーんレスでなかった場合は終了
-        if(resContainer.dataset.aboned !== 'true') return;
 
+    /**
+     * 次のレスへ移動する
+     */
+    scrollToNextRes: function(){
+        $.scrollToElement(this._getCurrentRes().nextElementSibling);
+    },
+
+
+    /**
+     * 前のレスへ移動する
+     */
+    scrollToPrevRes: function(){
+        $.scrollToElement(this._getCurrentRes().previousElementSibling);
+    },
+
+
+    /**
+     * スレッドを再読込する
+     */
+    reload: function(){
+        location.reload();
+    }
+};
+
+
+
+/**
+ * レスに対するコマンドの実装
+ */
+var ResCommand = {
+
+    startup: function(){
+        document.addEventListener('click', this, false);
+    },
+
+
+    handleEvent: function(aEvent){
+        let target = aEvent.originalTarget;
+        let container = $.parentByClass('resContainer', target, true);
+
+        // HTML 外要素の場合
+        if(!(target instanceof HTMLElement)) return;
+
+        // レス要素外の場合
+        if(!container) return;
+
+
+        switch(target.className){
+            case 'resNumber':
+                this.replyTo(target.textContent);
+                break;
+
+            default:
+                if($.parentByClass('resHeader', target, true) && container.dataset.aboned === 'true'){
+                    this.toggleCollapse(container);
+                }
+                break;
+        }
+    },
+
+
+    /**
+     * 返信する
+     * @param {Number} resNumber 返信元のレス番号
+     */
+    replyTo: function(resNumber){
+        location.href = 'chaika://post/' + EXACT_URL + resNumber;
+    },
+
+
+    /**
+     * 指定したレスの位置までスクロールする
+     * @param {Number} resNumber スクロール先のレス番号
+     */
+    scrollTo: function(resNumber){
+        $.scrollToElement($.selector('article[data-number="' + resNumber + '"]'));
+    },
+
+
+    /**
+     * レスの表示/非表示を切り替える
+     * @param {Element} resContainer 対象のレス要素
+     */
+    toggleCollapse: function(resContainer){
         resContainer.classList.toggle('collapsed');
     }
 
 };
 
 
+
+/**
+ * キーショートカットを扱う
+ */
+var ShortcutHandler = {
+
+    /**
+     * ショートカットキーと機能とのマッピング
+     * 押した順に + で結合される.
+     * 例えば Control, Shift, Enter の順で押せば Ctrl+Shift+Enter となる.
+     * キーの名称は
+     *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
+     * を, 機能については ThreadCommand, ResCommand を参照.
+     */
+    keyMap: {
+        'Control+Enter': function(){ ThreadCommand.write(); },
+        'Shift+Enter': function(){ ThreadCommand.write(); },
+        'w': function(){ ThreadCommand.write(); },
+        'r': function(){ ThreadCommand.reload(); },
+        'n': function(){ ThreadCommand.scrollToNewMark(); },
+        'j': function(){ ThreadCommand.scrollToNextRes(); },
+        'k': function(){ ThreadCommand.scrollToPrevRes(); },
+        'f': function(){ window.scrollByPages(1); },
+        'b': function(){ window.scrollByPages(-1); },
+    },
+
+
+    /**
+     * 押したキーを格納するスタック
+     * @type {Array.<String>}
+     */
+    _keyStack: [],
+
+
+    /**
+     * 1回の操作であると認識する時間 [ms]
+     * @type {Number}
+     */
+    _threshold: 500,
+
+
+    startup: function(){
+        if(Prefs.get('pref-enable-shortcut')){
+            document.addEventListener('keydown', this, false);
+        }
+    },
+
+
+    handleEvent: function(aEvent){
+        if(aEvent.defaultPrevented) return;
+        if(/(?:textarea|input|select|button)/i.test(aEvent.target.tagName)) return;
+
+
+        this._keyStack.push(aEvent.key);
+
+        let keyStr = this._keyStack.join('+');
+
+        if(this.keyMap[keyStr]){
+            aEvent.preventDefault();
+            this.keyMap[keyStr].call();
+
+        }else if(Prefs.get('pref-enable-resjump') && /^[\d\+]+$/.test(keyStr)){
+            aEvent.preventDefault();
+            ResCommand.scrollTo(keyStr.replace(/\+/g, ''));
+        }
+
+
+        if(this._timer){
+            clearTimeout(this._timer);
+        }
+
+        this._timer = setTimeout(() => { this._keyStack = []; }, this._threshold);
+    }
+};
+
+
+
+
+/**
+ * 即時あぼーんを扱う
+ */
 var AboneHandler = {
 
     startup: function(){
         document.addEventListener("chaika-abone-add", this, false);
         document.addEventListener('chaika-abone-remove', this, false);
     },
+
 
     handleEvent: function(aEvent){
         var aboneType = aEvent.sourceEvent.type;
@@ -708,9 +912,7 @@ var Popup = {
 
 
         //親ポップアップがある場合は記録する
-        var parent = aEvent.relatedTarget.classList.contains('popup') ?
-                     aEvent.relatedTarget :
-                     $.parentByClass('popup', aEvent.relatedTarget);
+        var parent = $.parentByClass('popup', aEvent.relatedTarget, true);
 
         if(parent){
             popupNode.dataset.parent = $.attrs(parent, 'id');
@@ -743,9 +945,7 @@ var Popup = {
         }
 
         //今マウスが乗っているポップアップ要素
-        let hoveredPopup = aEvent.relatedTarget.classList.contains('popup') ?
-                           aEvent.relatedTarget :
-                           $.parentByClass('popup', aEvent.relatedTarget);
+        let hoveredPopup = $.parentByClass('popup', aEvent.relatedTarget, true);
 
 
         //自分自身が hovered の時は消さない
@@ -1029,5 +1229,20 @@ Popup.Image = {
 
 };
 
+
+
+function init(){
+    //レス指定がない場合は新着位置までスクロール
+    if(!location.hash){
+        ThreadCommand.scrollToNewMark();
+    }
+
+    Prefs.startup();
+    ResInfo.startup();
+    ResCommand.startup();
+    ShortcutHandler.startup();
+    AboneHandler.startup();
+    Popup.startup();
+}
 
 init();

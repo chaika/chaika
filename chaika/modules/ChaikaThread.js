@@ -4,7 +4,7 @@
 EXPORTED_SYMBOLS = ["ChaikaThread"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
-
+Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -89,11 +89,33 @@ ChaikaThread.prototype = {
      * @type nsIFile
      */
     datFile: null,
+
     /**
      *
      * @type String
      */
-    title: null,
+    get title(){
+        if(!this._title) return '';
+
+        let replacedThreadData = ChaikaContentReplacer.replace({
+            title: this._title,
+            thread_url: this.plainURL ? this.plainURL.spec : '',
+            board_url: this.boardURL ? this.boardURL.spec : '',
+            isThreadList: false,
+            isSubjectTxt: true
+        });
+
+        if(replacedThreadData){
+            this._title = replacedThreadData.title;
+        }
+
+        return this._title;
+    },
+
+    set title(title){
+        this._title = title;
+    },
+
     /**
      *
      * @type Number

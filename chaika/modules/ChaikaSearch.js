@@ -244,7 +244,7 @@ var ChaikaSearchPlugin = {
      *
      * 検索結果を取得する用途がない場合、null を指定する
      *
-     * @param {String} term 検索文字列 (エンコード済みでない)
+     * @param {String} term 検索文字列 (URIEncode はされていないが, '<' などは ChaikaIO#escapeHTML により実体参照化されている)
      * @return {Promise} - 成功時: 以下のようなオブジェクトの配列を返す必要がある
      *     [
      *         {

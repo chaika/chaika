@@ -173,6 +173,7 @@ body {
 .resNumber {
     font-weight: bold;
     color: #111;
+    cursor: pointer;
 }
 
 .resNew .resNumber {
@@ -351,6 +352,7 @@ body {
     position: fixed;
     top: 0;
     right: 0;
+    line-height: 1.8;
 }
 
 #settings:target{
@@ -371,4 +373,9 @@ label{
 
 fieldset{
     margin-bottom: 1em;
+}
+
+fieldset > div{
+    font-size: 90%;
+    margin: 0.5em 0 0 1.5em;
 }

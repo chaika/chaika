@@ -179,6 +179,81 @@
     </section>
 
     <section>
+        <h1>1.7.1 - 2014/11/2</h1>
+        <ul>
+            <li class="new">
+                置換マネージャによりレスの内容やスレタイを置換できるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/142">#142</a>)
+            </li>
+            <li class="new">
+                ツールバーボタンを押すことでサイドバーが開くようになりました
+                (<a href="https://github.com/chaika/chaika/issues/98">#98</a>)
+            </li>
+            <li class="new">
+                デフォルトスキンでレス番号をクリックして返信できるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/130">#130</a>)
+            </li>
+            <li class="new">
+                デフォルトスキンでキーボートショートカットを実装しました
+                (<a href="https://github.com/chaika/chaika/issues/131">#131</a>)
+                <aside class="info">
+                    <p>
+                        デフォルトのショートカットは以下のとおりです。
+                        変更する場合には script.js 内の <code>ShortcutHandler</code> 部分を直接編集して下さい。
+                    </p>
+                    <ul class="list">
+                        <li>書き込み: Ctrl + Enter, Shift + Enter, w</li>
+                        <li>再読み込み: r</li>
+                        <li>新着レスへ移動: n</li>
+                        <li>次のレスへ移動: j</li>
+                        <li>前のレスへ移動: k</li>
+                        <li>次のページヘ移動: f</li>
+                        <li>前のページヘ移動: b</li>
+                        <li>レス番号へ移動: レス番号を数字で入力</li>
+                    </ul>
+                </aside>
+            </li>
+            <li class="new">
+                ImageViewURLReplace.dat にて変更された URL を表示した場合に元の URL へ移動するかを尋ねるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/65">#65</a>)
+            </li>
+            <li class="fixed">
+                したらばの仕様変更によりスレッドが立てられなくなっていた問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/150">#150</a>)
+            </li>
+            <li class="fixed">
+                コンテキストメニューをフラットにすると正しく動作しなくなる問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/143">#143</a>)
+            </li>
+            <li class="fixed">
+                Google の検索結果でリンク先に関するコンテキストメニューが表示されない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/153">#153</a>)
+            </li>
+            <li class="fixed">
+                NGEx で対象が空文字の場合に正しく条件を判定できない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/151">#151</a>)
+            </li>
+            <li class="fixed">
+                NG データが1つしかない場合にその NG データを削除できない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/152">#152</a>)
+            </li>
+            <li class="fixed">
+                サイドバー検索において一部の文字が検索できない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/136">#136</a>)
+            </li>
+            <li class="fixed">
+                スレッド一覧やスレッド表示で一部の文字が文字化けする問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/135">#135</a>,
+                 <a href="https://github.com/chaika/chaika/issues/149">#149</a>)
+            </li>
+            <li class="fixed">
+                Cookie が無効な場合にデフォルトスキンの全機能が使用できなくなる問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/129">#129</a>)
+            </li>
+        </ul>
+    </section>
+
+    <section>
         <h1>1.7.0 - 2014/10/14</h1>
         <ul>
             <li class="new">あぼーん方法に NGEx を追加

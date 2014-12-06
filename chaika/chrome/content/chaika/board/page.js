@@ -41,6 +41,7 @@ Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -263,7 +264,7 @@ var BoardTree = {
         }
 
 
-        //スレッドあぼーん処理
+        //スレッドあぼーん処理 および スレタイ置換
         var enableHideAbone = ChaikaCore.pref.getBool('thread_hide_abone');
         var threads = gBoard.itemsDoc.documentElement.getElementsByTagName('boarditem');
 
@@ -273,6 +274,8 @@ var BoardTree = {
             //透明あぼーんの影響で最後の方は参照できなくなる
             if(!thread) continue;
 
+
+            //スレッドあぼーん処理
             let hitAboneData = ChaikaAboneManager.shouldAbone({
                 title: thread.getAttribute('title'),
                 date: thread.getAttribute('created'),
@@ -295,6 +298,21 @@ var BoardTree = {
                 }else{
                     thread.setAttribute('title', '***** ABONE ***** (' + hitAboneData.title + ')');
                 }
+            }
+
+
+            //スレタイ置換処理
+            let replacedThreadData = ChaikaContentReplacer.replace({
+                title: thread.getAttribute('title'),
+                date: thread.getAttribute('created'),
+                thread_url: thread.getAttribute('url'),
+                board_url: gBoard.url,
+                isThreadList: true,
+                isSubjectTxt: false
+            });
+
+            if(replacedThreadData){
+                thread.setAttribute('title', replacedThreadData.title);
             }
         }
 

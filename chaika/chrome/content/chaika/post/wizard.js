@@ -121,8 +121,8 @@ function shutdown(){
     // ただし、defaultmail.txtの内容は覚えない
     var sageCheck = document.getElementById("sageCheck");
 
-    if(sageCheck.hasAttribute('previousValue')){
-        sageCheck.setAttribute('checked', sageCheck.getAttribute('previousValue').toString());
+    if(sageCheck.hasAttribute('originalSageChecked')){
+        sageCheck.setAttribute('checked', sageCheck.getAttribute('originalSageChecked').toString());
     }else{
         sageCheck.setAttribute('checked', sageCheck.checked.toString());
     }
@@ -584,16 +584,14 @@ var FormPage = {
 
     /**
      * sageチェックボックスを管理する
-     * @param {Boolean} init 初期化する場合はtrue
+     * @param {Boolean} init 初期化する場合は true
      */
     sageCheck: function FormPage_sageCheck(init){
-        //defaultmail.txtで指定されている場合は、
-        //sageチェックボックスをそれに合わせる
-        if(init && this._mailForm.value){
-            //defaultmail.txtではない時の値を覚えておく
-            this._sageCheck.setAttribute('previousValue', this._sageCheck.checked.toString());
-
-            this._sageCheck.checked = this._mailForm.value.indexOf('sage') > -1;
+        //defaultmail.txt で指定されている場合は、
+        //チェックボックスをそれに合わせて defaultmail.txt ではない時の値を覚えておく
+        if(init && this._getDefaultData('defaultmail.txt') !== null){
+            this._sageCheck.setAttribute('originalSageChecked', this._sageCheck.checked.toString());
+            this._sageCheck.checked = this._mailForm.value.contains('sage');
         }
 
         //emptyTextの設定
@@ -749,37 +747,51 @@ var FormPage = {
     },
 
 
-    _setDefaultMailName: function FormPage_setDefaultMailName(){
+    _getDefaultData: function(aFileName){
+        let defaultDataFile = ChaikaCore.getDataDir();
+        defaultDataFile.appendRelativePath(aFileName);
 
-        function getDefaultData(aFileName){
-            var defaultDataFile = ChaikaCore.getDataDir();
-            defaultDataFile.appendRelativePath(aFileName);
-
-            if(!defaultDataFile.exists()){
-                var defaultsFile = ChaikaCore.getDefaultsDir();
-                defaultsFile.appendRelativePath(defaultDataFile.leafName);
-                defaultsFile.copyTo(defaultDataFile.parent, null);
-                defaultDataFile = defaultDataFile.clone();
-            }
-
-            var urlSpec = gBoard.url.spec;
-            var lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
-                            .replace(/\r/g, "\n").split(/\n+/);
-            for(var i=0; i<lines.length; i++){
-                var data = lines[i].split(/\t+/);
-                if(!(/^\s*(?:;|'|#|\/\/)/).test(data[0]) && urlSpec.indexOf(data[0]) != -1){
-                    return (data[1]);
-                }
-            }
-            return null;
+        if(!defaultDataFile.exists()){
+            let defaultsFile = ChaikaCore.getDefaultsDir();
+            defaultsFile.appendRelativePath(defaultDataFile.leafName);
+            defaultsFile.copyTo(defaultDataFile.parent, null);
+            defaultDataFile = defaultDataFile.clone();
         }
 
+        let boardURL = gBoard.url.spec;
+        let lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
+                                 .split(/[\n\r]+/);
 
-        var defaultData = getDefaultData("defaultmail.txt");
-        if(defaultData) this._mailForm.value = defaultData;
+        for(let i=0; i<lines.length; i++){
+            // タブがない行は単なる空行
+            if(!lines[i].contains('\t')) continue;
 
-        defaultData = getDefaultData("defaultname.txt");
-        if(defaultData) this._nameForm.value = defaultData;
+            // コメント行
+            if(/^\s*(?:;|'|#|\/\/)/.test(lines[i])) continue;
+
+
+            let [boardID, defaultData, target] = lines[i].split(/\t+/);
+
+            if(target && ((target === 'thread' && gWizType !== WIZ_TYPE_NEW_THREAD) ||
+                          (target === 'post' && gWizType !== WIZ_TYPE_RES))){
+                continue;
+            }
+
+            if(boardURL.contains(boardID)){
+                return defaultData;
+            }
+        }
+
+        return null;
+    },
+
+
+    _setDefaultMailName: function FormPage_setDefaultMailName(){
+        let defaultMail = this._getDefaultData("defaultmail.txt");
+        if(defaultMail !== null) this._mailForm.value = defaultMail;
+
+        let defaultName = this._getDefaultData("defaultname.txt");
+        if(defaultName !== null) this._nameForm.value = defaultName;
     }
 };
 

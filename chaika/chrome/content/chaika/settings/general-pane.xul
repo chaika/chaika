@@ -9,18 +9,29 @@
 <prefpane id="paneGeneral" onpaneload="gGeneralPane.startup()">
 
     <preferences>
-        <preference id="extensions.chaika.http_proxy_mode"
-                name="extensions.chaika.http_proxy_mode" type="int"
-                onchange="setContainerDisabled(this.name, 'txtProxyValue', 2)"/>
-        <preference id="extensions.chaika.http_proxy_value"
-                name="extensions.chaika.http_proxy_value" type="unichar"/>
+        <preference id="extensions.chaika.warn_when_delete_log"
+                    name="extensions.chaika.warn_when_delete_log"
+                    type="bool"/>
         <preference id="extensions.chaika.appoint_data_dir"
-                name="extensions.chaika.appoint_data_dir" type="bool"
-                onchange="setContainerDisabled(this.name, 'boxDataDir', true)"/>
+                    name="extensions.chaika.appoint_data_dir"
+                    type="bool"
+                    onchange="setContainerDisabled(this.name, 'boxDataDir', true)"/>
         <preference id="extensions.chaika.data_dir"
-                name="extensions.chaika.data_dir" type="unichar"/>
-        <preference id="extensions.chaika.warn_when_delete_log" type="bool"
-                name="extensions.chaika.warn_when_delete_log"/>
+                    name="extensions.chaika.data_dir"
+                    type="unichar"/>
+        <preference id="extensions.chaika.historymenu.board_max"
+                    name="extensions.chaika.historymenu.board_max"
+                    type="int"/>
+        <preference id="extensions.chaika.historymenu.thread_max"
+                    name="extensions.chaika.historymenu.thread_max"
+                    type="int"/>
+        <preference id="extensions.chaika.http_proxy_mode"
+                    name="extensions.chaika.http_proxy_mode"
+                    type="int"
+                    onchange="setContainerDisabled(this.name, 'txtProxyValue', 2)"/>
+        <preference id="extensions.chaika.http_proxy_value"
+                    name="extensions.chaika.http_proxy_value"
+                    type="unichar"/>
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
@@ -45,6 +56,22 @@
     </groupbox>
 
     <groupbox>
+        <caption class="setting-description" label="履歴" />
+        <vbox align="left">
+            <hbox align="center">
+                <label value="記憶する板の数:"/>
+                <textbox type="number" min="0" max="20" size="1"
+                         preference="extensions.chaika.historymenu.board_max"/>
+            </hbox>
+            <hbox align="center">
+                <label value="記憶するスレの数:"/>
+                <textbox type="number" min="0" max="20" size="1"
+                         preference="extensions.chaika.historymenu.thread_max"/>
+            </hbox>
+        </vbox>
+    </groupbox>
+
+    <groupbox>
         <caption class="setting-description" label="プロキシ" />
         <hbox align="start">
             <menulist preference="extensions.chaika.http_proxy_mode">
@@ -56,6 +83,14 @@
             </menulist>
             <textbox id="txtProxyValue" preference="extensions.chaika.http_proxy_value"/>
         </hbox>
+    </groupbox>
+
+    <groupbox>
+        <caption class="setting-description" label="置換" />
+        <vbox align="start">
+            <button label="置換マネージャ..."
+                    oncommand="gGeneralPane.openReplacementManager()" />
+        </vbox>
     </groupbox>
 
     <vbox style="margin:0.5em 0px 0px 0.5em">

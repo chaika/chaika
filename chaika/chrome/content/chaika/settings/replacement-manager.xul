@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/settings/replacement-manager.css" type="text/css"?>
+
+<window id="winMain" title="置換 マネージャ" width="600" height="500"
+    onload="gReplacementManager.startup()" onunload="gReplacementManager.shutdown()"
+    persist="screenX screenY width height"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <hbox>
+        <spacer flex="1" />
+        <button label="新規" class="button-add" />
+    </hbox>
+
+    <listbox id="rulelist" />
+
+    <hbox>
+        <spacer flex="1" />
+        <button label="保存" class="button-save" />
+        <button label="削除" class="button-remove" />
+    </hbox>
+
+    <vbox id="editor"></vbox>
+
+    <script type="application/javascript; version=1.7"
+            src="chrome://chaika/content/settings/replacement-manager.js"/>
+</window>

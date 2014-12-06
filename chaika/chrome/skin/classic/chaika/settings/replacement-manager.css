@@ -1,0 +1,31 @@
+/* See license.txt for terms of usage */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+window{
+    padding: 1em;
+}
+
+listbox{
+    height: 150px;
+}
+
+#editor{
+    -moz-binding: url(chrome://chaika/content/settings/replacement-manager-editor.xml#editor);
+}
+
+#special-replacement-patterns-desc{
+    background-color: #33dd00;
+}
+
+.dt{
+    font-weight: bold;
+}
+
+.template{
+    display: none;
+}
+
+.fixed-height{
+    overflow: auto;
+}

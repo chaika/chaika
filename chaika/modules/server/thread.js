@@ -6,6 +6,7 @@ Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
 
 
@@ -257,7 +258,7 @@ Thread2ch.prototype = {
             if(this.optionsOnes && this.optionsOnes <= this._logLineCount){
                 this._headerResponded = true;
 
-                let title = UniConverter.toSJIS(this.thread.title);
+                let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                 let header = this.converter.getHeader(title);
                 this.write(header);
                 this.write(this.datLineParse(datLines[this.optionsOnes-1],
@@ -270,7 +271,7 @@ Thread2ch.prototype = {
             }else if(this.optionsEnd  && this.optionsEnd <= this._logLineCount){
                 this._headerResponded = true;
 
-                let title = UniConverter.toSJIS(this.thread.title);
+                let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                 let header = this.converter.getHeader(title);
                 this.write(header);
 
@@ -298,7 +299,7 @@ Thread2ch.prototype = {
                 }else if(this.thread.title){
                     this._headerResponded = true;
 
-                    let title = UniConverter.toSJIS(this.thread.title);
+                    let title = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(this.thread.title));
                     let header = this.converter.getHeader(title);
                     this.write(header);
                 }else{
@@ -383,7 +384,8 @@ Thread2ch.prototype = {
      */
     sanitizeHTML: function(aStr){
         //実体参照を保護する
-        aStr = aStr.replace("&#", " &# ", "g");
+        aStr = aStr.replace("&#", "_&#_", "g")  // &#169; など
+                   .replace(/&([a-zA-Z0-9]+?);/g, '_&_$1;');  // &copy; など
 
         //sanitize
         var doc = this._parser.parseFromString("<html><body></body></html>", 'text/html');
@@ -394,7 +396,8 @@ Thread2ch.prototype = {
         sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g');
 
         //実体参照を元に戻す
-        sanitizedStr = sanitizedStr.replace(" &amp;# ", "&#", "g");
+        sanitizedStr = sanitizedStr.replace("_&amp;#_", "&#", "g")
+                                   .replace(/_&amp;_([a-zA-Z0-9]+?);/g, '&$1;');
 
         // <br /> をもとに戻す
         sanitizedStr = sanitizedStr.replace('<br />', '<br>', 'g');
@@ -436,9 +439,10 @@ Thread2ch.prototype = {
         if(!this._headerResponded && threadTitle){
             this._headerResponded = true;
 
+            // 一旦 ChaikaThread を通して ChaikaContentReplacer を反映させる
             this.thread.title = UniConverter.fromSJIS(threadTitle);
 
-            let header = this.converter.getHeader(threadTitle);
+            let header = this.converter.getHeader(UniConverter.toSJIS(this.thread.title));
             this.write(header);
             this._handler.response.flush();
         }
@@ -572,6 +576,46 @@ Thread2ch.prototype = {
                 }
             }
         }
+
+
+        //ユーザー定義の置換
+        let replacedResData = ChaikaContentReplacer.replace({
+            name: UniConverter.fromSJIS(resName),
+            mail: UniConverter.fromSJIS(resMail),
+            id: resID,
+            msg: UniConverter.fromSJIS(resMes),
+            date: UniConverter.fromSJIS(resDate),
+            ip: resIP,
+            host: resHost,
+            be: resBeID + '',
+            baseBe: resBeBaseID + '',
+            title: this.thread.title,
+            thread_url: this.thread.plainURL.spec,
+            board_url: this.thread.boardURL.spec,
+            isThreadList: false,
+            isSubjectTxt: false
+        });
+
+        if(replacedResData){
+            [
+                resName,
+                resMail,
+                resDate,
+                resIP,
+                resHost,
+                resMes,
+                resID
+            ] = [
+                UniConverter.toSJIS(replacedResData.name),
+                UniConverter.toSJIS(replacedResData.mail),
+                UniConverter.toSJIS(replacedResData.date),
+                UniConverter.toSJIS(replacedResData.ip),
+                UniConverter.toSJIS(replacedResData.host),
+                UniConverter.toSJIS(replacedResData.msg),
+                UniConverter.toSJIS(replacedResData.id),
+            ];
+        }
+
 
         // JSでは "\" が特殊な意味を持つため、数値文字参照に変換
         resName = resName.replace(/([^\x81-\xfc]|^)\x5C/g,"$1&#x5C;");

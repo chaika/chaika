@@ -111,6 +111,7 @@ AboneData.prototype = {
         if(this._data === null){
             ChaikaCore.logger.error('Fail in converting the encoding of ' + this._ngFile.leafName);
             this._data = "";
+            this._encodingError = true;
         }
 
         this._data = this._data.split('\n')
@@ -119,7 +120,7 @@ AboneData.prototype = {
 
 
     _saveNgData: function(){
-        if(this._data && this._data.length > 0){
+        if(this._data && !this._encodingError){
             ChaikaCore.io.writeString(this._ngFile, 'UTF-8', false, this._data.join("\n"));
         }
     },
@@ -219,7 +220,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
         value: function(aRule, aResData){
             let target = aResData[aRule.target];
 
-            if(!target){
+            if(typeof target !== 'string'){
                 return false;
             }
 
