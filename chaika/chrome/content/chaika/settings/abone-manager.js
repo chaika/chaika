@@ -253,7 +253,8 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
             this._editor = document.getElementById('ngex-editor');
 
             if(this._listbox.getRowCount() > 0){
-                setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
+                this._listbox.selectedIndex = 0;
+                this.populateData(this._listbox.selectedItem.value, true);
             }else{
                 this._editor.collapsed = true;
             }
