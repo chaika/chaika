@@ -536,6 +536,11 @@ var Bbsmenu = {
     getBbsmenuDoc: function Bbsmenu_getBbsmenuDoc(){
         let bbsmenuDoc = this._DOMParser.parseFromString("<bbsmenu/>", "text/xml");
 
+
+        /**
+         * 外部板を定義する XML ファイルから板情報を読み込む
+         * @param {nsIFile} file 読み込む XML ファイル
+         */
         let importOutsideDoc = function(file){
             let doc = this.getOutsideDoc(file);
 
@@ -546,11 +551,16 @@ var Bbsmenu = {
         }.bind(this);
 
 
-        let defaultOutsideFile = ChaikaCore.getDefaultsDir();
-        defaultOutsideFile.appendRelativePath("outside.xml");
+        // chaika 関連の外部板
+        if(ChaikaCore.pref.getBool('bbsmenu.add_chaika_boards')){
+            let defaultOutsideFile = ChaikaCore.getDefaultsDir();
 
-        importOutsideDoc(defaultOutsideFile);
+            defaultOutsideFile.appendRelativePath("outside.xml");
+            importOutsideDoc(defaultOutsideFile);
+        }
 
+
+        // ユーザー定義の外部板
         let userOutsideFile = ChaikaCore.getDataDir();
         userOutsideFile.appendRelativePath('favorite_boards.xml');
 
@@ -564,6 +574,7 @@ var Bbsmenu = {
         importOutsideDoc(userOutsideFile);
 
 
+        // BBSMENU
         var storage = ChaikaCore.storage;
         var sql = "SELECT title, url, path, board_type, is_category FROM bbsmenu;";
         var statement = storage.createStatement(sql);

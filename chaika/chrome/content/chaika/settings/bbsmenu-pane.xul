@@ -9,6 +9,10 @@
 <prefpane id="paneBbsmenu" onpaneload="gBbsmenuPane.startup()">
 
     <preferences>
+        <preference id="extensions.chaika.bbsmenu.bbsmenu_html_url"
+                    name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
+        <preference id="extensions.chaika.bbsmenu.add_chaika_boards"
+                    name="extensions.chaika.bbsmenu.add_chaika_boards" type="bool" />
         <preference id="extensions.chaika.bbsmenu.search.default_engine_name"
                     name="extensions.chaika.bbsmenu.search.default_engine_name" type="string" />
         <preference id="extensions.chaika.bbsmenu.toggle_open_container"
@@ -19,13 +23,21 @@
                     name="extensions.chaika.bbsmenu.open_single_click" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.open_new_tab"
                     name="extensions.chaika.bbsmenu.open_new_tab" type="bool"/>
-        <preference id="extensions.chaika.bbsmenu.bbsmenu_html_url"
-                    name="extensions.chaika.bbsmenu.bbsmenu_html_url" type="string"/>
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
             src="chrome://chaika/content/settings/bbsmenu-pane.js"/>
 
+    <groupbox>
+        <caption class="setting-description" label="板一覧データ" />
+        <hbox align="center">
+            <label value="BBSMENU:" />
+            <textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
+            <button label="規定値に戻す" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
+        </hbox>
+        <checkbox label="chaika に関連する板を自動的に追加する"
+                  preference="extensions.chaika.bbsmenu.add_chaika_boards" />
+    </groupbox>
 
     <groupbox>
         <caption class="setting-description" label="検索ボックス" />
@@ -56,20 +68,12 @@
                 </menulist>
             </hbox>
             <checkbox label="一度に開けるカテゴリをひとつに制限する"
-                    preference="extensions.chaika.bbsmenu.toggle_open_container"/>
+                      preference="extensions.chaika.bbsmenu.toggle_open_container"/>
             <checkbox label="シングルクリックで開く"
-                    preference="extensions.chaika.bbsmenu.open_single_click"/>
+                      preference="extensions.chaika.bbsmenu.open_single_click"/>
             <checkbox label="新しいタブで開く"
-                    preference="extensions.chaika.bbsmenu.open_new_tab"/>
+                      preference="extensions.chaika.bbsmenu.open_new_tab"/>
         </vbox>
-    </groupbox>
-
-    <groupbox>
-        <caption class="setting-description" label="板一覧取得 URL" />
-        <hbox align="center">
-            <textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
-            <button label="規定値に戻す" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
-        </hbox>
     </groupbox>
 
 </prefpane>
