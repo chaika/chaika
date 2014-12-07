@@ -10,6 +10,9 @@ var gEditor;
 function startup(){
     gEditor = document.getElementById('ngex-editor');
 
+    gEditor.setAutoNaming(true);
+    gEditor._setExpirePreset('today', true);
+
     if('arguments' in window &&
        window.arguments.length > 0 &&
        typeof window.arguments[0] === 'object'){

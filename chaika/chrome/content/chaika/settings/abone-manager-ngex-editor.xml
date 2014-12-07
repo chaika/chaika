@@ -95,12 +95,6 @@
 
             this._labelbox = this._root.querySelector('.label');
             this._ruleEditor = this._root.querySelector('.rule-editor');
-
-            this.setAutoNaming(true);
-
-            setTimeout(() => {
-                this._setExpirePreset('today', true);
-            }, 0);
         ]]></constructor>
 
 
@@ -121,8 +115,10 @@
                                 break;
 
                             default:
-                                if(target.matches && target.matches('.expire-preset menuitem') ||
-                                   target.mozMatchesSelector && target.mozMatchesSelector('.expire-preset menuitem')){
+                                if(target.matches &&  // For Firefox 34+
+                                   target.matches('.expire-preset menuitem') ||
+                                   target.mozMatchesSelector &&  // For Firefox 33-
+                                   target.mozMatchesSelector('.expire-preset menuitem')){
                                         this._setExpirePreset(target.value);
                                 }
                         }
@@ -274,7 +270,7 @@
                 if(ngData.expire){
                     this._populateExpire(new Date(ngData.expire));
                 }else{
-                    this._setExpirePreset('today');
+                    this._setExpirePreset('today', true);
                 }
 
                 this._ruleEditor.populateData({
