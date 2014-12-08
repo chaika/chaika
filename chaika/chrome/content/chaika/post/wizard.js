@@ -783,7 +783,8 @@ var FormPage = {
         }
 
         let boardURL = gBoard.url.spec;
-        let lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
+        let titleSpec = ((gWizType == WIZ_TYPE_RES) ? gThread.title : gBoard.getTitle());
+        let lines = ChaikaCore.io.readString(defaultDataFile, "UTF-8")
                                  .split(/[\n\r]+/);
 
         for(let i=0; i<lines.length; i++){
@@ -795,13 +796,22 @@ var FormPage = {
 
 
             let [boardID, defaultData, target] = lines[i].split(/\t+/);
+            let title = '';
+
+            let idx = boardID.indexOf(' ');
+            if(idx !== -1){
+                // スペースより後ろをスレタイ
+                title = boardID.slice(idx + 1);
+                // スペースより前を boardID とする
+                boardID = boardID.slice(0, idx);
+            }
 
             if(target && ((target === 'thread' && gWizType !== WIZ_TYPE_NEW_THREAD) ||
                           (target === 'post' && gWizType !== WIZ_TYPE_RES))){
                 continue;
             }
 
-            if(boardURL.contains(boardID)){
+            if(boardURL.contains(boardID) && titleSpec.contains(title)){
                 return defaultData;
             }
         }
