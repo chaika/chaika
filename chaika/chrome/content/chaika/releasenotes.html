@@ -179,6 +179,166 @@
     </section>
 
     <section>
+        <h1>1.7.2 - 2014/12/</h1>
+        <ul>
+            <li class="new">
+                NGEx や置換マネージャの条件を入れ子にできるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/148">#148</a>)
+            </li>
+            <li class="new">
+                NGEx の有効期限をプリセットから選べるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/147">#147</a>)
+            </li>
+            <li class="new">
+                NGEx や置換マネージャの編集欄がウィンドウサイズに応じて広がるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/132">#132</a>)
+            </li>
+            <li class="new">
+                AA マネージャ, NGEx, 置換マネージャの項目リスト部分においてコンテキストメニューが実装されました
+                (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+                <aside class="info">
+                    <p>
+                        コンテキストメニューから新規項目の追加や削除が行えるようになりました。
+                    </p>
+                </aside>
+            </li>
+            <li class="new">
+                置換マネージャにおいて ReplaceStr.txt 形式のデータをインポートできるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/10">#10</a>)
+            </li>
+            <li class="new">
+                サイドバーの「ツール」メニューから各マネージャやフォルダを開けるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/182">#182</a>)
+            </li>
+            <li class="new">
+                置換マネージャを開くメニューがコンテキストメニューに追加されました
+                (<a href="https://github.com/chaika/chaika/issues/179">#179</a>)
+            </li>
+            <li class="new">
+                まちBBS のホスト表示に対応しました
+                (<a href="https://github.com/chaika/chaika/issues/201">#201</a>)
+            </li>
+            <li class="new">
+                ImageViewURLReplace.dat に関する通知の表示を、通知のオプションから無効化できるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/164">#164</a>)
+            </li>
+            <li class="new">
+                板一覧でキーボートショートカットを実装しました
+                (<a href="https://github.com/chaika/chaika/issues/171">#171</a>)
+                <aside class="info">
+                    <p>
+                        デフォルトのショートカットは以下のとおりです。
+                    </p>
+                    <ul class="list">
+                        <li>選択したスレッドを開く: Enter</li>
+                        <li>選択したスレッドを新規タブで開く: Ctrl+Enter, Alt+Enter</li>
+                        <li>スレッド一覧を更新する: r</li>
+                        <li>検索欄にフォーカスを移す: f</li>
+                        <li>下のスレッドへフォーカスを移す: j, ↓</li>
+                        <li>上のスレッドへフォーカスを移す: k, ↑</li>
+                        <li>1ページ分下へ移動する: Space</li>
+                        <li>1ページ分上へ移動する: Shift+Space</li>
+                    </ul>
+                </aside>
+            </li>
+            <li class="new">
+                デフォルトスキンに関して以下の改善を行いました
+                <ul class="list">
+                    <li>
+                        ヘッダー部分に新着レス数やスレッドサイズなどの表示を追加しました
+                    </li>
+                    <li>
+                        ポップアップの左部分に余白をあけることで逆参照がたどりやすくなりました
+                        (<a href="https://github.com/chaika/chaika/issues/161">#161</a>)
+                    </li>
+                    <li>
+                        ポップアップを上方向に表示するオプションを実装しました
+                        (<a href="https://github.com/chaika/chaika/issues/162">#162</a>)
+                    </li>
+                    <li>
+                        画像かどうかの判定を緩くするオプションを実装しました
+                    </li>
+                    <li>
+                        ポップアップが消えやすい問題を修正しました
+                        (<a href="https://github.com/chaika/chaika/issues/163">#163</a>)
+                    </li>
+                    <li>
+                        ID が空のときに発言数カウントが正しく動作しない問題を修正しました
+                        (<a href="https://github.com/chaika/chaika/issues/165">#165</a>)
+                    </li>
+                    <li>
+                        ID 抽出ポップアップにて他のポップアップの内容が含まれる問題を修正しました
+                    </li>
+                    <li>
+                        ポップアップの遅延が常に無効になっていた問題を修正しました
+                    </li>
+                    <li>
+                        ウィンドウの高さが低い場合にオプションが見切れてしまう問題を修正しました
+                    </li>
+                </ul>
+            </li>
+
+            <li class="removed">
+                NGEx や置換マネージャのウィンドウサイズを自動的に変更する機能を廃止しました
+                (<a href="https://github.com/chaika/chaika/issues/170">#170</a>)
+            </li>
+
+            <li class="changed">
+                外部板を追加する方法が変更されました
+                <aside class="info">
+                    <p>
+                        outside.xml を編集している場合には移行作業が必要となります。
+                        詳細につきましては
+                        <a href="https://github.com/chaika/chaika/wiki/%E5%A4%96%E9%83%A8%E6%9D%BF">Wiki</a>
+                        をご覧ください。
+                    </p>
+                    <p>
+                        この変更に伴い, 以下の機能が追加されました。
+                    </p>
+                    <ul class="list">
+                        <li>chaika 関連の板を自動的に一覧に追加するかどうかを設定できるようになりました。</li>
+                        <li>板一覧の「ツール」メニューから外部板を追加するファイルを開けるようになりました。</li>
+                    </ul>
+                </aside>
+            </li>
+
+            <li class="fixed">
+                スタートページを about:config に設定している場合に、起動時にツールバーボタンが常に表示される問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/159">#159</a>)
+            </li>
+            <li class="fixed">
+                不具合報告テンプレートにセキュリティやプライバシーに関わる情報が含まれる可能性がある問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/168">#168</a>)
+            </li>
+            <li class="fixed">
+                スレッド一覧において板URLを条件に設定したNGExや置換が動作しない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/187">#187</a>,
+                <a href="https://github.com/chaika/chaika/issues/200">#200</a>)
+            </li>
+            <li class="fixed">
+                板URLに対して「リンク先を chaika で開く」が動作しない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/189">#189</a>)
+            </li>
+            <li class="fixed">
+                コンテキストメニューをフラットにしている場合に、ブラウザのコンテキストメニューが動作しなくなることがある問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/190">#190</a>)
+            </li>
+            <li class="fixed">
+                リンク中に「|」が含まれる場合にリンクが途切れてしまう問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/180">#180</a>)
+            </li>
+            <li class="fixed">
+                Aero 環境下でサイドバーのフォルダアイコンが見切れる問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/188">#188</a>)
+            </li>
+            <li class="fixed">
+                Firefox 36 以降で板一覧が更新できない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/158">#158</a>)
+            </li>
+        </ul>
+    </section>
+
+    <section>
         <h1>1.7.1 - 2014/11/2</h1>
         <ul>
             <li class="new">
