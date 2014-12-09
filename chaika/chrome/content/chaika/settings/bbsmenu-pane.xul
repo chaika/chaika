@@ -33,7 +33,7 @@
         <hbox align="center">
             <label value="BBSMENU:" />
             <textbox preference="extensions.chaika.bbsmenu.bbsmenu_html_url" flex="1"/>
-            <button label="規定値に戻す" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
+            <button label="既定値に戻す" oncommand="gBbsmenuPane.resetBbsmenuURL()"/>
         </hbox>
         <checkbox label="chaika に関連する板を自動的に追加する"
                   preference="extensions.chaika.bbsmenu.add_chaika_boards" />
