@@ -47,7 +47,7 @@
 
 
 #boardTree treechildren::-moz-tree-row(highlight-true){
-  background-color: #ff9 !important;
+  background-color: orange !important;
 }
 
 /* 行が選択されている場合には文字色が適切でない場合があるので、
