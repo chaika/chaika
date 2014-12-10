@@ -222,12 +222,14 @@ AboneManagerView.prototype = {
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
-        let rv;
+        let rv = true;
 
-        if(this._listbox.selectedItems.length > 1){
-            rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
-        }else{
-            rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
+        if(ChaikaCore.pref.getBool('abone.warn_when_delete')){
+            if(this._listbox.selectedItems.length > 1){
+                rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+            }else{
+                rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
+            }
         }
 
         if(rv){

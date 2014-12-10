@@ -27,3 +27,20 @@ description.setting-description {
   font-size: 0.9em;
   text-align: right;
 }
+
+#fontSize,
+#aaFontSize,
+#aaLineHeight{
+  width: 3.5em;
+}
+
+#fontPreview,
+#aaFontPreview{
+  width: 420px;
+  height: 180px;
+  padding: 5px;
+}
+
+#lstThreadAAFontList{
+  width: 12em;
+}
