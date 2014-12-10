@@ -343,7 +343,15 @@ AATreeView.prototype = {
     isSorted: function(){ return false; },
 
     canAppend: function(sourceNode, parentNode){
-        return parentNode.childNodes.length === parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
+        try{
+            // For Firefox 32+
+            return parentNode.childNodes.length ===
+                   parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
+        }catch(ex){
+            // For Firefox 31- (slower)
+            return Array.slice(parentNode.childNodes)
+                        .every((node) => node.nodeName === sourceNode.nodeName);
+        }
     },
 
     canDrop: function(targetIndex, orientation, dataTransfer){
