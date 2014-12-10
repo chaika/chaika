@@ -75,7 +75,7 @@ header{
     margin: 0;
     padding: 0.6em;
     width: 100%;
-    background-color: #666;
+    background-color: rgba(0, 0, 0, 0.65);
     color: #eee;
     font-size: 0.9em;
     line-height: 1.0;
@@ -166,16 +166,25 @@ nav > ul > li > ul > li > a:hover{
 /* ***** ***** フッター ***** ***** */
 
 #status {
-    margin: 4em 0 15px 0;
-    text-align: center;
-}
-
-#status > span {
-    padding: 6px 24px;
-    font-size: 0.7em;
+    display: inline-block;
+    margin: 15px 0;
+    margin-left: 50%;
+    transform: translate(-50%);
+    padding: 3px 18px;
     border: 1px solid #BBB;
     border-radius: 6px;
+    text-align: center;
+    font-size: 0.7em;
     color: #888;
+}
+
+:-moz-any(
+    footer[data-status^="\0028\00B4\30FB\03C9\30FB\0060\0029"], /* (´・ω・`) */
+    footer[data-status="\0028\0020\FF70\03C9\FF70\0029\300C\0044\0041\0054\0020\843D\3061\300D"] /* ( ｰωｰ)「DAT 落ち」 */
+) > #status{
+    background-color: #777;
+    color: white;
+    border-color: transparent;
 }
 
 
