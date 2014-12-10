@@ -305,7 +305,7 @@ nav > ul > li > ul > li > a:hover{
 /* ***** ***** ハイライトレス ***** ***** */
 
 .resDateImportant{
-    color: red;
+    color: #E63;
 }
 
 [data-aboned="false"] .resHeaderAboneContent:not(:empty):before{
