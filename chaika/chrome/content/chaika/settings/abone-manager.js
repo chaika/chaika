@@ -291,6 +291,7 @@ NGExAboneManagerView.prototype = Object.create(AboneManagerView.prototype, {
                     this.add();
                     break;
 
+                case 'button-remove':
                 case 'context-remove':
                     this.remove();
                     break;

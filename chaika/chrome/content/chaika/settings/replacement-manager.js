@@ -89,6 +89,7 @@ var gReplacementManager = {
                         this.import();
                         break;
 
+                    case 'button-remove':
                     case 'context-remove':
                         this.remove();
                         break;
