@@ -179,7 +179,7 @@
     </section>
 
     <section>
-        <h1>1.7.2 - 2014/12/</h1>
+        <h1>1.7.2 - 2014/12/27</h1>
         <ul>
             <li class="new">
                 NGEx や置換マネージャの条件を入れ子にできるようになりました
@@ -192,6 +192,15 @@
             <li class="new">
                 NGEx や置換マネージャの編集欄がウィンドウサイズに応じて広がるようになりました
                 (<a href="https://github.com/chaika/chaika/issues/132">#132</a>)
+            </li>
+            <li class="new">
+                あぼーんマネージャや置換マネージャで項目を削除するときに確認ダイアログを表示するようになりました
+                (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+                <aside class="info">
+                    <p>
+                        ダイアログの表示は設定から OFF にすることができます。
+                    </p>
+                </aside>
             </li>
             <li class="new">
                 AA マネージャ, NGEx, 置換マネージャの項目リスト部分においてコンテキストメニューが実装されました
@@ -248,6 +257,10 @@
                         ヘッダー部分に新着レス数やスレッドサイズなどの表示を追加しました
                     </li>
                     <li>
+                        エラーが発生した際にページ下部のステータス表示を強調するようになりました
+                        (<a href="https://github.com/chaika/chaika/issues/219">#219</a>)
+                    </li>
+                    <li>
                         ポップアップの左部分に余白をあけることで逆参照がたどりやすくなりました
                         (<a href="https://github.com/chaika/chaika/issues/161">#161</a>)
                     </li>
@@ -285,6 +298,7 @@
 
             <li class="changed">
                 外部板を追加する方法が変更されました
+                (<a href="https://github.com/chaika/chaika/issues/155">#155</a>)
                 <aside class="info">
                     <p>
                         outside.xml を編集している場合には移行作業が必要となります。
@@ -302,6 +316,11 @@
                 </aside>
             </li>
 
+            <li class="changed">
+                スレッド一覧でのハイライト表示のコントラスト差が軽減されました
+                (<a href="https://github.com/chaika/chaika/issues/217">#217</a>)
+            </li>
+
             <li class="fixed">
                 スタートページを about:config に設定している場合に、起動時にツールバーボタンが常に表示される問題を修正しました
                 (<a href="https://github.com/chaika/chaika/issues/159">#159</a>)
@@ -316,7 +335,7 @@
                 <a href="https://github.com/chaika/chaika/issues/200">#200</a>)
             </li>
             <li class="fixed">
-                板URLに対して「リンク先を chaika で開く」が動作しない問題を修正しました
+                板へのリンクに対して「リンク先を chaika で開く」が動作しない問題を修正しました
                 (<a href="https://github.com/chaika/chaika/issues/189">#189</a>)
             </li>
             <li class="fixed">
@@ -332,8 +351,23 @@
                 (<a href="https://github.com/chaika/chaika/issues/188">#188</a>)
             </li>
             <li class="fixed">
+                Firefox 31 以下で AA マネージャが動作しない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/215">#215</a>)
+            </li>
+            <li class="fixed">
                 Firefox 36 以降で板一覧が更新できない問題を修正しました
                 (<a href="https://github.com/chaika/chaika/issues/158">#158</a>)
+            </li>
+            <li class="fixed">
+                その他軽微なバグ修正や改善を行いました
+                (<a href="https://github.com/chaika/chaika/issues/127">#127</a>,
+                 <a href="https://github.com/chaika/chaika/issues/156">#156</a>,
+                 <a href="https://github.com/chaika/chaika/issues/166">#166</a>,
+                 <a href="https://github.com/chaika/chaika/issues/167">#167</a>,
+                 <a href="https://github.com/chaika/chaika/issues/178">#178</a>,
+                 <a href="https://github.com/chaika/chaika/issues/214">#214</a>,
+                 <a href="https://github.com/chaika/chaika/issues/217">#217</a>,
+                 <a href="https://github.com/chaika/chaika/issues/218">#218</a>)
             </li>
         </ul>
     </section>
