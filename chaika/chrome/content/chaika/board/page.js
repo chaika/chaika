@@ -280,7 +280,7 @@ var BoardTree = {
                 title: thread.getAttribute('title'),
                 date: thread.getAttribute('created'),
                 thread_url: thread.getAttribute('url'),
-                board_url: gBoard.url,
+                board_url: gBoard.url.spec,
                 isThread: true
             });
 
@@ -306,7 +306,7 @@ var BoardTree = {
                 title: thread.getAttribute('title'),
                 date: thread.getAttribute('created'),
                 thread_url: thread.getAttribute('url'),
-                board_url: gBoard.url,
+                board_url: gBoard.url.spec,
                 isThreadList: true,
                 isSubjectTxt: false
             });
@@ -372,21 +372,46 @@ var BoardTree = {
     },
 
     keyDown: function BoardTree_keyDown(aEvent){
-        if(this.tree.currentIndex == -1) return;
+        switch(aEvent.key){
+            case 'Enter':
+                this.openThread(aEvent.ctrlKey || aEvent.altKey);
+                break;
 
-        if(aEvent.keyCode == aEvent.DOM_VK_ENTER || aEvent.keyCode == aEvent.DOM_VK_RETURN){
-            if(aEvent.ctrlKey || aEvent.altKey){
-                this.openThread(true);
-            }else{
-                this.openThread(false);
-            }
+            case 'Spacebar':  // For Firefox 28-
+            case ' ':
+                if(aEvent.shiftKey){
+                    this.tree._moveByPage(-1, 0, aEvent);
+                }else{
+                    this.tree._moveByPage(1, this.tree.view.rowCount - 1, aEvent);
+                }
+                break;
 
-        }else if(aEvent.charCode == aEvent.DOM_VK_SPACE){
-            if(aEvent.shiftKey){
-                this.tree._moveByPage(-1, 0, aEvent);
-            }else{
-                this.tree._moveByPage(1, this.tree.view.rowCount - 1, aEvent);
-            }
+            case 'r':
+                subjectUpdate();
+                break;
+
+            case 'f':
+                document.getElementById('searchTextBox').focus();
+                break;
+
+            case 'j':
+                let nextIndex = this.tree.currentIndex + 1;
+
+                if(nextIndex > this.tree.view.rowCount - 1) nextIndex = this.tree.view.rowCount - 1;
+
+                this.tree.treeBoxObject.view.selection.select(nextIndex);
+                this.tree.treeBoxObject.ensureRowIsVisible(nextIndex);
+                break;
+
+            case 'k':
+                let prevIndex = this.tree.currentIndex - 1;
+
+                if(prevIndex < 0) prevIndex = 0;
+
+                this.tree.treeBoxObject.view.selection.select(prevIndex);
+                this.tree.treeBoxObject.ensureRowIsVisible(prevIndex);
+                break;
+
         }
     },
 
@@ -503,13 +528,11 @@ function setStatus(aString){
 /**
  * subject.txt をダウンロードする
  */
-function subjectUpdate(aEvent, aForce){
-    if(aEvent && aEvent.type=="click" && aEvent.button!=0) return;
-
+function subjectUpdate(aForceUpdate){
         // ダウンロード間隔の制限
     var subjectFile = gBoard.subjectFile.clone();
     var settingFile = gBoard.settingFile.clone();
-    if(subjectFile.exists() && !aForce){
+    if(subjectFile.exists() && !aForceUpdate){
         var interval = new Date().getTime() - subjectFile.lastModifiedTime;
         var updateIntervalLimit =  ChaikaCore.pref.getInt("board.update_interval_limit");
             // 不正な値や、10 秒以下なら 10 秒にする
@@ -599,31 +622,15 @@ function showBrowser(aTab){
 }
 
 function openLogsDir(){
-    var logDir = gBoard.subjectFile.parent;
-    ChaikaCore.io.revealDir(logDir);
+    ChaikaCore.io.reveal(gBoard.subjectFile.parent);
 }
 
 function postNewThread(){
-    var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-
-    var browserWindow = ChaikaCore.browser.getBrowserWindow();
-    browserWindow.openDialog(postWizardURLSpec, "_blank",
-        "chrome, resizable, dialog", gBoard.url.spec, true);
+    ChaikaCore.browser.openWindow("chrome://chaika/content/post/wizard.xul", null, gBoard.url.spec, true);
 }
 
 function openSettings(){
-    var settingDialogURL = "chrome://chaika/content/settings/settings.xul#paneBoard";
-
-    var features = "";
-    try{
-        var pref = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-        var instantApply = pref.getBoolPref("browser.preferences.instantApply");
-        features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-    }catch(ex){
-        features = "chrome,titlebar,toolbar,centerscreen,modal";
-    }
-    var browserWindow = ChaikaCore.browser.getBrowserWindow();
-    browserWindow.openDialog(settingDialogURL, "", features);
+    ChaikaCore.browser.openWindow("chrome://chaika/content/settings/settings.xul#paneBoard", "chaika:settings");
 }
 
 function showBanner(aEvent){
@@ -778,7 +785,7 @@ var UpdateObserver = {
         if(aTopic == "findNewThread:update"){
             var newThreadInfo = JSON.parse(aData);
             if(newThreadInfo.boardURL == gBoard.url.spec){
-                subjectUpdate(null, true);
+                subjectUpdate(true);
             }
             return;
         }

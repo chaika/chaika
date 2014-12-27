@@ -41,10 +41,6 @@ tab[selected="true"] {
     color: black !important;
 }
 
-.template{
-    display: none;
-}
-
-.fixed-height{
-    overflow: auto;
+#ngex-editor{
+    -moz-binding: url(chrome://chaika/content/settings/abone-manager-ngex-editor.xml#editor);
 }

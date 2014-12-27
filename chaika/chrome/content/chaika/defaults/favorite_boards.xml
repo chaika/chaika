@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- See license.txt for terms of usage -->
+
+<!--
+    任意の外部板を板一覧に追加するためのファイルです。
+    編集方法については https://github.com/chaika/chaika/wiki/%E5%A4%96%E9%83%A8%E6%9D%BF を参照して下さい。
+-->
+
+<bbsmenu>
+<!--
+	<category title="パート速報">
+	    <board title="パート速報VIP" url="http://ex14.vip2ch.com/part4vip/" type="0" />
+        <board title="SS速報VIP" url="http://ex14.vip2ch.com/news4ssnip/" type="0" />
+	</category>
+-->
+</bbsmenu>

@@ -1,0 +1,356 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<bindings id="chaikaRuleEditorBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="editor">
+    <content>
+        <xul:vbox flex="1" anonid="root">
+            <xul:vbox class="groups" flex="1" />
+
+            <xul:groupbox class="template group">
+                <xul:caption align="center" pack="start">
+                    <xul:description value="次の" />
+
+                    <xul:menulist class="match">
+                        <xul:menupopup>
+                            <xul:menuitem label="すべて" value="all" />
+                            <xul:menuitem label="いずれか" value="any" />
+                        </xul:menupopup>
+                    </xul:menulist>
+
+                    <xul:description value="のルールに一致:" />
+
+                    <xul:spacer flex="1" />
+
+                    <xul:button label="-"
+                                class="button-remove-group"
+                                tooltiptext="このグループを削除します." />
+                    <xul:button label="+"
+                                class="button-add-group"
+                                tooltiptext="新しい子グループを作成します. Ctrl, Command, Shift のいずれかと共にクリックすると新しい子ルールを追加します." />
+                </xul:caption>
+
+                <xul:vbox class="rules" flex="1" />
+            </xul:groupbox>
+
+            <xul:hbox class="template rule" align="center" pack="start">
+                <xul:menulist class="rule-target">
+                    <xul:menupopup>
+                        <xul:menuitem label="名前" value="name" />
+                        <xul:menuitem label="メール" value="mail" />
+                        <xul:menuitem label="日付" value="date" />
+                        <xul:menuitem label="発信元" value="ip" />
+                        <xul:menuitem label="ホスト" value="host" />
+                        <xul:menuitem label="ID" value="id" />
+                        <xul:menuitem label="BeID" value="be" />
+                        <xul:menuitem label="Be基礎番号" value="baseBe" />
+                        <xul:menuitem label="本文" value="msg" />
+                        <xul:menuitem label="スレタイ" value="title" />
+                        <xul:menuitem label="板URL" value="board_url" />
+                        <xul:menuitem label="スレURL" value="thread_url" />
+                    </xul:menupopup>
+                </xul:menulist>
+
+                <xul:label value="が" />
+
+                <xul:textbox class="rule-query" flex="1" size="10" />
+
+                <xul:menulist class="rule-condition">
+                    <xul:menupopup>
+                        <xul:menuitem label="を含む" value="contains" />
+                        <xul:menuitem label="を含まない" value="notContain" />
+                        <xul:menuitem label="と一致する" value="equals" />
+                        <xul:menuitem label="と一致しない" value="notEqual" />
+                        <xul:menuitem label="で始まる" value="startsWith" />
+                        <xul:menuitem label="で終わる" value="endsWith" />
+                    </xul:menupopup>
+                </xul:menulist>
+
+                <xul:checkbox label="/a/"
+                              tooltiptext="正規表現"
+                              class="rule-regexp" />
+                <xul:checkbox label="Aa"
+                              tooltiptext="大文字小文字を区別する"
+                              class="rule-case-sensitive"
+                              checked="true" />
+
+                <xul:button label="-"
+                            class="button-remove-rule"
+                            tooltiptext="このルールを削除します." />
+                <xul:button label="+"
+                            class="button-add-rule"
+                            tooltiptext="新しいルールを追加します." />
+            </xul:hbox>
+        </xul:vbox>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://chaika/skin/settings/rule-editor.css"/>
+    </resources>
+
+    <handlers>
+        <handler event="command" action="this.handleEvent(event)"/>
+        <handler event="change" action="this.handleEvent(event)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+            this.appendGroupTo(this._root.querySelector('.groups'));
+        ]]></constructor>
+
+
+        <property name="_root"
+                  onget="return document.getAnonymousElementByAttribute(this, 'anonid', 'root')" />
+
+
+        <!--
+        /**
+         * 直下の要素のみに対して querySelectorAll を実行する
+         * Firefox 31- では querySelector における :scope が実装されていないため
+         * その shim として使用する
+         *
+         * @param query {String} セレクタ文字列
+         * @param parent {Element} 親要素
+         * @return <Array.Element>
+         */
+        -->
+        <method name="_querySelectorAllForChildren">
+            <parameter name="query" />
+            <parameter name="parent" />
+            <body><![CDATA[
+                try{
+                    // For Firefox 32+
+                    return parent.querySelectorAll(query);
+                }catch(ex){
+                    // For Firefox 31- (much slower)
+                    function _query(query, parent){
+                        let queries = query.replace(':scope >', '', 'g').split('>');
+                        let children = Array.slice(parent.querySelectorAll(queries.shift()));
+
+                        children = children.filter((node) => node.parentNode === parent);
+
+                        if(!queries.length){
+                            return children;
+                        }else{
+                            return children.reduce((elems, elem) =>
+                                elems.concat(_query(queries.join('>'), elem))
+                            , []);
+                        }
+                    }
+
+                    return _query(query, parent);
+                }
+            ]]></body>
+        </method>
+
+
+
+        <method name="handleEvent">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                let target = aEvent.originalTarget;
+
+                switch(aEvent.type){
+                    case 'command':
+                        switch(target.className){
+                            case 'button-add-group':
+                                if(aEvent.ctrlKey || aEvent.metaKey || aEvent.shiftKey){
+                                    this.appendRuleTo(target.parentNode.nextElementSibling);
+                                }else{
+                                    this.appendGroupTo(target.parentNode.nextElementSibling);
+                                }
+                                break;
+
+                            case 'button-add-rule':
+                                this.appendRuleTo(target.parentNode.parentNode);
+                                break;
+
+                            case 'button-remove-group':
+                                this.removeItem(target.parentNode.parentNode);
+                                break;
+
+                            case 'button-remove-rule':
+                                this.removeItem(target.parentNode);
+                                break;
+                        }
+                        break;
+
+                    case 'change':
+                        break;
+
+                    default:
+                        return;
+                }
+            ]]></body>
+        </method>
+
+        <method name="appendGroupTo">
+            <parameter name="parentNode" />
+            <parameter name="empty" />
+            <body><![CDATA[
+                let template = this._root.querySelector('.template.group');
+                let newGroup = template.cloneNode(true);
+
+                newGroup.classList.remove('template');
+                parentNode.appendChild(newGroup);
+
+                if(!empty){
+                    this.appendRuleToGroup(newGroup);
+                }
+
+                return newGroup;
+            ]]></body>
+        </method>
+
+        <method name="appendRuleTo">
+            <parameter name="parentNode" />
+            <body><![CDATA[
+                let template = this._root.querySelector('.template.rule');
+                let newItem = template.cloneNode(true);
+
+                newItem.classList.remove('template');
+                parentNode.appendChild(newItem);
+
+                return newItem;
+            ]]></body>
+        </method>
+
+        <method name="appendRuleToGroup">
+            <parameter name="groupNode" />
+            <body><![CDATA[
+                return this.appendRuleTo(groupNode.querySelector('.rules'));
+            ]]></body>
+        </method>
+
+        <method name="removeItem">
+            <parameter name="item"/>
+            <body><![CDATA[
+                if(this._querySelectorAllForChildren(':scope > .rule, :scope > .group', item.parentNode).length !== 1){
+                    item.parentNode.removeChild(item);
+                }
+            ]]></body>
+        </method>
+
+        <method name="clearAll">
+            <body><![CDATA[
+                let groups = this._root.querySelector('.groups');
+
+                while(groups.childNodes.length > 0){
+                    groups.removeChild(groups.firstChild);
+                }
+            ]]></body>
+        </method>
+
+        <method name="getLabelText">
+            <body><![CDATA[
+                var getGroupLabel = function(groupNode){
+                    let groupLabel = '';
+                    let match = groupNode.querySelector('caption > .match').selectedItem.label;
+                    let rules = this._querySelectorAllForChildren(':scope > .rules > :-moz-any(.rule, .group)', groupNode);
+
+                    groupLabel = Array.slice(rules).map((node) => {
+                        if(node.classList.contains('rule')){
+                            let target = node.querySelector('.rule-target').selectedItem.label;
+                            let query = node.querySelector('.rule-query').value;
+                            let condition = node.querySelector('.rule-condition').selectedItem.label;
+
+                            return target + 'が' + query + condition;
+                        }else if(node.classList.contains('group')){
+                            return '(' + getGroupLabel(node) + ')';
+                        }
+                    }).join(', ');
+
+                    return groupLabel + ' の' + match;
+                }.bind(this);
+
+                return getGroupLabel(this._root.querySelector('.groups').firstChild);
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * ルールオブジェクトを返す
+         * @return {Group} ruleData
+         * @return {String} ruleData.match 'all' or 'any'
+         * @return {Array.<Group, Rule>} ruleData.rules
+         * @note {String} Rule.target 検索対象 'name', 'msg', etc. See above menulist.rule-target.
+         * @note {String} Rule.query 検索文字列
+         * @note {String} Rule.condition 検索条件 'contains', 'equals', etc. See above menulist.rule-condition.
+         * @note {Boolean} Rule.regexp 正規表現？
+         * @note {Boolean} Rule.ignoreCase 大文字小文字無視？
+         */
+        -->
+        <method name="getRuleData">
+            <body><![CDATA[
+                var getGroupData = function(groupNode){
+                    let groupData = {};
+
+                    groupData.match = groupNode.querySelector('caption > .match').value;
+
+                    let rules = this._querySelectorAllForChildren(':scope > .rules > :-moz-any(.rule, .group)', groupNode);
+
+                    groupData.rules = Array.slice(rules).map((node) => {
+                        if(node.classList.contains('rule')){
+                            return {
+                                target: node.querySelector('.rule-target').value,
+                                query: node.querySelector('.rule-query').value,
+                                condition: node.querySelector('.rule-condition').value,
+                                regexp: node.querySelector('.rule-regexp').checked,
+                                ignoreCase: ! node.querySelector('.rule-case-sensitive').checked
+                            };
+                        }else if(node.classList.contains('group')){
+                            return getGroupData(node);
+                        }
+                    });
+
+                    return groupData;
+                }.bind(this);
+
+                return getGroupData(this._root.querySelector('.groups').firstChild);
+            ]]></body>
+        </method>
+
+        <method name="populateData">
+            <parameter name="ruleData" />
+            <body><![CDATA[
+                this.clearAll();
+
+                var populateGroup = function(group, parentNode){
+                    let groupNode = this.appendGroupTo(parentNode, true);
+
+                    groupNode.querySelector('caption > .match').value = group.match;
+
+                    group.rules.forEach((rule) => {
+                        if(rule.rules instanceof Array && rule.rules.length){
+                            populateGroup(rule, groupNode.querySelector('.rules'));
+                        }else{
+                            let node = this.appendRuleToGroup(groupNode);
+
+                            node.querySelector('.rule-target').value = rule.target;
+                            node.querySelector('.rule-query').value = rule.query;
+                            node.querySelector('.rule-condition').value = rule.condition;
+                            node.querySelector('.rule-regexp').checked = !!rule.regexp;
+                            node.querySelector('.rule-case-sensitive').checked = ! rule.ignoreCase;
+                        }
+                    });
+
+                    if(group.rules.length < 1){
+                        this.appendRuleToGroup(groupNode);
+                    }
+                }.bind(this);
+
+                populateGroup(ruleData, this._root.querySelector('.groups'));
+            ]]></body>
+        </method>
+
+    </implementation>
+</binding>
+
+</bindings>

@@ -28,7 +28,9 @@
                     <xul:menuitem label="タイトル" anonid="copy-title" />
                     <xul:menuitem label="URL" anonid="copy-url" />
                     <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
-                    <xul:menuitem label="タイトルと URL と選択部分" anonid="copy-title-url-selection" class="chaika-shown-when-text-selected" />
+                    <xul:menuitem label="タイトルと URL と選択部分"
+                                  anonid="copy-title-url-selection"
+                                  class="chaika-shown-when-text-selected" />
                 </xul:menupopup>
             </xul:menu>
 
@@ -67,15 +69,19 @@
             <xul:menuseparator anonid="open-link-in-sep" class="chaika-shown-on-bbs-link" />
 
             <xul:menuitem label="すべてのレスを表示" anonid="change-limit-all" class="chaika-shown-on-thread" />
-            <xul:menuitem label="新着50件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
+            <xul:menuitem label="新着 50 件を表示" anonid="change-limit-l50" class="chaika-shown-on-thread" />
             <xul:menuitem label="スレッド一覧を開く" anonid="go-to-board" class="chaika-shown-on-thread" />
             <xul:menuitem label="次のスレッドを検索する" anonid="find-next-thread" class="chaika-shown-on-thread" />
 
             <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="選択部分を AA として登録する" anonid="register-selection-as-aa" class="chaika-shown-when-text-selected" />
+            <xul:menuitem label="選択部分を AA として登録する"
+                          anonid="register-selection-as-aa"
+                          class="chaika-shown-when-text-selected" />
 
-            <xul:menuseparator anonid="extra-utils-sep" class="chaika-shown-when-text-selected" />
+            <xul:menuitem label="置換マネージャ..." anonid="open-replacement-manager" />
+
+            <xul:menuseparator anonid="extra-utils-sep" />
 
             <xul:menuitem label="サイドバーを表示" anonid="toggle-sidebar">
                 <xul:observes element="viewChaikaSidebar" attribute="oncommand" />
@@ -100,6 +106,7 @@
 
     <handlers>
         <handler event="popupshowing" action="this._onPopupshowing(event)" />
+        <handler event="popuphiding" action="this._onPopuphiding(event)" />
         <handler event="command" action="this._doCommand(event, false)"/>
         <handler event="click" button="1" action="this._doCommand(event, true)"/>
     </handlers>
@@ -151,14 +158,16 @@
         -->
         <method name="_getCurrentBoardURL">
             <body><![CDATA[
-                var currentURI = null;
+                let currentURI = null;
+
                 try{
                     currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
                 }catch(ex){
                     return null;
                 }
 
-                var threadURI = this._getCurrentThreadURL();
+                let threadURI = this._getCurrentThreadURL();
+
                 if(threadURI){
                     return this.ChaikaThread.getBoardURL(threadURI);
                 }else if(this._isBoard(currentURI)){
@@ -180,6 +189,8 @@
         <method name="_getPlainURL">
             <parameter name="aURI"/>
             <body><![CDATA[
+                if(!aURI) return;
+
                 let spec = aURI instanceof Components.interfaces.nsIURI ? aURI.spec : aURI;
 
                 // Google リダイレクタ対策
@@ -302,6 +313,25 @@
             <body><![CDATA[
                 //表示・非表示を制御するためのステータスを設定する
                 this._setStatus();
+
+                // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
+                // への対処のため、gContextMenu をストアしておく
+                this._gContextMenu = gContextMenu;
+            ]]></body>
+        </method>
+
+
+        <method name="_onPopuphiding">
+            <parameter name="aEvent" />
+            <body><![CDATA[
+                // コンテキストメニューをフラットにしている場合,
+                // browserMenu.xml 内のサブメニュー (menu) を閉じた際に
+                // #contentAreaContextMenu の onpopuphiding が動作してしまい,
+                // gContextMenu = null となってしまう
+                // これを回避するため, サブメニューを閉じた時に gContextMenu を復元する
+                if(aEvent.originalTarget.nodeName === 'xul:menupopup'){
+                    gContextMenu = this._gContextMenu;
+                }
             ]]></body>
         </method>
 
@@ -314,8 +344,6 @@
                 const isOnChaika = this._isChaika(currentURI);
                 const isOnThread = this._isThread(currentURI);
                 const isOnBoard = this._isBoard(currentURI);
-
-                this.ChaikaCore.logger.debug(gContextMenu);
 
                 const isContextMenu = !!gContextMenu;
                 const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
@@ -456,6 +484,10 @@
                         this.registerAsAA(selectedText);
                         break;
 
+                    case 'open-replacement-manager':
+                        this.openReplacementManager();
+                        break;
+
                     case "open-settings":
                         this.openSettings();
                         break;
@@ -545,9 +577,11 @@
             <parameter name="ngType" />
             <parameter name="ngWord" />
             <body><![CDATA[
-                window.openDialog("chrome://chaika/content/settings/abone-manager.xul",
-                                  "_blank", "chrome, resizable, minimazable, toolbar",
-                                  ngType, ngWord);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/abone-manager.xul",
+                    null,
+                    ngType, ngWord
+                );
             ]]></body>
         </method>
 
@@ -702,13 +736,16 @@
         -->
         <method name="write">
             <body><![CDATA[
-                var threadURL = this._getCurrentThreadURL();
+                let threadURL = this._getCurrentThreadURL();
                 if(!threadURL) return;
 
-                var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-                var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
-                window.openDialog(postWizardURLSpec, "_blank",
-                            "chrome, resizable, minimizable, dialog", threadPlainURL.spec);
+                let threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/post/wizard.xul",
+                    null,
+                    threadPlainURL.spec
+                );
             ]]></body>
         </method>
 
@@ -752,15 +789,17 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit"/>
             <body><![CDATA[
-                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                var url = this._getPlainURL(aURI) ||
+                          this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL();
+
                 if(!url) return;
 
                 try{
                     if(this._isBoard(url)){
                         this.ChaikaCore.browser.openBoard(url, aAddTab);
                     }else{
-                        var threadURL = this._getPlainURL(url);
-                        this.ChaikaCore.browser.openThread(threadURL, aAddTab, disregardLimit, false);
+                        this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, false);
                     }
                 }catch(ex){
                     this.ChaikaCore.logger.error(ex);
@@ -783,14 +822,13 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit" />
             <body><![CDATA[
-                var url = aURI || this._getCurrentThreadURL() || this._getCurrentBoardURL();
+                var url = this._getPlainURL(aURI) ||
+                          this._getCurrentThreadURL() ||
+                          this._getCurrentBoardURL();
+
                 if(!url) return;
 
-                url = this._getPlainURL(url);
-
-                if(url){
-                    this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
-                }
+                this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, true);
             ]]></body>
         </method>
 
@@ -870,9 +908,10 @@
                     let item = FoxAge2chUtils.service.getItem(threadID);
 
                     if(item){
-                        window.openDialog(
-                            "chrome://foxage2ch/content/findThread.xul", "FoxAge2ch:FindThread",
-                            "chrome,centerscreen,modal,dialog=no,all", threadID
+                        this.ChaikaCore.browser.openWindow(
+                            "chrome://foxage2ch/content/findThread.xul",
+                            "FoxAge2ch:FindThread",
+                            threadID
                         );
                         return;
                     }
@@ -913,8 +952,23 @@
         <method name="registerAsAA">
             <parameter name="aaStr" />
             <body><![CDATA[
-                window.openDialog("chrome://chaika/content/settings/aa-manager.xul",
-                                  "_blank", "chrome, resizable, minimazable, toolbar", aaStr);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/aa-manager.xul",
+                    null,
+                    aaStr
+                );
+            ]]></body>
+        </method>
+
+
+        <!--
+        /**
+         * 置換マネージャを開く
+         */
+        -->
+        <method name="openReplacementManager">
+            <body><![CDATA[
+                this.ChaikaCore.browser.openWindow("chrome://chaika/content/settings/replacement-manager.xul");
             ]]></body>
         </method>
 
@@ -926,15 +980,10 @@
         -->
         <method name="openSettings">
             <body><![CDATA[
-                var settingDialogURL = "chrome://chaika/content/settings/settings.xul";
-                var features = "";
-                try{
-                    var instantApply = Services.prefs.getBoolPref("browser.preferences.instantApply");
-                    features = "chrome,titlebar,toolbar,centerscreen" + (instantApply ? ",dialog=no" : ",modal");
-                }catch(ex){
-                    features = "chrome,titlebar,toolbar,centerscreen,modal,minimazable";
-                }
-                window.openDialog(settingDialogURL, "", features);
+                this.ChaikaCore.browser.openWindow(
+                    "chrome://chaika/content/settings/settings.xul",
+                    "chaika:settings"
+                );
             ]]></body>
         </method>
     </implementation>

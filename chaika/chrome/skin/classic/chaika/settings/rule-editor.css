@@ -1,0 +1,24 @@
+/* See license.txt for terms of usage */
+
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+textbox[flex]{
+    min-width: 3em;
+}
+
+.groups{
+    overflow: auto;
+    min-height: 3em;
+}
+
+.template{
+    display: none;
+}
+
+.button-add-rule,
+.button-remove-rule,
+.button-add-group,
+.button-remove-group{
+    min-width: 0 !important;
+    margin: 3px !important;
+}

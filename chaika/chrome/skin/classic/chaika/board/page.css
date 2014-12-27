@@ -47,8 +47,15 @@
 
 
 #boardTree treechildren::-moz-tree-row(highlight-true){
-  background-color: #ff9 !important;
+  background-color: orange !important;
 }
+
+/* 行が選択されている場合には文字色が適切でない場合があるので、
+   ハイライト表示ではなく選択表示を優先することにする */
+#boardTree treechildren::-moz-tree-row(highlight-true, selected){
+  background-color: Highlight !important;
+}
+
 
 
 #boardTree treechildren::-moz-tree-image(status){

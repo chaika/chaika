@@ -738,9 +738,21 @@ var FormPage = {
                 return;
             }
 
-            if(prefName.startsWith('login.')) return;
+            // exclude accounts id & password
+            if(prefName.startsWith('maru_')) return;
+            if(prefName.endsWith('_id')) return;
+            if(prefName.endsWith('.id')) return;
+            if(prefName.endsWith('password')) return;
 
-            list.push(prefName + ': ' + getPrefValue(prefName));
+            let prefValue = getPrefValue(prefName);
+
+            if(prefName === 'data_dir' ||
+               prefName === 'http_proxy_value' ||
+               prefName.startsWith('login.')){
+                    prefValue = '(changed)';
+            }
+
+            list.push(prefName + ': ' + prefValue);
         });
 
         return list;

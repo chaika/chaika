@@ -36,7 +36,7 @@
              type="search"
              timeout="2000"
              oncommand="if(this.value === '') SearchBox.search('')"
-             onkeypress="if(event.keyCode == KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
+             onkeypress="if(event.keyCode === KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
         <box>
             <dropmarker popup="searchModeMenu" class="plain" />
         </box>
@@ -53,13 +53,29 @@
         <menu id="toolsMenu" label="ツール" class="plain menu-iconic">
             <menupopup id="toolsMenuPopup" position="after_end">
                 <menuitem label="BBSMENU を更新" oncommand="BbsmenuUpdater.update()" />
+                <menuitem label="外部板を追加" oncommand="Bbsmenu.openOutsideXML()" />
                 <menuseparator />
-                <menuitem label="ログマネージャ..." oncommand="Page.openLogManager()" />
-                <menuitem label="データフォルダを開く" oncommand="Page.openDataFolder()" />
+                <menu label="マネージャを開く">
+                    <menupopup>
+                        <menuitem label="ログマネージャ" oncommand="Page.openLogManager()" />
+                        <menuitem label="あぼーんマネージャ" oncommand="Page.openAboneManager()" />
+                        <menuitem label="置換マネージャ" oncommand="Page.openReplacementManager()" />
+                        <menuitem label="AA マネージャ" oncommand="Page.openAAManager()" />
+                    </menupopup>
+                </menu>
+                <menu label="フォルダを開く">
+                    <menupopup>
+                        <menuitem label="データフォルダ" oncommand="Page.openDataFolder()" />
+                        <menuitem label="スキンフォルダ" oncommand="Page.openSkinFolder()" />
+                        <menuitem label="検索プラグインフォルダ" oncommand="Page.openSearchPluginFolder()" />
+                        <menuitem label="ログフォルダ" oncommand="Page.openLogFolder()" />
+                    </menupopup>
+                </menu>
                 <menuseparator />
                 <menuitem label="リリースノート" oncommand="Page.openReleaseNotes()" />
                 <menuitem label="トラブルシューティング情報" oncommand="Page.openSupport()" />
                 <menuitem label="オンラインヘルプ" oncommand="Page.openOnlineHelp()" />
+                <menuitem label="公式サイト" oncommand="Page.openHomePage()" />
                 <menuseparator />
                 <menuitem label="FoxAge2ch を開く" id="viewFoxAge2chMenu"
                           hidden="true" oncommand="Page.viewFoxAge2ch()" />

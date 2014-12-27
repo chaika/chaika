@@ -1,20 +1,10 @@
 /* See license.txt for terms of usage */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 EXPORTED_SYMBOLS = ["ChaikaRoninLogin", "ChaikaBeLogin", "ChaikaP2Login"];
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
-
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-
-
-/** @ignore */
-function makeException(aResult, aMessage){
-    var stack = Components.stack.caller.caller;
-    return new Components.Exception(aMessage || "exception", aResult, stack);
-}
+Cu.import("resource://chaika-modules/ChaikaCore.js");
 
 
 /**
@@ -149,16 +139,11 @@ var ChaikaRoninLogin = {
 
 
     get enabled(){
-        let isLoggedIn = this.isLoggedIn();
-
-        ChaikaCore.logger.debug('internal flag:', this._enabled, 'logged in:', isLoggedIn);
-
-        return this._enabled && isLoggedIn;
+        return this._enabled && this.isLoggedIn();
     },
 
 
     set enabled(bool){
-        ChaikaCore.logger.debug('set internal flag to:', bool);
         this._enabled = bool;
     },
 
@@ -245,8 +230,9 @@ var ChaikaRoninLogin = {
         var account = this.getLoginInfo();
 
         //有効なアカウントが存在しないとき
-        if(!account){
-            return ChaikaCore.logger.debug('Login Error: No Account Available');
+        if(!account.id || !account.password){
+            ChaikaCore.logger.debug('Login Error: No Account Available');
+            return this._onFail();
         }
 
         //すでに有効なセッションIDが存在するとき
@@ -299,11 +285,13 @@ var ChaikaRoninLogin = {
         let now = Date.now() / 1000;
         let sessionID = ChaikaCore.pref.getChar("login.ronin.session_id");
 
-        ChaikaCore.logger.debug(now, lastAuthTime, now - lastAuthTime, sessionID);
+        let loggedIn = (now - lastAuthTime) < 6 * 60 * 60 &&
+                       typeof sessionID === 'string' &&
+                       sessionID !== "";
 
-        return (now - lastAuthTime) < 6 * 60 * 60 &&
-               typeof sessionID === 'string' &&
-               sessionID !== "";
+        ChaikaCore.logger.debug('logged in:', loggedIn);
+
+        return loggedIn;
     },
 
     _getLoginURI: function ChaikaRoninLogin__getLoginURI(){
@@ -345,17 +333,13 @@ var ChaikaRoninLogin = {
     _listener: {
         onStartRequest: function(aRequest, aContext){
             this._binaryStream = Cc["@mozilla.org/binaryinputstream;1"]
-                    .createInstance(Ci.nsIBinaryInputStream);
+                                    .createInstance(Ci.nsIBinaryInputStream);
             this._data = [];
-
-            ChaikaCore.logger.debug('Start Request');
         },
 
         onDataAvailable: function(aRequest, aContext, aInputStream, aOffset, aCount){
             this._binaryStream.setInputStream(aInputStream);
             this._data.push(this._binaryStream.readBytes(aCount));
-
-            ChaikaCore.logger.debug('Data Available; Received Data:', this._data.join(''));
         },
 
         onStopRequest: function(aRequest, aContext, aStatus){

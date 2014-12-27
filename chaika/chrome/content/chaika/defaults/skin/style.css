@@ -3,6 +3,7 @@
 @charset 'utf-8';
 
 /* ***** ***** Animations ***** ***** */
+
 @keyframes fadeout{
     from{
         opacity: 1.0;
@@ -55,6 +56,7 @@
 
 html {
     background-color: #F6F6F6;
+    line-height: 1.5;
 }
 
 body {
@@ -62,92 +64,127 @@ body {
     margin: 4.5em 0 0 0;
 }
 
-#pageTitle {
+
+/* ***** ***** ヘッダー ***** ***** */
+
+header{
+    -moz-box-sizing: border-box;
     position: fixed;
-    border-bottom: 1px solid #222;
     top: 0;
-    left:0px;
-    right:0px;
-    line-height: 1;
+    left: 0;
     margin: 0;
-    padding:0.6em 5em 0.6em 0.6em;
-    background: #666;
-    color: #EEE;
+    padding: 0.6em;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.65);
+    color: #eee;
     font-size: 0.9em;
+    line-height: 1.0;
+    border-bottom: 1px solid #222;
 }
 
-#navMenu {
-    position: fixed;
-    top: 0.4em;
-    right: 0.4em;
-    font-size: 0.9em;
-    cursor: default;
+header:after{
+    content: '';
+    clear: both;
+}
+
+/* スレッドタイトル */
+
+header > h1{
+    -moz-box-sizing: border-box;
+    float: left;
+    margin: 0;
     padding: 0;
-    margin: 0;
-    list-style-type: none;
-    line-height: 1;
+    padding-right: 4.5em;
+    font-size: 100%;
 }
 
-#navMenu .menuItem {
-    font-size: 0.9em;
-    font-weight: bold;
-    color: #FFF;
-    display: block;
-    padding: 3px 6px;
-    margin: 0;
+#thread-info{
+    display: inline-block;
+    margin-left: 1em;
+    font-size: 80%;
+    font-weight: normal;
+    color: #ddd;
 }
 
-#navMenu ul{
-    padding: 0;
-    margin: 0;
-    background-color: rgba(60, 60, 60, 0.85);
-}
-
-#navMenu li{
-    padding: 1px;
-    margin: 0;
-    list-style-type: none;
-}
-
-#navMenu > li > ul{
-    border: 1px solid #555;
+#thread-info[data-populated="false"]{
     display: none;
 }
 
-#navMenu:hover > li > ul{
+
+/* ナビゲーション */
+
+nav {
+    text-align: right;
+    position: fixed;
+    right: 0;
+    padding: 0 8px;
+}
+
+nav ul{
+    padding: 0;
+    margin: 0;
+    cursor: default;
+    list-style-type: none;
+}
+
+nav li{
+    display: block;
+    margin: 0;
+    padding: 1px;
+    list-style-type: none;
+    color: #fff;
+}
+
+nav > ul > li{
+    font-weight: bold;
+}
+
+nav > ul > li > ul{
+    background-color: rgba(60, 60, 60, 0.85);
+    border: 1px solid #555;
+    font-weight: normal;
+    display: none;
+}
+
+nav > ul:hover > li > ul{
     display: block;
 }
 
-#navMenu > li {
-    text-align: right;
-}
-
-#navMenu > li > ul > li > a:link,
-#navMenu > li > ul > li > a:visited{
+nav > ul > li > ul > li > a{
+    color: #fff;
     font-size: 0.9em;
-    color: #F6F6F6;
     display: block;
     padding: 4px 8px;
     text-decoration: none;
 }
 
-#navMenu > li > ul > li > a:hover{
-    background-color: #888;
-    color: #FFF;
-    opacity: 1;
+nav > ul > li > ul > li > a:hover{
+    background-color: rgba(60, 60, 60, 1.0);
 }
+
+
+/* ***** ***** フッター ***** ***** */
 
 #status {
-    margin: 4em 0 15px 0;
-    text-align: center;
-}
-
-#status > span {
-    padding: 6px 24px;
-    font-size: 0.7em;
+    display: inline-block;
+    margin: 15px 0;
+    margin-left: 50%;
+    transform: translate(-50%);
+    padding: 3px 18px;
     border: 1px solid #BBB;
     border-radius: 6px;
+    text-align: center;
+    font-size: 0.7em;
     color: #888;
+}
+
+:-moz-any(
+    footer[data-status^="\0028\00B4\30FB\03C9\30FB\0060\0029"], /* (´・ω・`) */
+    footer[data-status="\0028\0020\FF70\03C9\FF70\0029\300C\0044\0041\0054\0020\843D\3061\300D"] /* ( ｰωｰ)「DAT 落ち」 */
+) > #status{
+    background-color: #777;
+    color: white;
+    border-color: transparent;
 }
 
 
@@ -237,6 +274,7 @@ body {
 /* ***** ***** あぼーん レス ***** ***** */
 
 /** 折りたたみ時 **/
+
 .collapsed .resHeaderContent,
 .collapsed .resBody{
     display: none;
@@ -257,6 +295,7 @@ body {
 }
 
 /** 展開時 **/
+
 [data-aboned="true"]:not(.collapsed) .resHeaderContent{
     display: inline;
 }
@@ -273,8 +312,9 @@ body {
 
 
 /* ***** ***** ハイライトレス ***** ***** */
+
 .resDateImportant{
-    color: red;
+    color: #E63;
 }
 
 [data-aboned="false"] .resHeaderAboneContent:not(:empty):before{
@@ -292,9 +332,10 @@ body {
 
 
 /* ***** ***** ポップアップ ***** ***** */
+
 .popup {
     font-size: 0.8em;
-    padding: 8px;
+    padding: 5px;
     border-radius: 8px;
     box-shadow: #333 0 0 12px;
     background-color: rgba(60, 60, 60, 0.85);
@@ -316,8 +357,14 @@ body {
 
 
 /* レスポップアップ */
+
 .popupInner > .resContainer {
-    margin: 1px;
+    padding-left: 2.5em;
+    padding-right: 1em;
+}
+
+.popupInner .resBody{
+    padding-bottom: 5px;
 }
 
 .popupInner > .aaRes{
@@ -326,6 +373,7 @@ body {
 
 
 /* 画像ポップアップ */
+
 .ImagePopup {
     min-width: 100px;
     min-height: 0;
@@ -346,13 +394,17 @@ body {
 }
 
 
-/** 設定画面 **/
+/* ***** ***** 設定画面 ***** ***** */
+
 #settings{
     display: none;
     position: fixed;
     top: 0;
     right: 0;
     line-height: 1.8;
+    padding: 1em;
+    max-height: 90%;
+    overflow: auto;
 }
 
 #settings:target{
@@ -378,4 +430,22 @@ fieldset{
 fieldset > div{
     font-size: 90%;
     margin: 0.5em 0 0 1.5em;
+}
+
+fieldset > section{
+    margin: 0.5em 0;
+}
+
+fieldset > section > h1{
+    font-size: 100%;
+    font-weight: normal;
+    padding: 0; margin: 0;
+}
+
+fieldset > section > label{
+    display: inline-block;
+}
+
+fieldset > section > label:first-of-type{
+    margin-left: 1em;
 }

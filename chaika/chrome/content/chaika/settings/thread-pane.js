@@ -143,16 +143,14 @@ var gThreadPane = {
     openSkinDir: function(){
         var skinDir = ChaikaCore.getDataDir();
         skinDir.appendRelativePath("skin");
-        ChaikaCore.io.revealDir(skinDir);
+        ChaikaCore.io.reveal(skinDir);
     },
 
     openAboneManager: function(){
-        var aboneManagerURL = "chrome://chaika/content/settings/abone-manager.xul";
-        document.documentElement.openWindow("", aboneManagerURL);
+        ChaikaCore.browser.openWindow("chrome://chaika/content/settings/abone-manager.xul");
     },
 
     openAAManager: function(){
-        var aboneManagerURL = "chrome://chaika/content/settings/aa-manager.xul";
-        document.documentElement.openWindow("", aboneManagerURL);
+        ChaikaCore.browser.openWindow("chrome://chaika/content/settings/aa-manager.xul");
     }
 };
