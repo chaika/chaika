@@ -59,6 +59,11 @@ SkinServerScript.prototype = {
         aServerHandler.response.setHeader("Content-Type", contentType);
 
 
+        // Set Content-Length
+        // The lack of Content-Length header may cause request failure in some environments. (#224)
+        aServerHandler.response.setHeader("Content-Length", skinFile.fileSize);
+
+
         // Send 200
         aServerHandler.response.writeHeaders(200);
 
