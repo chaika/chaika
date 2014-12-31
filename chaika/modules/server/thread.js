@@ -1676,7 +1676,7 @@ ThreadConverter.prototype = {
         // refs.  AA（アスキーアート）簡易判定アルゴリズム - awef
         //        http://d.hatena.ne.jp/awef/20110412/1302605740
         // @license MIT License (Copyright (c) 2011 awef) (only the following one-line)
-        if(/(?:(?:\x81\x40) ){2,}(?!<br \/>|$)/i.test(aMessage)){
+        if(/(?:(?:(?:\x81\x40) )|(?:[^>] (?:\x81\x40)))(?!<|$)/i.test(aMessage)){
             return true;
         }
 
