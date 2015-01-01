@@ -1671,12 +1671,12 @@ ThreadConverter.prototype = {
             }
         }
 
-        // read.crx, V2C 互換
-        // 全角空白と半角空白が2回以上連続して交互になっている時に AA と判定
+        // read.crx, V2C 互換方式
+        // 全角空白と半角空白が連続している時に AA と判定
         // refs.  AA（アスキーアート）簡易判定アルゴリズム - awef
         //        http://d.hatena.ne.jp/awef/20110412/1302605740
         // @license MIT License (Copyright (c) 2011 awef) (only the following one-line)
-        if(/(?:(?:\x81\x40) ){2,}(?!<br \/>|$)/i.test(aMessage)){
+        if(/(?:(?:\x81\x40 )|(?:[^>] \x81\x40))(?!<|$)/i.test(aMessage)){
             return true;
         }
 
