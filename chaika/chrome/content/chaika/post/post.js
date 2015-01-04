@@ -363,6 +363,8 @@ Post.prototype = {
 
 
     _convert: function Post__convert(aStr, aCharset, aConvertHTML4Entity, aEscape){
+        if(aStr === undefined) return '';
+
         var unicodeConverter = Cc["@mozilla.org/intl/scriptableunicodeconverter"]
                 .createInstance(Ci.nsIScriptableUnicodeConverter);
         var entityConverter = Cc["@mozilla.org/intl/entityconverter;1"]

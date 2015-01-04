@@ -3,32 +3,34 @@
 <!-- See license.txt for terms of usage -->
 
 <overlay id="threadPaneOverlay"
-        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <prefpane id="paneThread" onpaneload="gThreadPane.startup()">
 
     <preferences>
         <preference id="extensions.chaika.thread_skin"
-                name="extensions.chaika.thread_skin" type="unichar"/>
+                    name="extensions.chaika.thread_skin" type="unichar"/>
         <preference id="extensions.chaika.thread_show_be_icon"
-                name="extensions.chaika.thread_show_be_icon" type="bool"/>
+                    name="extensions.chaika.thread_show_be_icon" type="bool"/>
         <preference id="extensions.chaika.thread_font_name"
-                name="extensions.chaika.thread_font_name" type="unichar"/>
+                    name="extensions.chaika.thread_font_name" type="unichar"/>
         <preference id="extensions.chaika.thread_font_size"
-                name="extensions.chaika.thread_font_size" type="int"/>
+                    name="extensions.chaika.thread_font_size" type="int"/>
         <preference id="extensions.chaika.thread_aa_font_name"
-                name="extensions.chaika.thread_aa_font_name" type="unichar"/>
+                    name="extensions.chaika.thread_aa_font_name" type="unichar"/>
         <preference id="extensions.chaika.thread_aa_font_size"
-                name="extensions.chaika.thread_aa_font_size" type="int"/>
+                    name="extensions.chaika.thread_aa_font_size" type="int"/>
         <preference id="extensions.chaika.thread_aa_line_space"
-                name="extensions.chaika.thread_aa_line_space" type="int"/>
+                    name="extensions.chaika.thread_aa_line_space" type="int"/>
+        <preference id="extensions.chaika.abone.warn_when_delete"
+                    name="extensions.chaika.abone.warn_when_delete" type="bool" />
         <preference id="extensions.chaika.thread_hide_abone"
-                name="extensions.chaika.thread_hide_abone" type="bool"/>
+                    name="extensions.chaika.thread_hide_abone" type="bool"/>
         <preference id="extensions.chaika.thread_chain_abone"
-                name="extensions.chaika.thread_chain_abone" type="bool"/>
+                    name="extensions.chaika.thread_chain_abone" type="bool"/>
         <preference id="extensions.chaika.refController.enabled"
-                name="extensions.chaika.refController.enabled" type="bool"/>
+                    name="extensions.chaika.refController.enabled" type="bool"/>
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
@@ -45,7 +47,7 @@
                 <button label="スキンフォルダを開く" oncommand="gThreadPane.openSkinDir()"/>
             </hbox>
             <checkbox label="Be アイコンの表示"
-                    preference="extensions.chaika.thread_show_be_icon"/>
+                      preference="extensions.chaika.thread_show_be_icon"/>
         </vbox>
     </groupbox>
 
@@ -53,18 +55,19 @@
         <caption class="setting-description" label="フォント" />
         <vbox>
             <hbox align="center">
-                <button label="フォント"     oncommand="gThreadPane.openFontPreview(this, 'fontPanel')"/>
+                <button label="フォント" oncommand="gThreadPane.openFontPreview(this, 'fontPanel')"/>
             </hbox>
             <hbox align="center">
                 <button label="AA用フォント" oncommand="gThreadPane.openFontPreview(this, 'aaFontPanel')"/>
-                <label value="(対応スキンでのみ有効)"/>
+                <description value="(対応スキンでのみ有効)"/>
             </hbox>
+
             <popupset>
                 <panel id="fontPanel" position="after_start">
                     <hbox align="center">
                         <menulist id="lstThreadFontList"
-                                preference="extensions.chaika.thread_font_name"
-                                onselect="gThreadPane.setFontPreviewBoxFont()">
+                                  preference="extensions.chaika.thread_font_name"
+                                  onselect="gThreadPane.setFontPreviewBoxFont()">
                             <menupopup>
                                 <menuitem label="明朝体 (Serif)" value="serif"/>
                                 <menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
@@ -72,19 +75,20 @@
                                 <menuseparator/>
                             </menupopup>
                         </menulist>
+
                         <label value="サイズ :"/>
-                        <textbox id="fontSize" value="16" type="number" min="8" max="32" style="width:3.5em;"
-                                preference="extensions.chaika.thread_font_size"
-                                onchange="gThreadPane.setFontPreviewBoxFont()"/>
+                        <textbox id="fontSize" type="number" min="8" max="32"
+                                 preference="extensions.chaika.thread_font_size"
+                                 onchange="gThreadPane.setFontPreviewBoxFont()"/>
                     </hbox>
-                    <textbox id="fontPreview" multiline="true" wrap="off"
-                            value="" style="width:420px; height:180px; padding:5px;" flex="1"/>
+                    <textbox id="fontPreview" multiline="true" wrap="off" flex="1"/>
                 </panel>
+
                 <panel id="aaFontPanel" position="after_start">
                     <hbox align="center">
-                        <menulist id="lstThreadAAFontList" sizetopopup="none" style="width:12em;"
-                                preference="extensions.chaika.thread_aa_font_name"
-                                onselect="gThreadPane.setAAFontPreviewBoxFont()">
+                        <menulist id="lstThreadAAFontList" sizetopopup="none"
+                                  preference="extensions.chaika.thread_aa_font_name"
+                                  onselect="gThreadPane.setAAFontPreviewBoxFont()">
                             <menupopup>
                                 <menuitem label="明朝体 (Serif)" value="serif"/>
                                 <menuitem label="ゴシック体 (Sans-serif)" value="sans-serif"/>
@@ -92,17 +96,18 @@
                                 <menuseparator/>
                             </menupopup>
                         </menulist>
+
                         <label value="サイズ :"/>
-                        <textbox id="aaFontSize" value="16" type="number" min="8" max="32" style="width:3.5em;"
-                                preference="extensions.chaika.thread_aa_font_size"
-                                onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
+                        <textbox id="aaFontSize" type="number" min="8" max="32"
+                                  preference="extensions.chaika.thread_aa_font_size"
+                                  onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
+
                         <label value="高さ :"/>
-                        <textbox value="1" id="aaLineHeight" type="number" min="0" max="20" style="width:3.5em;"
-                            preference="extensions.chaika.thread_aa_line_space"
-                            onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
+                        <textbox id="aaLineHeight" type="number" min="0" max="20"
+                                 preference="extensions.chaika.thread_aa_line_space"
+                                 onchange="gThreadPane.setAAFontPreviewBoxFont()"/>
                     </hbox>
-                    <textbox id="aaFontPreview" multiline="true" wrap="off"
-                            value="" style="width:420px; height:180px; padding:5px;" flex="1"/>
+                    <textbox id="aaFontPreview" multiline="true" wrap="off" flex="1"/>
                 </panel>
             </popupset>
         </vbox>
@@ -113,10 +118,12 @@
         <vbox align="start">
             <button label="あぼーんマネージャ..."
                     oncommand="gThreadPane.openAboneManager()"/>
+            <checkbox label="項目を削除するときに警告する"
+                      preference="extensions.chaika.abone.warn_when_delete" />
             <checkbox label="あぼーんしたレスを表示しない (透明あぼーん)"
-                    preference="extensions.chaika.thread_hide_abone"/>
+                      preference="extensions.chaika.thread_hide_abone"/>
             <checkbox label="連鎖あぼーん"
-                    preference="extensions.chaika.thread_chain_abone"/>
+                      preference="extensions.chaika.thread_chain_abone"/>
         </vbox>
     </groupbox>
 
@@ -132,11 +139,10 @@
         <caption class="setting-description" label="その他" />
         <vbox>
             <checkbox label="スレッド表示のリンクからはリファラを送らない"
-                    preference="extensions.chaika.refController.enabled"/>
+                      preference="extensions.chaika.refController.enabled"/>
         </vbox>
     </groupbox>
 
 </prefpane>
-
 
 </overlay>

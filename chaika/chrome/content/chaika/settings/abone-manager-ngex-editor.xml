@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+
+<!-- See license.txt for terms of usage -->
+
+<bindings id="chaikaNGExEditorBindings"
+        xmlns="http://www.mozilla.org/xbl"
+        xmlns:xbl="http://www.mozilla.org/xbl"
+        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<binding id="editor">
+    <content>
+        <xul:vbox flex="1" anonid="root">
+            <xul:hbox align="center" pack="start">
+                <xul:label value="ラベル:" />
+                <xul:textbox class="label" flex="1" />
+                <xul:checkbox label="自動" checked="true" class="auto-naming" />
+            </xul:hbox>
+
+            <xul:groupbox flex="1">
+                <xul:caption label="条件" />
+                <xul:vbox class="rule-editor" flex="1"
+                          style="-moz-binding: url(chrome://chaika/content/settings/rule-editor.xml#editor)" />
+            </xul:groupbox>
+
+            <xul:groupbox>
+                <xul:caption label="オプション" />
+
+                <xul:hbox align="center" pack="start">
+                    <xul:label value="対象:" />
+                    <xul:radiogroup class="target">
+                        <xul:hbox>
+                            <xul:radio label="レス" value="post" />
+                            <xul:radio label="スレッド" value="thread" />
+                        </xul:hbox>
+                    </xul:radiogroup>
+                </xul:hbox>
+
+                <xul:hbox align="center" pack="start">
+                    <xul:label value="透明あぼーん:" />
+                    <xul:radiogroup class="hide-abone">
+                        <xul:hbox>
+                            <xul:radio label="デフォルトの設定に従う" value="undefined" selected="true" />
+                            <xul:radio label="する" value="true" />
+                            <xul:radio label="しない" value="false" />
+                        </xul:hbox>
+                    </xul:radiogroup>
+                </xul:hbox>
+
+                <xul:hbox align="center" pack="start">
+                    <xul:label value="連鎖あぼーん:" />
+                    <xul:radiogroup class="chain-abone">
+                        <xul:hbox>
+                            <xul:radio label="デフォルトの設定に従う" value="undefined" selected="true" />
+                            <xul:radio label="する" value="true" />
+                            <xul:radio label="しない" value="false" />
+                        </xul:hbox>
+                    </xul:radiogroup>
+                </xul:hbox>
+
+                <xul:hbox align="center" pack="start">
+                    <xul:checkbox label="有効期限をつける: " class="set-expire" />
+                    <xul:datepicker class="expire-date" type="popup" />
+                    <xul:timepicker class="expire-time" hideseconds="true" />
+                    <xul:button label="プリセット" type="menu" class="expire-preset">
+                        <xul:menupopup>
+                            <xul:menuitem label="1 時間後" value="3600000" />
+                            <xul:menuitem label="3 時間後" value="10800000" />
+                            <xul:menuitem label="12 時間後" value="43200000" />
+                            <xul:menuitem label="今日いっぱい" value="today" />
+                            <xul:menuitem label="明日いっぱい" value="tomorrow" />
+                            <xul:menuitem label="1 週間後" value="1week" />
+                            <xul:menuitem label="1 ヶ月後" value="1month" />
+                        </xul:menupopup>
+                    </xul:button>
+                </xul:hbox>
+
+                <xul:checkbox label="ヒットしたレスのIDを自動的にNGIDに追加する" class="autoNGID" />
+                <xul:checkbox label="あぼーんせずにハイライトする" class="highlight" />
+            </xul:groupbox>
+        </xul:vbox>
+    </content>
+
+    <resources>
+        <stylesheet src="chrome://chaika/skin/settings/abone-manager.css"/>
+    </resources>
+
+    <handlers>
+        <handler event="command" action="this.handleEvent(event)"/>
+        <handler event="change" action="this.handleEvent(event)"/>
+    </handlers>
+
+    <implementation>
+        <constructor><![CDATA[
+            Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+
+            this._labelbox = this._root.querySelector('.label');
+            this._ruleEditor = this._root.querySelector('.rule-editor');
+        ]]></constructor>
+
+
+        <property name="_root"
+                  onget="return document.getAnonymousElementByAttribute(this, 'anonid', 'root')" />
+
+
+        <method name="handleEvent">
+            <parameter name="aEvent"/>
+            <body><![CDATA[
+                let target = aEvent.originalTarget;
+
+                switch(aEvent.type){
+                    case 'command':
+                        switch(target.getAttribute('class')){
+                            case 'auto-naming':
+                                this.toggleAutoNaming();
+                                break;
+
+                            default:
+                                if(target.matches &&  // For Firefox 34+
+                                   target.matches('.expire-preset menuitem') ||
+                                   target.mozMatchesSelector &&  // For Firefox 33-
+                                   target.mozMatchesSelector('.expire-preset menuitem')){
+                                        this._setExpirePreset(target.value);
+                                }
+                        }
+                        break;
+
+                    case 'change':
+                        break;
+
+                    default:
+                        return;
+                }
+
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * 自動ネーミングを切り替える
+         */
+        -->
+        <method name="toggleAutoNaming">
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.auto-naming');
+
+                this._enableAutoNaming =
+                this._labelbox.disabled = checkbox.checked;
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * 自動ネーミングを設定する
+         * @param {Boolean} enable 設定する値
+         */
+        -->
+        <method name="setAutoNaming">
+            <parameter name="enable"/>
+            <body><![CDATA[
+                let checkbox = this._root.querySelector('.auto-naming');
+
+                checkbox.checked =
+                this._enableAutoNaming =
+                this._labelbox.disabled = enable;
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * ラベルを入力されたデータから得られるラベルに設定する
+         */
+        -->
+        <method name="setLabel">
+            <body><![CDATA[
+                this._labelbox.value = this.getLabelText();
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * 入力データからラベルを得る
+         * @return {String} ラベル
+         */
+        -->
+        <method name="getLabelText">
+            <body><![CDATA[
+                let rulesText = this._ruleEditor.getLabelText();
+                let target = this._root.querySelector('.target').selectedItem.label;
+
+                return rulesText + 'に一致する' + target;
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * 入力データに一致するNGデータオブジェクトを得る
+         * @return {NGExData}
+         */
+        -->
+        <method name="getNgData">
+            <body><![CDATA[
+                // eval 関数の代替
+                function _eval(str){
+                    switch(str){
+                        case 'true':
+                            return true;
+
+                        case 'false':
+                            return false;
+
+                        case 'undefined':
+                            return void 0;
+                    }
+                }
+
+
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+
+                let ngData = {};
+                let ruleData = this._ruleEditor.getRuleData();
+
+                ngData.title = this._labelbox.value;
+                ngData.match = ruleData.match;
+                ngData.target = this._root.querySelector('.target').value;
+                ngData.autoNGID = this._root.querySelector('.autoNGID').checked;
+                ngData.highlight = this._root.querySelector('.highlight').checked;
+
+                ngData.hide = _eval(this._root.querySelector('.hide-abone').value);
+                ngData.chain = _eval(this._root.querySelector('.chain-abone').value);
+
+                if(this._root.querySelector('.set-expire').checked){
+                    let datepicker = this._root.querySelector('.expire-date');
+                    let timepicker = this._root.querySelector('.expire-time');
+                    let expire = new Date(datepicker.year, datepicker.month, datepicker.date,
+                                          timepicker.hour, timepicker.minute, 0, 0);
+
+                    ngData.expire = expire.getTime();
+                }
+
+                ngData.rules = ruleData.rules;
+
+                return ngData;
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * データを入力フィールドに入力する
+         * @param {NGExData} 入力するデータ
+         */
+        -->
+        <method name="populateData">
+            <parameter name="ngData"/>
+            <body><![CDATA[
+                this._labelbox.value = ngData.title || '';
+                this._root.querySelector('.target').value = ngData.target;
+                this._root.querySelector('.autoNGID').checked = !!ngData.autoNGID;
+                this._root.querySelector('.highlight').checked = !!ngData.highlight;
+
+                this._root.querySelector('.hide-abone').value = ngData.hide + '';
+                this._root.querySelector('.chain-abone').value = ngData.chain + '';
+
+                this._root.querySelector('.set-expire').checked = !!ngData.expire;
+
+                if(ngData.expire){
+                    this._populateExpire(new Date(ngData.expire));
+                }else{
+                    this._setExpirePreset('today', true);
+                }
+
+                this._ruleEditor.populateData({
+                    match: ngData.match,
+                    rules: ngData.rules
+                });
+
+
+                //タイトルが設定されていないか、
+                //自動ネーミングと設定されているラベルが一致したら
+                //自動ネーミングが有効だと判断する
+                this.setAutoNaming(!ngData.title || ngData.title === this.getLabelText());
+
+                //もし有効ならラベルをセットする
+                if(this._enableAutoNaming){
+                    this.setLabel();
+                }
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * プリセットから有効期限を設定する
+         * @param {String} relativeExpire 有効期限を表す文字列 現在からの相対時間(ミリ秒), または 'today', 'tomorrow' など
+         * @param {Boolean} notToEnableExpire 有効期限を有効にしないようにする
+         */
+        -->
+        <method name="_setExpirePreset">
+            <parameter name="relativeExpire" />
+            <parameter name="notToEnableExpire" />
+            <body><![CDATA[
+                if(!notToEnableExpire){
+                    this._root.querySelector('.set-expire').checked = true;
+                }
+
+                if(Number.isInteger(relativeExpire - 0)){
+                    let expire = Date.now() + (relativeExpire - 0);
+                    this._populateExpire(new Date(expire));
+                }else{
+                    let now = new Date();
+                    let expire;
+
+                    switch(relativeExpire){
+                        case 'today':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                            break;
+
+                        case 'tomorrow':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 2);
+                            break;
+
+                        case '1week':
+                            expire = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7);
+                            break;
+
+                        case '1month':
+                            expire = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                            break;
+                    }
+
+                    if(expire){
+                        this._populateExpire(expire);
+                    }
+                }
+            ]]></body>
+        </method>
+
+        <!--
+        /**
+         * 有効期限を設定する
+         * @param {Date} expire
+         */
+        -->
+        <method name="_populateExpire">
+            <parameter name="expire" />
+            <body><![CDATA[
+                let datepicker = this._root.querySelector('.expire-date');
+                let timepicker = this._root.querySelector('.expire-time');
+
+                datepicker.year = expire.getFullYear();
+                datepicker.month = expire.getMonth();
+                datepicker.date = expire.getDate();
+                timepicker.hour = expire.getHours();
+                timepicker.minute = expire.getMinutes();
+            ]]></body>
+        </method>
+
+    </implementation>
+</binding>
+
+</bindings>

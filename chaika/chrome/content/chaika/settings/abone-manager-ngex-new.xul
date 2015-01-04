@@ -3,9 +3,9 @@
 <!-- See license.txt for terms of usage -->
 
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<?xml-stylesheet href="chrome://chaika/skin/settings/replacement-manager.css" type="text/css"?>
+<?xml-stylesheet href="chrome://chaika/skin/settings/abone-manager.css" type="text/css"?>
 
-<dialog id="chaikaReplacementManagerNew"
+<dialog id="abonemanager-ngex"
         buttons="accept, cancel"
         buttoniconaccept="save"
         ondialogaccept="onDialogAccept()"
@@ -13,8 +13,8 @@
         onload="startup()"
         onunload="shutdown()">
 
-    <vbox id="editor" flex="1"></vbox>
+    <vbox id="ngex-editor" flex="1"></vbox>
 
     <script type="application/javascript; version=1.7"
-            src="chrome://chaika/content/settings/replacement-manager-new.js"/>
+            src="chrome://chaika/content/settings/abone-manager-ngex-new.js"/>
 </dialog>

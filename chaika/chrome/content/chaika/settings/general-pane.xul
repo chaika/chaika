@@ -32,6 +32,9 @@
         <preference id="extensions.chaika.http_proxy_value"
                     name="extensions.chaika.http_proxy_value"
                     type="unichar"/>
+        <preference id="extensions.chaika.replace.warn_when_delete"
+                    name="extensions.chaika.replace.warn_when_delete"
+                    type="bool" />
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
@@ -41,13 +44,13 @@
         <caption class="setting-description" label="ログ" />
         <vbox>
             <checkbox label="ログを削除するときに警告する"
-                    preference="extensions.chaika.warn_when_delete_log" />
+                      preference="extensions.chaika.warn_when_delete_log" />
             <checkbox label="ログファイルの位置を指定する *"
-                    preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
+                      preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
             <hbox id="boxDataDir" class="indent" flex="1" align="start">
                 <textbox id="txtDataDir" flex="8"
-                        preference="extensions.chaika.data_dir"
-                        onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
+                         preference="extensions.chaika.data_dir"
+                         onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
                 <button id="btnDataDirSelect" label="参照..."
                         oncommand="gGeneralPane.selectDataDir()"/>
                 <spacer flex="1"/>
@@ -90,6 +93,8 @@
         <vbox align="start">
             <button label="置換マネージャ..."
                     oncommand="gGeneralPane.openReplacementManager()" />
+            <checkbox label="項目を削除するときに警告する"
+                      preference="extensions.chaika.replace.warn_when_delete" />
         </vbox>
     </groupbox>
 

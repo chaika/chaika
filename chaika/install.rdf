@@ -5,7 +5,7 @@
     <Description about="urn:mozilla:install-manifest"
                  em:name="chaika"
                  em:version="1.7.5pre.e10s"
-                 em:description="2ch.net(Japanese Web Forums) Browser"
+                 em:description="Dedicated browser for 2ch.net (the most popular textboard in Japan)"
                  em:id="chaika@chaika.xrea.jp"
                  em:type="2"
                  em:unpack="true"

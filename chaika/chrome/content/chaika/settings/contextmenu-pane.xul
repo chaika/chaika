@@ -10,56 +10,72 @@
 
     <preferences>
         <preference id="extensions.chaika.contextmenu.abone.enabled"
-                name="extensions.chaika.contextmenu.abone.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.abone.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.copy.enabled"
-                name="extensions.chaika.contextmenu.copy.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.copy.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.search.enabled"
-                name="extensions.chaika.contextmenu.search.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.search.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.history.enabled"
-                name="extensions.chaika.contextmenu.history.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.history.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.skin.enabled"
-                name="extensions.chaika.contextmenu.skin.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.skin.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.skin-sep.enabled"
+                    name="extensions.chaika.contextmenu.skin-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.write.enabled"
-                name="extensions.chaika.contextmenu.write.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.write.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.delete-log.enabled"
-                name="extensions.chaika.contextmenu.delete-log.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.delete-log.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.thread-sep.enabled"
+                    name="extensions.chaika.contextmenu.thread-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.view-in-chaika.enabled"
-                name="extensions.chaika.contextmenu.view-in-chaika.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.view-in-chaika.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.view-in-browser.enabled"
-                name="extensions.chaika.contextmenu.view-in-browser.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.view-in-browser.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.view-in-sep.enabled"
+                    name="extensions.chaika.contextmenu.view-in-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.open-link-in-chaika.enabled"
-                name="extensions.chaika.contextmenu.open-link-in-chaika.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.open-link-in-chaika.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.open-link-in-browser.enabled"
-                name="extensions.chaika.contextmenu.open-link-in-browser.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.open-link-in-browser.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-link-in-sep.enabled"
+                    name="extensions.chaika.contextmenu.open-link-in-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.change-limit-all.enabled"
-                name="extensions.chaika.contextmenu.change-limit-all.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.change-limit-all.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.change-limit-l50.enabled"
-                name="extensions.chaika.contextmenu.change-limit-l50.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.change-limit-l50.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.go-to-board.enabled"
-                name="extensions.chaika.contextmenu.go-to-board.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.go-to-board.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.find-next-thread.enabled"
-                name="extensions.chaika.contextmenu.find-next-thread.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.find-next-thread.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.thread-utils-sep.enabled"
+                    name="extensions.chaika.contextmenu.thread-utils-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.register-selection-as-aa.enabled"
-                name="extensions.chaika.contextmenu.register-selection-as-aa.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.register-selection-as-aa.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.open-replacement-manager.enabled"
+                    name="extensions.chaika.contextmenu.open-replacement-manager.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.extra-utils-sep.enabled"
+                    name="extensions.chaika.contextmenu.extra-utils-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.toggle-sidebar.enabled"
-                name="extensions.chaika.contextmenu.toggle-sidebar.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.toggle-sidebar.enabled" type="bool" />
+        <preference id="extensions.chaika.contextmenu.sidebar-sep.enabled"
+                    name="extensions.chaika.contextmenu.sidebar-sep.enabled" type="bool" />
         <preference id="extensions.chaika.contextmenu.open-settings.enabled"
-                name="extensions.chaika.contextmenu.open-settings.enabled" type="bool" />
+                    name="extensions.chaika.contextmenu.open-settings.enabled" type="bool" />
 
         <preference id="extensions.chaika.contextmenu.enabled"
-                name="extensions.chaika.contextmenu.enabled" type="bool"
-                onchange="setContainerDisabled(this.name, 'subprefs_contextmenu', true)"/>
+                    name="extensions.chaika.contextmenu.enabled" type="bool"
+                    onchange="setContainerDisabled(this.name, 'subprefs_contextmenu', true)"/>
         <preference id="extensions.chaika.contextmenu.show_only_on_bbs"
-                name="extensions.chaika.contextmenu.show_only_on_bbs" type="bool"
-                onchange="setContainerDisabled(this.name, 'subprefs_only_bbs', true)" />
+                    name="extensions.chaika.contextmenu.show_only_on_bbs" type="bool"
+                    onchange="setContainerDisabled(this.name, 'subprefs_only_bbs', true)" />
         <preference id="extensions.chaika.contextmenu.always_show_open_link"
-                name="extensions.chaika.contextmenu.always_show_open_link" type="bool" />
+                    name="extensions.chaika.contextmenu.always_show_open_link" type="bool" />
         <preference id="extensions.chaika.contextmenu.flattened"
-                name="extensions.chaika.contextmenu.flattened" type="bool" />
+                    name="extensions.chaika.contextmenu.flattened" type="bool" />
     </preferences>
 
     <checkbox label="コンテキストメニューに chaika の項目を追加する *"
-            preference="extensions.chaika.contextmenu.enabled" />
+              preference="extensions.chaika.contextmenu.enabled" />
     <vbox id="subprefs_contextmenu" class="indent">
         <groupbox>
             <caption label="項目" />
@@ -70,20 +86,28 @@
                     <checkbox label="検索" preference="extensions.chaika.contextmenu.search.enabled" />
                     <checkbox label="履歴" preference="extensions.chaika.contextmenu.history.enabled" />
                     <checkbox label="スキン" preference="extensions.chaika.contextmenu.skin.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.skin-sep.enabled" />
                     <checkbox label="このスレッドに書き込む" preference="extensions.chaika.contextmenu.write.enabled" />
                     <checkbox label="このスレッドのログを削除" preference="extensions.chaika.contextmenu.delete-log.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.thread-sep.enabled" />
                     <checkbox label="chaika で開く" preference="extensions.chaika.contextmenu.view-in-chaika.enabled" />
                     <checkbox label="ブラウザで開く" preference="extensions.chaika.contextmenu.view-in-browser.enabled" />
-                </vbox>
-                <vbox>
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.view-in-sep.enabled" />
                     <checkbox label="リンク先を chaika で開く" preference="extensions.chaika.contextmenu.open-link-in-chaika.enabled" />
                     <checkbox label="リンク先をブラウザで開く" preference="extensions.chaika.contextmenu.open-link-in-browser.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.open-link-in-sep.enabled" />
+                </vbox>
+                <vbox>
                     <checkbox label="すべてのレスを表示" preference="extensions.chaika.contextmenu.change-limit-all.enabled" />
                     <checkbox label="新着50件を表示" preference="extensions.chaika.contextmenu.change-limit-l50.enabled" />
                     <checkbox label="スレッド一覧を開く" preference="extensions.chaika.contextmenu.go-to-board.enabled" />
                     <checkbox label="次スレを検索する" preference="extensions.chaika.contextmenu.find-next-thread.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.thread-utils-sep.enabled" />
                     <checkbox label="選択部分を AA として登録する" preference="extensions.chaika.contextmenu.register-selection-as-aa.enabled" />
+                    <checkbox label="置換マネージャ..." preference="extensions.chaika.contextmenu.open-replacement-manager.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.extra-utils-sep.enabled" />
                     <checkbox label="サイドバーを表示" preference="extensions.chaika.contextmenu.toggle-sidebar.enabled" />
+                    <checkbox label="─────" preference="extensions.chaika.contextmenu.sidebar-sep.enabled" />
                     <checkbox label="オプション..." preference="extensions.chaika.contextmenu.open-settings.enabled" />
                 </vbox>
             </hbox>
@@ -92,13 +116,13 @@
         <groupbox>
             <caption label="表示" />
             <checkbox label="chaika および掲示板上でのみ表示する"
-                    preference="extensions.chaika.contextmenu.show_only_on_bbs" />
+                      preference="extensions.chaika.contextmenu.show_only_on_bbs" />
                 <vbox class="indent" id="subprefs_only_bbs">
                     <checkbox label="リンク先についての項目は一般サイトでも表示する"
-                        preference="extensions.chaika.contextmenu.always_show_open_link" />
+                              preference="extensions.chaika.contextmenu.always_show_open_link" />
                 </vbox>
             <checkbox label="コンテキストメニューをフラットにする *"
-                    preference="extensions.chaika.contextmenu.flattened" />
+                      preference="extensions.chaika.contextmenu.flattened" />
         </groupbox>
     </vbox>
 

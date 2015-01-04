@@ -748,7 +748,7 @@ Thread2ch.prototype = {
 
         // 通常リンク処理
         if(resMes.contains("ttp")){
-            var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#]+)/g;
+            var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#\|]+)/g;
 
             if(ChaikaHttpController.ivur.enabled){
                 resMes = resMes.replace(regUrlLink, function(aStr, aScheme, aSecure, aSpec){
@@ -1291,7 +1291,7 @@ function ThreadMachi(){
 ThreadMachi.prototype = Object.create(Thread2ch.prototype, {
     datDownload: {
         value: function(){
-            var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi");
+            var datURLSpec = this.thread.url.resolve("./").replace("read.cgi", "offlaw.cgi/2");
             this._aboneChecked = true;
             this._threadAbone = false;
             this._deltaMode = false;
@@ -1318,8 +1318,13 @@ ThreadMachi.prototype = Object.create(Thread2ch.prototype, {
         value: function(aLine, aNumber, aNew){
             if(!aLine) return "";
 
+            // 透明削除がある場合に正しいレス番号に補正する
             var resArray = aLine.split("<>");
             var trueNumber = parseInt(resArray.shift());
+
+            // リモートホスト情報を日付部分に追加して 2ch 互換データにする
+            resArray[2] += ' HOST:' + resArray[5];
+            resArray.pop();
 
             return Thread2ch.prototype.datLineParse.apply(this, [resArray.join("<>"), trueNumber, aNew]);
         }
@@ -1561,9 +1566,7 @@ ThreadConverter.prototype = {
             let ngData = UniConverter.toSJIS(ChaikaCore.io.escapeHTML(aNGData.title || aNGData));
 
             //タグを置換する
-            return aRes.replace(/(?:\r|\n|\t)/g, "")
-                       .replace(/<!--.*?-->/g, "")
-                       .replace(/<PLAINNUMBER\/>/g, aNumber)
+            return aRes.replace(/<PLAINNUMBER\/>/g, aNumber)
                        .replace(/<NUMBER\/>/g, aNumber)
                        .replace(/<NAME\/>/g, aName)
                        .replace(/<MAIL\/>/g, aMail)
@@ -1668,12 +1671,12 @@ ThreadConverter.prototype = {
             }
         }
 
-        // read.crx, V2C 互換
-        // 全角空白と半角空白が2回以上連続して交互になっている時に AA と判定
+        // read.crx, V2C 互換方式
+        // 全角空白と半角空白が連続している時に AA と判定
         // refs.  AA（アスキーアート）簡易判定アルゴリズム - awef
         //        http://d.hatena.ne.jp/awef/20110412/1302605740
         // @license MIT License (Copyright (c) 2011 awef) (only the following one-line)
-        if(/(?:(?:\x81\x40) ){2,}(?!<br \/>|$)/i.test(aMessage)){
+        if(/(?:(?:\x81\x40 )|(?:[^>] \x81\x40))(?!<|$)/i.test(aMessage)){
             return true;
         }
 

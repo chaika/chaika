@@ -1,13 +1,17 @@
 /* See license.txt for terms of usage */
 
 Components.utils.import('resource://chaika-modules/ChaikaCore.js');
-Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+
 
 var gEditor;
 
 
 function startup(){
-    gEditor = document.getElementById('editor');
+    gEditor = document.getElementById('ngex-editor');
+
+    gEditor.setAutoNaming(true);
+    gEditor._setExpirePreset('today', true);
 
     if('arguments' in window &&
        window.arguments.length > 0 &&
@@ -28,5 +32,5 @@ function onDialogAccept(){
         gEditor.setLabel();
     }
 
-    ChaikaContentReplacer.add(gEditor.getReplaceData());
+    ChaikaAboneManager.ex.add(gEditor.getNgData());
 }

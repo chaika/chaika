@@ -346,7 +346,17 @@ ChaikaBoard.prototype = {
         var boardID = this.id;
         var database = ChaikaCore.storage;
 
-        var today = Date.parse((new Date()).toLocaleFormat("%b %d %Y")) / 1000
+        // Get the `Date#time` value for the midnight of today, tomorrow and yesterday.
+        // We shouldn't use Date#toLocaleFormat, because it has not been standardized. (cf. #221)
+        // Also, we can't use Date#parse, because:
+        // - For the ISO-8601 format string, its time zone is ambiguous:
+        //      ES5 defines the string as UTC time string,
+        //      while ES6 specifies it is to treated as local time.
+        // - For the RFC2822 format string, we can't get it easily, i.e.,
+        //   it is difficult to apply the local time-zone correctly.
+        // - For other formats (e.g. Dec 25, 2014), the results are undefined and may be unexpected.
+        var now = new Date();
+        var today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
         var yesterday = today - 86400;
         var tomorrow = today + 86400;
 

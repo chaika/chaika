@@ -126,6 +126,11 @@ AboneData.prototype = {
     },
 
 
+    /**
+     * NGワードに該当するレスかどうかを返す
+     * @param {ResData} aResData
+     * @see ChaikaAboneManager.shouldAbone
+     */
     shouldAbone: function(aResData){
         return aResData && this._data.find((ngData) => aResData.contains(ngData));
     },
@@ -172,6 +177,80 @@ AboneData.prototype = {
 };
 
 
+
+/**
+ * NGEx のあぼーんデータを表す.
+ */
+var NGExData = {
+    /**
+     * タイトル
+     * @type {String}
+     * @required
+     */
+    title: '',
+
+    /**
+     * あぼーんの対象
+     * @type {String}
+     * @note 'post' (レス), 'thread' (スレッド) のみが可
+     * @required
+     */
+    target: 'post',
+
+    /**
+     * マッチの方法
+     * @type {String}
+     * @note 'any' (いづれか), 'all' (全て) のみが可
+     * @required
+     */
+    match: 'all',
+
+    /**
+     * 連鎖あぼーんをするかどうか
+     * @type {Boolean|undefined}
+     * @note true: する, false: しない, undefined: デフォルトの設定に従う
+     */
+    chain: undefined,
+
+    /**
+     * 透明あぼーんをするかどうか
+     * @type {Boolean|undefined}
+     * @note true: する, false: しない, undefined: デフォルトの設定に従う
+     */
+    hide: undefined,
+
+    /**
+     * 有効期限
+     * @type {Number|undefined}
+     * @note UNIX時間を設定する. undefined の場合は期限なしを表す.
+     */
+    expire: undefined,
+
+    /**
+     * 自動NGIDをするかどうか
+     * @type {Boolean}
+     * @note true: する, false: しない
+     */
+    autoNGID: false,
+
+    /**
+     * あぼーんせずにハイライトするかどうか
+     * @type {Boolean}
+     * @note true: する, false: しない
+     */
+    highlight: false,
+
+
+    /**
+     * マッチする条件
+     * @type {Array.<Group, Rule>}
+     * @see getRuleData in chrome://chaika/content/settings/rule-editor.xml#editor
+     */
+    rules: [],
+};
+
+
+
 /**
  * あぼーんデータ (NGEx)
  */
@@ -202,6 +281,11 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
     },
 
 
+    /**
+     * NGワードに該当するレスかどうかを返す
+     * @param {ResData} aResData
+     * @see ChaikaAboneManager.shouldAbone
+     */
     shouldAbone: {
         value: function(aResData){
             return this._dataObj.find((ngData) => {
@@ -210,18 +294,34 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                     return false;
                 }
 
-                if(ngData.match === 'all')
-                    return ngData.rules.every((rule) => this._matchRule(rule, aResData));
-
-                else if(ngData.match === 'any')
-                    return ngData.rules.some((rule) => this._matchRule(rule, aResData));
+                return this._matchRule(ngData, aResData);
             });
         }
     },
 
 
+    /**
+     * 条件に一致するレスかどうかを返す
+     * @param {RuleData} aRule 条件
+     * @param {ResData} aResData レスデータ
+     * @see ChaikaAboneManager.shouldAbone
+     * @see getRuleData in chrome://chaika/content/settings/rule-editor.xml#editor
+     * @note ChaikaContentReplacer からも呼ばれる
+     * @todo 条件に一致するかどうかという処理は置換処理でも使われているため別のクラスとして抽出するべき
+     */
     _matchRule: {
         value: function(aRule, aResData){
+            if(aRule.match && aRule.rules){
+                switch(aRule.match){
+                    case 'all':
+                        return aRule.rules.every((rule) => this._matchRule(rule, aResData));
+
+                    case 'any':
+                        return aRule.rules.some((rule) => this._matchRule(rule, aResData));
+                }
+            }
+
+
             let target = aResData[aRule.target];
 
             if(typeof target !== 'string'){

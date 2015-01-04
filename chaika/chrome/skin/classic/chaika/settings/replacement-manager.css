@@ -21,11 +21,3 @@ listbox{
 .dt{
     font-weight: bold;
 }
-
-.template{
-    display: none;
-}
-
-.fixed-height{
-    overflow: auto;
-}

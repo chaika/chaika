@@ -32,13 +32,15 @@ var gReplacementManager = {
         this._listbox = document.getElementById('rulelist');
 
         this._listbox.addEventListener('select', this);
-        document.querySelector('.button-add').addEventListener('command', this);
-        document.querySelector('.button-remove').addEventListener('command', this);
-        document.querySelector('.button-save').addEventListener('command', this);
+        document.addEventListener('command', this);
 
         this._initList();
 
-        window.resizeTo(600, 500);
+        if(this._listbox.getRowCount() > 0){
+            setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
+        }
+
+        window.sizeToContent();
     },
 
 
@@ -47,9 +49,7 @@ var gReplacementManager = {
         Services.obs.removeObserver(gReplacerObserver, "chaika-replace-rule-remove", false);
 
         this._listbox.removeEventListener('select', this);
-        document.querySelector('.button-add').removeEventListener('command', this);
-        document.querySelector('.button-remove').removeEventListener('command', this);
-        document.querySelector('.button-save').removeEventListener('command', this);
+        document.removeEventListener('command', this);
     },
 
 
@@ -68,9 +68,6 @@ var gReplacementManager = {
             //一つも項目がない場合にはユーザーが混乱するのを防ぐため、
             //データ編集欄を非表示にしておく
             this._editor.collapsed = true;
-        }else{
-            //先頭を選択
-            setTimeout(() => { this._listbox.selectedIndex = 0; }, 0);
         }
     },
 
@@ -84,10 +81,16 @@ var gReplacementManager = {
             case 'command':
                 switch(aEvent.originalTarget.className){
                     case 'button-add':
+                    case 'context-add':
                         this.add();
                         break;
 
+                    case 'button-import':
+                        this.import();
+                        break;
+
                     case 'button-remove':
+                    case 'context-remove':
                         this.remove();
                         break;
 
@@ -136,13 +139,29 @@ var gReplacementManager = {
     },
 
 
-    /**
-     * 選択されているデータを削除する
-     */
+    import: function(){
+        window.openDialog('chrome://chaika/content/settings/replacestr.xul',
+                          '_blank', 'modal, resizable');
+    },
+
+
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
-        ChaikaContentReplacer.remove(JSON.parse(this._listbox.selectedItem.value));
+        let rv = true;
+
+        if(ChaikaCore.pref.getBool('replace.warn_when_delete')){
+            if(this._listbox.selectedItems.length > 1){
+                rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+            }else{
+                rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
+            }
+        }
+
+        if(rv){
+            this._listbox.selectedItems.map((node) => JSON.parse(node.value))
+                                       .forEach((item) => ChaikaContentReplacer.remove(item));
+        }
     },
 
 

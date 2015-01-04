@@ -215,23 +215,18 @@ chContentHandler.prototype = {
                 break;
 
             default:
-                ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
+                ChaikaCore.logger.warning(contextWin.location + " : " + url.spec);
                 break;
         }
     },
 
 
     _openPostWizard: function chContentHandler__openPostWizard(aThreadURLSpec){
-        var argString = Cc["@mozilla.org/supports-string;1"]
-                .createInstance(Ci.nsISupportsString);
-        argString.data = aThreadURLSpec;
-
-        var winWatcher = Cc["@mozilla.org/embedcomp/window-watcher;1"]
-                .getService(Ci.nsIWindowWatcher);
-        var postWizardURLSpec = "chrome://chaika/content/post/wizard.xul";
-
-        winWatcher.openWindow(null, postWizardURLSpec,
-                "_blank", "chrome, resizable, minimizable, dialog", argString);
+        ChaikaCore.browser.openWindow(
+            "chrome://chaika/content/post/wizard.xul",
+            null,
+            aThreadURLSpec
+        );
     },
 
 

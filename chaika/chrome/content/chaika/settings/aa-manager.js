@@ -107,27 +107,29 @@ var gAAManager = {
         let fp = Cc["@mozilla.org/filepicker;1"].createInstance(Ci.nsIFilePicker);
 
         fp.init(window, 'AAList.txt の選択', Ci.nsIFilePicker.modeOpen);
-        fp.appendFilters(Ci.nsIFilePicker.filterAll | Ci.nsIFilePicker.filterText);
+        fp.appendFilters(Ci.nsIFilePicker.filterText);
 
         let rv = fp.show();
 
-        if(rv === Ci.nsIFilePicker.returnOK || rv === Ci.nsIFilePicker.returnReplace){
+        if(rv === Ci.nsIFilePicker.returnOK){
             let file = fp.file;
             let aaListString = ChaikaCore.io.readString(file, 'Shift_JIS');
             let aaGroupTitles = aaListString.match(/^\[[^\]]+\]$/mg);
             let aaGroups = aaListString.split(/^\[[^\]]+\]$/m);
             let aaTables = {};
 
-            aaGroupTitles = Array.slice(aaGroupTitles).map((title) => {
-                return title.replace(/^\[/, '').replace(/\]$/, '');
-            });
+            aaGroupTitles = aaGroupTitles.map((title) => title.replace(/^\[|\]$/g, ''));
 
+            // AAList.txt は [aalist] で始まるため, 先頭に空要素ができるのを削除
             aaGroups.shift();
 
             aaGroups.forEach((group, index) => {
                 if(aaGroupTitles[index].toLowerCase() === 'aalist'){
                     //一行AA
                     group.split(/[\r\n]+/).forEach((line) => {
+                        //空行
+                        if(!!line) return;
+
                         //複数行AAのタイトル
                         if(line.startsWith('*')) return;
 
@@ -341,7 +343,15 @@ AATreeView.prototype = {
     isSorted: function(){ return false; },
 
     canAppend: function(sourceNode, parentNode){
-        return parentNode.childNodes.length === parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
+        try{
+            // For Firefox 32+
+            return parentNode.childNodes.length ===
+                   parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
+        }catch(ex){
+            // For Firefox 31- (slower)
+            return Array.slice(parentNode.childNodes)
+                        .every((node) => node.nodeName === sourceNode.nodeName);
+        }
     },
 
     canDrop: function(targetIndex, orientation, dataTransfer){

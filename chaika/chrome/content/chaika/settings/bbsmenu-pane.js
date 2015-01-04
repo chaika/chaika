@@ -69,7 +69,7 @@ var gBbsmenuPane = {
     openSearchPluginDir: function(){
         var pluginDir = ChaikaCore.getDataDir();
         pluginDir.appendRelativePath("search");
-        ChaikaCore.io.revealDir(pluginDir);
+        ChaikaCore.io.reveal(pluginDir);
     },
 
     resetBbsmenuURL: function(){
