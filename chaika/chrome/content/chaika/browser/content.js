@@ -1,9 +1,14 @@
 /* See license.txt for terms of usage */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import('resource://chaika-modules/ChaikaRedirector.js');
+
+
 /**
  * Frame Script
  */
-
 var ChaikaBrowserContent = {
 
     init: function(){
@@ -11,6 +16,12 @@ var ChaikaBrowserContent = {
         addMessageListener('chaika-post-finished', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-add', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
+
+        // We should initialize ChaikaRedirector in the content process
+        // to allow nsIContentPolicy handle http requests made in the content.
+        if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled")){
+            ChaikaRedirector.init();
+        }
     },
 
 

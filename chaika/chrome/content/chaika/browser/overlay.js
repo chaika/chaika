@@ -114,32 +114,11 @@ var ChaikaBrowserOverlay = {
     },
 
 
-    check2chRedirection: function(aLocation){
-        let ChaikaBoard = ChaikaBrowserOverlay.ChaikaBoard;
-
-        if(ChaikaBoard.getBoardType(aLocation) === ChaikaBoard.BOARD_TYPE_PAGE) return;
-        if(ChaikaBrowserOverlay.browserMenu._isChaika(aLocation)) return;
-        if(aLocation.spec.contains('?chaika_force_browser=1')) return;
-
-        let replaceViewLimit = ChaikaBrowserOverlay.ChaikaCore.pref.getBool("browser.redirector.replace_view_limit");
-        let redirectTo;
-
-        if(ChaikaBrowserOverlay.browserMenu._isThread(aLocation)){
-            redirectTo = ChaikaBrowserOverlay.ChaikaCore.browser._getThreadURL(aLocation, replaceViewLimit, false);
-        }else{
-            redirectTo = ChaikaBrowserOverlay.ChaikaCore.browser._getBoardURI(aLocation);
-        }
-
-        openUILinkIn(redirectTo.spec, 'current');
-    },
-
-
     webProgress: {
         onLocationChange: function(aWebProgress, aRequest, aLocation){
             setTimeout(() => {
                 ChaikaBrowserOverlay.toolbarButton.onLocationChange(aLocation);
                 ChaikaBrowserOverlay.checkIvurRedirection(aLocation);
-                ChaikaBrowserOverlay.check2chRedirection(aLocation);
             }, 0);
         },
 
@@ -157,7 +136,6 @@ var ChaikaBrowserOverlay = {
 
 Components.utils.import("resource://gre/modules/PopupNotifications.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js", ChaikaBrowserOverlay);
-Components.utils.import("resource://chaika-modules/ChaikaBoard.js", ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAboneManager.js', ChaikaBrowserOverlay);
 Components.utils.import('resource://chaika-modules/ChaikaAddonInfo.js', ChaikaBrowserOverlay);
 
