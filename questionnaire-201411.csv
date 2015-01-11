@@ -1,0 +1,1741 @@
+回答日時,Q1,Q2-1,Q2-2,Q2-3,Q2-4,Q2-5,Q2-6,Q2-7,Q3-1,Q3-2,Q3-3,Q3-4,Q3-5,Q3-6,Q3-7,Q4-1,Q4-2,Q4-3,Q4-4,Q4-5,Q4-6,Q5-1,Q5-2,Q5-3,Q5-4,Q5-5,Q6,Q7-1,Q7-2,Q7-3,Q7-4,Q7-5,Q7-6,Q7-7,Q8-1,Q8-2,Q8-3,Q8-4,Q8-5,Q8-6,Q9-1,Q9-2,Q9-3,Q9-4,Q9-5,Q9-6,Q9-7,Q9-8,Q9-9,Q9-10,Q9-11,Q9-12,Q9-13,Q9-14,Q9-15,Q9-16,Q9-17,Q9-18,Q9-19,Q9-20,Q10-1,Q10-2,Q10-3,Q10-4,Q10-5,Q10-6,Q10-7,Q10-8,Q10-9,Q10-10,Q10-11,Q10-12,Q10-13,Q10-14,Q10-15,Q10-16,Q10-17,Q10-18,Q10-19,Q10-20,Q11
+2014-11-03 23:09:07,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.3; Win64; x64; Firefox/31.0)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+LogSearch2ch 1.1.3
+ContextMenu2ch 3.5
+
+【変更した設定値】
+appoint_data_dir: true
+board.auto_update: true
+board.thread_view_limit: 0
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+contextmenu.enabled: false
+data_dir: (masked)
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+thread_get_log_from_mimizun: true
+thread_hide_abone: true",0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,右クリックで呼び出した時にそのカーソル位置にあればどこでもよいです。,0,0,1,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,便利なソフトを公開していただきありがとうございます!
+2014-11-03 23:14:12,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Linux x86_64; Firefox/33.0)
+【使用スキン】(Default)
+【関連アドオン】
+2ch  (無効)
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.tree_size: medium
+board.auto_update: true
+board.open_single_click: false
+board.thread_view_limit: 10
+board.tree_size: medium
+contextmenu.abone.enabled: false
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.history.enabled: false
+contextmenu.open-settings.enabled: false
+contextmenu.search.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+post.auto_finish: true
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.5pre
+thread_font_name: VL Pゴシック
+warn_when_delete_log: false
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,"chaika および掲示板上だけでのみ表示するにしているが、
+chaika 以外のコンテキストメニュー項目をほぼ使わないため一番上が良いかと",0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,いつも更新お疲れ様です
+2014-11-03 23:20:24,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 5.1; Firefox/31.2.0)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch ex 3.3.10.049
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.toggle_open_container: true
+bbsmenu.tree_size: medium
+board.thread_view_limit: 100
+board.tree_size: big
+browser.browsermenu.reload_when_skin_changed: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+contextmenu.enabled: false
+data_dir: (masked)
+post.auto_finish: true
+post.warn_be: false
+releasenotes_showed: 1.7.1
+thread_aa_font_name: MeiryoAA
+thread_chain_abone: true
+thread_skin: gray_2.7.2
+
+【不具合の内容・再現手順】",0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,もし使いにくいと思ったら自分でどうにかするのでこのままでいいです,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,便利に使わせてもらってます。どうもありがとう。
+2014-11-03 23:21:09,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.0; Firefox/33.0.2)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+board.auto_update: true
+board.open_new_tab: true
+board.tree_size: medium
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+contextmenu.abone.enabled: false
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.flattened: true
+contextmenu.history.enabled: false
+contextmenu.open-link-in-browser.enabled: false
+contextmenu.open-settings.enabled: false
+contextmenu.register-selection-as-aa.enabled: false
+contextmenu.search.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.view-in-browser.enabled: false
+contextmenu.view-in-chaika.enabled: false
+post.auto_finish: true
+post.warn_when_close: false
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_font_size: 18
+thread_get_log_from_mimizun: true
+warn_when_delete_log: false",0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,ありがとうございます。
+2014-11-03 23:33:59,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; Win64; x64; Cyberfox/33.0.2)
+【使用スキン】LeanNotes-1.0.7
+【関連アドオン】
+FoxAge2ch 3.3.10
+bbs2chreader ex 0.4.19.014 (無効)
+
+【変更した設定値】
+bbsmenu.tree_size: medium
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.redirector.enabled: true
+browser.redirector.throw_bookmarks: true
+data_dir: (masked)
+http_proxy_mode: 1
+releasenotes_showed: 1.7.0
+thread_chain_abone: true
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+thread_skin: LeanNotes-1.0.7
+
+【不具合の内容・再現手順】",0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,大量のアンカーが貼られているレスを簡単にあぼーんできるようになるとありがたいです。
+2014-11-03 23:37:32,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】gray
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.open_new_tab: true
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+post.auto_finish: true
+post.warn_p2: true
+releasenotes_showed: 1.7.5pre
+thread_aa_font_name: MS Pゴシック
+thread_font_name: 游ゴシック
+thread_font_size: 18
+thread_get_log_from_mimizun: true
+thread_skin: gray",1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,"どう変化したのか分からないが
+chaika閲覧中に右クリックしたメニューの事と仮定して
+chaika閲覧中のみ出てくるメニューなので
+「名前をつけてページを保存」の上
+というよりは最上部の4つのアイコンの直下",0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,"4月以降に増えた開発版常用者はjim暴走事件でp2遮断されてchaikaに移行した人かもなので毛色が違うのかもね
+設問7:特に削除する必要を感じない
+連続書き込み時のsamba値タイマーが欲しいくらい
+Userchrome.cssで対処するのがFirefoxらしいと思う"
+2014-11-03 23:50:14,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; Firefox/33.0)
+【使用スキン】(Default)
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+bbsmenu.tree_size: medium
+board.auto_update: true
+board.open_new_tab: true
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+contextmenu.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+historymenu.board_max: 20
+historymenu.thread_max: 20
+post.auto_be_disable: true
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_hide_abone: true
+thread_show_be_icon: true
+warn_when_delete_log: false",0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,"Chaikaのコンテキストメニューはほぼ使っていない。
+なのでスレッド表示のスレタイ部分、右上のMENU部分に機能を移動させていいのではないか?あぼーんや次スレ検索など。
+
+アイコンの下三角で出てくる項目と、スレタイ右横のMENUと重複してる項目はMENU部分だけに残したほうがいいのではないか?",0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1,1,1,0,0,0,0,0,1,0,1,1,0,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,サイドバーの板一覧、カテゴリ部分に、履歴にあるような、最近アクセスした板、アクセス回数の多い板を5件程度、表示できないか?iPhoneアプリのBB2Cの板一覧ような感じで。履歴表示が板一覧と統合するのがややこしければ、サイドバーの検索窓の上部に独立して履歴表示があってもいいと思うが。
+2014-11-03 23:52:18,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.open_new_tab: true
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.throw_bookmarks: true
+browser.toolbarbutton.installed: true
+data_dir: (masked)
+post.auto_finish: true
+post.warn_mistaken_posting: false
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.5pre
+thread_fix_invalid_anchor: true
+thread_font_name: IPA Pゴシック
+thread_get_log_from_mimizun: true
+thread_skin: gray_2.7.2",0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,マウスの移動距離が少ない先頭位置、ContextMenu2chの上が望ましいと思うけど、常に表示する設定ならちょっとうざいかも。今の位置でも別に構わないです。,0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"サイドバーの使い方ですがAll-in-One Sidebarを入れ、
+通常はFoxAge2chかSage++を開いています。
+切り替えはサイドバー上部のボタンメメニューかツールバーに置いた
+サイドバーボタンもしくはキーボードショートカットで切り替えています。
+chaikaはFoxAge2chのツールメニューから行くこともあリます。"
+2014-11-03 23:56:38,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; Firefox/24.7.0)
+【使用スキン】gray_2.6.2
+【関連アドオン】
+FoxAge2ch ex 3.3.10.049
+ContextMenu2ch 3.5
+
+【変更した設定値】
+bbsmenu.open_single_click: false
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.open_single_click: false
+browser.browsermenu.confirm_add_abone: false
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.toolbarbutton.installed: true
+post.auto_finish: true
+post.emphasize_warnings: true
+post.warn_when_close: false
+refController.enabled: false
+releasenotes_showed: 1.7.0
+thread_aa_font_name: MS Pゴシック
+thread_font_name: MeiryoKe_UIGothic
+thread_hide_abone: true
+thread_skin: gray_2.6.2
+
+【不具合の内容・再現手順】",1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,"このまま。
+特にこだわりはない。",0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"あえて選択肢にないのだろうけど「どちらでもよい。」が欲しい(要望)。
+
+【設問3】サイドバーの利用状況
+普段は別のサイドバーを開いているのでよく切り替える
+
+多分foxage2chを併用してるユーザーは切り替えを多用していると思います。
+スレッドの検索時に開くわけですが、今の状態はちょっと不便です。
+
+
+【設問5】サイドバーの開閉状態表示
+【回答したくない】
+
+正確にはどちらでもよいし、特に気にしない。
+メニューアイコンは状態表示しない方がいい(見栄え的な意味で)。
+Firefox標準のブックマークや履歴のサイドバーアイコンは状態表示してるのでもしもサイドバーアイコンが復活するならばそちらは状態表示した方がいいかも(見栄え的な意味で)。
+
+ついでにサイドバーアイコンのデザインはカモメじゃなく前の「2」の方が好き。
+もちろんfoxage2chのアイコンと並べた時の見栄えがよろしいからですが。
+
+
+【設問7】書き込みウィザードのデザイン
+「書き込みウィザード」の文字
+
+むしろ「書き込みウィザード」と「マターリ」の白枠部分まるごとカットでいいのではないだろうか。
+
+
+【設問8】outside.xml
+その他(下の「備考」にご記入下さい)
+
+反対というわけではないが、外部版を追加する際素人には困難な仕様になるとちょっと困る。
+
+
+
+最後に
+コンテキストメニューに必死チェッカー追加駄目ですかね(小声)。"
+2014-11-04 00:00:33,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【不具合の内容・再現手順】
+【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.bbsmenu_html_url: http://menu.70.kg/bbsmenu.html
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.tree_size: medium
+browser.redirector.enabled: true
+contextmenu.register-selection-as-aa.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+releasenotes_showed: 1.7.1
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_offlaw2: true
+thread_get_log_from_viprpg: true
+thread_show_be_icon: true
+thread_skin: smorgas-lego-ex-20120605",0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 00:04:07,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+bbsmenu.open_single_click: false
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+browser.redirector.enabled: true
+maru_auto_auth: false
+maru_enabled: true
+maru_id:
+maru_last_auth_time: 
+maru_session_id: (masked)
+post.auto_be_disable: true
+post.auto_finish: true
+refController.enabled: false
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_font_name: MS Pゴシック
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_offlaw2: true
+thread_get_log_from_unkar: true
+thread_show_be_icon: true
+thread_skin: smorgas-lego-ex-20120605
+
+【不具合の内容・再現手順】",0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,このままでよい,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,">アイコンを変化させることで通知したほうがよい ※具体的にどのような変化をするべきか「備考」にご記入下さい
+
+アイコンが押されたままの状態にする"
+2014-11-04 00:09:03,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/35.0a2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+chaika, FoxAge2ch  (無効)
+chaika 書き込みウィザード 
+FoxAge2ch ボタン 
+
+【変更した設定値】
+abonemanager.id_expire_days: 5
+appoint_data_dir: true
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html
+board.auto_update: true
+board.thread_view_limit: 0
+browser.browsermenu.confirm_add_abone: false
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+enable_browser_contextmenu: false
+post.warn_p2: true
+releasenotes_showed: 1.7.1
+thread_aa_font_name: IPA モナー Pゴシック
+thread_chain_abone: true
+thread_get_log_from_mimizun: true
+thread_skin: gray_2.7.2",0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,今のままでいい(ほかのアドオンのメニューと同じように「要素を調査」より下の位置にあるべき),0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"あぼーんマネージャのNGExについて2つ要望します。
+・条件の入力ボックス(「を含む」の左隣の欄)が狭すぎるので広くしてほしい。「Aa」の右隣の+-ボタンの幅を狭めたり、ウィンドウの横幅を広げたときに(ラベル欄が広がるのと同じように)条件の入力ボックスの横幅も合わせて広げてほしい。
+・ウィンドウの高さを広げたとき、登録済みのNGリストの高さも合わせて広げてほしい。"
+2014-11-04 00:17:29,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】BowⅣ
+【関連アドオン】
+2ch URL Modify 0.3
+Chaika 表示中のログを削除 undefined
+
+【変更した設定値】
+aa.confirm_before_save: true
+aa.create_and_save: false
+abone.show_context_only_2ch: false
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+bbsmenu.open_single_click: false
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+board.tree_size: medium
+browser.browsermenu.confirm_add_abone: false
+browser_contextmenu_confirm_add_abone: false
+browser_toolbarbutton_only_bbs: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.go-to-board.enabled: false
+contextmenu.history.enabled: false
+contextmenu.open-board.enabled: false
+contextmenu.open-in-browser.enabled: false
+contextmenu.open-in-chaika.enabled: false
+contextmenu.open-link-in-browser.enabled: false
+contextmenu.open-link-in-chaika.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+data_dir: (masked)
+enable_browser_toolbarbutton: false
+historymenu.board_max: 0
+historymenu.thread_max: 0
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+thread_aa_font_name: KGHC-AA
+thread_aa_line_space: 0
+thread_font_name: KGHC-AA
+thread_get_log_from_mimizun: true
+thread_hide_abone: true
+thread_skin: BowⅣ",0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,0,0,0,このままでよい,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"ツールバーボタン
+左クリックで開く、右クリックでメニューがいいかな
+ステータスバーや縦置きツールバーに置く事を考えてボタンサイズは小さい方がいい
+
+書き込みウィザードのデザイン
+コンパクトにするのは賛成だが
+すでにcssで改造してコンパクトにしてる人の為に
+今のスタイルで数値を変えて幅、高さ、色等を変えた方が影響が少ないのではないか
+
+表示部分を広くする為にツールバーやタブの高さを低くする改造をしているユーザーが
+いますのでボタンの大きさが少し大きくなっただけでも全体の使い勝手が変わってしまいます"
+2014-11-04 00:23:24,【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.3; WOW64; Firefox/35.0a2),0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,マウスジェスチャで済ませているので、コンテキストメニューは不要,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問4:サイドバーの開閉もメニューもマウスジェスチャで済ませているので
+　　　　現在カモメは常時非表示"
+2014-11-04 00:36:41,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/32.0.3)
+【使用スキン】(Default)
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+bbsmenu.tree_size: medium
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.redirector.enabled: true
+browser_contextmenu_flatten: true
+contextmenu.copy.enabled: false
+contextmenu.delete-log.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.open-board.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+enable_browser_toolbarbutton: false
+historymenu.board_max: 20
+historymenu.thread_max: 20
+maru_enabled: true
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_font_name: Meiryo UI
+thread_font_size: 20",0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問 5 サイドバーの開閉状態表示
+アイコンを変化させることで通知したほうがよい
+凹んだように見える状態"
+2014-11-04 01:15:54,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.0)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+Chaika/bbs2chreader ex :: Post Wizard Clean Up 
+chaika-thread-toolbaritem 
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_single_click: false
+board.auto_update: true
+board.open_single_click: false
+browser.redirector.enabled: true
+browser.redirector.throw_bookmarks: true
+browser.toolbarbutton.installed: true
+data_dir: (masked)
+http_proxy_mode: 1
+http_proxy_value: 118.243.183.2:14789
+post.auto_finish: true
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.0
+thread_aa_font_name: IPA モナー Pゴシック
+thread_fix_invalid_anchor: true
+thread_font_name: M+1P+IPAG
+thread_get_log_from_mimizun: true
+thread_skin: smorgas-lego-ex-20120605
+
+【不具合の内容・再現手順】",0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,"可能な限り上部が好みです。
+(ナビゲーション直下など)",0,0,1,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,"設問 7、書き込みウィザードのデザイン についてでが、
+私は2009年にUserCSSを作成し、修正を施すことなく現在まで利用し続けています。
+https://userstyles.org/styles/17012/
+
+適用した場合のスクリーンショットです。何らかの参考になればと思います。
+http://bbs2ch.sourceforge.jp/uploader/img/827.png
+
+また、「名前欄の上のスレッドタイトル」についてですが、
+・上記のスクリーンショットでも顕著ですが、環境によってウィンドウタイトルが読み辛い事
+・スレッドタイトルの確認を怠ると、誤爆という形で利用者以外にも迷惑がかかる事
+の2点から、現状のまま表示させた方が良いかと思います。"
+2014-11-04 01:32:53,,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 02:07:10,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Linux x86_64; Firefox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+board.auto_update: true
+board.open_new_tab: true
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+contextmenu.enabled: false
+data_dir: (masked)
+post.auto_finish: true
+post.warn_when_close: false
+releasenotes_showed: 1.7.5pre
+server_port.firefox: 8822
+tab_load_in_foreground: true
+thread_aa_font_name: IPAMonaPGothic
+thread_font_size: 14
+thread_show_be_icon: true
+thread_skin: gray_2.7.2
+warn_when_delete_log: false",0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 04:12:15,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; Win64; x64; Cyberfox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+2chブラウザで開く 0.7 (無効)
+FoxAge2ch 3.3.10
+LogSearch2ch 1.1.3
+ContextMenu2ch 3.4
+
+【変更した設定値】
+bbsmenu.2ch_compatible_boards: #info.2ch.sc, #be.2ch.sc, .2ch.sc, .open2ch.net
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.27.sc.xp.p0.p1.op./-all/bbsmenu.html
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser_contextmenu_add_tab_by_click: true
+browser_toolbarbutton_add_tab_by_click: true
+enable_browser_contextmenu: false
+http_proxy_mode: 1
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.0
+thread_aa_font_name: MS Pゴシック
+thread_font_name: メイリオ改
+thread_show_be_icon: true
+thread_skin: gray_2.7.2",1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,0,どこでもいい,0,1,1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,ツールバーボタンに関してですが、私は各種ツールバーを使い分けて運用しているために、ツールバー開閉ボタンではなく、ツールバー内容の切り替えボタンとして必要です。
+2014-11-04 04:33:18,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+Chaika/bbs2chreader ex :: Post Wizard Clean Up
+
+【変更した設定値】
+bbsmenu.find2ch.use_rss: false
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+board.thread_view_limit: 0
+browser.redirector.enabled: true
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.enabled: false
+contextmenu.history.enabled: false
+contextmenu.register-selection-as-aa.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.write.enabled: false
+post.auto_finish: true
+post.auto_p2_disable: true
+releasenotes_showed: 1.7.1
+thread_aa_font_name: MS Pゴシック
+thread_aa_font_size: 13
+thread_aa_line_space: 1
+thread_chain_abone: true
+thread_font_name: メイリオ
+thread_font_size: 14
+thread_hide_abone: true
+thread_show_be_icon: true
+thread_skin: smorgas-lego-ex-20120605",0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,0,0,0,
+2014-11-04 06:25:53,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/31.2.0)
+【使用スキン】smorgas-mix-怪_自分用改造2014-10-24
+【関連アドオン】
+Chaika Abone Helper 0.0.26 (無効)
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+abonemanager.id_expire_days: 0
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+bbsmenu.open_single_click: false
+bbsmenu.toggle_open_container: true
+bbsmenu.tree_size: medium
+board.auto_update: true
+board.open_single_click: false
+board.thread_view_limit: 150
+board.tree_size: medium
+browser.browsermenu.confirm_add_abone: false
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser.redirector.throw_bookmarks: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+browser_contextmenu_confirm_add_abone: false
+browser_contextmenu_only_bbs: false
+contextmenu.copy.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.open-board.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+maru_enabled: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.5pre
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_chain_abone: true
+thread_font_name: MeiryoKe_PGothic
+thread_get_log_from_mimizun: true
+thread_hide_abone: true
+thread_show_be_icon: true
+thread_skin: smorgas-mix-怪_自分用改造2014-10-24
+
+【変更箇所】
+・スキン変更箇所として、IDをNGにする時、2クリックでNGIDに登録できるようにした。(本文のIDを右クリックで選択し、chaikaコンテクストメニューから1クリックでIDをあぼーんできるように。)
+・chaika本体に「IDあぼーん」という項目をコンテクストメニューの一番上に追加した。",0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,ESR 31 + アドオン「Menu Editor」でコンテキストメニューを弄っているので、このままでよい。,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"デフォルト値の変更に関しては、後で自分で設定しなおせばいいだけなので、全て作者様に任せます。
+サイドバーやその他設定変更部分も、自分が普段使用していなかった部分なので、全て作者様に任せます。
+
+【個人的に追加、改善して欲しい機能】
+・chaikaコンテクストメニューに「IDあぼーん」という項目を追加して欲しい。(NGIDは個人的によく使う機能なので、あぼーん内のIDまでカーソルを持っていくのが面倒。)
+
+・chaikaコンテクストメニューに「あぼーんマネージャを開く」という項目を追加して欲しい。(chaika1.6.3でよく使っていたので。)
+
+・chaikaコンテクストメニューに「置換マネージャを開く」という項目を追加して欲しい。(ついでなので、よく使いそうな項目も追加要望に。)
+
+・NGExでラベルを削除する時は削除確認ウィンドウが欲しい。(保存ボタンと削除ボタンが隣り合わせになっていて、間違って削除ボタンを押すと一発削除になるのが気になった。)
+
+・NGExのラベル欄が縦に狭く、目的のラベルまでスクロールする手間が増えたので、ラベルを一覧表示出来るようにして欲しい。(現在30行以上のラベルがあるので、目的のラベルまでのスクロール量がchaika1.6.3と比べてとても多くなっている。)
+
+・NGExのラベル欄でラベルの上下位置をNGExウィンドウ内で変更出来るようにして欲しい。(NGの優先度にも関わってくるので。)
+
+・「自動的にNGIDに追加する」機能を使うとラベルが大量に増える時があるので、自動NGIDのラベルは通常のラベル欄とは別の場所に表示して欲しい。
+
+・最後に、「NGEx で子条件グループを作成できるようにする - Issue #148」の実装を心待ちにしております。これがあればラベル欄を20行以内にまとめられるので、スッキリします。"
+2014-11-04 07:18:47,,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,1,0,0,1,0,0,0,0,,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 08:25:52,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 5.1; Firefox/33.0)
+【使用スキン】081skin_029
+【関連アドオン】
+bbs2chreader ex 0.4.19.014 (無効)
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+board.open_new_tab: true
+board.tree_size: medium
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+data_dir: (masked)
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.0
+thread_show_be_icon: true
+thread_skin: 081skin_029
+
+【不具合の内容・再現手順】",0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,今のままで良い。,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 08:55:06,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+contextmenu.enabled: false
+releasenotes_showed: 1.7.5pre
+thread_aa_font_name: MeiryoKe_PGothic
+thread_aa_font_size: 14
+thread_font_name: メイリオ
+thread_font_size: 12",0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,1,0,0,1,0,0,0,0,"このままでよい
+(コンテキストメニューは使っていないため)",0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"・1.7からDefaultスキンの設定をCookieに保存しているようだが、これをやめてほしい
+(Cookie拒否、Fx終了時に削除を行っているため)
+
+・http://anago.2ch.net/test/read.cgi/software/1403350012/951
+このバグ(?)も対応してほしい
+(旧バージョンでは問題なかった、コンテキストメニューのほうは問題なし)"
+2014-11-04 09:57:10,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0.jb.vs.op.sc/-all/bbsmenu.html
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+browser_contextmenu_reload_when_skin_changed: true
+contextmenu.show_only_on_bbs: false
+enable_browser_toolbarbutton: false
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_aa_font_name: Meiryo mod 12pt AA
+thread_font_name: メイリオ-AAR
+thread_skin: smorgas-lego-ex-20120605
+
+【不具合の内容・再現手順】",1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,"要望
+・アドオン S3 Menu Wizard と共存できるとうれしい
+・ツールバーボタンの▼を削除し 現状の左右クリックでメニュー サイドバー表示機能を。左右クリックは逆動作でもいい"
+2014-11-04 10:29:46,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre 1411031830_419aeeb8f0; Windows NT 6.3; Win64; x64; Firefox/36.0a1)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch ex 3.3.10.049
+
+【変更した設定値】
+abone.show_context: false
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0.jb.vs.op.sc/-all/bbsmenu.html
+bbsmenu.find2ch.use_rss: false
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.open_new_tab: true
+board.thread_view_limit: 0
+board.title_strip_regexp:  ?\[転載禁止\] ?|(|&(amp;)?(copy|#169);|\(c\)|)([23]ch\.net|bbspink\.com)[\t\uFF65]?
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser_contextmenu_find_2ch_in_sidebar: true
+browser_contextmenu_reload_when_skin_changed: true
+browser_toolbarbutton_only_bbs: false
+contextmenu.show_only_on_bbs: false
+post.warn_be: false
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.5pre 1411031830_419aeeb8f0
+thread_aa_font_name: MS Pゴシック
+thread_font_name: MeiryoKe_PGothic
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_offlaw2: true
+thread_get_log_from_viprpg: true
+thread_show_be_icon: true",0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,なるべく上の方が当然楽ではあるが、あまりこだわりはない,0,0,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"ツールバーボタン⇒基本的には今のままで良いが、「ツールバーボタンを右クリックでchaikaメニュー」として▼を削除する方がすっきりすると思う
+
+outside.xml⇒反対と言うほど強い意見ではないが、外部板の追加編集はChaika本体では無くてProfileの属性のような気がする"
+2014-11-04 10:41:33,,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,一番上か一番下,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,とにかく余計な機能追加などしないでほしい。ブラウザで簡単に見ることが出来る程度で良かったのに、色々追加するのはスキンなど個人で追加していけばいいし、そこまでするなら専用のブラウザを使え!と思う。
+2014-11-04 12:05:30,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.0; Firefox/24.8.1)
+【使用スキン】Plat(20100506)
+【関連アドオン】
+FoxAge2ch 3.3.10
+LogSearch2ch 1.1.3
+ContextMenu2ch 3.5 (無効)
+
+【変更した設定値】
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+browser.browsermenu.confirm_add_abone: false
+browser.redirector.enabled: true
+contextmenu.abone.enabled: false
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.delete-log.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.flattened: true
+contextmenu.open-board.enabled: false
+contextmenu.open-settings.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+enable_browser_contextmenu: false
+enable_browser_toolbarbutton: false
+historymenu.board_max: 20
+historymenu.thread_max: 20
+ngfiles.enabled: true
+post.show_preview: false
+post.warn_when_close: false
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_aa_font_name: AXIS-R_AA
+thread_aa_font_size: 14
+thread_font_name: AXIS Std R
+thread_font_size: 14
+thread_hide_abone: true
+thread_skin: Plat(20100506)
+warn_when_delete_log: false",0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,一番上,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,"～ツールバーボタン～
+スペース確保や2chの利用が少ないのもあって
+ほぼサイドバーは閉じたまま。
+板の移動は「最近アクセスした板」の使用頻度が高い。
+開閉ボタンがなくてもこれで賄える。
+ただし「最近アクセスした板」は1.70から
+直感的ではなくなっているので改良が必要。
+
+～outside.xml～
+外部板の利用がメインなので
+outside.xmlをいじって登録した事もあったが、
+手軽に登録できるFoxAge2chに置き換わっているので構わない。
+
+～要望～
+「最近アクセスした板」の改良
+ロダ 670.zip 新着スレに印をつけるパッチ
+
+アップデートお疲れ様です。
+くれぐれも体調の方お気をつけて!!"
+2014-11-04 16:17:04,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; Win64; x64; Firefox/33.0.2)
+【使用スキン】LeanNotes-1.1.1
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 03.chaika.filter.board
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.toolbarbutton.installed: true
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.go-to-board.enabled: false
+contextmenu.history.enabled: false
+contextmenu.open-board.enabled: false
+contextmenu.open-in-browser.enabled: false
+contextmenu.open-link-in-browser.enabled: false
+contextmenu.register-selection-as-aa.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+enable_browser_toolbarbutton: false
+historymenu.board_max: 0
+historymenu.thread_max: 0
+post.auto_finish: true
+post.warn_when_close: false
+releasenotes_showed: 1.7.1
+thread_aa_font_name: MeiryoKe_PGothic
+thread_chain_abone: true
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+warn_when_delete_log: false",0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,1,1,0,1,0,0,0,0,"一番上の4つのボタンの下
+なるべく上がいい",0,0,1,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,サイドバーはショートカットキーで開閉しているのでボタンは必要ない
+2014-11-04 17:36:29,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/32.0.3)
+【使用スキン】Default改
+【関連アドオン】
+ContextMenu2ch 1.0
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+board.auto_update: true
+board.thread_view_limit: 0
+browser.redirector.enabled: true
+maru_enabled: true
+post.auto_finish: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+thread_skin: Default改",0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,0,このままでOKです,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"chaika、大変重宝しております
+いつもありがとうございます"
+2014-11-04 18:10:13,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+ContextMenu2ch 3.5
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.open_single_click: false
+board.tree_size: medium
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+contextmenu.open-board.enabled: false
+contextmenu.open-in-browser.enabled: false
+contextmenu.open-in-chaika.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+post.write_log.failed: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_font_size: 19
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+thread_skin: gray_2.7.2
+warn_when_delete_log: false
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"大変便利に使わせていただいており深く感謝申し上げます
+陰ながら心より応援しております
+季節柄ご自愛下さい"
+2014-11-04 20:38:54,,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,0,下にあると不便であることは確かなんですが、かといって挿入箇所を決め打ちすると、将来のFirefoxのバージョンアップなどで予期せぬ挙動になりかねないので難しい。裏技的なコードで挿入箇所を決め打ちするぐらいなら今のままの方が良いと思う。,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"以下項目別にコメントします。
+
+　普段は別のサイドバーを開いているのであまり切り替えない→Foxage2chがメイン。Foxage2ch・chikaとものショートカットキーで開いてます(ツールバーにアイコンを増やしたくないので)
+
+　ツールバーボタン→サイドバーボタンと機能メニューボタンは、必要となる状況が全く異なるので、そもそも一緒にすること自体に無理があるように思う。個人的にはサイドバーボタンは使ってないので無くても問題ないです
+
+　書き込みウィザード→ウィザードの白い部分は、ユーザがこのステップで何をすべきかを説明するためのものなので、「書き込み内容の入力」「プレビュー」ぐらいで良いと思う。タイトルバーの方に「書き込みウィザード - (スレ名) [chaika]」で良いのでは。名前欄の上のスレッドタイトルは書き込みの誤爆防止に役立ってます(少なくとも自分には)
+
+　outside.xml→個人的には使ってないです(カスタムBBSメニューで外部板登録している)が、個人データフォルダにoutside.xmlがあればそっちを参照、無ければシステムフォルダのものを参照、でいいと思います
+
+　URLの表示制限を書き換えて開く→chika使い始めの頃、chika表示へ切り替えたときURLのレス表示範囲指定がchikaレス表示で反映されないのはバグなのかなと思った。それと「URLの表示制限を書き換えて開く」という設定項目の意味がわからなかった。「表示制限」じゃなく「レス表示範囲」の方がわかりやすいと思う
+
+　スレッド一覧を開いた時に自動的に一覧を更新する→開いた時点での最新情報が自動的に表示されて当然だと思うので
+
+　【スレ一覧/リスト】シングルクリックで開く→chika使い始めの頃、これがどうしても慣れなくてダブルクリック動作に変更した。Windowsエクスプローラと同じ感覚で使えるように。もしサイドバー以外の場所でシングルクリック動作をするなら、Webブラウザと同様にシングルクリック動作する場所でマウスカーソルを「人差し指」にしないとユーザが戸惑うと思います"
+2014-11-04 20:42:33,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.3; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex
+【関連アドオン】
+FoxAge2ch 3.3.10
+ContextMenu2ch.uc.xul null
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+board.auto_update: true
+board.open_new_tab: true
+board.thread_view_limit: 0
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.browsermenu.open_in_new_tab: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser_toolbarbutton_add_tab_by_click: true
+enable_browser_contextmenu: false
+releasenotes_showed: 1.7.1
+thread_skin: smorgas-lego-ex
+
+【不具合の内容・再現手順】",0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,"一番上にあるのがよい
+メニューの下にセパレータを入れてほしい",0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 21:30:59,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Linux i686; Firefox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch ex 3.3.10.049
+ContextMenu2ch.uc.xul null
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+browser.redirector.enabled: true
+browser.redirector.replace_view_limit: false
+browser.toolbarbutton.installed: true
+browser_contextmenu_disregard_url_option: false
+contextmenu.enabled: false
+data_dir: (masked)
+enable_browser_contextmenu: false
+enable_browser_toolbarbutton: false
+historymenu.board_max: 0
+historymenu.thread_max: 0
+post.auto_finish: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_name: Monapo
+thread_aa_line_space: 0
+thread_font_name: MigMix 1P
+thread_get_log_from_mimizun: true
+thread_hide_abone: true
+thread_show_be_icon: true
+thread_skin: gray_2.7.2",0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,個人的には現状でもよいです,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問4について
+現状のままでも構いませんが矢印部分を取り外せる選択肢が
+用意されていても良いかなとは思います　各人の好みに合わせられるという意味で
+
+設問5について
+あまりテーマや背景色に影響がなさそうな凹凸(押し込み・出っ張り)で表現はどうでしょう
+
+設問7について
+しいて言えば配置替えはどうでしょうか　Win版「書き込みウィザード」「マターリ」を一行に並べる
+名前・メール・sageと下部各種チェックボタン・ツールを一行になど
+ただ間隔によっては押し間違えが頻発する可能性もありそうですね…
+
+設問9について
+デフォルト値に関してではありませんが【ブラウザ/スレッドリダイレクタ】の項目についてです
+初めて使った時にどんな機能なのかわかるようでわからなかった記憶があります
+「ブックマークやスレッド表示からはそのまま開く」は、「ブックマーク」はわかるものの
+「スレッド表示」はどこの表示?「そのまま」とはどのままなんだろう…
+また「URLの表示制限を書き換えて開く」もレスの範囲指定のことだと少し経って気づきました
+わかってみればそういうことか、と理解できるんですが初見ではわかりにくかったです
+自分だけかもしれませんがもう少し詳しく書いてあればより良いかなと思いました
+
+
+お疲れ様です。更新作業が活発になり改良が重ねられていて一ユーザーとして嬉しく思っています。
+あまり無理にならない範囲での更新作業をしていただけると使う側としても気持ちが良いです。
+応援しています。
+
+改変に関してざっくりとした意見としてはいずれにせよ賛否は出るものだと思っています。
+このアンケートのように意見が何らかでも反映される柔軟性があれば問題はないと思います。"
+2014-11-04 21:46:27,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.3; WOW64; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+board.auto_update: true
+board.thread_view_limit: 0
+board_auto_update: true
+board_thread_view_limit: 100
+browser.toolbarbutton.installed: true
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+thread_chain_abone: true
+thread_hide_abone: true
+thread_skin: smorgas-lego-ex-20120605",0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 22:08:26,えっと、見識が無く、設問の意図がつかめません…。ユーザーエージェントも意味は知っていますが、どこで確認してどうやってここに貼ればよいものか…。,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,利用スタイルがライトすぎるのか、コンテキストメニューは、ほぼ使用しておらず…。ただ、今開いてみた印象としては、下過ぎて困る方はいらっしゃるかと思います。,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,1,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"いつもお世話になっております。やっとお礼が言えます(笑)。
+2chはいつも、chaikaで、ROMで、デフォルトスキンで、スマホのニュースアプリの感覚で使っています。ので、アンケート回答者としてはライトすぎてお役に立てないかもしれませんが、こういうユーザーもいると言う事くらいはお伝えできるかと。
+重ね重ね、開発ご苦労様です。ありがとうございます。
+
+追伸:画像のインライン表示が夢です。"
+2014-11-04 22:32:38,,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-04 22:58:59,,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,一番上,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問 5　サイドバーの開閉状態表示
+アイコンの周囲に影をつけて、押しているようなイメージにしてもらえるとわかりやすいです。
+サイドバー自体を見るより先に、ツールバーのアイコンを見てサイドバーに何を表示しているか判断する癖があるので。
+
+いつも開発お疲れ様です。
+上に述べたのは単に個人の希望なので、作者様が使いやすいと思ったようにしてください。
+もうこれ以上改良するところはないんじゃないかなと思っても、それ以上の機能と使いやすさを追求して更新を続けてくださっていつも感謝しています。
+多くの人が使っているアドオンだけに大変なことも多いと思いますが、無理なさらずご自身のことを第一に考えてゆっくり開発されてくださいね。"
+2014-11-05 00:09:03,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; Firefox/34.0)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch ex 3.3.10.049",0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,このままでよい,0,0,1,1,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問 4ツールバーボタン
+サイドバーは開きっぱなしにしてボタンを使わないのでわかりません。
+
+設問 7書き込みウィザードのデザイン
+デザインとは違うかもしれませんが、
+・「ツール」ボタンのメニューポップアップにあるAAの項目をボタンとして表に出してほしい。
+・書き込み欄を常に出しておけてFirefoxを閉じたら書き込みウィザードも一緒に閉じられるようにしてほしい。
+　書き込みウィザードは出したけど結局書き込まないでFirefoxを閉じたら
+　書き込みウィザードだけ残ってたってことがよくあるのでそれをなくしたいです。
+　試しにSidebar mixにchrome://chaika/content/post/wizard.xulを入れてみたら
+　「URLが不正です」でだめでした。
+・タブが変わったら書き込み先のURLも一緒にそのURLになるようにしてほしい。
+・書き込むときに「次へ」ボタンをクリックする代わりにキーボートショートカットで書き込めるようにしてほしい。
+よろしくお願いします。"
+2014-11-05 01:32:36,"Ver.1.6.3
+基本的にデフォルトだが、「2ch スレッド URL を自動的に chaika で開く」、「chaikaおよび掲示板上でのみ表示する」、各「新しいタブで開く」をON、各「】シングルクリックで開く」をOFF",0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,1,0,0,1,0,0,0,このままでよい,0,0,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"※サイドバーボタンについて
+現状のサイドバーボタンから矢印部を削除し、メニューは右クリックで表示するようにしてほしい
+また、押下時(サイドバー表示時)は、従来のボタンの様に影をつけてほしい。(ブックマーク等、他のサイドバーボタンと同様の動き。)"
+2014-11-05 10:04:10,,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-05 10:35:12,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.3; Win64; x64; Firefox/36.0a1)
+【使用スキン】smorgas-lego-ex-20110112
+【関連アドオン】
+chaika 書き込みウィザード編集 
+chaika　スレ一覧編集 
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser.redirector.throw_bookmarks: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+browser_contextmenu_reload_when_skin_changed: true
+historymenu.board_max: 20
+historymenu.thread_max: 20
+post.auto_finish: true
+post.show_preview: false
+post.warn_when_close: false
+post.write_log.failed: true
+releasenotes_showed: 1.7.5pre
+tab_load_in_foreground: true
+thread_font_size: 12
+thread_get_log_from_mimizun: true
+thread_skin: smorgas-lego-ex-20110112
+
+【不具合の内容・再現手順】",1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,どこなのかよくわかりません,0,0,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,"サイドバーのアドオンは全然他の人の話に出て来ませんがpanoという物を使っています。
+これはサイドバーが上下に分けられていて、別々の物を表示出来る物です。
+ちなみに自分の使い方は上段にタブをツリー表示(で合ってるのかな)、下段にchaikaとしていてワイド液晶な事もあり常時開いたままなのでサイドバーを表示は全く使っていません。
+このアドオン便利だと思うのに人気無いんだよなぁ…(笑)
+と、どうでも良い事を書いてすみませんw
+ありがたく使わせて頂いています。
+無理の無い程度でこれからもよろしくお願いします。"
+2014-11-06 02:32:19,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Linux x86_64; Firefox/33.0)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+browser.browsermenu.confirm_add_abone: false
+browser.browsermenu.reload_when_skin_changed: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser.redirector.replace_view_limit: false
+browser.toolbarbutton.installed: true
+browser_contextmenu_confirm_add_abone: false
+browser_contextmenu_disregard_url_option: false
+browser_contextmenu_only_bbs_except_open_link: true
+browser_contextmenu_reload_when_skin_changed: true
+browser_toolbarbutton_disregard_url_option: false
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.delete-log.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.go-to-board.enabled: false
+contextmenu.history.enabled: false
+contextmenu.open-settings.enabled: false
+contextmenu.search.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_name: Monapo
+thread_chain_abone: true
+thread_fix_invalid_anchor: true
+thread_font_name: Takao P明朝
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_unkar: true
+thread_get_log_from_varda2: true
+thread_skin: smorgas-lego-ex-20120605",0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,1,0,0,0,0,どこでも良い,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"質問3の回答補足
+OminiSidebarのメインにchaikaを、TwinサイバーにFoxage2chをそれぞれフォーカスが無くなると自動的に閉じる設定で使っています。
+サイドバーを開くのはOminiSidebarのOpen Main Sidebarボタン及びOpen Twin Sidebarボタンで行なっています。"
+2014-11-06 02:54:44,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.3; WOW64; Firefox/33.0.2)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_single_click: false
+board.auto_update: true
+board.open_single_click: false
+browser.browsermenu.reload_when_skin_changed: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+data_dir: (masked)
+post.auto_finish: true
+releasenotes_showed: 1.7.0
+thread_aa_font_name: MS Pゴシック
+thread_chain_abone: true
+thread_font_name: MeiryoKe_PGothic
+warn_when_delete_log: false",0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,特にこだわらない,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-06 10:58:54,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/31.2.0)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+browser.toolbarbutton.installed: true
+browser_contextmenu_flatten: true
+browser_contextmenu_only_bbs_except_open_link: true
+contextmenu.abone.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.copy.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.flattened: true
+contextmenu.history.enabled: false
+contextmenu.open-link-in-browser.enabled: false
+contextmenu.register-selection-as-aa.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+enable_browser_toolbarbutton: false
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_get_log_from_mimizun: true
+
+【不具合の内容・再現手順】",0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,位置に関してはコメントは特にないのですが、コンテクストメニューの表示について下の備考に書きましたので確認をお願いします。,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"先に本題を書かせていただきます。私はfirefox ESR版を使っているのですが、どうもコンテクストメニューの設定がうまく反映されません。チェックを入れた項目が表示されなかったり、フラット表示にならなかったりします。ですので普段は1.6.3を使っています。新規プロファイルでchaika1.7.0だけを入れてみても再現したので、もし他の方からも
+報告が入っていたら確認をよろしくお願いします。
+
+最後になってしまいましたがとても便利に使わせもらっています。ありがとうございます。アンケートでは、超が付く程のライトユーザーですので、分からない箇所、使っていない箇所に関しては""【回答したくない】""にチェックを入れました。"
+2014-11-06 13:26:25,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.0)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+Chaika Abone Helper 0.0.26 (無効)
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.open_new_tab: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+board.open_new_tab: true
+board.open_single_click: false
+board.thread_view_limit: 0
+board.tree_size: medium
+browser.browsermenu.disregard_url_limit: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser_contextmenu_add_tab_by_click: true
+browser_contextmenu_only_bbs_except_open_link: true
+browser_contextmenu_reload_when_skin_changed: true
+browser_toolbarbutton_add_tab_by_click: true
+contextmenu.history.enabled: false
+post.auto_finish: true
+post.emphasize_warnings: true
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_font_name: メイリオ
+thread_font_size: 15
+thread_show_be_icon: true
+thread_skin: gray_2.7.2
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,1,このままでもよい,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,
+2014-11-06 20:08:13,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.3; Win64; x64; Cyberfox/33.0.2)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+board.open_single_click: false
+board_click_action: 0
+board_double_click_action: 1
+board_thread_view_limit: 100
+browser.browsermenu.confirm_add_abone: false
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.redirector.enabled: true
+releasenotes_showed: 1.7.1
+thread_chain_abone: true
+thread_hide_abone: true",0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-07 02:06:49,,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"USBメモリにfirefoxポータブルを入れて使用してます。
+できれば、ログを保存しないモードもほしいです。(スキンが便利。でもログの削除がメンドクサイ)"
+2014-11-07 03:49:25,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Linux x86_64; Firefox/32.0)
+【使用スキン】(Default)
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+bbsmenu.tree_size: big
+board.auto_update: true
+board.open_new_tab: true
+board.tree_size: big
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_name: HGPゴシックE
+thread_font_name: HGPゴシックE
+thread_font_size: 26
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_unkar: true
+thread_get_log_from_varda2: true
+
+【不具合の内容・再現手順】",0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,1,1,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"右クリックのメニューにカーソルの位置のレス番のアンカーを含めた「このレスにアンカーを付けて書き込む」みたいな選択肢があると嬉しいです。
+
+スキンまでの大げさなことではなく、背景色、文字色を選べると嬉しいです。
+また、未読スレ、既読スレで色分けしたり。
+
+ツリー表示?(まとめサイトでありますよね)みたいなのに切り替えられると嬉しいです。
+
+以上、androidのen2chというアプリを使ったので、その影響で良いと思ったところを交えてリクエストさせていただきます。
+今のままでも充分、便利に使わせて頂いておりまして、とても感謝しています。"
+2014-11-07 06:03:56,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.1; WOW64; Firefox/33.0.2)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+bbsmenu.toggle_open_container: true
+board.auto_update: true
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.redirector.enabled: true
+browser.redirector.replace_view_limit: false
+browser_contextmenu_find_2ch_in_sidebar: true
+browser_contextmenu_only_bbs: false
+browser_contextmenu_reload_when_skin_changed: true
+browser_toolbarbutton_add_tab_by_click: true
+browser_toolbarbutton_disregard_url_option: false
+contextmenu.enabled: false
+data_dir: (masked)
+enable_browser_contextmenu: false
+historymenu.board_max: 10
+historymenu.thread_max: 10
+logger.level: 4
+post.auto_be_disable: true
+post.auto_finish: true
+post.auto_p2_disable: true
+post.emphasize_warnings: true
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.5pre
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_chain_abone: true
+thread_get_log_from_mimizun: true
+warn_when_delete_log: false",0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0,0,0,コンテキストメニューは使っていないので分かりません。,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"> 設問4 ツールバーボタン
+現状の方式は若干不便だと思っていますが、chaikaのサイドバーの使用頻度が低いので許容できています。
+個人的な理想を言えば、FoxAge2ch のサイドバーに切り替えボタンが付くことかもしれません。chaikaとは無関係になってしまいますが。"
+2014-11-07 11:31:38,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; Firefox/33.0.2)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+browser.toolbarbutton.installed: true
+http_proxy_mode: 1
+post.auto_finish: true
+post.warn_p2: true
+releasenotes_showed: 1.7.0
+thread_hide_abone: true
+thread_skin: smorgas-lego-ex-20120605",0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,"いつもありがとうございます。
+chaikaの機能なのか、スキンの機能なのかわかりませんが、
+まちBBSの投稿者ステータスに、リモートホストを表示するように
+して欲しいです。
+また、ログの自動削除機能が欲しいです。"
+2014-11-07 20:18:21,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"昨日アンケートに回答したものです(ログを保存しないモード)
+もう一つ要望(わがまま)
+2chscとopen2chの板一覧もそれぞれ取れるようにしてほしい
+サイドバーで切り替えて表示か一緒に表示かどちらでもOK
+http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0.sc.op/-all/bbsmenu.html
+ここもありますがサーバー移転時の反映が遅いので・・・"
+2014-11-08 23:45:46,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.3; Win64; x64; Firefox/33.0.2)
+【使用スキン】gray_2.7.2
+【関連アドオン】
+FoxAge2ch 3.3.10
+
+【変更した設定値】
+appoint_data_dir: true
+bbsmenu.bbsmenu_html_url: http://menu.70.kg/bbsmenu.html
+bbsmenu.open_new_tab: true
+board.auto_update: true
+board.open_new_tab: true
+browser.browsermenu.remove_limit_when_copy: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+browser_contextmenu_confirm_add_abone: false
+browser_contextmenu_find_2ch_in_sidebar: true
+browser_contextmenu_reload_when_skin_changed: true
+contextmenu.open-in-browser.enabled: false
+contextmenu.search.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.write.enabled: false
+data_dir: (masked)
+historymenu.board_max: 5
+historymenu.thread_max: 5
+post.auto_be_disable: true
+post.auto_be_enable: true
+post.auto_finish: true
+post.warn_p2: true
+post.write_log.succeeded: true
+refController.enabled: false
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_name: Meiryo mod 12pt AA
+thread_fix_invalid_anchor: true
+thread_font_size: 14
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+thread_skin: gray_2.7.2
+warn_when_delete_log: false",0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでいいです。,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,1,0,1,0,1,1,1,0,0,0,0,0,0,0,0,0,1,0,1,1,1,0,0,0,1,1,0,0,0,0,0,0,0,0,1,0,とくにありません。
+2014-11-11 00:06:37,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Linux i686; Firefox/33.0)
+【使用スキン】gray_2.7.3
+【関連アドオン】
+FoxAge2ch 3.3.10",0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,0,0,0,"「戻る・進む・更新・ブックマークのアイコン」という項目の下
+Firefoxにchaikaのみ導入した環境において、現在の位置ではマウスの操作量が多すぎるように感じます。
+ブラウジングの基本動作のすぐ下だと直感的に使いやすいと思います。",0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"設問5
+Foxage2chと同じ変化
+設問9
+「サイドバーを表示」
+要望
+・コンテキストメニューの区切り線の非表示機能
+表示する機能を絞ると区切り線だらけになってしまい、
+見栄えが良くないです。
+・ログマネージャー上で外部板名の表示
+したらば等の外部板はurl表示なため、
+複数の板でログを保持していると視認性が悪いです。
+・ログ・置換・AA・あぼーんマネージャーついて
+オプションの各ページに分散しているので、
+簡単にアクセスできるようなメニューが欲しいです。
+(サイドバーのログマネージャーの項目付近等)"
+2014-11-17 19:02:40,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】(Default)
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+board.auto_update: true
+board.open_single_click: false
+browser.redirector.enabled: true
+releasenotes_showed: 1.7.0
+thread_hide_abone: true
+
+【不具合の内容・再現手順】",0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,このままでよい,1,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"outside.xmlについては書換が容易であることの方が望ましいです。
+要望があります。
+外部板において各板毎にフィルタが初期設定できるようにしてほしいです。
+<filter>フィルタしたいキーワード</filter>
+このような感じで設定できて、板を開くとそのフィルタが適用されるイメージです。
+
+特定のスレッドだけリスト表示するフィルタ機能が開く板毎に適用されると、外部板をカテゴリ別でブックマークする様な管理が可能になるので、前向きに検討していただけたらと思います。"
+2014-11-23 21:53:52,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.1; Firefox/33.1)
+【使用スキン】gray
+【関連アドオン】
+FoxAge2ch 3.3.11
+
+【変更した設定値】
+appoint_data_dir: true
+board.auto_update: true
+board.tree_size: medium
+browser.browsermenu.confirm_add_abone: false
+browser.redirector.replace_view_limit: false
+browser.toolbarbutton.installed: true
+contextmenu.enabled: false
+data_dir: (masked)
+releasenotes_showed: 1.7.5pre
+thread_font_name: serif
+thread_font_size: 15
+thread_get_log_from_mimizun: true
+thread_show_be_icon: true
+thread_skin: gray
+warn_when_delete_log: false",0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,0,1,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"いつも更新ありがとうございます。
+学業が忙しい中の更新は中々大変だとは思いますが、自分のペースで無理をしないように、これからもよろしくお願いします。"
+2014-11-23 22:01:19,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.11
+
+【変更した設定値】
+bbsmenu.open_new_tab: true
+board.auto_update: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+post.auto_finish: true
+releasenotes_showed: 1.7.1
+thread_chain_abone: true
+thread_hide_abone: true
+thread_skin: smorgas-lego-ex-20120605
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,このままでよい,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-23 23:13:05,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】gray_2.7.4
+【関連アドオン】
+FoxAge2ch ex 3.3.11.050
+
+【変更した設定値】
+bbsmenu.search.default_engine_name: 01.ff2ch.syoboi.jp
+board.auto_update: true
+board.thread_view_limit: 0
+browser.browsermenu.find_2ch_in_sidebar: true
+browser.browsermenu.open_in_new_tab: true
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+contextmenu.enabled: false
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_chain_abone: true
+thread_fix_invalid_anchor: true
+thread_get_log_from_mimizun: true
+thread_hide_abone: true
+thread_skin: gray_2.7.4",0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,一番上(アイコンのすぐ下),0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"いつもご苦労様ですchaika使わせてもらってます
+ありがとうございます
+
+要望
+ContextMenu2chの機能をまるごと移植してほしい
+今見ているスレの一覧をサイドバーで見たい"
+2014-11-24 11:47:46,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.0)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch 3.3.11
+
+【変更した設定値】
+appoint_data_dir: true
+board.auto_update: true
+board.open_single_click: false
+board.thread_view_limit: 0
+board_auto_update: true
+board_click_action: 0
+board_double_click_action: 1
+board_thread_view_limit: 0
+browser.redirector.enabled: true
+data_dir: (masked)
+releasenotes_showed: 1.7.1
+tab_load_in_foreground: true
+thread_fix_invalid_anchor: true
+thread_get_log_from_mimizun: true
+thread_skin: smorgas-lego-ex-20120605
+
+【不具合の内容・再現手順】",0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,「このままでよい」,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+2014-11-24 17:45:13,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+ContextMenu2ch 3.5 (無効)
+FoxAge2ch ex 3.3.11.050
+
+【変更した設定値】
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.vs.p0.m0.29/-all/bbsmenu.html
+board.auto_update: true
+board.open_new_tab: true
+board.title_strip: true
+board.title_strip_regexp:  ?\[\u8EE2\u8F09\u7981\u6B62\] ?|(\u00A9|&(amp;)?(copy|#169);|\(c\)|\uFFFD)([23]ch\.net|bbspink\.com)\t?
+browser.browsermenu.open_in_new_tab: true
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+browser_toolbarbutton_add_tab_by_click: true
+data_dir: (masked)
+imageViewURLReplace.enabled: true
+maru_enabled: true
+maru_id: xxxxxx
+maru_last_auth_time: 1415258084
+maru_session_id: (masked)
+post.auto_finish: true
+post.auto_p2_disable: true
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.1
+thread_get_log_from_mimizun: true
+thread_hide_abone: true
+thread_skin: smorgas-lego-ex-20120605",1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,一番上が良い,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,1,0,1,
+2014-11-24 23:11:15,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 5.1; Firefox/24.8.1)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+(なし)
+
+【変更した設定値】
+board.auto_update: true
+board.thread_view_limit: 0
+browser.redirector.enabled: true
+browser.toolbarbutton.installed: true
+browser.toolbarbutton.show_only_on_bbs: true
+contextmenu.abone.enabled: false
+contextmenu.delete-log.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.open-board.enabled: false
+contextmenu.open-in-browser.enabled: false
+contextmenu.open-in-chaika.enabled: false
+contextmenu.open-link-in-browser.enabled: false
+contextmenu.open-link-in-chaika.enabled: false
+contextmenu.open-settings.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.skin.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+releasenotes_showed: 1.7.0
+thread_font_size: 13
+thread_hide_abone: true
+thread_skin: smorgas-lego-ex-20120605
+warn_when_delete_log: false
+
+【不具合の内容・再現手順】",0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,Menu Wizardというアドオンで自由に調整できるので、位置に関してはどこでも良いです。,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"いつもありがとうございます。
+bbs2chreaderの頃からお世話になっており、これからも利用していきます。
+
+設問6でMenu Wizardを利用していると書きましたが、最近のMenu Wizardのアップデートでchaikaのコンテキストメニューに何も表示されなくなってしまいました。
+本来ならばMenu WizardのForumに書き込むべきでしょうが、海外製かつ競合しているchaikaが2ch用というほぼ国内専用のアドオンなので対応してもらえないのが目に見えています。
+余裕があったらでいいので、対応を検討してください。よろしくお願いします。"
+2014-11-25 21:21:18,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.1; Intel Mac OS X 10.10; Firefox/33.1)
+【使用スキン】smorgas-lego-ex-20120605
+【関連アドオン】
+FoxAge2ch ex 3.3.11.050
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,このままでよい,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
+2014-11-25 21:36:05,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】gray_2.7.4
+【関連アドオン】
+FoxAge2ch 3.3.11
+
+【変更した設定値】
+board.thread_view_limit: 0
+browser.toolbarbutton.installed: true
+releasenotes_showed: 1.7.0
+tab_load_in_foreground: true
+thread_aa_font_size: 12
+thread_font_size: 12
+thread_skin: gray_2.7.4
+
+【不具合の内容・再現手順】",0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,コンテキストメニューの位置が気になるほどまだ使いこなせてないので特に意見はありません。,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,設問8は、外部板追加用のUI等を用意するというのであれば賛成です。
+2014-11-28 23:21:43,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.0pre; Windows NT 6.1; WOW64; Firefox/33.1.1)
+【使用スキン】gray_2.6.2_mod2
+【関連アドオン】
+Chaika Abone Helper 0.0.26 (無効)
+FoxSync2ch 0.0.2 (無効)
+FoxAge2ch ex 3.3.10.049
+
+【変更した設定値】
+bbsmenu.bbsmenu_html_url: http://kita.jikkyo.org/cbm/cbm.cgi/20.26.27.m0.m2.p1.t1.t2.vs./=m4$01356789abcdefghijklnopqrstuvwxyz_=!&/bbsmenu.html
+bbsmenu.open_single_click: false
+board.open_new_tab: true
+board.open_single_click: false
+board.thread_view_limit: 100
+browser.browsermenu.open_in_new_tab: true
+browser.redirector.enabled: true
+browser.redirector.replace_view_limit: false
+browser_contextmenu_disregard_url_option: false
+browser_toolbarbutton_disregard_url_option: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.toggle-sidebar.enabled: false
+contextmenu.write.enabled: false
+enable_browser_toolbarbutton: false
+maru_auto_auth: false
+maru_enabled: true
+maru_id: ***
+maru_last_auth_time: 1367131850
+maru_session_id: (masked)
+ngfiles.enabled: true
+post.auto_finish: true
+post.thread_reload: false
+post.warn_p2: true
+post.write_log.failed: true
+post.write_log.succeeded: true
+releasenotes_showed: 1.7.0pre
+thread_aa_font_name: MS Pゴシック
+thread_aa_line_space: 1
+thread_font_name: MS Pゴシック
+thread_font_size: 15
+thread_get_log_from_bg20: true
+thread_get_log_from_mimizun: true
+thread_get_log_from_offlaw2: true
+thread_get_log_from_unkar: true
+thread_get_log_from_viprpg: true
+thread_show_be_icon: true
+thread_skin: gray_2.6.2_mod2",0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,1,0,0,0,0,"このままでよい
+必要なら個人でDOMiで変更できる",0,0,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,
+2014-11-30 16:28:54,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.0; Firefox/33.1.1)
+【使用スキン】(Default)
+【関連アドオン】
+FoxAge2ch ex 3.3.11.050
+
+【変更した設定値】
+board.auto_update: true
+board.open_single_click: false
+browser.browsermenu.reload_when_skin_changed: true
+browser.redirector.enabled: true
+browser.redirector.throw_bookmarks: true
+browser.toolbarbutton.installed: true
+contextmenu.change-limit-all.enabled: false
+contextmenu.change-limit-l50.enabled: false
+contextmenu.find-next-thread.enabled: false
+contextmenu.history.enabled: false
+contextmenu.open-in-browser.enabled: false
+contextmenu.show-all.enabled: false
+contextmenu.show-l50.enabled: false
+contextmenu.show_only_on_bbs: false
+historymenu.board_max: 0
+historymenu.thread_max: 0
+login.ronin.last_auth_time: (changed)
+post.auto_be_disable: true
+post.emphasize_warnings: true
+releasenotes_showed: 1.7.5pre
+tab_load_in_foreground: true
+thread_aa_font_name: MS Pゴシック
+thread_fix_invalid_anchor: true
+thread_show_be_icon: true
+
+
+【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.0; WOW64; Firefox/33.1.1) 
+変更なし",0,1,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,"主環境ではMenu Editorにて一番上にchaikaが来る様にしています。
+別環境では特に変更せず使用していますが困ることはありませんので
+このままでも構いません。",0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"おつかれさまです。
+サイドバー見切れ対応ありがとうございます。
+文字サイズ小にて問題無く表示されています。
+
+
+設問 8　outside.xmlについて
+1.7.5pre更新後該当ファイルを自作outside.xmlに変更してからchaikaを利用しています。
+個人作成用outside.xmlを別名にしファイル読み込み時先頭に追加できるなどご検討頂ければ幸いです。
+
+
+要望です。
+
+<mark>[隔離病棟]</mark> 随時実験中と見せかけて $Mango->{part}->[14]2ch.net	
+http://maguro.2ch.net/test/read.cgi/mango/1417184044/l40
+実験板なので現状困ることはありませんが、ここでは文字装飾がありポップアップ画面上だと
+黄色下地に白文字と読み辛い所が発生する為装飾文字を使わないか色を変更して頂ければ幸いです。
+
+以上よろしくお願い致します。"
+2014-11-30 23:57:37,"【ユーザーエージェント】Monazilla/1.00 (chaika/1.7.5pre; Windows NT 6.2; WOW64; Firefox/33.1.1)
+【使用スキン】gray
+【関連アドオン】
+FoxAge2ch 3.3.11
+
+(以下省略)",0,0,0,1,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,戻る/進む/再読み込み/ブックマークが並ぶ項目の下,0,0,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,"いつもchaikaを使わせていただきありがとうございます。
+
+・設問8について
+現在のfavorite_boards.xmlを編集する形でよいと思う
+
+・その他の要望
+(1) ブラウザ > chaika メニュー > URL の表示制限を書き換えて開く
+ブラウザ > スレッドリダイレクタ > URL の表示制限を書き換えて開く に
+http://XXX.2ch.net/test/read.cgi/XXX/lxx は書き換え、
+http://XXX.2ch.net/test/read.cgi/XXX/xx や /xx,yy や /xx-yy はそのままにする設定がほしい
+(2) 置換マネージャの置換項目にBeIDを入れてほしい
+(3) 書き込みウィザードにカウントダウンを入れてほしい
+(4) 書き込みウィザードのAA・定型文の挿入をボタンとして独立し左下(戻る/次へ/キャンセルボタンの段左端)などに置いてほしい
+
+よろしくお願いします。"
