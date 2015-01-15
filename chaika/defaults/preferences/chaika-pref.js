@@ -1,25 +1,31 @@
+pref("extensions.chaika.logger.level", 2);
 pref('extensions.chaika.releasenotes_showed', '1.5.7');
 
+// general
 pref("extensions.chaika.http_proxy_mode", 0);
 pref("extensions.chaika.http_proxy_value", "localhost:8080");
 pref("extensions.chaika.tab_load_in_foreground", false);
 pref("extensions.chaika.appoint_data_dir", false);
 pref("extensions.chaika.data_dir", "");
-pref("extensions.chaika.warn_when_delete_log", true);
 pref("extensions.chaika.server_port.firefox", 8823);
 pref("extensions.chaika.server_port.seamonkey", 8824);
 pref("extensions.chaika.server_port.other", 8825);
 
+// history
+pref("extensions.chaika.history_expire_days", 60);
 pref("extensions.chaika.historymenu.board_max", 6);
 pref("extensions.chaika.historymenu.thread_max", 6);
 
+// replacement manager
 pref('extensions.chaika.replace.warn_when_delete', true);
 
+// thread redirector
 pref("extensions.chaika.browser.redirector.enabled", false);
 pref("extensions.chaika.browser.redirector.throw_bookmarks", false);
 pref("extensions.chaika.browser.redirector.replace_view_limit", true);
 pref('extensions.chaika.browser.redirector.ivur.behavior', 0);
 
+// chaika menu
 pref('extensions.chaika.browser.browsermenu.open_in_new_tab', false);
 pref('extensions.chaika.browser.browsermenu.disregard_url_limit', false);
 pref('extensions.chaika.browser.browsermenu.remove_limit_when_copy', false);
@@ -27,9 +33,11 @@ pref('extensions.chaika.browser.browsermenu.confirm_add_abone', true);
 pref('extensions.chaika.browser.browsermenu.reload_when_skin_changed', false);
 pref('extensions.chaika.browser.browsermenu.find_2ch_in_sidebar', false);
 
+// toolbar button
 pref('extensions.chaika.browser.toolbarbutton.installed', false);
 pref('extensions.chaika.browser.toolbarbutton.show_only_on_bbs', false);
 
+// context menu
 pref('extensions.chaika.contextmenu.enabled', true);
 pref('extensions.chaika.contextmenu.show_only_on_bbs', true);
 pref('extensions.chaika.contextmenu.always_show_open_link', true);
@@ -61,24 +69,24 @@ pref("extensions.chaika.contextmenu.toggle-sidebar.enabled", true);
 pref("extensions.chaika.contextmenu.sidebar-sep.enabled", true);
 pref("extensions.chaika.contextmenu.open-settings.enabled", true);
 
+// http controller
 pref("extensions.chaika.refController.enabled", true);
 pref('extensions.chaika.imageViewURLReplace.enabled', false);
 pref('extensions.chaika.ngfiles.enabled', false);
 
-pref("extensions.chaika.logger.level", 2);
-
-pref("extensions.chaika.history_expire_days", 60);
-
+// account: ronin
 pref("extensions.chaika.login.ronin.login_url", "https://2chv.tora3.net/futen.cgi");
 pref("extensions.chaika.login.ronin.last_auth_time", 0);
 pref("extensions.chaika.login.ronin.session_id", "");
 pref("extensions.chaika.login.ronin.id", "");
 pref("extensions.chaika.login.ronin.password", "");
 
+// account: be
 pref("extensions.chaika.login.be.login_url", "http://be.2ch.net/test/login.php");
 pref("extensions.chaika.login.be.id", "");
 pref("extensions.chaika.login.be.password", "");
 
+// account: p2
 pref("extensions.chaika.login.p2.login_url", "http://p2.2ch.net/p2/?b=pc");
 pref("extensions.chaika.login.p2.post_url", "http://p2.2ch.net/p2/post.php?grid=ON");
 pref("extensions.chaika.login.p2.csrfid_url", "http://p2.2ch.net/p2/post_form.php");
@@ -86,6 +94,7 @@ pref("extensions.chaika.login.p2.cookie_domain", ".p2.2ch.net");
 pref("extensions.chaika.login.p2.id", "");
 pref("extensions.chaika.login.p2.password", "");
 
+// bbsmenu (the list of boards)
 pref("extensions.chaika.bbsmenu.add_chaika_boards", true);
 pref('extensions.chaika.bbsmenu.search.default_engine_name', '00.search.2ch.net');
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
@@ -95,6 +104,7 @@ pref("extensions.chaika.bbsmenu.tree_size", "small");
 pref("extensions.chaika.bbsmenu.open_single_click", true);
 pref("extensions.chaika.bbsmenu.open_new_tab", false);
 
+// board (the list of threads)
 pref("extensions.chaika.board.auto_update", false);
 pref("extensions.chaika.board.update_interval_limit", 45);
 pref("extensions.chaika.board.thread_view_limit", 50);
@@ -102,6 +112,7 @@ pref("extensions.chaika.board.tree_size", "small");
 pref("extensions.chaika.board.open_single_click", true);
 pref("extensions.chaika.board.open_new_tab", false);
 
+// thread view
 pref("extensions.chaika.thread_skin", "");
 pref("extensions.chaika.thread_font_name", "sans-serif");
 pref("extensions.chaika.thread_font_size", 16);
@@ -109,14 +120,20 @@ pref("extensions.chaika.thread_aa_font_name", "sans-serif");
 pref("extensions.chaika.thread_aa_font_size", 16);
 pref("extensions.chaika.thread_aa_line_space", 2);
 pref("extensions.chaika.thread_show_be_icon", false);
-pref("extensions.chaika.thread_get_log_from_mimizun", false);
-pref("extensions.chaika.thread_alert_got_log", true);
 pref("extensions.chaika.thread_fix_invalid_anchor", false);
 
+// dat
+pref("extensions.chaika.thread_get_log_from_mimizun", false);
+pref("extensions.chaika.thread_alert_got_log", true);
+pref("extensions.chaika.dat.self-repair.enabled", true);
+pref("extensions.chaika.warn_when_delete_log", true);
+
+// abone
 pref('extensions.chaika.abone.warn_when_delete', true);
 pref("extensions.chaika.thread_hide_abone", false);
 pref("extensions.chaika.thread_chain_abone", false);
 
+// post
 pref("extensions.chaika.post.thread_reload", true);
 pref("extensions.chaika.post.auto_finish", false);
 pref("extensions.chaika.post.auto_finish_delay", 750);

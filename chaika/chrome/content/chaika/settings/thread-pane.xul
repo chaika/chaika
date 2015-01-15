@@ -31,6 +31,8 @@
                     name="extensions.chaika.thread_chain_abone" type="bool"/>
         <preference id="extensions.chaika.refController.enabled"
                     name="extensions.chaika.refController.enabled" type="bool"/>
+        <preference id="extensions.chaika.dat.self-repair.enabled"
+                    name="extensions.chaika.dat.self-repair.enabled" type="bool" />
     </preferences>
 
     <script type="application/x-javascript; version=1.7"
@@ -140,6 +142,9 @@
         <vbox>
             <checkbox label="スレッド表示のリンクからはリファラを送らない"
                       preference="extensions.chaika.refController.enabled"/>
+            <checkbox label="壊れたログを自動修復する"
+                      tooltiptext="あぼーんが発生してログの差分取得ができなくなった場合に, 自動的にログ全体を再取得します"
+                      preference="extensions.chaika.dat.self-repair.enabled"/>
         </vbox>
     </groupbox>
 

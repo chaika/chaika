@@ -788,7 +788,7 @@ Thread2ch.prototype = {
     },
 
 
-    datDownload: function(aKako){
+    datDownload: function(aKako, aDisableRange){
         this._maruMode = false;
         this._mimizunMode = false;
 
@@ -840,15 +840,21 @@ Thread2ch.prototype = {
         this._aboneChecked = true;
         this._threadAbone = false;
 
-        // 差分GET
-        if(this.thread.datFile.exists() && this.thread.lastModified){
-            let lastModified = this.thread.lastModified;
-            let range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
+        // Set If-Modified-Since
+        if(this.thread.lastModified){
+            this.httpChannel.setRequestHeader("If-Modified-Since", this.thread.lastModified, false);
+        }
+
+        if(!aDisableRange && this.thread.datFile.exists()){
+            // 差分 GET
+            // あぼーんされたか調べるために1byte余計に取得する
+            let begin = this.thread.datFile.fileSize - 1;
+
             this.httpChannel.setRequestHeader("Accept-Encoding", "", false);
-            this.httpChannel.setRequestHeader("If-Modified-Since", lastModified, false);
-            this.httpChannel.setRequestHeader("Range", "bytes=" + range + "-", false);
+            this.httpChannel.setRequestHeader("Range", "bytes=" + begin + "-", false);
             this._aboneChecked = false;
         }else{
+            // 全取得
             this.httpChannel.setRequestHeader("Accept-Encoding", "gzip", false);
         }
 
@@ -989,8 +995,7 @@ Thread2ch.prototype = {
                 this.close();
                 return;
             case 416: //あぼーん
-                this.write(this.converter.getFooter("abone"));
-                this.close();
+                this._onThreadCollapsed();
                 return;
             default: // HTTP エラー
                 this.write(this.converter.getFooter(httpStatus));
@@ -998,9 +1003,9 @@ Thread2ch.prototype = {
                 return;
         }
 
-        if(this._threadAbone){ //あぼーん
-            this.write(this.converter.getFooter("abone"));
-            this.close();
+        //あぼーん発生時
+        if(this._threadAbone){
+            this._onThreadCollapsed();
             return;
         }
 
@@ -1020,6 +1025,32 @@ Thread2ch.prototype = {
         this.close();
         this._data = null;
     },
+
+
+    /**
+     * あぼーんが発生して dat が正常に差分取得できなくなったときに呼ばれる
+     */
+    _onThreadCollapsed: function(){
+        if(ChaikaCore.pref.getBool('dat.self-repair.enabled')){
+            // dat の自動修復
+            ChaikaCore.logger.warning('The dat file of this thread seems to be collapsed. ' +
+                                      'Recapture the whole dat to repair.');
+
+            this.thread.lineCount = this._logLineCount;
+            this._readLogCount = this._logLineCount;
+            this.datDownload(false, true);
+
+            // dat が壊れる (あぼーんされた部分が残っている dat になってしまうので, 次回の range がおかしくなる)
+            // ため, うらで dat を取得しなおして置き換える
+            //    (dat の取得処理とブラウザへの出力処理が分離されていないので応急処置)
+            let downloader = new ChaikaDownloader(this.thread.datURL, this.thread.datFile);
+            downloader.download();
+        }else{
+            this.write(this.converter.getFooter("abone"));
+            this.close();
+        }
+    },
+
 
     datSave: function(aDatContent){
                 // 書き込みのバッティングを避ける
