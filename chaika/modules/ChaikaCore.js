@@ -689,8 +689,8 @@ ChaikaBrowser.prototype = {
     getGlobalMessageManager: function(){
         if(this._globalMM) return this._globalMM;
 
-        this._globalMM = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIMessageListenerManager);
-        this._globalMM.loadFrameScript('chrome://chaika/content/browser/content.js', false);
+        this._globalMM = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIFrameScriptLoader);
+        this._globalMM.loadFrameScript('chrome://chaika/content/browser/content.js', true);
 
         return this._globalMM;
     },
