@@ -8,6 +8,7 @@ Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
+Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
 const Ci = Components.interfaces;
