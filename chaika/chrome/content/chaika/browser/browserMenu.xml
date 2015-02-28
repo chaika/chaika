@@ -310,9 +310,16 @@
 
 
         <method name="_onPopupshowing">
+            <parameter name="aEvent" />
             <body><![CDATA[
                 //表示・非表示を制御するためのステータスを設定する
                 this._setStatus();
+
+                //選択文字列の保存
+                let [element, focusedWindow] = BrowserUtils.getFocusSync(document);
+
+                this._selection = focusedWindow.getSelection();
+                this._selectedText = this._selection.toString();
 
                 // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
                 // への対処のため、gContextMenu をストアしておく
@@ -382,8 +389,8 @@
                 let anonymousID = targetElement.getAttribute("anonid");
                 let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
                 let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-                let selection = content.getSelection();
-                let selectedText = selection.toString();
+                let selection = this._selection;
+                let selectedText = this._selectedText;
 
 
                 if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
@@ -613,7 +620,7 @@
                     try{
                         title = (new this.ChaikaBoard(uri)).getTitle();
                     }catch(ex2){
-                        title = content.document.title;
+                        title = getBrowser().contentTitle;
                     }
                 }
 
@@ -623,7 +630,7 @@
 
                 var text = template.replace("%TITLE%", title, "g")
                                    .replace("%URL%", uri.spec, "g")
-                                   .replace("%SEL%", content.getSelection().toString(), "g")
+                                   .replace("%SEL%", this._selectedText, "g")
                                    .replace("%NEWLINE%", NEWLINE, "g");
 
                 var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
