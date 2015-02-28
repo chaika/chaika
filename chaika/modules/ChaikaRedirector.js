@@ -38,23 +38,33 @@ let ChaikaRedirector = {
     },
 
 
+    _runAsync: function(callback, thisObj, ...params){
+        let runnable = {
+            run: function(){
+                callback.apply(thisObj, params);
+            }
+        };
+
+        Services.tm.currentThread.dispatch(runnable, Ci.nsIEventTarget.DISPATCH_NORMAL);
+    },
+
+
     init: function(){
-        this._registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+        let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+        let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
 
         try{
-            this._registrar.registerFactory(this.classID, this.classDescription, this.contractID, this);
+            registrar.registerFactory(this.classID, this.classDescription, this.contractID, this);
         }catch(e if e.result == Cr.NS_ERROR_FACTORY_EXISTS){
+            // This workaround causes freezing during shutdown. Disabled for now.
             // Workaround Bug 924340: rerun this method asynchronously.
-            Services.tm.currentThread.dispatch({
-                run: this.init.bind(this)
-            }, Ci.nsIEventTarget.DISPATCH_NORMAL);
+            //this._runAsync(this.init.bind(this));
+            return;
         }
 
 
-        this._cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
-
         this.xpcom_categories.forEach((category) => {
-            this._cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
+            cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
         });
 
 
@@ -64,19 +74,17 @@ let ChaikaRedirector = {
 
 
     uninit: function(){
+        let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
+        let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
+
         Services.obs.removeObserver(this, "xpcom-category-entry-removed");
         Services.obs.removeObserver(this, "xpcom-category-cleared");
 
         this.xpcom_categories.forEach((category) => {
-            this._cm.deleteCategoryEntry(category, this.contractID, false);
+            cm.deleteCategoryEntry(category, this.contractID, false);
         });
 
-        // This needs to run asynchronously, see Bug 753687
-        Services.tm.currentThread.dispatch({
-            run: function(){
-                this._registrar.unregisterFactory(this.classID, this);
-            }.bind(this)
-        }, Ci.nsIEventTarget.DISPATCH_NORMAL);
+        registrar.unregisterFactory(this.classID, this);
     },
 
 
@@ -139,7 +147,8 @@ let ChaikaRedirector = {
                 }
 
                 // Our category entry was removed, make sure to add it back
-                this._cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
+                let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
+                cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
                 break;
             }
         }
