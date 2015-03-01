@@ -84,8 +84,7 @@
       class="sidebar-placesTree"
       hidecolumnpicker="true"
       flex="1"
-      context="treeContextMenu"
-      onclick="Page._treeView.handleClick(event)">
+      context="treeContextMenu">
 
     <treecols>
         <treecol id="title" flex="1" primary="true" hideheader="true" />
@@ -93,7 +92,8 @@
 
     <treechildren id="bbsmenuTree-children"
                   class="sidebar-placesTreechildren"
-                  flex="1" />
+                  flex="1"
+                  onclick="Page._treeView.handleClick(event)" />
 
 </tree>
 

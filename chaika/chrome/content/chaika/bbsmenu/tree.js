@@ -83,6 +83,11 @@ BBSTreeView.prototype = {
 
         if(row.value === -1 || obj.value === 'twisty') return;
 
+        if(this.isContainer(row.value)){
+            this.toggleOpenState(row.value);
+            return;
+        }
+
         this._openURL(row.value);
     },
 
@@ -175,12 +180,19 @@ BBSTreeView.prototype = {
         if(this._visibleNodes[index].hasAttribute('opened')){
             this._visibleNodes[index].removeAttribute('opened');
         }else{
+            // Exclusive open/close
+            if(ChaikaCore.pref.getBool('bbsmenu.toggle_open_container')){
+                Array.slice(this._xml.querySelectorAll('[opened]')).forEach((node) => {
+                    node.removeAttribute('opened');
+                });
+            }
+
             this._visibleNodes[index].setAttribute('opened', 'true');
         }
 
         this._buildVisibleNodes();
-        this._treeBoxObject.rowCountChanged(index + 1, this.rowCount - lastRowCount);
-        this._treeBoxObject.invalidateRow(index);
+        this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
+        this._treeBoxObject.invalidate();
     },
 
 
