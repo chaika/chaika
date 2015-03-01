@@ -95,7 +95,10 @@ BBSMenu.prototype = {
                 '<bbsmenu src="' + primaryURL + '" charset="' + primaryCharset + '" />' +
             '</bbsmenu>';
 
-        return this._parseXML(root);
+        return this._parseXML(root)
+                   .then((doc) => {
+                       return this._xml = doc;
+                   });
     },
 
 
@@ -185,6 +188,7 @@ BBSMenu.prototype = {
                 return this.update();
             }
 
+            // Update BBSMENU if the local menu is older than one-month old.
             if(Date.now() - this._bbsmenuFile.lastModifiedTime > 30 * 24 * 60 * 60 * 1000){
                 ChaikaCore.logger.debug('bbsmenu.xml is too old.');
 
@@ -196,9 +200,7 @@ BBSMenu.prototype = {
 
             return this._parser.parseFromString(localContent, 'text/xml');
         }).then((doc) => {
-            this._xml = doc;
-
-            return doc;
+            return this._xml = doc;
         });
     }
 
