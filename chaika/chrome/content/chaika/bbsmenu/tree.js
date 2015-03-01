@@ -203,9 +203,10 @@ BBSTreeView.prototype = {
 
     toggleOpenState: function(index){
         let lastRowCount = this.rowCount;
+        let folder = this._visibleNodes[index];
 
-        if(this._visibleNodes[index].hasAttribute('opened')){
-            this._visibleNodes[index].removeAttribute('opened');
+        if(folder.hasAttribute('opened')){
+            folder.removeAttribute('opened');
         }else{
             // Exclusive open/close
             if(ChaikaCore.pref.getBool('bbsmenu.toggle_open_container')){
@@ -214,12 +215,14 @@ BBSTreeView.prototype = {
                 });
             }
 
-            this._visibleNodes[index].setAttribute('opened', 'true');
+            folder.setAttribute('opened', 'true');
         }
 
         this._buildVisibleNodes();
         this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
         this._treeBoxObject.invalidate();
+
+        this._treeBoxObject.ensureRowIsVisible(this._visibleNodes.indexOf(folder));
     },
 
 
