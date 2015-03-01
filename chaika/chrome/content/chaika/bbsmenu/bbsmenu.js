@@ -27,7 +27,7 @@ BBSMenu.prototype = {
     },
 
 
-    _uninit: function(){
+    uninit: function(){
         this._save();
     },
 

@@ -24,9 +24,9 @@ let Page = {
 
 
     _initEvent: function(){
-        let searchBoxNode = document.getElementById('searchBox');
-
-        searchBoxNode.addEventListener('keydown', (ev) => this._incrementalSearch(ev.target.value));
+        window.addEventListener('unload', Page.shutdown.bind(this));
+        document.getElementById('searchBox')
+                .addEventListener('keydown', (ev) => this._incrementalSearch(ev.target.value));
     },
 
 
@@ -217,4 +217,3 @@ let Page = {
 
 
 Page.startup();
-window.addEventListener('unload', Page.shutdown.bind(this), false);
