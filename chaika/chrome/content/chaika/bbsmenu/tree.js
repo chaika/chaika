@@ -108,12 +108,22 @@ BBSTreeView.prototype = {
         }
     },
 
-    getRowProperties: function(index){},
+    getRowProperties: function(index){
+        let props = [];
+
+        if(this.isContainer(index)){
+            props.push('title');
+        }
+
+        if(this.isSeparator(index)){
+            props.push('separator');
+        }
+
+        return props.join(' ');
+    },
 
     getCellProperties: function(row, col){
-        if(this.isContainer(row)){
-            return 'title';
-        }
+        return this.getRowProperties(row);
     },
 
     getColumnProperties: function(col){},
@@ -130,7 +140,9 @@ BBSTreeView.prototype = {
         return false;
     },
 
-    isSeparator: function(index){ return false; },
+    isSeparator: function(index){
+        return this._visibleNodes[index].nodeName === 'separator';
+    },
 
     isSorted: function(){ return false; },
 
@@ -160,7 +172,18 @@ BBSTreeView.prototype = {
         return level;
     },
 
-    getImageSrc: function(row, col){},
+    getImageSrc: function(row, col){
+        let url = this._visibleNodes[row].getAttribute('url');
+
+        if(url){
+            let host = Services.io.newURI(url, null, null).host;
+
+            return 'http://' + host + '/favicon.ico';
+        }
+
+        return '';
+    },
+
     getProgressMode: function(row, col){},
     getCellValue: function(row, col){},
 
@@ -203,17 +226,10 @@ BBSTreeView.prototype = {
     cycleHeader: function(col){},
     selectionChanged: function(){},
     cycleCell: function(row, col){},
-
     isEditable: function(row, col){ return false; },
-
     isSelectable: function(row, col){},
     setCellValue: function(row, col, value){},
-
-    setCellText: function(row, col, value){
-        this._visibleNodes[row].setAttribute('title', value);
-        this._treeBoxObject.invalidateRow(row);
-    },
-
+    setCellText: function(row, col, value){},
     performAction: function(action){},
     performActionOnRow: function(action, row){},
     performActionOnCell: function(action, row, col){},

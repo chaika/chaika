@@ -89,7 +89,9 @@ BBSMenu.prototype = {
         let root = '' +
             '<bbsmenu>' +
                 '<bbsmenu src="%%DATA_DIR%%/favorite_boards.xml" charset="utf-8" />' +
+                '<separator />' +
                 '<bbsmenu src="%%DEFAULTS_DIR%%/outside.xml" charset="utf-8" />' +
+                '<separator />' +
                 '<bbsmenu src="' + primaryURL + '" charset="' + primaryCharset + '" />' +
             '</bbsmenu>';
 
