@@ -18,12 +18,16 @@ BBSTreeView.prototype = {
     },
 
     build: function(xml){
+        let lastRowCount = this.rowCount;
+
         if(xml){
             this._xml = xml;
             this._buildVisibleNodes();
+            this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
             this._treeBoxObject.invalidate();
         }else{
             this._visibleNodes = [];
+            this._treeBoxObject.rowCountChanged(1, this.rowCount - lastRowCount);
             this._treeBoxObject.invalidate();
         }
     },
