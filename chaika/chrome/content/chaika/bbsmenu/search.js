@@ -80,10 +80,10 @@ SearchBox.prototype = {
       */
     _onSuccess: function(results){
         let doc = document.implementation.createDocument(null, '', null);
-        let root = document.createElement('category');
+        let root = doc.createElement('category');
 
         results.forEach((board) => {
-            let boardItem = document.createElement('board');
+            let boardItem = doc.createElement('board');
             let boardTitle = ChaikaCore.io.unescapeHTML(board.title);
 
             boardItem.setAttribute('title', boardTitle);
@@ -95,7 +95,7 @@ SearchBox.prototype = {
                 boardItem.setAttribute('opened', 'true');
 
                 board.threads.forEach((thread) => {
-                    let threadItem = document.createElement('thread');
+                    let threadItem = doc.createElement('thread');
                     let threadTitle = ChaikaCore.io.unescapeHTML(thread.title);
 
                     if(thread.post){

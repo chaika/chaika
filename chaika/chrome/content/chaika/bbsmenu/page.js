@@ -80,10 +80,13 @@ let Page = {
         if(query === ''){
             // 検索ボックスがクリアされた時は BBSMENU を表示する
             this._bbsmenu.getXML().then((xml) => {
-                this._ns.clear();
                 this._treeView.build(xml);
+
+                this._ns.clear();
             }).catch((ex) => {
                 this._treeView.build(null);
+
+                this._ns.clear();
                 this._ns.critical('BBSMENU 初期化エラー: ' + ex.message);
                 ChaikaCore.logger.error(ex);
             });
@@ -98,11 +101,10 @@ let Page = {
                 this._treeView.build(resultXML);
 
                 this._ns.clear();
-                this._ns.info(results.length + '件見つかりました.', 2000);
             }).catch((er) => {
-                this._treeView.build(null);
+                this._ns.clear();
                 this._ns.critical('検索失敗: ' + er.message);
-                ChaikaCore.logger.error('Search failed:', aError);
+                ChaikaCore.logger.error('Search failed:', er);
             });
         }
     },
