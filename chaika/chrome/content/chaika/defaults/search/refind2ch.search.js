@@ -42,7 +42,7 @@ var Refind2ch = {
         // 404 means "No results found."
         // http://refind2ch.org/about#to_developer
         if(this._req.status === 404){
-            return this._defer.reject('Results Not Found.');
+            return this._defer.reject('No results found.');
         }
 
         if(this._req.status !== 200 || !this._req.responseText){
