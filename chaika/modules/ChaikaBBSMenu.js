@@ -1,11 +1,13 @@
 /* See license.txt for terms of usage */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-function BBSMenu(){
-    this._init.apply(this, arguments);
-}
+Cu.import("resource://chaika-modules/ChaikaCore.js");
 
-BBSMenu.prototype = {
+EXPORTED_SYMBOLS = ["ChaikaBBSMenu"];
+
+
+let ChaikaBBSMenu = {
 
     /**
      * @type {Document}
@@ -19,7 +21,7 @@ BBSMenu.prototype = {
     _bbsmenuFile: null,
 
 
-    _init: function(){
+    _startup: function(){
         this._bbsmenuFile = ChaikaCore.getDataDir();
         this._bbsmenuFile.appendRelativePath('bbsmenu.xml');
 
@@ -27,7 +29,7 @@ BBSMenu.prototype = {
     },
 
 
-    uninit: function(){
+    _quit: function(){
         this._save();
     },
 

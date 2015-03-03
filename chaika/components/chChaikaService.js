@@ -41,6 +41,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
         ChaikaContentReplacer._startup();
 
+        Components.utils.import('resource://chaika-modules/ChaikaBBSMenu.js');
+        ChaikaBBSMenu._startup();
+
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
@@ -55,6 +58,7 @@ ChaikaService.prototype = {
 
 
     _quitApp: function ChaikaService__quitApp(){
+        ChaikaBBSMenu._quit();
         ChaikaContentReplacer._quit();
         ChaikaAA._quit();
         ChaikaRoninLogin._quit();

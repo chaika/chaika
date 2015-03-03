@@ -5,7 +5,6 @@ let Page = {
 
     startup: function(){
         this._ns = new NotificationService(document.getElementById('notification'));
-        this._bbsmenu = new BBSMenu();
         this._search = new SearchBox(document.getElementById('searchBox'),
                                        document.getElementById('searchEngineMenu'));
 
@@ -17,7 +16,6 @@ let Page = {
 
     shutdown: function(){
         this._treeView.uninit();
-        this._bbsmenu.uninit();
         this._search.uninit();
         this._uninitTree();
     },
@@ -33,7 +31,7 @@ let Page = {
     _initTree: function(){
         this._tree = document.getElementById("bbsmenuTree");
 
-        this._bbsmenu.getXML().then((xml) => {
+        ChaikaBBSMenu.getXML().then((xml) => {
             this._treeView = new BBSTreeView(xml);
             this._tree.view = this._treeView;
         }).catch((ex) => {
@@ -79,7 +77,7 @@ let Page = {
     search: function(query, engine){
         if(query === ''){
             // 検索ボックスがクリアされた時は BBSMENU を表示する
-            this._bbsmenu.getXML().then((xml) => {
+            ChaikaBBSMenu.getXML().then((xml) => {
                 this._treeView.build(xml);
 
                 this._ns.clear();
@@ -143,7 +141,7 @@ let Page = {
     updateBBSMENU: function(){
         this._ns.info('BBSMENU 更新中...');
 
-        this._bbsmenu.update().then((updatedXML) => {
+        ChaikaBBSMenu.update().then((updatedXML) => {
             this._treeView.build(updatedXML);
 
             this._ns.clear();

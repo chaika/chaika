@@ -103,6 +103,7 @@
 
     Cu.import('resource://gre/modules/Services.jsm');
     Cu.import("resource://chaika-modules/ChaikaCore.js");
+    Cu.import("resource://chaika-modules/ChaikaBBSMenu.js");
     Cu.import("resource://chaika-modules/ChaikaSearch.js");
     Cu.import("resource://chaika-modules/ChaikaURLUtil.js");
 </script>
@@ -110,7 +111,6 @@
 <script type="application/javascript" src="notification.js" />
 <script type="application/javascript" src="tree.js" />
 <script type="application/javascript" src="search.js" />
-<script type="application/javascript" src="bbsmenu.js" />
 <script type="application/javascript" src="page.js" />
 
 </page>
