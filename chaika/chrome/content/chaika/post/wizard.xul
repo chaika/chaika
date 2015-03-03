@@ -14,7 +14,6 @@
         persist="screenX screenY width height"
         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/javascript" src="chrome://chaika/content/promise.min.js" />
 <script type="application/javascript" src="chrome://chaika/content/post/wizard.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/post.js"/>
 <script type="application/javascript" src="chrome://chaika/content/post/trip.js"/>
