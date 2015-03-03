@@ -101,7 +101,6 @@ pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 pref("extensions.chaika.bbsmenu.tree_size", "small");
-pref("extensions.chaika.bbsmenu.open_single_click", true);
 pref("extensions.chaika.bbsmenu.open_new_tab", false);
 
 // board (the list of threads)

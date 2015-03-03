@@ -19,8 +19,6 @@
                     name="extensions.chaika.bbsmenu.toggle_open_container" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.tree_size"
                     name="extensions.chaika.bbsmenu.tree_size" type="string"/>
-        <preference id="extensions.chaika.bbsmenu.open_single_click"
-                    name="extensions.chaika.bbsmenu.open_single_click" type="bool"/>
         <preference id="extensions.chaika.bbsmenu.open_new_tab"
                     name="extensions.chaika.bbsmenu.open_new_tab" type="bool"/>
     </preferences>
@@ -69,8 +67,6 @@
             </hbox>
             <checkbox label="一度に開けるカテゴリをひとつに制限する"
                       preference="extensions.chaika.bbsmenu.toggle_open_container"/>
-            <checkbox label="シングルクリックで開く"
-                      preference="extensions.chaika.bbsmenu.open_single_click"/>
             <checkbox label="新しいタブで開く"
                       preference="extensions.chaika.bbsmenu.open_new_tab"/>
         </vbox>

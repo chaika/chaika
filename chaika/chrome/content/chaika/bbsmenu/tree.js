@@ -87,16 +87,14 @@ BBSTreeView.prototype = {
 
         if(row.value === -1 || obj.value === 'twisty') return;
 
-        if(this.isContainer(row.value)){
-            this.toggleOpenState(row.value);
-            return;
-        }
+        let node = this._visibleNodes[row.value];
 
-        this._openURL(row.value);
+        if(node.hasAttribute('url')){
+            this._openURL(node.getAttribute('url'));
+        }
     },
 
-    _openURL: function(index){
-        let url = this._visibleNodes[index].getAttribute('url');
+    _openURL: function(url){
         let uri = Services.io.newURI(url, null, null);
 
         if(ChaikaURLUtil.isBoard(url)){
