@@ -78,7 +78,7 @@ BBSTreeView.prototype = {
     selection: null,
 
     handleClick: function(event){
-        if(event.button !== 0) return;
+        if(event.button > 1) return;
 
         let row = {};
         let obj = {};
@@ -88,21 +88,22 @@ BBSTreeView.prototype = {
         if(row.value === -1 || obj.value === 'twisty') return;
 
         let node = this._visibleNodes[row.value];
+        let inNewTab = ChaikaCore.pref.getBool('bbsmenu.open_new_tab') ? !event.button : event.button;
 
         if(node.hasAttribute('url')){
-            this._openURL(node.getAttribute('url'));
+            this._openURL(node.getAttribute('url'), inNewTab);
         }
     },
 
-    _openURL: function(url){
+    _openURL: function(url, inNewTab){
         let uri = Services.io.newURI(url, null, null);
 
         if(ChaikaURLUtil.isBoard(url)){
-            ChaikaCore.browser.openBoard(uri);
+            ChaikaCore.browser.openBoard(uri, inNewTab);
         }else if(ChaikaURLUtil.isThread(url)){
-            ChaikaCore.browser.openThread(uri);
+            ChaikaCore.browser.openThread(uri, inNewTab);
         }else{
-            ChaikaCore.browser.openURL(uri);
+            ChaikaCore.browser.openURL(uri, inNewTab);
         }
     },
 
