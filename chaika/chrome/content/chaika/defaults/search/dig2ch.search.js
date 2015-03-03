@@ -10,8 +10,6 @@ var Dig2ch = {
 
     version: '2.0.0',
 
-    updateURL: '%%ChaikaDefaultsDir%%/search/dig2ch.search.js',
-
     charset: 'utf-8',
 
     url: 'http://dig.2ch.net/?keywords=%%TERM%%',

@@ -19,8 +19,6 @@ var BoardFilter = {
 
     version: '1.0.0',
 
-    updateURL: '%%ChaikaDefaultsDir%%/search/boardFilter.search.js',
-
     charset: 'utf-8',
 
     url: null,

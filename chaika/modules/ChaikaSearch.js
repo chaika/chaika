@@ -26,68 +26,18 @@ var ChaikaSearch = {
 
     /** @private **/
     _startup: function(){
-        this._loadPlugins();
-        this._updatePlugins();
-    },
-
-
-    /**
-     * プラグインのアップデート処理を行う
-     */
-    _updatePlugins: function(){
-        let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
-        let pluginFolder = this._getPluginFolder();
-        let hasUpdate = false;
-
-        this.plugins.forEach(plugin => {
-            if(!plugin.version || !plugin.updateURL) return;
-
-            let updateURL = plugin.updateURL;
-
-            if(updateURL.contains('%%ChaikaDefaultsDir%%')){
-                let defaultsDir = ChaikaCore.getDefaultsDir();
-                let defaultsDirSpec = fph.getURLSpecFromActualFile(defaultsDir);
-
-                updateURL = updateURL.replace('%%ChaikaDefaultsDir%%', defaultsDirSpec);
-            }
-
-            let remotePlugin = this._loadPluginFromURL(updateURL);
-
-            if(Services.vc.compare(plugin.version, remotePlugin.version) < 0){
-                ChaikaCore.logger.debug(plugin.name, 'needs to be updated.',
-                                        'old:', plugin.version, 'new:', remotePlugin.version);
-
-                //いまのところ file:// スキーム以外は未対応
-                if(!updateURL.startsWith('file://')) return;
-
-                let fileName = updateURL.match(/[^\/]+$/)[0];
-                let oldFile = pluginFolder.clone();
-                let newFile = fph.getFileFromURLSpec(updateURL);
-
-                oldFile.appendRelativePath(fileName);
-                oldFile.remove(false);
-                newFile.copyTo(oldFile.parent, null);
-
-                ChaikaCore.logger.debug('Successfully updated.');
-                hasUpdate = true;
-            }
-        });
-
-        if(hasUpdate){
-            ChaikaCore.logger.debug('All search plugins are now up-to-date. Reload the plugins...');
-            this._loadPlugins();
-        }
+        // Load the third-party plugins first so that they can override the default plugins.
+        this._loadPlugins(this._getUserPluginsFolder());
+        this._loadPlugins(this._getDefaultPluginsFolder());
     },
 
 
     /**
      * 検索プラグインを読み込む
      */
-    _loadPlugins: function(){
+    _loadPlugins: function(pluginFolder){
         const pluginExtReg = /\.search\.js$/;
         let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
-
-        let pluginFolder = this._getPluginFolder();
         let files = pluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
 
         this.plugins.length = 0;
@@ -100,7 +50,14 @@ var ChaikaSearch = {
                 let url = fph.getURLSpecFromActualFile(file);
                 let plugin = this._loadPluginFromURL(url);
 
-                if(plugin){
+                // Migration: remove the old files.
+                if(plugin && plugin.updateURL && plugin.updateURL.contains('%%ChaikaDefaultsDir%%')){
+                    file.remove(false);
+                    continue;
+                }
+
+                // Don't load the plugin whose id is already existed.
+                if(plugin && !this.getPlugin(plugin.id)){
                     this.plugins.push(plugin);
                 }
             }
@@ -138,44 +95,31 @@ var ChaikaSearch = {
 
 
     /**
-     * 検索プラグインフォルダを返す
+     * 組み込みの検索プラグインフォルダを返す
+     * @return {nsFile}
+     */
+    _getDefaultPluginsFolder: function(){
+        let folder = ChaikaCore.getDefaultsDir();
+        folder.appendRelativePath('search');
+
+        return folder;
+    },
+
+
+    /**
+     * サードパーティ検索プラグインフォルダを返す
      * なければ作成する
      * @return {nsFile}
      */
-    _getPluginFolder: function(){
-        let pluginFolder = ChaikaCore.getDataDir();
-        pluginFolder.appendRelativePath('search');
+    _getUserPluginsFolder: function(){
+        let folder = ChaikaCore.getDataDir();
+        folder.appendRelativePath('search');
 
-        let origPluginFolder = ChaikaCore.getDefaultsDir();
-        origPluginFolder.appendRelativePath('search');
-
-
-        if(!pluginFolder.exists()){
-            //フォルダがまだ存在しない場合には、
-            //defaults フォルダからコピーしてくる
-            origPluginFolder.copyTo(ChaikaCore.getDataDir(), null);
-        }else{
-            //新規に追加されたデフォルトプラグインをコピーする
-
-            let entries = origPluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
-
-            while(true){
-                let origPlugin = entries.nextFile;
-                if(!origPlugin) break;
-
-                let plugin = pluginFolder.clone();
-                plugin.appendRelativePath(origPlugin.leafName);
-
-                if(!plugin.exists()){
-                    origPlugin.copyTo(pluginFolder, null);
-                }
-            }
-
-            entries.close();
+        if(!folder.exists()){
+            folder.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
         }
 
-
-        return pluginFolder;
+        return folder;
     },
 
 
