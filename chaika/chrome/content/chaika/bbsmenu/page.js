@@ -84,8 +84,6 @@ let Page = {
 
                 this._ns.clear();
             }).catch((ex) => {
-                this._treeView.build(null);
-
                 this._ns.clear();
                 this._ns.critical('BBSMENU 初期化エラー: ' + ex.message);
                 ChaikaCore.logger.error(ex);
@@ -151,6 +149,7 @@ let Page = {
             this._ns.clear();
             this._ns.info('更新完了', 1500);
         }).catch((er) => {
+            this._ns.clear();
             this._ns.critical('更新失敗: ' + er.message);
             ChaikaCore.logger.error(er);
         });

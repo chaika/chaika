@@ -119,6 +119,7 @@ SearchBox.prototype = {
     },
 
     _onError: function(er){
+        ChaikaCore.logger.error(er);
         return er;
     },
 
