@@ -54,7 +54,10 @@ let ChaikaURLUtil = {
      * @return {Bool}
      */
     isBBS: function(aURL){
-        return this.isBoard(aURL) || this.isThread(aURL);
+        let url = Services.io.newURI(aURL, null, null);
+
+        return BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
+               !EXCLUDE_DOMAINS.some((domain) => url.host.contains(domain));
     },
 
 
@@ -63,10 +66,7 @@ let ChaikaURLUtil = {
      * @return {Bool}
      */
     isBoard: function(aURL){
-        let url = Services.io.newURI(aURL, null, null);
-
-        return BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
-               !EXCLUDE_DOMAINS.some((domain) => url.host.contains(domain));
+        return this.isBBS(aURL) && !this.isThread(aURL);
     },
 
 
