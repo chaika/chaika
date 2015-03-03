@@ -39,9 +39,14 @@ var Refind2ch = {
     },
 
     _onSuccess: function(){
+        // 404 means "No results found."
+        // http://refind2ch.org/about#to_developer
+        if(this._req.status === 404){
+            return this._defer.reject('Results Not Found.');
+        }
+
         if(this._req.status !== 200 || !this._req.responseText){
-            return this._defer.reject('Unable to connect or parse the response. Status:' +
-                                      this._req.status + ' Response', this._req.responseText);
+            return this._defer.reject('Unable to connect or parse the response. Status:' + this._req.status);
         }
 
         let parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);

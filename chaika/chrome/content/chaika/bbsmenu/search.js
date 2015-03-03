@@ -52,8 +52,7 @@ SearchBox.prototype = {
         let plugin = ChaikaSearch.getPlugin(this._engine);
         let promise = plugin.search(ChaikaCore.io.escapeHTML(query));
 
-        return promise.then(this._onSuccess, this._onError)
-                      .catch(this._onError);
+        return promise.then(this._onSuccess);
     },
 
 
@@ -116,11 +115,6 @@ SearchBox.prototype = {
         doc.appendChild(root);
 
         return doc;
-    },
-
-    _onError: function(er){
-        ChaikaCore.logger.error(er);
-        return er;
     },
 
 

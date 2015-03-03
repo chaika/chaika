@@ -72,7 +72,7 @@ let Page = {
     _incrementalSearch: function(query){
         if(this._inputTimer) clearTimeout(this._inputTimer);
 
-        this._inputTimer = setTimeout(() => this.search(query), 250);
+        this._inputTimer = setTimeout(() => this.search(query), 500);
     },
 
 
@@ -101,7 +101,7 @@ let Page = {
                 this._ns.clear();
             }).catch((er) => {
                 this._ns.clear();
-                this._ns.critical('検索失敗: ' + er.message);
+                this._ns.critical('検索失敗: ' + (er.message || er));
                 ChaikaCore.logger.error('Search failed:', er);
             });
         }
