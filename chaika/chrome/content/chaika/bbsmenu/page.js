@@ -104,21 +104,6 @@ let Page = {
     },
 
 
-    updateBBSMENU: function(){
-        this._ns.info('BBSMENU 更新中...');
-
-        this._bbsmenu.update().then((updatedXML) => {
-            this._treeView.build(updatedXML);
-
-            this._ns.clear();
-            this._ns.info('更新完了', 1500);
-        }).catch((er) => {
-            this._ns.critical('更新失敗: ' + er.message);
-            ChaikaCore.logger.error(er);
-        });
-    },
-
-
 
     /**
      * URL を新しいタブで開く
@@ -150,6 +135,27 @@ let Page = {
 
 
     /* ***** Implement menu commands ***** */
+
+    updateBBSMENU: function(){
+        this._ns.info('BBSMENU 更新中...');
+
+        this._bbsmenu.update().then((updatedXML) => {
+            this._treeView.build(updatedXML);
+
+            this._ns.clear();
+            this._ns.info('更新完了', 1500);
+        }).catch((er) => {
+            this._ns.critical('更新失敗: ' + er.message);
+            ChaikaCore.logger.error(er);
+        });
+    },
+
+    addFavoriteBoard: function(){
+        let favBoardFile = ChaikaCore.getDataDir();
+        favBoardFile.appendRelativePath('favorite_boards.xml');
+
+        this._openFolder(favBoardFile);
+    },
 
     openLogManager: function(){
         this._openURL("chaika://log-manager/");
