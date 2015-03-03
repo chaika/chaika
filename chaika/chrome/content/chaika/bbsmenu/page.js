@@ -6,7 +6,7 @@ let Page = {
     startup: function(){
         this._ns = new NotificationService(document.getElementById('notification'));
         this._bbsmenu = new BBSMenu();
-        this.searchBox = new SearchBox(document.getElementById('searchBox'),
+        this._search = new SearchBox(document.getElementById('searchBox'),
                                        document.getElementById('searchEngineMenu'));
 
         this._initEvent();
@@ -18,7 +18,7 @@ let Page = {
     shutdown: function(){
         this._treeView.uninit();
         this._bbsmenu.uninit();
-        this.searchBox.uninit();
+        this._search.uninit();
         this._uninitTree();
     },
 
@@ -76,7 +76,7 @@ let Page = {
     },
 
 
-    search: function(query){
+    search: function(query, engine){
         if(query === ''){
             // 検索ボックスがクリアされた時は BBSMENU を表示する
             this._bbsmenu.getXML().then((xml) => {
@@ -90,7 +90,11 @@ let Page = {
         }else{
             this._ns.info('検索中...');
 
-            this.searchBox.search(query).then((resultXML) => {
+            if(engine){
+                this._search.setSearchEngine(engine);
+            }
+
+            this._search.search(query).then((resultXML) => {
                 this._treeView.build(resultXML);
 
                 this._ns.clear();

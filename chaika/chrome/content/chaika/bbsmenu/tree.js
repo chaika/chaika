@@ -77,6 +77,19 @@ BBSTreeView.prototype = {
 
     selection: null,
 
+    handleContextMenu: function(event){
+        let row = {};
+        let obj = {};
+
+        this._treeBoxObject.getCellAt(event.clientX, event.clientY, row, {}, obj);
+
+        if(row.value === -1 || obj.value === 'twisty') return;
+
+        let node = this._visibleNodes[row.value];
+
+        return ChaikaURLUtil.isBBS(node.getAttribute('url'));
+    },
+
     handleClick: function(event){
         if(event.button > 1) return;
 

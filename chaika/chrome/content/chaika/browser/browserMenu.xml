@@ -680,8 +680,8 @@
 
                             searchBox.focus();
                             searchBox.value = aTerm;
-                            sideWin.SearchBox.setSearchMode(aID);
-                            sideWin.SearchBox.search(aTerm);
+
+                            sideWin.Page.search(aTerm, aID);
 
                             sidebar.removeEventListener('DOMContentLoaded', _doSearch, false);
                         }, 0);

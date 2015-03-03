@@ -20,7 +20,7 @@
 
     <menupopup id="treeContextMenu"
                style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-               onpopupshowing="return ChaikaURLUtil.isBBS(event.target.getAttribute('url'));" />
+               onpopupshowing="return true;" />
 </popupset>
 
 <hbox align="center">
