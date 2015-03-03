@@ -7,7 +7,7 @@ Cu.import("resource://gre/modules/Promise.jsm");
 
 var Refind2ch = {
 
-    id: 'refind2ch.org',
+    id: '02.refind2ch.org',
 
     name: 'スレッド検索 (refind2ch.org)',
 
