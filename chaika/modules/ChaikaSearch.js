@@ -188,7 +188,7 @@ var ChaikaSearchPlugin = {
      *
      * 検索結果を取得する用途がない場合、null を指定する
      *
-     * @param {String} term 検索文字列 (URIEncode はされていないが, '<' などは ChaikaIO#escapeHTML により実体参照化されている)
+     * @param {String} query 検索文字列 (URIEncode はされていないが, '<' などは ChaikaIO#escapeHTML により実体参照化されている)
      * @return {Promise} - 成功時: 以下のようなオブジェクトの配列を返す必要がある
      *     [
      *         {
@@ -204,39 +204,6 @@ var ChaikaSearchPlugin = {
      *     ]
      *                    - 失敗時: エラーオブジェクトを返す必要がある
      */
-    search: function(term){},
+    search: function(query){},
 
 };
-
-
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
-}

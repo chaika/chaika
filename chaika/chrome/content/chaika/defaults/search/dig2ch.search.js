@@ -1,7 +1,5 @@
 /* See license.txt for terms of usage */
 
-Components.utils.import("resource://gre/modules/Promise.jsm");
-
 var Dig2ch = {
 
     id: '00.dig.2ch.net',
@@ -14,61 +12,61 @@ var Dig2ch = {
 
     url: 'http://dig.2ch.net/?keywords=%%TERM%%',
 
-    search: function(term){
-        this._defer = Promise.defer();
+    search: function(query){
+        return new Promise((resolve, reject) => {
+            const url = 'http://dig.2ch.net/?json=1&keywords=' + encodeURIComponent(query);
+            const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
+            let req = XMLHttpRequest();
 
-        let TERM = encodeURIComponent(term);
+            req.addEventListener('error', reject, false);
+            req.addEventListener('load', () => {
+                if(req.status !== 200 || !req.responseText){
+                    reject('Unable to connect. (status: ' + this._req.status + ')');
+                    return;
+                }
 
-        const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
-        this._req = XMLHttpRequest();
-        this._req.addEventListener('error', this._onError.bind(this), false);
-        this._req.addEventListener('load', this._onSuccess.bind(this), false);
-        this._req.open("GET", 'http://dig.2ch.net/?json=1&keywords=' + TERM, true);
-        this._req.overrideMimeType('text/plain; charset=utf-8');
-        this._req.send(null);
 
-        return this._defer.promise;
-    },
+                let json = JSON.parse(req.responseText);
 
-    _onError: function(){
-        this._defer.reject('HTTP Status: ' + this._req.status);
-    },
+                if(!json.result){
+                    reject('Server error.');
+                    return;
+                }
 
-    _onSuccess: function(){
-        if(this._req.status !== 200 || !this._req.responseText){
-            return this._defer.reject('Unable to connect. Status:',
-                                      this._req.status, 'Response', this._req.responseText);
-        }
+                if(!json.result.length){
+                    reject('No results found.');
+                }
 
-        let json = JSON.parse(this._req.responseText);
 
-        if(!json.result){
-            return this._defer.reject('Failed due to server error.', this._req.responseText);
-        }
+                let boards = [];
 
-        let boards = [];
+                json.result.forEach((thread) => {
+                    let board = boards.find((board) => board.id === thread.bbs);
 
-        json.result.forEach((thread) => {
-            let board = boards.find((board) => board.id === thread.bbs);
+                    if(!board){
+                        board = {
+                            id: thread.bbs,
+                            title: thread.ita,
+                            threads: []
+                        };
 
-            if(!board){
-                board = {
-                    id: thread.bbs,
-                    title: thread.ita,
-                    threads: []
-                };
+                        boards.push(board);
+                    }
 
-                boards.push(board);
-            }
+                    board.threads.push({
+                        url: thread.url,
+                        title: thread.subject,
+                        post: thread.resno,
+                    });
+                });
 
-            board.threads.push({
-                url: thread.url,
-                title: thread.subject,
-                post: thread.resno,
-            });
+                resolve(boards);
+            }, false);
+
+            req.open("GET", url, true);
+            req.overrideMimeType('text/plain; charset=utf-8');
+            req.send(null);
         });
-
-        this._defer.resolve(boards);
     },
 
 };

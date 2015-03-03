@@ -377,7 +377,6 @@ var BoardTree = {
                 this.openThread(aEvent.ctrlKey || aEvent.altKey);
                 break;
 
-            case 'Spacebar':  // For Firefox 28-
             case ' ':
                 if(aEvent.shiftKey){
                     this.tree._moveByPage(-1, 0, aEvent);

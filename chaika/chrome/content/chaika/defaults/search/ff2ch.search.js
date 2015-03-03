@@ -1,7 +1,5 @@
 /* See license.txt for terms of usage */
 
-Components.utils.import("resource://gre/modules/Promise.jsm");
-
 
 var Ff2ch = {
 
@@ -15,66 +13,61 @@ var Ff2ch = {
 
     url: 'http://ff2ch.syoboi.jp/?q=%%TERM%%',
 
-    search: function(term){
-        this._defer = Promise.defer();
+    search: function(query){
+        return new Promise((resolve, reject) => {
+            const url = 'http://ff2ch.syoboi.jp/?alt=rss&q=' + encodeURIComponent(query);
+            const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
+            let req = XMLHttpRequest();
 
-        let TERM = encodeURIComponent(term);
+            req.addEventListener('error', reject, false);
+            req.addEventListener('load', () => {
+                if(req.status !== 200 || !req.responseText){
+                    reject('Unable to connect. (status: ' + this._req.status + ')');
+                    return;
+                }
 
-        const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
-        this._req = XMLHttpRequest();
-        this._req.addEventListener('error', this._onError.bind(this), false);
-        this._req.addEventListener('load', this._onSuccess.bind(this), false);
-        this._req.open("GET", 'http://ff2ch.syoboi.jp/?alt=rss&q=' + TERM, true);
-        this._req.overrideMimeType('application/rss+xml; charset=utf-8');
-        this._req.send(null);
+                if(!req.responseXML){
+                    reject('Response is not XML: ' + req.responseText);
+                    return;
+                }
 
-        return this._defer.promise;
-    },
 
-    _onError: function(){
-        this._defer.reject('HTTP Status: ' + this._req.status);
-    },
+                let doc = req.responseXML;
+                let boards = [];
 
-    _onSuccess: function(){
-        if(this._req.status !== 200 || !this._req.responseText){
-            return this._defer.reject('Unable to connect. Status:',
-                                      this._req.status, 'Response', this._req.responseText);
-        }
+                let threads = doc.getElementsByTagName('item');
 
-        if(!this._req.responseXML){
-            return this._defer.reject('The response doesn\'t seem to be XML.', this._req.responseText);
-        }
+                Array.slice(threads).forEach(thread => {
+                    let threadTitle = thread.querySelector('title').textContent.replace(/\s*\((\d+)\)$/, '');
+                    let threadPosts = RegExp.$1;
+                    let threadURL = thread.querySelector('guid').textContent.replace(/\d+-\d+$/, '');
+                    let boardTitle = thread.querySelector('category').textContent;
 
-        let doc = this._req.responseXML;
-        let boards = [];
+                    let board = boards.find(board => board.title === boardTitle);
 
-        let threads = doc.getElementsByTagName('item');
+                    if(!board){
+                        board = {
+                            title: boardTitle,
+                            threads: []
+                        };
 
-        Array.slice(threads).forEach(thread => {
-            let threadTitle = thread.querySelector('title').textContent.replace(/\s*\((\d+)\)$/, '');
-            let threadPosts = RegExp.$1;
-            let threadURL = thread.querySelector('guid').textContent.replace(/\d+-\d+$/, '');
-            let boardTitle = thread.querySelector('category').textContent;
+                        boards.push(board);
+                    }
 
-            let board = boards.find(board => board.title === boardTitle);
+                    board.threads.push({
+                        url: threadURL,
+                        title: threadTitle,
+                        post: threadPosts,
+                    });
+                });
 
-            if(!board){
-                board = {
-                    title: boardTitle,
-                    threads: []
-                };
+                resolve(boards);
+            }, false);
 
-                boards.push(board);
-            }
-
-            board.threads.push({
-                url: threadURL,
-                title: threadTitle,
-                post: threadPosts,
-            });
+            req.open("GET", url, true);
+            req.overrideMimeType('application/rss+xml; charset=utf-8');
+            req.send(null);
         });
-
-        this._defer.resolve(boards);
-    },
+    }
 
 };
