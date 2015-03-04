@@ -74,9 +74,15 @@ var gBbsmenuPane = {
         ChaikaCore.io.reveal(pluginDir);
     },
 
-    resetBbsmenuURL: function(){
+    resetBBSMenuURL: function(){
         var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
         pref.value = pref.defaultValue;
+    },
+
+    addFavoriteBoard: function(){
+        let favBoardsFile = ChaikaCore.getDataDir();
+        favBoardsFile.appendRelativePath('favorite_boards.xml');
+        ChaikaCore.io.reveal(favBoardsFile);
     }
 
 };
