@@ -50,12 +50,14 @@ var gBbsmenuPane = {
         let menupopup = document.createElement('menupopup');
 
         ChaikaSearch.plugins.forEach(plugin => {
-            if(!plugin.search) return;
-
             let menuitem = document.createElement('menuitem');
 
             menuitem.setAttribute('label', plugin.name);
             menuitem.setAttribute('value', plugin.id);
+
+            if(!plugin.search){
+                menuitem.setAttribute('disabled', 'true');
+            }
 
             menupopup.appendChild(menuitem);
         });
