@@ -75,7 +75,7 @@ let ChaikaURLUtil = {
      * @return {Bool}
      */
     isThread: function(aURL){
-        return aURL.contains('/test/read.cgi/');
+        return aURL.contains('/read.');
     },
 
 
