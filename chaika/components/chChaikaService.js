@@ -58,13 +58,13 @@ ChaikaService.prototype = {
 
 
     _quitApp: function ChaikaService__quitApp(){
-        ChaikaBBSMenu._quit();
         ChaikaContentReplacer._quit();
         ChaikaAA._quit();
         ChaikaRoninLogin._quit();
         ChaikaAboneManager._quit();
         ChaikaHttpController._quit();
         ChaikaServer._quit();
+        ChaikaBBSMenu._quit();
         ChaikaCore._quit();
     },
 
