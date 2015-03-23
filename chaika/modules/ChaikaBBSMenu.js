@@ -149,7 +149,7 @@ let ChaikaBBSMenu = {
 
         htmlDoc.documentElement.appendChild(fragment);
 
-        let targetNodes = htmlDoc.querySelectorAll('font > b, font > a[href]');
+        let targetNodes = htmlDoc.querySelectorAll('b, a[href]');
         let currentCategoryNode;
 
         Array.slice(targetNodes).forEach((node) => {
