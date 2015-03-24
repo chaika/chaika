@@ -1131,7 +1131,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
             line = [
                 resName,
                 resMail,
-                resDate + ' ID:' + resID,
+                resDate + (resID ? ' ID:' + resID : ''),
                 resMes,
                 threadTitle
             ].join('<>');
