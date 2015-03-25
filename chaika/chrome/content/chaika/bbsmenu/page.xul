@@ -30,7 +30,8 @@
              value=""
              emptytext=""
              flex="1"
-             type="search">
+             type="search"
+             timeout="1000">
         <box>
             <dropmarker popup="searchEngineMenu" class="plain" />
         </box>

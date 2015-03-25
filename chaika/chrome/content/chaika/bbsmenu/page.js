@@ -26,7 +26,7 @@ let Page = {
 
     _initEvent: function(){
         document.getElementById('searchBox')
-                .addEventListener('keydown', (ev) => this._incrementalSearch(ev.target.value));
+                .addEventListener('command', (ev) => this.search(ev.target.value));
     },
 
 
@@ -66,13 +66,6 @@ let Page = {
             document.getElementById("viewFoxAge2chMenu").hidden = false;
             document.getElementById('viewFoxAge2chMenu-separator').hidden = false;
         }
-    },
-
-
-    _incrementalSearch: function(query){
-        if(this._inputTimer) clearTimeout(this._inputTimer);
-
-        this._inputTimer = setTimeout(() => this.search(query), 500);
     },
 
 
