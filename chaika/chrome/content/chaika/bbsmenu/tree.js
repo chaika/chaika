@@ -187,6 +187,9 @@ BBSTreeView.prototype = {
     getImageSrc: function(row, col){
         let url = this._visibleNodes[row].getAttribute('url');
 
+        // Make sure that the favicon is shown in the tree.
+        setTimeout(() => this._treeBoxObject.invalidateRow(row), 0);
+
         if(url){
             let host = Services.io.newURI(url, null, null).host;
 
