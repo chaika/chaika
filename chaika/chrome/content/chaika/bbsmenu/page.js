@@ -9,7 +9,7 @@ let Page = {
     startup: function(){
         this._ns = new NotificationService(document.getElementById('notification'));
         this._search = new SearchBox(document.getElementById('searchBox'),
-                                       document.getElementById('searchEngineMenu'));
+                                     document.getElementById('searchEngineMenu'));
 
         this._initEvent();
         this._initTree();
@@ -18,8 +18,6 @@ let Page = {
 
 
     shutdown: function(){
-        this._treeView.uninit();
-        this._search.uninit();
         this._uninitTree();
     },
 
@@ -48,6 +46,7 @@ let Page = {
 
 
     _uninitTree: function(){
+        this._treeView.uninit();
         this._branch.removeObserver('', this);
     },
 
