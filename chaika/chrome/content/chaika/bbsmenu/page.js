@@ -3,6 +3,9 @@
 
 let Page = {
 
+    /**
+     * 初回表示時に実行される
+     */
     startup: function(){
         this._ns = new NotificationService(document.getElementById('notification'));
         this._search = new SearchBox(document.getElementById('searchBox'),
@@ -22,7 +25,6 @@ let Page = {
 
 
     _initEvent: function(){
-        window.addEventListener('unload', Page.shutdown.bind(this));
         document.getElementById('searchBox')
                 .addEventListener('keydown', (ev) => this._incrementalSearch(ev.target.value));
     },
@@ -238,6 +240,3 @@ let Page = {
         }
     }
 };
-
-
-Page.startup();
