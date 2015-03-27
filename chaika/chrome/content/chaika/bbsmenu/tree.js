@@ -101,6 +101,14 @@ BBSTreeView.prototype = {
 
         if(row.value === -1 || obj.value === 'twisty') return;
 
+
+        // container
+        if(this.isContainer(row.value) && ChaikaCore.pref.getBool('bbsmenu.open_single_click')){
+            this.toggleOpenState(row.value);
+            return;
+        }
+
+
         let node = this._visibleNodes[row.value];
         let inNewTab = ChaikaCore.pref.getBool('bbsmenu.open_new_tab') ? !event.button : event.button;
 
