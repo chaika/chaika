@@ -55,6 +55,7 @@ BBSTreeView.prototype = {
         this._visibleNodes.forEach((node) => {
             node._level = this._getAccurateLevel(node);
             node._parentIndex = this._visibleNodes.indexOf(node.parentNode);
+            node._iconPainted = false;
         });
     },
 
@@ -185,13 +186,17 @@ BBSTreeView.prototype = {
     },
 
     getImageSrc: function(row, col){
-        let url = this._visibleNodes[row].getAttribute('url');
-
-        // Make sure that the favicon is shown in the tree.
-        setTimeout(() => this._treeBoxObject.invalidateRow(row), 0);
+        let node = this._visibleNodes[row];
+        let url = node.getAttribute('url');
 
         if(url){
             let host = Services.io.newURI(url, null, null).host;
+
+            // Make sure that the favicon is shown in the tree.
+            if(!node._iconPainted){
+                setTimeout(() => this._treeBoxObject.invalidateCell(row, col), 100);
+                node._iconPainted = true;
+            }
 
             return 'http://' + host + '/favicon.ico';
         }
