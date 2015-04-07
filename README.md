@@ -1,7 +1,9 @@
 chaika
 ======
 
-Firefox に 2ちゃんねる専用ブラウザ相当の機能を追加するアドオンです。
+2ちゃんねるなどの掲示板閲覧をより快適にするアドオンです。
+
+他の専用ブラウザに引けを取らないだけでなく、Firefox と連携した多様な機能を提供します。
 
 
 Install
@@ -18,8 +20,8 @@ For Users
 * [FAQ(よくある質問)](http://bbs2ch.sourceforge.jp/?page=FAQ)
 
 ### コミュニティ
-* [2ch現行スレッド](http://dig.2ch.net/?keywords=bbs2chreader%2Fchaika&AndOr=0&maxResult=50&atLeast=1&Sort=5&Link=1&Bbs=all&924=1)
-* [スレッド避難所](http://jbbs.shitaraba.net/computer/44179/)
+* [現行スレッド](http://refind2ch.org/search?q=chaika)
+* [サポート掲示板](http://jbbs.shitaraba.net/computer/44179/)
 * [公式アップローダー](http://bbs2ch.sourceforge.jp/uploader/upload.php)
 * [スキン一覧](http://bbs2ch.sourceforge.jp/?page=Skin%2F0.4.5)
 
@@ -29,7 +31,7 @@ For Users
 
 For Developers
 ---
-### 関連アドオン・スキン開発
+### プラグイン・関連アドオン・スキン開発
 * [開発者の方向けオンラインマニュアル](https://github.com/chaika/chaika/wiki#%E9%96%8B%E7%99%BA%E8%80%85%E3%81%AE%E6%96%B9%E5%90%91%E3%81%91)
 
 
@@ -41,8 +43,6 @@ For Developers
 
 
 #### テスト環境
-* [chaika 開発版](https://github.com/chaika/chaika/tree/develop)
-
 * [開発用テスト板](http://jbbs.shitaraba.net/computer/43679/)
 
 #### バグ一覧・ToDo
