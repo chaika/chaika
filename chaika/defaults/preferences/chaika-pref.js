@@ -127,7 +127,7 @@ pref("extensions.chaika.thread_fix_invalid_anchor", false);
 // dat
 pref("extensions.chaika.thread_get_log_from_mimizun", false);
 pref("extensions.chaika.thread_alert_got_log", true);
-pref("extensions.chaika.dat.self-repair.enabled", true);
+pref("extensions.chaika.dat.self-repair.enabled", false);
 pref("extensions.chaika.warn_when_delete_log", true);
 
 // abone
