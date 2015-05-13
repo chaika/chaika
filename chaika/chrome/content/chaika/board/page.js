@@ -259,7 +259,7 @@ var BoardTree = {
             searchStr = "%" + searchStr + "%";
             gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
         }else{
-            var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
+            var filterLimit = Number(document.getElementById("filterGroup").value);
             gBoard.refresh(filterLimit);
         }
 
@@ -520,7 +520,6 @@ var BoardTree = {
 };
 
 function setStatus(aString){
-    document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0;
     document.getElementById("lblStatus").value = aString;
 }
 

@@ -2,20 +2,12 @@
 
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+#toolbar{
+    font-size: 1.25em;
+}
+
 #lblTitle {
-  font-size: 12px;
   font-weight: bold;
-  color: #F6F6F6;
-}
-
-#lblStatus {
- color: #CCC;
-}
-
-
-#searchTextBox {
-  margin: 0px 4px;
-  width: 9em;
 }
 
 
