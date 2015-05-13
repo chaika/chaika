@@ -60,7 +60,7 @@
 
         <checkbox label="サーバの立ち上げに失敗したときに自動的に代替ポートを探す *"
                   preference="extensions.chaika.server.port.retry"
-                  tooltiptext="ブックマークや開いていたスレッドが一時的に使用できなくなることがあります." />
+                  tooltiptext="指定したポートが開いていなかった場合に, 空きポートを自動的に探します. ブックマークや開いていたスレッドが一時的に使用できなくなることがあります." />
 
         <checkbox label="使用するポートを毎回ランダムに選択する *"
                   preference="extensions.chaika.server.port.randomization"
