@@ -1658,7 +1658,7 @@ ThreadConverter.prototype = {
         var lineCount = aMessage.match(/<br>/g);
 
         if(lineCount && lineCount.length >= 3){
-            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ￣
+            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ‾
             // \x81\x5e = ／, \x81_ = ＼, \x84\xaa = ━, \x81i = （, \x81j = ）
             // 半角空白は、英文中に多く含まれるためカウントから外す
             let aaSymbols = /(?:\x81\x40|\x81F|\x81b|\x84\xab|\x81P|\x81\x5e|\x81_|\x84\xaa|\x81i|\x81j|[^\x81-\xfc][_:;\|\/\\\(\)])/g;
