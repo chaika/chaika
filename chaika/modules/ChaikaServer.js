@@ -76,6 +76,11 @@ var ChaikaServer = {
         os.removeObserver(this, "network:offline-status-changed");
 
         this._stop();
+
+        // Restore the original port number.
+        if(this._origPort){
+            Services.prefs.setIntPref('extensions.chaika.server.port', this._origPort);
+        }
     },
 
 

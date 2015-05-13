@@ -54,7 +54,7 @@
 
         <hbox align="center">
             <label value="使用するポート *:" />
-            <textbox type="number" min="0" max="65535" size="3"
+            <textbox type="number" min="1" max="65535" size="3"
                      preference="extensions.chaika.server.port" />
         </hbox>
 
