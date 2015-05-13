@@ -17,16 +17,16 @@ For Users
 
 ### マニュアル・ヘルプ
 * [オンラインヘルプ](https://github.com/chaika/chaika/wiki)
-* [FAQ(よくある質問)](http://bbs2ch.sourceforge.jp/?page=FAQ)
+* [FAQ(よくある質問)](http://bbs2ch.osdn.jp/?page=FAQ)
 
 ### コミュニティ
 * [現行スレッド](http://refind2ch.org/search?q=chaika)
 * [サポート掲示板](http://jbbs.shitaraba.net/computer/44179/)
-* [公式アップローダー](http://bbs2ch.sourceforge.jp/uploader/upload.php)
-* [スキン一覧](http://bbs2ch.sourceforge.jp/?page=Skin%2F0.4.5)
+* [公式アップローダー](http://bbs2ch.osdn.jp/uploader/upload.php)
+* [スキン一覧](http://bbs2ch.osdn.jp/?page=Skin%2F0.4.5)
 
 ### 関連
-* [bbs2chreader 公式サイト](http://bbs2ch.sourceforge.jp/)
+* [bbs2chreader 公式サイト](http://bbs2ch.osdn.jp/)
 
 
 For Developers
@@ -53,8 +53,8 @@ For Developers
     * [旧旧ToDo](https://spreadsheets.google.com/pub?key=pbbe5TFNb21RVxOf7ygNJfg) : b2r 0.5系 (flysonさん作成)
     * [旧ToDo](http://d.hatena.ne.jp/nazodane/20080609/1212999112) : b2r 0.5系 (Nazoさん作成)
     * [launchpad](https://bugs.launchpad.net/bbs2ch) : b2r バグトラッカー
-    * [あぼーん改善案](http://bbs2ch.sourceforge.jp/?page=%A4%A2%A4%DC%A1%BC%A4%F3%B2%FE%C1%B1)
-    * [書きこみ改善案](http://bbs2ch.sourceforge.jp/?page=%BD%F1%A4%AD%B9%FE%A4%DF%B2%FE%C1%B1)
+    * [あぼーん改善案](http://bbs2ch.osdn.jp/?page=%A4%A2%A4%DC%A1%BC%A4%F3%B2%FE%C1%B1)
+    * [書きこみ改善案](http://bbs2ch.osdn.jp/?page=%BD%F1%A4%AD%B9%FE%A4%DF%B2%FE%C1%B1)
     * [bbs2chreader開発板](http://jbbs.shitaraba.net/computer/41231/): Nazoさん作成の旧開発板
 
 #### ブランチモデル
