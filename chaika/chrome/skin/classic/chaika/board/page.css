@@ -39,7 +39,7 @@
 
 
 #boardTree treechildren::-moz-tree-row(highlight-true){
-  background-color: orange !important;
+  background-color: #FF9500 !important;  /* Chameleon highlight orange */
 }
 
 /* 行が選択されている場合には文字色が適切でない場合があるので、
