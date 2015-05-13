@@ -17,6 +17,8 @@ function ChaikaService(){
 ChaikaService.prototype = {
 
     _startup: function ChaikaService__startup(){
+        Components.utils.import("resource://chaika-modules/Logger.js");
+
         Components.utils.import("resource://chaika-modules/ChaikaCore.js");
         ChaikaCore._startup();
 
@@ -66,6 +68,7 @@ ChaikaService.prototype = {
         ChaikaServer._quit();
         ChaikaBBSMenu._quit();
         ChaikaCore._quit();
+        Logger.uninit();
     },
 
 

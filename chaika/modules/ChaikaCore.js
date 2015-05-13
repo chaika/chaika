@@ -7,6 +7,7 @@ Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
+Components.utils.import("resource://chaika-modules/ChaikaURLUtil.js");
 
 
 const Ci = Components.interfaces;
@@ -112,6 +113,7 @@ var ChaikaCore = {
     /**
      * ログをとるための {@link ChaikaLogger} オブジェクト
      * @type ChaikaLogger
+     * @deprecated
      */
     logger: null,
 
@@ -348,35 +350,6 @@ var ChaikaCore = {
 
 
     /**
-     * Chaika がスレッド表示に使用するローカルサーバの URL を返す。
-     * @return {nsIURL}
-     */
-    getServerURL: function ChaikaCore_getServerURL(){
-        if(!this._serverURL){
-            var port = 0;
-            try{
-                var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
-                if(appInfo.name == "Firefox"){
-                    port = this.pref.getInt("server_port.firefox");
-                }else if(appInfo.name == "SeaMonkey"){
-                    port = this.pref.getInt("server_port.seamonkey");
-                }else{
-                    port = this.pref.getInt("server_port.other");
-                }
-            }catch(ex){
-                this.logger.error(ex);
-                port = this.pref.getInt("server_port.other");
-            }
-
-            var spec = "http://127.0.0.1:" + port;
-            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-            this._serverURL = ioService.newURI(spec, null, null);
-        }
-        return this._serverURL.clone().QueryInterface(Ci.nsIURL);
-    },
-
-
-    /**
      * プロクシや UserAgent などの設定を施した nsIHttpChannel を返す。
      * @param {nsIURI} aURL nsIHttpChannel を作成する URL
      * @return {nsIHttpChannel}
@@ -485,17 +458,18 @@ ChaikaCore.ChaikaURLItem.prototype = {
  * メッセージログを取るオブジェクト。
  * {@link ChaikaCore.logger} を経由して利用すること。
  * @constructor
+ * @deprecated
  */
 function ChaikaLogger(){
 }
 
 ChaikaLogger.prototype = {
 
-    LEVEL_NONE      : 0,
-    LEVEL_ERROR     : 1,
-    LEVEL_WARNING   : 2,
-    LEVEL_INFO      : 3,
-    LEVEL_DEBUG     : 4,
+    LEVEL_NONE      : 70,
+    LEVEL_ERROR     : 60,
+    LEVEL_WARNING   : 50,
+    LEVEL_INFO      : 40,
+    LEVEL_DEBUG     : 20,
 
 
     /** @private */
@@ -536,25 +510,25 @@ ChaikaLogger.prototype = {
 
 
     debug: function ChaikaLogger_debug(...args){
-        if(this._level < this.LEVEL_DEBUG) return;
+        if(this._level > this.LEVEL_DEBUG) return;
 
         args.unshift('DEBUG');
         this._insertLog.apply(this, args);
     },
     info: function ChaikaLogger_info(...args){
-        if(this._level < this.LEVEL_INFO) return;
+        if(this._level > this.LEVEL_INFO) return;
 
         args.unshift('INFO');
         this._insertLog.apply(this, args);
     },
     warning: function ChaikaLogger_warning(...args){
-        if(this._level < this.LEVEL_WARNING) return;
+        if(this._level > this.LEVEL_WARNING) return;
 
         args.unshift('WARN');
         this._insertLog.apply(this, args);
     },
     error: function ChaikaLogger_error(...args){
-        if(this._level < this.LEVEL_ERROR) return;
+        if(this._level > this.LEVEL_ERROR) return;
 
         args.unshift('ERROR');
         this._insertLog.apply(this, args);
@@ -755,8 +729,7 @@ ChaikaBrowser.prototype = {
         }
 
         if(!aOpenBrowser){
-            threadURL = ioService.newURI("/thread/" + threadURL.spec,
-                        null, ChaikaCore.getServerURL());
+            threadURL = ioService.newURI(ChaikaURLUtil.chaikafy(threadURL.spec), null, null);
         }else if(ChaikaCore.pref.getBool("browser.redirector.enabled")){
             // スレッドリダイレクタを回避
             threadURL = ioService.newURI(threadURL.spec + '?chaika_force_browser=1', null, null);
