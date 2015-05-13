@@ -7,9 +7,11 @@ pref("extensions.chaika.http_proxy_value", "localhost:8080");
 pref("extensions.chaika.tab_load_in_foreground", false);
 pref("extensions.chaika.appoint_data_dir", false);
 pref("extensions.chaika.data_dir", "");
-pref("extensions.chaika.server_port.firefox", 8823);
-pref("extensions.chaika.server_port.seamonkey", 8824);
-pref("extensions.chaika.server_port.other", 8825);
+
+// local server
+pref("extensions.chaika.server.port", 8823);
+pref("extensions.chaika.server.port.retry", true);
+pref("extensions.chaika.server.port.randomization", false);
 
 // history
 pref("extensions.chaika.history_expire_days", 60);

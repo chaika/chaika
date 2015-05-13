@@ -7,6 +7,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://chaika-modules/ChaikaServer.js");
 
 
 const BBS_DOMAINS = [
@@ -33,10 +34,13 @@ const EXCLUDE_DOMAINS = [
  */
 let ChaikaURLUtil = {
 
+    /**
+     * The URL of the local server.
+     * @type {String}
+     * @example http://127.0.0.1:8823/
+     */
     get serverURL(){
-        let port = Services.prefs.getIntPref('extensions.chaika.server_port.firefox');
-
-        return 'http://127.0.0.1:' + port;
+        return ChaikaServer.serverURL.spec;
     },
 
 
@@ -84,7 +88,7 @@ let ChaikaURLUtil = {
      * @return {String}
      */
     unchaikafy: function(aURL){
-        return aURL.replace(this.serverURL, '')
+        return aURL.replace(this.serverURL + 'thread/', '')
                    .replace(/^chaika:\/\/[a-z]*\/?/, '');
     },
 
@@ -116,7 +120,7 @@ let ChaikaURLUtil = {
      * @return {String}
      */
     _chaikafyThread: function(aURL){
-        return this.serverURL + '/thread/' + aURL;
+        return this.serverURL + 'thread/' + aURL;
     }
 
 };

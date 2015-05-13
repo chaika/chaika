@@ -67,6 +67,7 @@
 
 <script type="application/javascript"><![CDATA[
     Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+    Components.utils.import("resource://chaika-modules/ChaikaServer.js");
     Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
 
     const Ci = Components.interfaces;
@@ -123,7 +124,7 @@
             </tr>\
             <tr>\
                 <th class="column">ServerURL</th>\
-                <td>' + ChaikaCore.getServerURL().spec + '</td>\
+                <td>' + ChaikaServer.serverURL.spec + '</td>\
             </tr>\
 \
             <tr>\

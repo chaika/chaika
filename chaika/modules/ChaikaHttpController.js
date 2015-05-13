@@ -6,6 +6,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/XPCOMUtils.jsm");
 Cu.import("resource://chaika-modules/ChaikaCore.js");
+Cu.import("resource://chaika-modules/ChaikaServer.js");
 
 
 /**
@@ -33,8 +34,6 @@ var ChaikaHttpController = {
         pref.addObserver("extensions.chaika.refController.enabled", this, true);
         pref.addObserver('extensions.chaika.imageViewURLReplace.enabled', this, true);
         pref.addObserver('extensions.chaika.ngfiles.enabled', this, true);
-
-        this._serverURL = ChaikaCore.getServerURL();
     },
 
 
@@ -61,10 +60,10 @@ var ChaikaHttpController = {
             if(!httpChannel.referrer) return;
 
             // リファラが内部サーバ以外なら終了
-            if(this._serverURL.hostPort !== httpChannel.referrer.hostPort) return;
+            if(ChaikaServer.serverURL.hostPort !== httpChannel.referrer.hostPort) return;
 
             // 読み込むリソースが内部サーバなら終了
-            if(this._serverURL.hostPort === httpChannel.URI.hostPort) return;
+            if(ChaikaServer.serverURL.hostPort === httpChannel.URI.hostPort) return;
 
 
             //リファラ制御

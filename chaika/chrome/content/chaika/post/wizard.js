@@ -5,6 +5,7 @@ Components.utils.import("resource://gre/modules/FormHistory.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
@@ -989,12 +990,10 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        let serverURL = ChaikaCore.getServerURL();
-
         ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
             'chaika-post-finished', {
                 url: gThread.plainURL.spec,
-                host: serverURL.hostPort
+                host: ChaikaServer.serverURL.hostPort
         });
     }
 

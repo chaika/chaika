@@ -2,6 +2,7 @@
 
 EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
@@ -1483,8 +1484,8 @@ ThreadConverter.prototype = {
      * @param aString string 置換される文字列
      */
     _replaceBaseTag: function(aString){
-        var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
-        var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
+        var skinURISpec = ChaikaServer.serverURL.resolve("./skin/");
+        var serverURLSpec = ChaikaServer.serverURL.resolve("./thread/");
         var fontName = ChaikaCore.pref.getUniChar("thread_font_name");
         var fontSize = ChaikaCore.pref.getInt("thread_font_size");
         var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
