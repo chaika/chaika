@@ -1087,7 +1087,6 @@ Popup.Res = {
 
         //枠外補正
         if(aBegin < 1) aBegin = 1;
-        if(aEnd > 1001) aEnd = 1001;
 
         //POPUP_LIMIT より多い時は省略する
         let tmpStart = aBegin;
