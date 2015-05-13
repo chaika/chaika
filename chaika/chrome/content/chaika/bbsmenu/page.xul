@@ -33,19 +33,19 @@
              type="search"
              timeout="1000">
         <box>
-            <dropmarker popup="searchEngineMenu" class="plain" />
+            <dropmarker popup="searchEngineMenu" />
         </box>
     </textbox>
 
-    <menubar id="mainMenubar" class="plain">
-        <menu id="historyMenu" label="履歴" class="plain menu-iconic">
+    <menubar id="mainMenubar">
+        <menu id="historyMenu" label="履歴" class="menu-iconic">
             <menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
                        position="after_end"
                        tooltiptext=""
                        itemContext="historyMenuContext" />
         </menu>
 
-        <menu id="toolsMenu" label="ツール" class="plain menu-iconic">
+        <menu id="toolsMenu" label="ツール" class="menu-iconic">
             <menupopup id="toolsMenuPopup" position="after_end">
                 <menuitem label="BBSMENU を更新" oncommand="Page.updateBBSMENU()" />
                 <menuitem label="外部板を追加" oncommand="Page.addFavoriteBoard()" />

@@ -63,7 +63,6 @@
 
 
 <tree id="boardTree"
-      class="plain"
       flex="2"
       context="boardTreeContextMenu"
       onclick="BoardTree.click(event)"
