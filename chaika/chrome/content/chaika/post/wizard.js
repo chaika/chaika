@@ -323,7 +323,7 @@ var FormPage = {
 
         //このレスにレス
         if(gWizType == WIZ_TYPE_RES && gThread.url.fileName){
-            var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+            var res = ">>" + gThread.url.fileName.replace(/,/g, "\n>>") + "\n";
             this._messeageForm.value = res;
         }
 

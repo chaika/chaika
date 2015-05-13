@@ -132,7 +132,7 @@ var ChaikaContentReplacer = {
 
 
                 // もともと置換対象に含まれている $ が特殊文字に変換されないようにする
-                aResData[target] = aResData[target].replace('$', '&#36;', 'g');
+                aResData[target] = aResData[target].replace(/\$/g, '&#36;');
 
 
                 // 置換

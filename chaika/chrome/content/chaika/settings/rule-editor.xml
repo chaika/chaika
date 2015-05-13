@@ -131,7 +131,7 @@
                 }catch(ex){
                     // For Firefox 31- (much slower)
                     function _query(query, parent){
-                        let queries = query.replace(':scope >', '', 'g').split('>');
+                        let queries = query.replace(/:scope >/g, '').split('>');
                         let children = Array.slice(parent.querySelectorAll(queries.shift()));
 
                         children = children.filter((node) => node.parentNode === parent);
