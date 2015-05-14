@@ -3,9 +3,9 @@
 <!-- See license.txt for terms of usage -->
 
 <bindings id="chaikaBrowserMenuBindings"
-        xmlns="http://www.mozilla.org/xbl"
-        xmlns:xbl="http://www.mozilla.org/xbl"
-        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+          xmlns="http://www.mozilla.org/xbl"
+          xmlns:xbl="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">

@@ -136,20 +136,13 @@
 
 
     /**
-     * Chaika Browser Menu
+     * Chaika Browser Menu (Base Class)
      * @class
      */
-    let BrowserMenu = {
+    let BrowserMenuBase = {
 
         get _root(){
             return document.getElementsByClassName('chaika-browser-menu')[0];
-        },
-
-        /**
-         * browserMenu.xml に処理を移譲する
-         */
-        __noSuchMethod__: function(methodName, args){
-            return this._root[methodName](...args);
         },
 
 
@@ -173,6 +166,32 @@
         },
 
     };
+
+
+    /**
+     * Chaika Browser Menu
+     * @class
+     */
+    let BrowserMenu = new Proxy(BrowserMenuBase, {
+
+        has: function(target, name){
+            return true;
+        },
+
+        get: function(target, name, receiver){
+            if(name in target){
+                return target[name];
+            }
+
+            // Forward the method call to browserMenu.xml
+            return () => {
+                let args = Array.from(arguments);
+
+                return target._root[name](args);
+            };
+        }
+
+    });
 
 
     /**
