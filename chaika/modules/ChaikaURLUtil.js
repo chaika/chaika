@@ -60,7 +60,8 @@ let ChaikaURLUtil = {
     isBBS: function(aURL){
         let url = Services.io.newURI(aURL, null, null);
 
-        return BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
+        return this.isChaikafied(aURL) ||
+               BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
                !EXCLUDE_DOMAINS.some((domain) => url.host.contains(domain));
     },
 
