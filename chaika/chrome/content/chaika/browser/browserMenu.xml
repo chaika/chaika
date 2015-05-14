@@ -316,10 +316,7 @@
                 this._setStatus();
 
                 //選択文字列の保存
-                let [element, focusedWindow] = BrowserUtils.getFocusSync(document);
-
-                this._selection = focusedWindow.getSelection();
-                this._selectedText = this._selection.toString();
+                this._selectedText = gContextMenu.textSelected;
 
                 // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
                 // への対処のため、gContextMenu をストアしておく
@@ -389,7 +386,6 @@
                 let anonymousID = targetElement.getAttribute("anonid");
                 let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
                 let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-                let selection = this._selection;
                 let selectedText = this._selectedText;
 
 
@@ -400,23 +396,23 @@
 
                 switch(anonymousID){
                     case 'abone-name':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selectedText);
                         break;
 
                     case 'abone-mail':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selectedText);
                         break;
 
                     case 'abone-id':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selectedText);
                         break;
 
                     case 'abone-word':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selectedText);
                         break;
 
                     case 'abone-ex':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selectedText);
                         break;
 
                     case "open-abone-manager":
@@ -533,8 +529,8 @@
         <!--
         /**
          * 指定された文字列をNGワードに追加する
-         * @param {Number} ngType NGワードの種類
-         * @param {Selection} ngWord 追加するNGワード
+         * @param {String} ngType NGワードの種類 ChaikaAboneManager.ABONE_TYPE_***
+         * @param {String} ngWord 追加するNGワード
          * @see ChaikaAboneManager
          */
         -->
@@ -542,7 +538,7 @@
             <parameter name="ngType" />
             <parameter name="ngWord" />
             <body><![CDATA[
-                var shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
+                let shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
 
                 if(ngType !== this.ChaikaAboneManager.ABONE_TYPE_EX){
                     if(shouldConfirm){
@@ -551,23 +547,15 @@
                         this.ChaikaAboneManager[ngType].add(ngWord.toString());
                     }
                 }else{
-                    let ngData = {
+                    this.openAboneManager(ngType, {
                         target: 'post',
                         match: 'all',
-                        rules: [],
-                    };
-
-                    for(let i = 0, iz = ngWord.rangeCount; i < iz; i++){
-                        let range = ngWord.getRangeAt(i);
-
-                        ngData.rules.push({
+                        rules: [{
                             target: 'msg',
-                            query: range.toString(),
+                            query: ngWord,
                             condition: 'contains'
-                        });
-                    }
-
-                    this.openAboneManager(ngType, ngData);
+                        }]
+                    });
                 }
             ]]></body>
         </method>

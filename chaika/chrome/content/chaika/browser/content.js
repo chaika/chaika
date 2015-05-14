@@ -10,7 +10,7 @@ Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
 /**
  * Frame Script
  */
-var ChaikaBrowserContent = {
+let ChaikaBrowserContent = {
 
     init: function(){
         addMessageListener('chaika-skin-changed', this.handleMessage.bind(this));
@@ -19,7 +19,7 @@ var ChaikaBrowserContent = {
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
 
         // We should initialize ChaikaRedirector in the content process
-        // to allow nsIContentPolicy handle http requests made in the content.
+        // to allow nsIContentPolicy to handle http requests made in the content.
         if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled")){
             ChaikaRedirector.init();
         }
