@@ -58,10 +58,18 @@ let ChaikaURLUtil = {
      * @return {Bool}
      */
     isBBS: function(aURL){
+        if(this.isChaikafied(aURL)){
+            return true;
+        }
+
+
         let url = Services.io.newURI(aURL, null, null);
 
-        return this.isChaikafied(aURL) ||
-               BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
+        if(!url.scheme || !url.scheme.startsWith('http')){
+            return false;
+        }
+
+        return BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
                !EXCLUDE_DOMAINS.some((domain) => url.host.contains(domain));
     },
 

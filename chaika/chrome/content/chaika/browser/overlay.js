@@ -7,6 +7,7 @@
     const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 
+    Cu.import("resource://gre/modules/Services.jsm");
     Cu.import("resource://gre/modules/PopupNotifications.jsm");
     Cu.import("resource://chaika-modules/ChaikaCore.js");
     Cu.import('resource://chaika-modules/ChaikaAddonInfo.js');
@@ -285,37 +286,31 @@
          * コンテキストメニューが表示された時に呼ばれる
          */
         _popupShowing: function(){
-            //掲示板上でのみ表示する設定の場合の表示・非表示
-            if(ChaikaCore.pref.getBool('contextmenu.show_only_on_bbs')){
-                if(ChaikaURLUtil.isBBS(gBrowser.currentURI.spec)){
-                    // i) ページが掲示板上である -> 表示
-                }else{
-                    // ii) ページが掲示板上でない
-                    if(ChaikaCore.pref.getBool('contextmenu.always_show_open_link') &&
-                       gContextMenu.onLink &&
-                       ChaikaURLUtil.isBBS(gContextMenu.linkURL.spec)){
-                            // ii) - a)「リンク先の項目は表示する」設定が有効, カーソルがリンク上, リンク先が掲示板 -> 表示
-                    }else{
-                        // ii) - b) それ以外 -> 非表示
-                        this._hide();
-                        return;
-                    }
+            // Show/hide the context menu
+            const showOnlyOnBBS = ChaikaCore.pref.getBool('contextmenu.show_only_on_bbs');
+            const showOnBBSLink = ChaikaCore.pref.getBool('contextmenu.always_show_open_link');
+            const isOnBBS = ChaikaURLUtil.isBBS(gBrowser.currentURI.spec);
+            const isOnBBSLink = gContextMenu.onLink && ChaikaURLUtil.isBBS(BrowserMenu._getLinkURL().spec);
+
+            if(showOnlyOnBBS && !isOnBBS){
+                if(!showOnBBSLink || (showOnBBSLink && !isOnBBSLink)){
+                    this._hide();
+                    return;
                 }
             }
-
 
             this._show();
 
 
-            //設定で非表示にされているものを非表示にする
+            // Show/hide each items
             let prefs = Services.prefs.getBranch("extensions.chaika.contextmenu.");
             let prefNames = prefs.getChildList("", {});
 
             prefNames.forEach((name) => {
                 if(!name.endsWith('enabled')) return;
 
-                var anonid = name.replace('.enabled', '');
-                var menuitem = document.getAnonymousElementByAttribute(this._browserMenu, 'anonid', anonid);
+                let anonid = name.replace('.enabled', '');
+                let menuitem = document.getAnonymousElementByAttribute(this._browserMenu, 'anonid', anonid);
 
                 if(menuitem){
                     menuitem.hidden = !prefs.getBoolPref(name);
