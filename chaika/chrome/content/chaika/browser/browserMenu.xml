@@ -13,12 +13,17 @@
         <xul:arrowscrollbox orient="vertical" flex="1" anonid="root" class="chaika-browser-menu-root">
             <xul:menu label="あぼーん" anonid="abone">
                 <xul:menupopup>
-                    <xul:menuitem label="名前" anonid="abone-name" />
-                    <xul:menuitem label="メール" anonid="abone-mail" />
-                    <xul:menuitem label="ID" anonid="abone-id" />
-                    <xul:menuitem label="本文" anonid="abone-word" />
-                    <xul:menuitem label="NGEx" anonid="abone-ex" />
-                    <xul:menuseparator />
+                    <xul:menuitem title="%SELECTION% を名前あぼーん" anonid="abone-name"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% をメールあぼーん" anonid="abone-mail"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を ID あぼーん" anonid="abone-id"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を本文あぼーん" anonid="abone-word"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を NGEx あぼーん" anonid="abone-ex"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuseparator class="chaika-shown-when-text-selected" />
                     <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
                 </xul:menupopup>
             </xul:menu>
@@ -28,18 +33,19 @@
                     <xul:menuitem label="タイトル" anonid="copy-title" />
                     <xul:menuitem label="URL" anonid="copy-url" />
                     <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
-                    <xul:menuitem label="タイトルと URL と選択部分"
+                    <xul:menuitem title="タイトルと URL と %SELECTION%"
                                   anonid="copy-title-url-selection"
-                                  class="chaika-shown-when-text-selected" />
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
                 </xul:menupopup>
             </xul:menu>
 
-            <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
+            <xul:menu title="%SELECTION% を検索" anonid="search"
+                      class="chaika-shown-when-text-selected chaika-shown-on-thread chaika-need-populate">
                 <xul:menupopup>
                     <xul:vbox anonid="search-thread" />
                     <xul:menuseparator anonid="search-thread-sep" />
-                    <xul:menuitem label="板で検索" anonid="search-in-board" />
-                    <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
+                    <xul:menuitem label="この板内を検索" anonid="search-in-board" />
+                    <xul:menuitem label="このスレッド内を検索" anonid="search-in-thread" />
                 </xul:menupopup>
             </xul:menu>
 
@@ -75,9 +81,9 @@
 
             <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="選択部分を AA として登録する"
+            <xul:menuitem title="%SELECTION% を AA として登録する"
                           anonid="register-selection-as-aa"
-                          class="chaika-shown-when-text-selected" />
+                          class="chaika-shown-when-text-selected chaika-need-populate" />
 
             <xul:menuitem label="置換マネージャ..." anonid="open-replacement-manager" />
 
@@ -317,6 +323,21 @@
 
                 //選択文字列の保存
                 this._selectedText = gContextMenu.textSelected;
+
+                //選択文字列を表示する項目へテキストを設定する
+                let root = document.getAnonymousElementByAttribute(this, "anonid", "root");
+                let itemsToPopulate = root.querySelectorAll('.chaika-need-populate');
+                let selectedText = this._selectedText;
+
+                if(selectedText.length > 12){
+                    selectedText = selectedText.slice(0, 12) + '…';
+                }
+
+                Array.from(itemsToPopulate).forEach((item) => {
+                    let label = item.getAttribute('title').replace(/%SELECTION%/g, '"' + selectedText + '"');
+
+                    item.setAttribute('label', label);
+                })
 
                 // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
                 // への対処のため、gContextMenu をストアしておく
