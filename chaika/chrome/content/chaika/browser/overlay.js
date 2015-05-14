@@ -10,6 +10,7 @@
     Cu.import("resource://gre/modules/PopupNotifications.jsm");
     Cu.import("resource://chaika-modules/ChaikaCore.js");
     Cu.import('resource://chaika-modules/ChaikaAddonInfo.js');
+    Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
 
 
     /**
@@ -286,13 +287,13 @@
         _popupShowing: function(){
             //掲示板上でのみ表示する設定の場合の表示・非表示
             if(ChaikaCore.pref.getBool('contextmenu.show_only_on_bbs')){
-                if(BrowserMenu._isBBS(gBrowser.currentURI)){
+                if(ChaikaURLUtil.isBBS(gBrowser.currentURI.spec)){
                     // i) ページが掲示板上である -> 表示
                 }else{
                     // ii) ページが掲示板上でない
                     if(ChaikaCore.pref.getBool('contextmenu.always_show_open_link') &&
                        gContextMenu.onLink &&
-                       BrowserMenu._isBBS(gContextMenu.linkURL)){
+                       ChaikaURLUtil.isBBS(gContextMenu.linkURL.spec)){
                             // ii) - a)「リンク先の項目は表示する」設定が有効, カーソルがリンク上, リンク先が掲示板 -> 表示
                     }else{
                         // ii) - b) それ以外 -> 非表示
@@ -354,7 +355,7 @@
             }
 
             this._toolbarbutton.hidden = aLocation.spec !== 'about:customizing' &&
-                                         !BrowserMenu._isBBS(aLocation.spec);
+                                         !ChaikaURLUtil.isBBS(aLocation.spec);
         },
 
     };
