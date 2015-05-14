@@ -18,7 +18,7 @@
 # 　 ※ハッシュ値はMD5をスクランブルした NGFiles.txt 独自のものです。
 #     NGFiles.txt 編集ソフト等を使うことで求めることができます。
 #     または, 以下のコードをブラウザーコンソールにて実行してください(行頭の「#」は削除してください)。
-# 
+#
 #           var url = "ブロックしたい画像のURL";
 #           var obj = {};
 #           Components.utils.import("resource://chaika-modules/ChaikaHttpController.js", obj);
