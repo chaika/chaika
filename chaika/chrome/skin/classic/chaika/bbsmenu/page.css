@@ -3,21 +3,33 @@
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
 
+/* ---- Search Box ------------------------- */
+
+#searchBox dropmarker {
+    -moz-appearance: none;
+    border-style: none;
+    background-color: transparent;
+    cursor: default;
+}
+
+
+/* ---- Toolbar ----------------------------- */
+
 #mainMenubar {
     -moz-appearance: none;
-    padding: 1px 2px 1px 1px;
     border-style: none;
-    margin: 0px;
+    margin: 0;
+    padding: 1px 2px 1px 1px;
 }
 
 #mainMenubar > menu {
-    padding: 1px !important;
-    margin: 1px !important;
-    list-style-image: url("chrome://chaika/skin/bbsmenu/toolbar-icon.png") !important;
+    margin: 1px;
+    padding: 1px;
+    list-style-image: url("chrome://chaika/skin/bbsmenu/toolbar-icon.png");
 }
 
 #mainMenubar > menu .menubar-left {
-    margin: 0px !important;
+    margin: 0;
 }
 
 #mainMenubar > menu .menubar-text {
@@ -33,29 +45,28 @@
 }
 
 
+/* ---- Tree ----------------------------- */
 
-#searchBox dropmarker {
-    -moz-appearance: none;
-    border-style: none;
-    background-color: transparent;
-    cursor: default;
+#bbsmenuTree.tree-text-small treechildren::-moz-tree-row{
+    min-height: 16px;
 }
 
-
-#bbsmenuTree treechildren::-moz-tree-cell-text,
-#bbsmenuTree treechildren::-moz-tree-row,
-#bbsmenuTree[treesize="small"] treechildren::-moz-tree-cell-text,
-#bbsmenuTree[treesize="small"] treechildren::-moz-tree-row {
-    height: 1.6em !important;
-    font-size: 12px !important;
+#bbsmenuTree.tree-text-small treechildren::-moz-tree-cell-text{
+    font-size: 12px;
 }
 
-#bbsmenuTree[treesize="medium"] treechildren::-moz-tree-cell-text,
-#bbsmenuTree[treesize="medium"] treechildren::-moz-tree-row {
-    font-size: 14px !important;
+#bbsmenuTree.tree-text-medium treechildren::-moz-tree-row{
+    min-height: 20px;
 }
 
-#bbsmenuTree[treesize="big"] treechildren::-moz-tree-cell-text,
-#bbsmenuTree[treesize="big"] treechildren::-moz-tree-row {
-    font-size: 16px !important;
+#bbsmenuTree.tree-text-medium treechildren::-moz-tree-cell-text{
+    font-size: 14px;
+}
+
+#bbsmenuTree.tree-text-big treechildren::-moz-tree-row{
+    min-height: 24px;
+}
+
+#bbsmenuTree.tree-text-big treechildren::-moz-tree-cell-text{
+    font-size: 16px;
 }

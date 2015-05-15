@@ -39,7 +39,8 @@ let Page = {
             ChaikaCore.logger.error(ex);
         });
 
-        this._tree.setAttribute('treesize', ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+        this._changeTextSize();
+
         this._branch = Services.prefs.getBranch("extensions.chaika.bbsmenu.");
         this._branch.addObserver('', this, false);
     },
@@ -53,8 +54,18 @@ let Page = {
 
     observe: function(aSubject, aTopic, aData){
         if(aData === "tree_size"){
-            this._tree.setAttribute('treesize', ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+            this._changeTextSize();
         }
+    },
+
+
+    _changeTextSize: function(){
+        this._tree.collapsed = true;
+
+        this._tree.className = this._tree.className.replace(/tree-text-\W+/g, '');
+        this._tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("bbsmenu.tree_size"));
+
+        setTimeout(() => this._tree.collapsed = false, 0);
     },
 
 
