@@ -40,6 +40,9 @@
 
 #boardTree treechildren::-moz-tree-row(highlight-true){
   background-color: #FF9500 !important;  /* Chameleon highlight orange */
+
+#boardTree treechildren::-moz-tree-row(highlight-true, selected){
+    background-color: #0095dd;  /* Chameleon blue for selection */
 }
 
 
