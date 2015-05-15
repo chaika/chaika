@@ -25,19 +25,19 @@
 }
 
 #boardTree.tree-text-medium treechildren::-moz-tree-row{
-    min-height: 36px;
+    min-height: 30px;
 }
 
 #boardTree.tree-text-medium treechildren::-moz-tree-cell-text{
-    font-size: 15px;
+    font-size: 14px;
 }
 
 #boardTree.tree-text-big treechildren::-moz-tree-row{
-    min-height: 40px;
+    min-height: 38px;
 }
 
 #boardTree.tree-text-big treechildren::-moz-tree-cell-text{
-    font-size: 18px;
+    font-size: 16px;
 }
 
 
