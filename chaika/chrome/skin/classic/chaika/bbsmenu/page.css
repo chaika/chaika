@@ -2,6 +2,7 @@
 
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+
 #mainMenubar {
     -moz-appearance: none;
     padding: 1px 2px 1px 1px;
@@ -34,12 +35,9 @@
 
 
 #searchBox dropmarker {
-    list-style-image: url("chrome://chaika/skin/bbsmenu/arrow-dn.gif");
     -moz-appearance: none;
     border-style: none;
     background-color: transparent;
-    width: 11px;
-    padding: 0px 2px 0px 0px;
     cursor: default;
 }
 
@@ -60,29 +58,4 @@
 #bbsmenuTree[treesize="big"] treechildren::-moz-tree-cell-text,
 #bbsmenuTree[treesize="big"] treechildren::-moz-tree-row {
     font-size: 16px !important;
-}
-
-
-/* 2ch */
-#bbsmenuTree treechildren::-moz-tree-image(title, type-0) {
-    list-style-image: url("chrome://chaika/skin/bbsmenu/tree-icon.png") !important;
-    -moz-image-region: rect(0px, 48px, 16px, 32px);
-}
-
-/* Be 2ch */
-#bbsmenuTree treechildren::-moz-tree-image(title, type-2) {
-    list-style-image: url("chrome://chaika/skin/bbsmenu/tree-icon.png") !important;
-    -moz-image-region: rect(0px, 64px, 16px, 48px);
-}
-
-/* JBBS */
-#bbsmenuTree treechildren::-moz-tree-image(title, type-3) {
-    list-style-image: url("chrome://chaika/skin/bbsmenu/tree-icon.png") !important;
-    -moz-image-region: rect(0px, 80px, 16px, 64px);
-}
-
-/* Machi BBS */
-#bbsmenuTree treechildren::-moz-tree-image(title, type-4) {
-    list-style-image: url("chrome://chaika/skin/bbsmenu/tree-icon.png") !important;
-    -moz-image-region: rect(0px, 96px, 16px, 80px);
 }
