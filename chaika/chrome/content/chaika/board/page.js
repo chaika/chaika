@@ -238,9 +238,10 @@ var BoardTree = {
 
     initTree: function BoardTree_initTree(aNoFocus){
         this.tree = document.getElementById("boardTree");
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
 
+        this.changeTreeSize();
         setPageTitle();
+
         if(this.firstInitBoardTree){
             ChaikaCore.history.visitPage(gBoard.url,
                     ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
@@ -348,8 +349,11 @@ var BoardTree = {
 
     changeTreeSize: function BoardTree_changeTreeSize(){
         this.tree.collapsed = true;
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
-        setTimeout(function(){ BoardTree.tree.collapsed = false }, 0);
+
+        this.tree.className = this.tree.className.replace(/tree-text-\W+/g, '');
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
+
+        setTimeout(() => this.tree.collapsed = false, 0);
     },
 
     click: function BoardTree_click(aEvent){

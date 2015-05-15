@@ -2,99 +2,94 @@
 
 @namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
 
+
+/* ---- Header ------------------------------- */
+
 #toolbar{
     font-size: 1.25em;
 }
 
 #lblTitle {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 
-#boardTree treechildren::-moz-tree-cell-text,
-#boardTree[treesize="small"] treechildren::-moz-tree-cell-text {
-  font-size: 12px !important;
-}
-#boardTree treechildren::-moz-tree-row,
-#boardTree[treesize="small"] treechildren::-moz-tree-row {
-  font-size: 12px !important;
-  height: 1.5em !important;
+/* ---- Text Size ------------------------------ */
+
+#boardTree.tree-text-small treechildren::-moz-tree-row{
+    min-height: 24px;
 }
 
-#boardTree[treesize="medium"] treechildren::-moz-tree-cell-text {
-  font-size: 14px !important;
-}
-#boardTree[treesize="medium"] treechildren::-moz-tree-row {
-  font-size: 14px !important;
-  height: 1.5em !important;
+#boardTree.tree-text-small treechildren::-moz-tree-cell-text{
+    font-size: 12px;
 }
 
-#boardTree[treesize="big"] treechildren::-moz-tree-cell-text {
-  font-size: 16px !important;
-}
-#boardTree[treesize="big"] treechildren::-moz-tree-row {
-  font-size: 16px !important;
-  height: 1.5em !important;
+#boardTree.tree-text-medium treechildren::-moz-tree-row{
+    min-height: 36px;
 }
 
+#boardTree.tree-text-medium treechildren::-moz-tree-cell-text{
+    font-size: 15px;
+}
 
-#boardTree treechildren::-moz-tree-row(highlight-true){
-  background-color: #FF9500 !important;  /* Chameleon highlight orange */
+#boardTree.tree-text-big treechildren::-moz-tree-row{
+    min-height: 40px;
+}
 
-#boardTree treechildren::-moz-tree-row(highlight-true, selected){
-    background-color: #0095dd;  /* Chameleon blue for selection */
+#boardTree.tree-text-big treechildren::-moz-tree-cell-text{
+    font-size: 18px;
 }
 
 
-
-#boardTree treechildren::-moz-tree-image(status){
-  margin-left: 2px;
-  list-style-image: url("chrome://chaika/skin/board/status-icon.png") !important;
-}
-
-/*  STATUS_NEW  */
-#boardTree treechildren::-moz-tree-image(status, s3){
-  -moz-image-region: rect(0px, 12px, 12px, 0px);
-}
-
-/*  STATUS_UNREAD  */
-#boardTree treechildren::-moz-tree-image(status, s2){
-  -moz-image-region: rect(0px, 24px, 12px, 12px);
-}
-
-/*  STATUS_SUBSCRIBE  */
-#boardTree treechildren::-moz-tree-image(status, s1){
-  -moz-image-region: rect(0px, 36px, 12px, 24px);
-}
-
-/*  STATUS_NONE  */
-#boardTree treechildren::-moz-tree-image(status, s0){
-  -moz-image-region: rect(0px, 48px, 12px, 36px);
-}
-
-/*  STATUS_DOWN  */
-#boardTree treechildren::-moz-tree-image(status, s4){
-  -moz-image-region: rect(0px, 60px, 12px, 48px);
-}
-
+/* ---- Tree Styling ------------------------------ */
 
 #boardTreeCol-number,
 #boardTreeCol-count,
 #boardTreeCol-read,
 #boardTreeCol-unread,
 #boardTreeCol-force {
-  text-align: right;
+    text-align: right;
 }
 
-#boardTree .treecol-text {
-  text-align: left;
+
+/* ---- Highlight (NGEx) --------------------------- */
+
+#boardTree treechildren::-moz-tree-row(highlight-true){
+    background-color: #ff9500;  /* Chameleon orange for highlight */
 }
 
-#boardTree treechildren::-moz-tree-cell {
-  margin-right: 4px;
-  margin-left: 2px;
+#boardTree treechildren::-moz-tree-row(highlight-true, selected){
+    background-color: #0095dd;  /* Chameleon blue for selection */
 }
 
-#boardTree treechildren::-moz-tree-cell(created) {
-  margin-left: 6px;
+
+/* ---- Status Image ----------------------------- */
+
+#boardTree treechildren::-moz-tree-image(status){
+    list-style-image: url("chrome://chaika/skin/board/status-icon.png");
+}
+
+/*  STATUS_NEW  */
+#boardTree treechildren::-moz-tree-image(status, s3){
+    -moz-image-region: rect(0px, 12px, 12px, 0px);
+}
+
+/*  STATUS_UNREAD  */
+#boardTree treechildren::-moz-tree-image(status, s2){
+    -moz-image-region: rect(0px, 24px, 12px, 12px);
+}
+
+/*  STATUS_SUBSCRIBE  */
+#boardTree treechildren::-moz-tree-image(status, s1){
+    -moz-image-region: rect(0px, 36px, 12px, 24px);
+}
+
+/*  STATUS_NONE  */
+#boardTree treechildren::-moz-tree-image(status, s0){
+    -moz-image-region: rect(0px, 48px, 12px, 36px);
+}
+
+/*  STATUS_DOWN  */
+#boardTree treechildren::-moz-tree-image(status, s4){
+    -moz-image-region: rect(0px, 60px, 12px, 48px);
 }
