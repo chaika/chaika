@@ -1,4 +1,4 @@
-chaika 
+chaika
 ======
 
 2ちゃんねるなどの掲示板閲覧をより快適にするアドオンです。
@@ -7,13 +7,13 @@ chaika
 
 
 Install
----
+-------
 
 [Mozilla 公式サイト](https://addons.mozilla.org/ja/firefox/addon/chaika/)よりインストール可能です。
 
 
 For Users
----
+---------
 
 ### マニュアル・ヘルプ
 * [オンラインヘルプ](https://github.com/chaika/chaika/wiki)
@@ -30,7 +30,8 @@ For Users
 
 
 For Developers
----
+--------------
+
 ### プラグイン・関連アドオン・スキン開発
 * [開発者の方向けオンラインマニュアル](https://github.com/chaika/chaika/wiki#%E9%96%8B%E7%99%BA%E8%80%85%E3%81%AE%E6%96%B9%E5%90%91%E3%81%91)
 
@@ -48,7 +49,7 @@ For Developers
 #### バグ一覧・ToDo
 * 最新バグ一覧: [Issues](https://github.com/chaika/chaika/issues?q=is%3Aopen+is%3Aissue+-label%3Afixed)
 
-* 更新が停止したバグ一覧など  
+* 更新が停止したバグ一覧など
     (新規投稿は上のバグ一覧にお願いします)
     * [旧旧ToDo](https://spreadsheets.google.com/pub?key=pbbe5TFNb21RVxOf7ygNJfg) : b2r 0.5系 (flysonさん作成)
     * [旧ToDo](http://d.hatena.ne.jp/nazodane/20080609/1212999112) : b2r 0.5系 (Nazoさん作成)
@@ -60,11 +61,11 @@ For Developers
 #### ブランチモデル
 基本規則は [ぼくが実際に運用していたGitブランチモデルについて ::ハブろぐ](http://havelog.ayumusato.com/develop/git/e513-git_branch_model.html) に準拠。
 
-* **master**  
+* **master**
   主にリリース版のタグ付専用として使用。直接コミットはせず、基本的にマージのみ。
-* **develop**  
+* **develop**
   開発用のブランチ。
-* **feature**  
+* **feature**
   大規模修正用のブランチ。
-* **release**  
+* **release**
   リリース候補用のブランチ。AMOは登録に時間がかかるため、登録が完了するまではこちらでバグフィックスする。開発はdevelopブランチで継続する。
