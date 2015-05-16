@@ -1,42 +1,52 @@
 /* See license.txt for terms of usage */
 
 
-function NotificationService(notifier){
-    this._notifier = notifier;
-}
+(function(global){
+    "use strict";
 
-NotificationService.prototype = {
 
-    _notify: function(aLevel, aMessage, aTimeout){
-        let notification = this._notifier.appendNotification(
-            aMessage, null, null, aLevel, null
-        );
+    function NotificationService(notifier){
+        this._notifier = notifier;
+    }
 
-        if(aTimeout){
-            setTimeout(() => { this.remove(notification); }, aTimeout);
-        }
+    NotificationService.prototype = {
 
-        return notification;
-    },
+        _notify: function(aLevel, aMessage, aTimeout){
+            let notification = this._notifier.appendNotification(
+                aMessage, null, null, aLevel, null
+            );
 
-    clear: function(){
-        this._notifier.removeAllNotifications(false);
-    },
+            if(aTimeout){
+                setTimeout(() => { this.remove(notification); }, aTimeout);
+            }
 
-    remove: function(aNode){
-        this._notifier.removeNotification(aNode);
-    },
+            return notification;
+        },
 
-    info: function(aMessage, aTimeout){
-        return this._notify(this._notifier.PRIORITY_INFO_MEDIUM, aMessage, aTimeout);
-    },
+        clear: function(){
+            this._notifier.removeAllNotifications(false);
+        },
 
-    warn: function(aMessage, aTimeout){
-        return this._notify(this._notifier.PRIORITY_WARNING_MEDIUM, aMessage, aTimeout);
-    },
+        remove: function(aNode){
+            this._notifier.removeNotification(aNode);
+        },
 
-    critical: function(aMessage, aTimeout){
-        return this._notify(this._notifier.PRIORITY_CRITICAL_MEDIUM_MEDIUM, aMessage, aTimeout);
-    },
+        info: function(aMessage, aTimeout){
+            return this._notify(this._notifier.PRIORITY_INFO_MEDIUM, aMessage, aTimeout);
+        },
 
-};
+        warn: function(aMessage, aTimeout){
+            return this._notify(this._notifier.PRIORITY_WARNING_MEDIUM, aMessage, aTimeout);
+        },
+
+        critical: function(aMessage, aTimeout){
+            return this._notify(this._notifier.PRIORITY_CRITICAL_MEDIUM_MEDIUM, aMessage, aTimeout);
+        },
+
+    };
+
+
+    // ---- Export ------------------------------------------
+    global.NotificationService = NotificationService;
+
+})((this || 0).self || global);
