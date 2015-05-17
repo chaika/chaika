@@ -5,6 +5,7 @@ EXPORTED_SYMBOLS = ["ChaikaCore"];
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
+Components.utils.import('resource://gre/modules/Deprecated.jsm');
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
 Components.utils.import("resource://chaika-modules/ChaikaURLUtil.js");
@@ -106,7 +107,7 @@ function makeException(aResult){
 /**
  * @namespace
  */
-var ChaikaCore = {
+var ChaikaCore_ = {
 
     initialized: false,
 
@@ -205,7 +206,7 @@ var ChaikaCore = {
         }catch(ex){
                 // SQLite ファイルの読み込みに失敗した場合は、
                 // バックアップを取って新規に作成する
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             storageService.backupDatabaseFile(dbFile, dbFile.leafName + ".corrupt");
             if(storage){
                 try{ storage.close(); }catch(ex2){};
@@ -214,7 +215,7 @@ var ChaikaCore = {
                 dbFile.remove(false);
                 storage = storageService.openDatabase(dbFile);
             }catch(ex2){
-                ChaikaCore.logger.error(ex2);
+                ChaikaCore_.logger.error(ex2);
             }
         }
 
@@ -238,27 +239,27 @@ var ChaikaCore = {
         try{
             if(!storage.tableExists("history")){
                 storage.executeSimpleSQL(STORAGE_SQL_HISTORY);
-                ChaikaCore.logger.info("Create Table: history");
+                ChaikaCore_.logger.info("Create Table: history");
             }
             if(!storage.tableExists("bbsmenu")){
                 storage.executeSimpleSQL(STORAGE_SQL_BBSMENU);
-                ChaikaCore.logger.info("Create Table: bbsmenu");
+                ChaikaCore_.logger.info("Create Table: bbsmenu");
             }
             if(!storage.tableExists("thread_data")){
                 storage.executeSimpleSQL(SQL_THREAD_DATA);
-                ChaikaCore.logger.info("Create Table: thread_data");
+                ChaikaCore_.logger.info("Create Table: thread_data");
             }
             if(!storage.tableExists("board_subject")){
                 storage.executeSimpleSQL(SQL_BOARD_SUBJECT);
-                ChaikaCore.logger.info("Create Table: board_subject");
+                ChaikaCore_.logger.info("Create Table: board_subject");
             }
             if(!storage.tableExists("board_data")){
                 storage.executeSimpleSQL(SQL_BOARD_DATA);
-                ChaikaCore.logger.info("Create Table: board_data");
+                ChaikaCore_.logger.info("Create Table: board_data");
             }
         }catch(ex){
-            ChaikaCore.logger.error(storage.lastErrorString);
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(storage.lastErrorString);
+            ChaikaCore_.logger.error(ex);
         }finally{
             storage.commitTransaction();
         }
@@ -450,7 +451,7 @@ var ChaikaCore = {
  * @param {String} aItemType このアイテムのタイプ "board"、"thread"、"page"
  * @param {Number} aBoardType ChaikaBoard.BOARD_TYPE_XXX
  */
-ChaikaCore.ChaikaURLItem = function ChaikaCore_ChaikaURLItem(
+ChaikaCore_.ChaikaURLItem = function ChaikaCore_ChaikaURLItem(
                                         aTitle, aURLSpec, aItemType, aBoardType){
     this.title     = aTitle;
     this.urlSpec   = aURLSpec;
@@ -458,7 +459,7 @@ ChaikaCore.ChaikaURLItem = function ChaikaCore_ChaikaURLItem(
     this.boardType = aBoardType;
 }
 
-ChaikaCore.ChaikaURLItem.prototype = {
+ChaikaCore_.ChaikaURLItem.prototype = {
 
     /**
      * @return {nsIURL}
@@ -470,11 +471,11 @@ ChaikaCore.ChaikaURLItem.prototype = {
 
     open: function ChaikaURLItem_open(aAddTab){
         if(this.itemType == "board"){
-            ChaikaCore.browser.openBoard(this.getURL(), aAddTab);
+            ChaikaCore_.browser.openBoard(this.getURL(), aAddTab);
         }else if(this.itemType == "thread"){
-            ChaikaCore.browser.openThread(this.getURL(), aAddTab, true);
+            ChaikaCore_.browser.openThread(this.getURL(), aAddTab, true);
         }else{
-            ChaikaCore.browser.openURL(this.getURL(), aAddTab);
+            ChaikaCore_.browser.openURL(this.getURL(), aAddTab);
         }
     }
 
@@ -485,7 +486,7 @@ ChaikaCore.ChaikaURLItem.prototype = {
 
 /**
  * メッセージログを取るオブジェクト。
- * {@link ChaikaCore.logger} を経由して利用すること。
+ * {@link ChaikaCore_.logger} を経由して利用すること。
  * @constructor
  * @deprecated
  */
@@ -503,7 +504,7 @@ ChaikaLogger.prototype = {
 
     /** @private */
     _startup: function ChaikaLogger__startup(){
-        this._level = ChaikaCore.pref.getInt("logger.level");
+        this._level = ChaikaCore_.pref.getInt("logger.level");
         this._console = Cc["@mozilla.org/consoleservice;1"]
                 .getService(Ci.nsIConsoleService);
     },
@@ -570,7 +571,7 @@ ChaikaLogger.prototype = {
 
 /**
  * Mozilla 設定システムにアクセスするためのオブジェクト。
- * {@link ChaikaCore.pref} を経由して利用すること。
+ * {@link ChaikaCore_.pref} を経由して利用すること。
  * @constructor
  * @param {String} aBranch 設定名のブランチ。指定しない場合はルートとみなされる
  */
@@ -591,7 +592,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getBoolPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -599,7 +600,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setBoolPref(aPrefName, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
+            ChaikaCore_.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -608,7 +609,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getIntPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -616,7 +617,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setIntPref(aPrefName, parseInt(aPrefValue));
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
+            ChaikaCore_.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -625,7 +626,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getCharPref(aPrefName);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -633,7 +634,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setCharPref(aPrefName, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, aPrefValue, ex);
+            ChaikaCore_.logger.error(aPrefName, aPrefValue, ex);
             throw makeException(ex.result);
         }
     },
@@ -642,7 +643,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getComplexValue(aPrefName, Ci.nsISupportsString).data;
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -652,7 +653,7 @@ ChaikaPref.prototype = {
             sStr.data = aPrefValue;
             return this._branch.setComplexValue(aPrefName, Ci.nsISupportsString, sStr);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -661,7 +662,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.getComplexValue(aPrefName, Ci.nsIFile);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     },
@@ -669,7 +670,7 @@ ChaikaPref.prototype = {
         try{
             return this._branch.setComplexValue(aPrefName, Ci.nsIFile, aPrefValue);
         }catch(ex){
-            ChaikaCore.logger.error(aPrefName, ex);
+            ChaikaCore_.logger.error(aPrefName, ex);
             throw makeException(ex.result);
         }
     }
@@ -680,7 +681,7 @@ ChaikaPref.prototype = {
 
 /**
  * ホストブラウザとの連携を行うオブジェクト
- * {@link ChaikaCore.browser} を経由して利用すること。
+ * {@link ChaikaCore_.browser} を経由して利用すること。
  * @constructor
  */
 function ChaikaBrowser(){
@@ -739,12 +740,12 @@ ChaikaBrowser.prototype = {
         try{
             if((/^\d{9,10}$/).test(threadURL.fileName)){
                 threadURL = ioService.newURI(threadURL.spec + "/", null, null);
-                ChaikaCore.logger.warning("Fixed URL: " + threadURL.spec);
+                ChaikaCore_.logger.warning("Fixed URL: " + threadURL.spec);
             }
 
                 // スレッド表示数の制限
             if(aReplaceViewLimit){
-                var threadViewLimit = ChaikaCore.pref.getInt("board.thread_view_limit");
+                var threadViewLimit = ChaikaCore_.pref.getInt("board.thread_view_limit");
 
                 if(threadViewLimit === 0){
                     threadURL = ioService.newURI("./", null, threadURL);
@@ -753,13 +754,13 @@ ChaikaBrowser.prototype = {
                 }
             }
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
 
         if(!aOpenBrowser){
             threadURL = ioService.newURI(ChaikaURLUtil.chaikafy(threadURL.spec), null, null);
-        }else if(ChaikaCore.pref.getBool("browser.redirector.enabled")){
+        }else if(ChaikaCore_.pref.getBool("browser.redirector.enabled")){
             // スレッドリダイレクタを回避
             threadURL = ioService.newURI(threadURL.spec + '?chaika_force_browser=1', null, null);
         }
@@ -778,7 +779,7 @@ ChaikaBrowser.prototype = {
             var boardURI = this._getBoardURI(aBoardURL);
             this.openURL(boardURI, aAddTab);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
         return boardURI;
@@ -820,16 +821,16 @@ ChaikaBrowser.prototype = {
                         browserWindow.TreeStyleTabService.readyToOpenChildTab(contentBrowser.selectedTab);
                     }
 
-                    var loadInForeground = ChaikaCore.pref.getBool("tab_load_in_foreground");
-                    ChaikaCore.logger.debug("loadOneTab: " + aURI.spec + " : " + loadInForeground);
+                    var loadInForeground = ChaikaCore_.pref.getBool("tab_load_in_foreground");
+                    ChaikaCore_.logger.debug("loadOneTab: " + aURI.spec + " : " + loadInForeground);
 
                     contentBrowser.loadOneTab(aURI.spec, null, null, null, !loadInForeground, false);
                 }else{
-                    ChaikaCore.logger.debug("loadURI: " + aURI.spec);
+                    ChaikaCore_.logger.debug("loadURI: " + aURI.spec);
                     contentBrowser.loadURI(aURI.spec);
                 }
             }catch(ex){
-                ChaikaCore.logger.error(ex);
+                ChaikaCore_.logger.error(ex);
                 throw makeException(ex.result);
             }
             return;
@@ -889,7 +890,7 @@ ChaikaBrowser.prototype = {
 
 /**
  * ファイルを読み書きするオブジェクト。
- * {@link ChaikaCore.io} を経由して利用すること。
+ * {@link ChaikaCore_.io} を経由して利用すること。
  * @constructor
  */
 function ChaikaIO(){
@@ -920,7 +921,7 @@ ChaikaIO.prototype = {
             converterInputStream.init(fileInputStream, charset, 1024*8,
                     Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
         return converterInputStream;
@@ -957,7 +958,7 @@ ChaikaIO.prototype = {
             converterOutputStream.init(fileOutputStream, charset, 0,
                     Ci.nsIConverterInputStream.DEFAULT_REPLACEMENT_CHARACTER);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
 
@@ -978,7 +979,7 @@ ChaikaIO.prototype = {
         try{
             stream = this.getFileInputStream(aFile, aCharset);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
 
@@ -989,7 +990,7 @@ ChaikaIO.prototype = {
                 result.push(str.value);
             }
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }finally{
             stream.close();
@@ -1014,7 +1015,7 @@ ChaikaIO.prototype = {
             if(suspects.length > 0){
                 fileString = this.readUnknownEncodingString(file, overrideOrigFile, suspects);
             }else{
-                ChaikaCore.logger.error('Unable to read string from ' + file.leafName + ': Unknown Encoding');
+                ChaikaCore_.logger.error('Unable to read string from ' + file.leafName + ': Unknown Encoding');
                 return null;
             }
         }
@@ -1036,16 +1037,16 @@ ChaikaIO.prototype = {
     writeString: function ChaikaIO_writeString(aFile, aCharset, aAppend, aContent){
         var stream;
         try{
-            stream = ChaikaCore.io.getFileOutputStream(aFile, aCharset, aAppend);
+            stream = ChaikaCore_.io.getFileOutputStream(aFile, aCharset, aAppend);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }
 
         try{
             stream.writeString(aContent);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }finally{
             stream.close();
@@ -1074,7 +1075,7 @@ ChaikaIO.prototype = {
 
             result.push(binaryStream.readBytes(binaryStream.available()));
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }finally{
             // binaryStream.close();
@@ -1108,7 +1109,7 @@ ChaikaIO.prototype = {
             fileStream.write(content, content.length);
             fileStream.flush();
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
             throw makeException(ex.result);
         }finally{
             fileStream.close();
@@ -1150,7 +1151,7 @@ ChaikaIO.prototype = {
 
             return true;
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(ex);
         }
 
         return false;
@@ -1214,7 +1215,7 @@ ChaikaIO.prototype = {
 
 /**
  * 履歴を管理するオブジェクト。
- * {@link ChaikaCore.history} を経由して利用すること。
+ * {@link ChaikaCore_.history} を経由して利用すること。
  * @constructor
  */
 function ChaikaHistory(){
@@ -1226,7 +1227,7 @@ ChaikaHistory.prototype = {
     _startup: function ChaikaHistory__startup(){
         var sql = "";
         this._statement = [];
-        var storage = ChaikaCore.storage;
+        var storage = ChaikaCore_.storage;
 
         sql = "SELECT ROWID FROM history WHERE id=?1";
         this._statement["visitPage_SelectID"] = storage.createStatement(sql);
@@ -1247,13 +1248,13 @@ ChaikaHistory.prototype = {
 
     visitPage: function ChaikaHistory_visitPage(aURL, aID, aTitle, aType){
         //プライベートモードの時は履歴に残さない
-        var win = ChaikaCore.browser.getBrowserWindow();
+        var win = ChaikaCore_.browser.getBrowserWindow();
         if(PrivateBrowsingUtils.isWindowPrivate(win)) return;
 
-        ChaikaCore.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
+        ChaikaCore_.logger.debug([aURL.spec, aID, /*aTitle,*/ aType]);
 
-        var title = ChaikaCore.io.unescapeHTML(aTitle);
-        var storage = ChaikaCore.storage;
+        var title = ChaikaCore_.io.unescapeHTML(aTitle);
+        var storage = ChaikaCore_.storage;
 
         storage.beginTransaction();
         try{
@@ -1286,8 +1287,8 @@ ChaikaHistory.prototype = {
             }
 
         }catch(ex){
-            ChaikaCore.logger.error(storage.lastErrorString);
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(storage.lastErrorString);
+            ChaikaCore_.logger.error(ex);
             return false;
         }finally{
             storage.commitTransaction();
@@ -1298,13 +1299,13 @@ ChaikaHistory.prototype = {
 
 
     clearHistory: function ChaikaHistory_clearHistory(){
-        var storage = ChaikaCore.storage;
+        var storage = ChaikaCore_.storage;
         storage.beginTransaction();
         try{
             storage.executeSimpleSQL("DELETE FROM history;");
         }catch(ex){
-            ChaikaCore.logger.error(storage.lastErrorString);
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(storage.lastErrorString);
+            ChaikaCore_.logger.error(ex);
         }finally{
             storage.commitTransaction();
         }
@@ -1313,10 +1314,38 @@ ChaikaHistory.prototype = {
         try{
             storage.executeSimpleSQL("VACUUM");
         }catch(ex){
-            ChaikaCore.logger.error(storage.lastErrorString);
-            ChaikaCore.logger.error(ex);
+            ChaikaCore_.logger.error(storage.lastErrorString);
+            ChaikaCore_.logger.error(ex);
         }
         */
     }
 
 };
+
+
+const loggerLevel = Services.prefs.getIntPref("extensions.chaika.logger.level");
+
+var ChaikaCore = new Proxy(ChaikaCore_, {
+
+    get: function(target, name, receiver){
+        const caller = Components.stack.caller;
+
+        // Warn deprecation when ChaikaCore is used from outside of ChaikaCore.
+        if(name !== 'initialized' && !caller.name.startsWith('ChaikaCore')){
+            // If the logging level is set to higher than INFO,
+            // we suppress the warning about the usage from inside of chaika,
+            // because ChaikaCore is still widely used in the chaika codebase.
+            if(loggerLevel > 40 && /:\/\/chaika|chaika@chaika\.xrea\.jp/.test(caller.filename)){
+                // Do not warn
+            }else{
+                Deprecated.warning('ChaikaCore is deprecated. It will be removed from chaika in the future.',
+                                   'https://github.com/chaika/chaika/issues/234');
+            }
+        }
+
+        if(name in target){
+            return target[name];
+        }
+    }
+
+});
