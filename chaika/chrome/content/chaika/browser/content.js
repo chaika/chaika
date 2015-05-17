@@ -19,7 +19,7 @@ let ChaikaBrowserContent = {
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
 
         // We should initialize ChaikaRedirector in the content process
-        // to allow nsIContentPolicy to handle http requests made in the content.
+        // so that nsISimpleContentPolicy can handle http-requests made in the content.
         if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled")){
             ChaikaRedirector.init();
         }

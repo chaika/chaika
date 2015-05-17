@@ -1,28 +1,29 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaRedirector"];
+"use strict";
 
+this.EXPORTED_SYMBOLS = ["ChaikaRedirector"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
+let { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
+let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { ChaikaURLUtil } = Cu.import('resource://chaika-modules/ChaikaURLUtil.js', {});
 
 
 /**
- * スレッドリダイレクタ機能を提供する
- * http 通信を補足するため, content プロセスから呼ばれる必要がある
+ * Thread Redirector to redirect from normal-view to chaika-view automatically.
+ * This module should be initialized from the content process to handle connections made in the content.
  */
 let ChaikaRedirector = {
 
     classDescription: "chaika thread redirector",
     classID: Components.ID("{a0f48aef-8a53-4bab-acd5-9618cbb67e14}"),
     contractID: "@chaika.xrea.jp/redirector;1",
-    xpcom_categories: ['content-policy'],
+    xpcom_categories: ['simple-content-policy'],
 
     QueryInterface: XPCOMUtils.generateQI([
-        Ci.nsIContentPolicy,
+        Ci.nsISimpleContentPolicy,
         Ci.nsISupportsWeakReference,
         Ci.nsIObserver,
         Ci.nsISupports,
@@ -88,26 +89,26 @@ let ChaikaRedirector = {
     },
 
 
-    shouldLoad: function(aContentType, aLocation, aRequestOrigin, aContext, aMimeType, aExtra){
+    shouldLoad: function(aContentType, aLocation, aRequestOrigin){
         // Don't redirect if the page is not HTTP document.
-        if(aContentType !== Ci.nsIContentPolicy.TYPE_DOCUMENT) return Ci.nsIContentPolicy.ACCEPT;
-        if(!aLocation.scheme.startsWith('http')) return Ci.nsIContentPolicy.ACCEPT;
+        if(aContentType !== Ci.nsISimpleContentPolicy.TYPE_DOCUMENT) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(!aLocation.scheme.startsWith('http')) return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is loaded from localhost or chrome.
         if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.throw_bookmarks") && aRequestOrigin){
             if(aRequestOrigin.host === "127.0.0.1" || aRequestOrigin.scheme === "chrome"){
-                return Ci.nsIContentPolicy.ACCEPT;
+                return Ci.nsISimpleContentPolicy.ACCEPT;
             }
         }
 
         // Don't redirect if the page is chaika-view.
-        if(ChaikaURLUtil.isChaikafied(aLocation.spec)) return Ci.nsIContentPolicy.ACCEPT;
+        if(ChaikaURLUtil.isChaikafied(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is not BBS.
-        if(!ChaikaURLUtil.isBBS(aLocation.spec)) return Ci.nsIContentPolicy.ACCEPT;
+        if(!ChaikaURLUtil.isBBS(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is forced to load as normal web-view.
-        if(aLocation.spec.contains('?chaika_force_browser=1')) return Ci.nsIContentPolicy.ACCEPT;
+        if(aLocation.spec.contains('?chaika_force_browser=1')) return Ci.nsISimpleContentPolicy.ACCEPT;
 
 
         // Redirect to chaika-view page!
@@ -123,12 +124,12 @@ let ChaikaRedirector = {
 
         aLocation.spec = redirectTo;
 
-        return Ci.nsIContentPolicy.ACCEPT;
+        return Ci.nsISimpleContentPolicy.ACCEPT;
     },
 
 
-    shouldProcess: function(aContentType, aContentLocation, aRequestOrigin, aContext, aMimeType, aExtra){
-        return Ci.nsIContentPolicy.ACCEPT;
+    shouldProcess: function(){
+        return Ci.nsISimpleContentPolicy.ACCEPT;
     },
 
 
