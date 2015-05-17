@@ -1130,12 +1130,6 @@ ChaikaIO.prototype = {
         }
 
         try{
-            // 関連づけられたファイラで開く
-            aFile.launch();
-            return true;
-        }catch(ex){}
-
-        try{
             // OS の機能で開く
             // aFile がファイルの場合にはファイルを内包しているフォルダを開く
             aFile.reveal();
