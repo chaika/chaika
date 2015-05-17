@@ -50,7 +50,7 @@ let Logger = {
 
     observe: function(aSubject, aTopic, aData){
         if(aData === 'extensions.chaika.logger.level'){
-            this._level = aSubject.getIntPref('extensions.chaika.logger.level');
+            this._level = Services.prefs.getIntPref('extensions.chaika.logger.level');
         }
     },
 
