@@ -188,13 +188,7 @@ AATreeView.prototype = {
         this._visibleNodes = this._visibleNodes.filter((node) => {
             if(!node) return false;
 
-            if(node.matches){
-                //Firefox 34+
-                return !node.matches('folder:not([opened]) *');
-            }else{
-                //Firefox 34-
-                return !node.mozMatchesSelector('folder:not([opened]) *');
-            }
+            return !node.matches('folder:not([opened]) *');
         });
 
         this._visibleNodes.forEach((node) => {
@@ -343,15 +337,8 @@ AATreeView.prototype = {
     isSorted: function(){ return false; },
 
     canAppend: function(sourceNode, parentNode){
-        try{
-            // For Firefox 32+
-            return parentNode.childNodes.length ===
-                   parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
-        }catch(ex){
-            // For Firefox 31- (slower)
-            return Array.slice(parentNode.childNodes)
-                        .every((node) => node.nodeName === sourceNode.nodeName);
-        }
+        return parentNode.childNodes.length ===
+               parentNode.querySelectorAll(':scope > ' + sourceNode.nodeName).length;
     },
 
     canDrop: function(targetIndex, orientation, dataTransfer){

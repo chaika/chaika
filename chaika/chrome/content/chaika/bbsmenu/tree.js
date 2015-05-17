@@ -53,13 +53,7 @@
             this._visibleNodes = this._visibleNodes.filter((node) => {
                 if(!node) return false;
 
-                if(node.matches){
-                    //Firefox 34+
-                    return !node.matches(':root *:not([opened]) *');
-                }else{
-                    //Firefox 34-
-                    return !node.mozMatchesSelector(':root *:not([opened]) *');
-                }
+                return !node.matches(':root *:not([opened]) *');
             });
 
             this._visibleNodes.forEach((node) => {
