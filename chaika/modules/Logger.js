@@ -1,13 +1,13 @@
 /* See license.txt for terms of usage */
 
-const EXPORTED_SYMBOLS = ["Logger"];
+'use strict';
 
+this.EXPORTED_SYMBOLS = ["Logger"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://gre/modules/Log.jsm");
+let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { Log } = Cu.import("resource://gre/modules/Log.jsm", {});
 
 
 let Logger = {
