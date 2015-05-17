@@ -350,6 +350,35 @@ var ChaikaCore = {
 
 
     /**
+    * Chaika がスレッド表示に使用するローカルサーバの URL を返す。
+    * @return {nsIURL}
+    */
+    getServerURL: function ChaikaCore_getServerURL(){
+       if(!this._serverURL){
+           var port = 0;
+           try{
+               var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
+               if(appInfo.name == "Firefox"){
+                   port = this.pref.getInt("server_port.firefox");
+               }else if(appInfo.name == "SeaMonkey"){
+                   port = this.pref.getInt("server_port.seamonkey");
+               }else{
+                   port = this.pref.getInt("server_port.other");
+               }
+           }catch(ex){
+               this.logger.error(ex);
+               port = this.pref.getInt("server_port.other");
+           }
+
+           var spec = "http://127.0.0.1:" + port;
+           var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+           this._serverURL = ioService.newURI(spec, null, null);
+       }
+       return this._serverURL.clone().QueryInterface(Ci.nsIURL);
+    },
+
+
+    /**
      * プロクシや UserAgent などの設定を施した nsIHttpChannel を返す。
      * @param {nsIURI} aURL nsIHttpChannel を作成する URL
      * @return {nsIHttpChannel}
