@@ -1,11 +1,14 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaSearch"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+'use strict';
+
+this.EXPORTED_SYMBOLS = ["ChaikaSearch"];
 
 const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+
+let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
+
 
 /**
  * chaika のスレッド検索を行うクラス
@@ -114,7 +117,7 @@ var ChaikaSearch = {
         folder.appendRelativePath('search');
 
         if(!folder.exists()){
-            folder.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+            folder.create(Ci.nsIFile.DIRECTORY_TYPE, Number.parseInt('0755', 8));
         }
 
         return folder;
