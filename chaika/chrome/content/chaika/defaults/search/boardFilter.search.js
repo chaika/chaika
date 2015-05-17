@@ -19,7 +19,7 @@ var BoardFilter = {
         return ChaikaBBSMenu.getXML().then((xml) => {
             let results = xml.querySelectorAll('[title*="' + query + '"]');
 
-            return Array.slice(results).map((node) => {
+            return Array.from(results).map((node) => {
                 return {
                     title: node.getAttribute('title'),
                     url: node.getAttribute('url')

@@ -21,7 +21,7 @@ var $ = {
      */
     klass: function(className, parent, noExtract){
         let result = (parent || document).getElementsByClassName(className);
-        return noExtract || result.length > 1 ? Array.slice(result) : result[0];
+        return noExtract || result.length > 1 ? Array.from(result) : result[0];
     },
 
     /**
@@ -31,7 +31,7 @@ var $ = {
      * @return {Array.<Node>}
      */
     tag: function(tagName, parent){
-        return Array.slice((parent || document).getElementsByTagName(tagName));
+        return Array.from((parent || document).getElementsByTagName(tagName));
     },
 
     /**
@@ -51,7 +51,7 @@ var $ = {
      * @return {Array.<Node>}
      */
     selectorAll: function(selector, parent){
-        return Array.slice((parent || document).querySelectorAll(selector));
+        return Array.from((parent || document).querySelectorAll(selector));
     },
 
     /**

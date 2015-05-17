@@ -49,7 +49,7 @@ var Refind2ch = {
                 let results = doc.querySelectorAll('#search_results > .thread_url');
                 let boards = [];
 
-                Array.slice(results).forEach((thread) => {
+                Array.from(results).forEach((thread) => {
                     let thread_title = thread.querySelector('.thread_title').textContent;
                     let thread_url = thread.getAttribute('href');
                     let thread_posts = Number.parseInt(thread.querySelector('.res_num').textContent);

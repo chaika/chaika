@@ -213,7 +213,7 @@
                     let match = groupNode.querySelector('caption > .match').selectedItem.label;
                     let rules = groupNode.querySelectorAll(':scope > .rules > :-moz-any(.rule, .group)');
 
-                    groupLabel = Array.slice(rules).map((node) => {
+                    groupLabel = Array.from(rules).map((node) => {
                         if(node.classList.contains('rule')){
                             let target = node.querySelector('.rule-target').selectedItem.label;
                             let query = node.querySelector('.rule-query').value;
@@ -254,7 +254,7 @@
 
                     let rules = groupNode.querySelectorAll(':scope > .rules > :-moz-any(.rule, .group)');
 
-                    groupData.rules = Array.slice(rules).map((node) => {
+                    groupData.rules = Array.from(rules).map((node) => {
                         if(node.classList.contains('rule')){
                             return {
                                 target: node.querySelector('.rule-target').value,

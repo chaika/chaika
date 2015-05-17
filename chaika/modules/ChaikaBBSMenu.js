@@ -121,7 +121,7 @@ let ChaikaBBSMenu = {
 
     _parseXML: function(xmlString){
         let doc = this._parser.parseFromString(xmlString, "application/xml");
-        let subSources = Array.slice(doc.querySelectorAll('bbsmenu[src]'));
+        let subSources = Array.from(doc.querySelectorAll('bbsmenu[src]'));
 
         return Promise.all(subSources.map((source) => {
             let url = source.getAttribute('src');
@@ -142,7 +142,7 @@ let ChaikaBBSMenu = {
             subDocs.forEach((subDoc, index) => {
                 let sourceNode = subSources[index];
 
-                Array.slice(subDoc.documentElement.childNodes).forEach((node) => {
+                Array.from(subDoc.documentElement.childNodes).forEach((node) => {
                     let importedNode = doc.importNode(node, true);
 
                     sourceNode.parentNode.insertBefore(importedNode, sourceNode);
@@ -167,7 +167,7 @@ let ChaikaBBSMenu = {
         let targetNodes = htmlDoc.querySelectorAll('b, a[href]');
         let currentCategoryNode;
 
-        Array.slice(targetNodes).forEach((node) => {
+        Array.from(targetNodes).forEach((node) => {
             switch(node.nodeName.toLowerCase()){
                 case 'b': {
                     currentCategoryNode = xmlDoc.createElement('category');

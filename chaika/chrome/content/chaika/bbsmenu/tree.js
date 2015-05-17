@@ -46,7 +46,7 @@
         },
 
         _buildVisibleNodes: function(){
-            this._visibleNodes = Array.slice(
+            this._visibleNodes = Array.from(
                 this._xml.querySelectorAll(':root > *, [opened] > *')
             );
 
@@ -242,7 +242,7 @@
             }else{
                 // Exclusive open/close
                 if(ChaikaCore.pref.getBool('bbsmenu.toggle_open_container')){
-                    Array.slice(this._xml.querySelectorAll('[opened]')).forEach((node) => {
+                    Array.from(this._xml.querySelectorAll('[opened]')).forEach((node) => {
                         // Exclude ancestors of the folder to open
                         if(node.querySelector('[title="' + folder.getAttribute('title') + '"]')){
                             return;

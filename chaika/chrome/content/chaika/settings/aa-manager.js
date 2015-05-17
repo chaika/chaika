@@ -183,7 +183,7 @@ AATreeView.prototype = {
     },
 
     _buildVisibleNodes: function(){
-        this._visibleNodes = Array.slice(this._xml.querySelectorAll(':root > folder, folder[opened] > :-moz-any(folder, aa)'));
+        this._visibleNodes = Array.from(this._xml.querySelectorAll(':root > folder, folder[opened] > :-moz-any(folder, aa)'));
 
         this._visibleNodes = this._visibleNodes.filter((node) => {
             if(!node) return false;

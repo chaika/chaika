@@ -37,7 +37,7 @@ var Ff2ch = {
 
                 let threads = doc.getElementsByTagName('item');
 
-                Array.slice(threads).forEach(thread => {
+                Array.from(threads).forEach(thread => {
                     let threadTitle = thread.querySelector('title').textContent.replace(/\s*\((\d+)\)$/, '');
                     let threadPosts = RegExp.$1;
                     let threadURL = thread.querySelector('guid').textContent.replace(/\d+-\d+$/, '');
