@@ -6,12 +6,9 @@
 
     const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-
-    Cu.import("resource://gre/modules/Services.jsm");
-    Cu.import("resource://gre/modules/PopupNotifications.jsm");
-    Cu.import("resource://chaika-modules/ChaikaCore.js");
-    Cu.import('resource://chaika-modules/ChaikaAddonInfo.js');
-    Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
+    let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
+    let { ChaikaAddonInfo } = Cu.import('resource://chaika-modules/ChaikaAddonInfo.js', {});
+    let { ChaikaURLUtil } = Cu.import('resource://chaika-modules/ChaikaURLUtil.js', {});
 
 
     /**
