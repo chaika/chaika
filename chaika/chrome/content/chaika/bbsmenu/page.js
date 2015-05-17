@@ -133,10 +133,10 @@
 
         /**
          * フォルダを開く
-         * @param {nsIFile} aDir 開くフォルダ
+         * @param {nsIFile} aFile 開くファイルまたはフォルダ
          */
-        _openFolder: function(aDir){
-            ChaikaCore.io.reveal(aDir);
+        _openFile: function(aFile){
+            ChaikaCore.io.reveal(aFile);
         },
 
 
@@ -172,7 +172,23 @@
             let favBoardFile = ChaikaCore.getDataDir();
             favBoardFile.appendRelativePath('favorite_boards.xml');
 
-            this._openFolder(favBoardFile);
+            if(ChaikaCore.pref.getBool('bbsmenu.open_favs_in_scratchpad')){
+                let { ScratchpadManager } = Cu.import('resource:///modules/devtools/scratchpad-manager.jsm', {});
+                let win = ScratchpadManager.openScratchpad();
+
+                win.addEventListener('load', () => {
+                    win.Scratchpad.addObserver({
+                        onReady: () => {
+                            win.Scratchpad.removeObserver(this);
+                            win.Scratchpad.importFromFile(favBoardFile, false, () => {
+                                win.Scratchpad.editor.setMode({ name: 'xml' });
+                            });
+                        }
+                    });
+                });
+            }else{
+                this._openFile(favBoardFile);
+            }
         },
 
         openLogManager: function(){
@@ -196,7 +212,7 @@
 
 
         openDataFolder: function(){
-            this._openFolder(ChaikaCore.getDataDir());
+            this._openFile(ChaikaCore.getDataDir());
         },
 
 
@@ -204,7 +220,7 @@
             let skinDir = ChaikaCore.getDataDir();
 
             skinDir.appendRelativePath('skin');
-            this._openFolder(skinDir);
+            this._openFile(skinDir);
         },
 
 
@@ -212,12 +228,12 @@
             let pluginFolder = ChaikaCore.getDataDir();
 
             pluginFolder.appendRelativePath('search');
-            this._openFolder(pluginFolder);
+            this._openFile(pluginFolder);
         },
 
 
         openLogFolder: function(){
-            this._openFolder(ChaikaCore.getLogDir());
+            this._openFile(ChaikaCore.getLogDir());
         },
 
 

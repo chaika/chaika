@@ -98,6 +98,7 @@ pref("extensions.chaika.login.p2.password", "");
 
 // bbsmenu (the list of boards)
 pref("extensions.chaika.bbsmenu.add_chaika_boards", true);
+pref("extensions.chaika.bbsmenu.open_favs_in_scratchpad", true);
 pref('extensions.chaika.bbsmenu.search.default_engine_name', '00.dig.2ch.net');
 pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
