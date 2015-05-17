@@ -40,8 +40,6 @@ var ChaikaSearch = {
         let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
         let files = pluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
 
-        this.plugins.length = 0;
-
         while(true){
             let file = files.nextFile;
             if(!file) break;
