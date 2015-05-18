@@ -660,15 +660,26 @@ var FormPage = {
         relatedAddons.then((addonList) => {
             template += "【ユーザーエージェント】" + userAgent + '\n';
             template += "【使用スキン】" + skinName + '\n';
-            template += "【関連アドオン】\n" + (addonList.join('\n') || '(なし)');
-            template += '\n\n';
+
+            if(addonList.length > 0){
+                template += "【関連アドオン】\n" + addonList.join('\n') + '\n\n';
+            }else{
+                template += '【関連アドオン】(なし)\n';
+            }
+
+            if(userAgent.contains('pre')){
+                template += '【コミットハッシュ】※ コミットハッシュは git rev-parse HEAD にて取得できます\n\n';
+            }
 
             if(detailed){
                 let changedPrefs = this._getChangedPrefList();
                 template += '【変更した設定値】\n' + changedPrefs.join('\n') + '\n\n';
             }
 
-            template += '【不具合の内容・再現手順】\n';
+            template += '【不具合の再現手順】\n' +
+                        '1. \n\n' +
+                        '【期待される現象・結果】\n\n' +
+                        '【実際に起こる現象・結果】\n';
 
             this._messeageForm.value += template;
         });
