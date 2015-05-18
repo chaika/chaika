@@ -90,7 +90,7 @@
 
 
         search: function(query, engine){
-            if(query === ''){
+            if(query === '' || query === undefined){
                 // 検索ボックスがクリアされた時は BBSMENU を表示する
                 ChaikaBBSMenu.getXML().then((xml) => {
                     this._treeView.build(xml);
