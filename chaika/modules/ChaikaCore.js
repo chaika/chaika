@@ -8,7 +8,7 @@ Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import('resource://gre/modules/Deprecated.jsm');
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
-Components.utils.import("resource://chaika-modules/ChaikaURLUtil.js");
+Components.utils.import("resource://chaika-modules/URLUtils.js");
 
 
 const Ci = Components.interfaces;
@@ -759,7 +759,7 @@ ChaikaBrowser.prototype = {
         }
 
         if(!aOpenBrowser){
-            threadURL = ioService.newURI(ChaikaURLUtil.chaikafy(threadURL.spec), null, null);
+            threadURL = ioService.newURI(URLUtils.chaikafy(threadURL.spec), null, null);
         }else if(ChaikaCore_.pref.getBool("browser.redirector.enabled")){
             // スレッドリダイレクタを回避
             threadURL = ioService.newURI(threadURL.spec + '?chaika_force_browser=1', null, null);

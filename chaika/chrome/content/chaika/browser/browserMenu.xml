@@ -123,7 +123,7 @@
             Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
-            Components.utils.import("resource://chaika-modules/ChaikaURLUtil.js", this);
+            Components.utils.import("resource://chaika-modules/URLUtils.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
 
             this.classList.add('chaika-browser-menu');
@@ -145,10 +145,10 @@
             <body><![CDATA[
                 let url = gBrowser.currentURI.spec;
 
-                if(!this.ChaikaURLUtil.isThread(url)){
+                if(!this.URLUtils.isThread(url)){
                     return null;
                 }else{
-                    return Services.io.newURI(this.ChaikaURLUtil.unchaikafy(url), null, null);
+                    return Services.io.newURI(this.URLUtils.unchaikafy(url), null, null);
                 }
             ]]></body>
         </method>
@@ -164,12 +164,12 @@
             <body><![CDATA[
                 let url = gBrowser.currentURI.spec;
 
-                if(this.ChaikaURLUtil.isThread(url)){
+                if(this.URLUtils.isThread(url)){
                     return this.ChaikaThread.getBoardURL(this._getCurrentThreadURL());
                 }
 
-                if(this.ChaikaURLUtil.isBoard(url)){
-                    return Services.io.newURI(this.ChaikaURLUtil.unchaikafy(url), null, null);
+                if(this.URLUtils.isBoard(url)){
+                    return Services.io.newURI(this.URLUtils.unchaikafy(url), null, null);
                 }
 
                 return null;
@@ -269,15 +269,15 @@
             <body><![CDATA[
                 const url = gBrowser.currentURI.spec;
 
-                const isOnBBS = this.ChaikaURLUtil.isBBS(url);
-                const isOnChaika = this.ChaikaURLUtil.isChaikafied(url);
-                const isOnThread = this.ChaikaURLUtil.isThread(url);
-                const isOnBoard = this.ChaikaURLUtil.isBoard(url);
+                const isOnBBS = this.URLUtils.isBBS(url);
+                const isOnChaika = this.URLUtils.isChaikafied(url);
+                const isOnThread = this.URLUtils.isThread(url);
+                const isOnBoard = this.URLUtils.isBoard(url);
 
                 const isContextMenu = !!gContextMenu;
                 const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
                 const isOnBBSLink = isContextMenu && gContextMenu.onLink &&
-                                    this.ChaikaURLUtil.isBBS(this._getLinkURL().spec);
+                                    this.URLUtils.isBBS(this._getLinkURL().spec);
 
                 let root = this;
 
@@ -717,7 +717,7 @@
                 if(!url) return;
 
                 try{
-                    if(this.ChaikaURLUtil.isBoard(url.spec)){
+                    if(this.URLUtils.isBoard(url.spec)){
                         this.ChaikaCore.browser.openBoard(url, aAddTab);
                     }else{
                         this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, false);
@@ -757,7 +757,7 @@
         <!--
         /**
          * スレッドの表示オプションを変更する
-         * @param {String} aOption 表示オプション "l30", "45-", ""(すべて表示) など
+         * @param {String} aOption 表���オプション "l30", "45-", ""(すべて表示) など
          * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
          */
         -->
@@ -776,7 +776,7 @@
 
                     threadURL = Services.io.newURI('./' + aOption, null, threadPlainURL);
                     this.ChaikaCore.browser.openThread(threadURL, aAddTab, false,
-                                                       !this.ChaikaURLUtil.isChaikafied(currentURL.spec));
+                                                       !this.URLUtils.isChaikafied(currentURL.spec));
                 }catch(ex){
                     this.ChaikaCore.logger.error(ex);
                 }
@@ -798,7 +798,7 @@
                 if(boardURL){
                     let currentURI = gBrowser.currentURI;
 
-                    if(this.ChaikaURLUtil.isChaikafied(currentURI.spec)){
+                    if(this.URLUtils.isChaikafied(currentURI.spec)){
                         this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
                     }else{
                         this.ChaikaCore.browser.openURL(boardURL, aAddTab);

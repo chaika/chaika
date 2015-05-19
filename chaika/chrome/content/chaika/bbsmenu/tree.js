@@ -8,7 +8,7 @@
 
     let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
-    let { ChaikaURLUtil }  = Cu.import("resource://chaika-modules/ChaikaURLUtil.js", {});
+    let { URLUtils }  = Cu.import("resource://chaika-modules/URLUtils.js", {});
 
 
     /**
@@ -92,7 +92,7 @@
 
             let node = this._visibleNodes[row.value];
 
-            return ChaikaURLUtil.isBBS(node.getAttribute('url'));
+            return URLUtils.isBBS(node.getAttribute('url'));
         },
 
         handleClick: function(event){
@@ -124,9 +124,9 @@
         _openURL: function(url, inNewTab){
             let uri = Services.io.newURI(url, null, null);
 
-            if(ChaikaURLUtil.isBoard(url)){
+            if(URLUtils.isBoard(url)){
                 ChaikaCore.browser.openBoard(uri, inNewTab);
-            }else if(ChaikaURLUtil.isThread(url)){
+            }else if(URLUtils.isThread(url)){
                 ChaikaCore.browser.openThread(uri, inNewTab);
             }else{
                 ChaikaCore.browser.openURL(uri, inNewTab);

@@ -8,7 +8,7 @@
 
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
     let { ChaikaAddonInfo } = Cu.import('resource://chaika-modules/ChaikaAddonInfo.js', {});
-    let { ChaikaURLUtil } = Cu.import('resource://chaika-modules/ChaikaURLUtil.js', {});
+    let { URLUtils } = Cu.import('resource://chaika-modules/URLUtils.js', {});
 
 
     /**
@@ -286,8 +286,8 @@
             // Show/hide the context menu
             const showOnlyOnBBS = ChaikaCore.pref.getBool('contextmenu.show_only_on_bbs');
             const showOnBBSLink = ChaikaCore.pref.getBool('contextmenu.always_show_open_link');
-            const isOnBBS = ChaikaURLUtil.isBBS(gBrowser.currentURI.spec);
-            const isOnBBSLink = gContextMenu.onLink && ChaikaURLUtil.isBBS(BrowserMenu._getLinkURL().spec);
+            const isOnBBS = URLUtils.isBBS(gBrowser.currentURI.spec);
+            const isOnBBSLink = gContextMenu.onLink && URLUtils.isBBS(BrowserMenu._getLinkURL().spec);
 
             if(showOnlyOnBBS && !isOnBBS){
                 if(!showOnBBSLink || (showOnBBSLink && !isOnBBSLink)){
@@ -347,7 +347,7 @@
             }
 
             this._toolbarbutton.hidden = aLocation.spec !== 'about:customizing' &&
-                                         !ChaikaURLUtil.isBBS(aLocation.spec);
+                                         !URLUtils.isBBS(aLocation.spec);
         },
 
     };

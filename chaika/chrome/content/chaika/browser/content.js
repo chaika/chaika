@@ -4,7 +4,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import('resource://chaika-modules/ChaikaRedirector.js');
-Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
+Cu.import('resource://chaika-modules/URLUtils.js');
 
 
 /**
@@ -28,12 +28,12 @@ let ChaikaBrowserContent = {
 
     handleMessage: function(message){
         if(!message.name.startsWith('chaika-')) return;
-        if(!ChaikaURLUtil.isChaikafied(content.location.href)) return;
+        if(!URLUtils.isChaikafied(content.location.href)) return;
 
 
         switch(message.name){
             case 'chaika-skin-changed':
-                if(ChaikaURLUtil.isThread(content.location.href)){
+                if(URLUtils.isThread(content.location.href)){
                     content.location.reload();
                 }
                 break;

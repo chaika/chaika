@@ -8,7 +8,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
-let { ChaikaURLUtil } = Cu.import('resource://chaika-modules/ChaikaURLUtil.js', {});
+let { URLUtils } = Cu.import('resource://chaika-modules/URLUtils.js', {});
 
 
 /**
@@ -102,17 +102,17 @@ let ChaikaRedirector = {
         }
 
         // Don't redirect if the page is chaika-view.
-        if(ChaikaURLUtil.isChaikafied(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(URLUtils.isChaikafied(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is not BBS.
-        if(!ChaikaURLUtil.isBBS(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(!URLUtils.isBBS(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is forced to load as normal web-view.
         if(aLocation.spec.contains('?chaika_force_browser=1')) return Ci.nsISimpleContentPolicy.ACCEPT;
 
 
         // Redirect to chaika-view page!
-        let redirectTo = ChaikaURLUtil.chaikafy(aLocation.spec);
+        let redirectTo = URLUtils.chaikafy(aLocation.spec);
 
         // Replace view limit
         let replaceViewLimit = Services.prefs.getBoolPref("extensions.chaika.browser.redirector.replace_view_limit");

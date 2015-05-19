@@ -2,7 +2,7 @@
 
 'use strict';
 
-this.EXPORTED_SYMBOLS = ["ChaikaURLUtil"];
+this.EXPORTED_SYMBOLS = ["URLUtils"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
@@ -32,7 +32,7 @@ const EXCLUDE_DOMAINS = [
 /**
  * URL に対し, chaika が絡む処理をまとめる
  */
-let ChaikaURLUtil = {
+let URLUtils = {
 
     /**
      * The URL of the local server.
