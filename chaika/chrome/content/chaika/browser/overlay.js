@@ -8,7 +8,7 @@
 
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
     let { ChaikaAddonInfo } = Cu.import('resource://chaika-modules/ChaikaAddonInfo.js', {});
-    let { URLUtils } = Cu.import('resource://chaika-modules/URLUtils.js', {});
+    let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 
 
     /**

@@ -8,7 +8,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
-let { URLUtils } = Cu.import('resource://chaika-modules/URLUtils.js', {});
+let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 
 
 /**

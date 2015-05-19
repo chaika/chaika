@@ -8,7 +8,7 @@
 
     let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
-    let { URLUtils }  = Cu.import("resource://chaika-modules/URLUtils.js", {});
+    let { URLUtils }  = Cu.import("resource://chaika-modules/utils/URLUtils.js", {});
 
 
     /**

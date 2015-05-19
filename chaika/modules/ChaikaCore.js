@@ -8,7 +8,7 @@ Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import('resource://gre/modules/Deprecated.jsm');
 Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
-Components.utils.import("resource://chaika-modules/URLUtils.js");
+Components.utils.import("resource://chaika-modules/utils/URLUtils.js");
 
 
 const Ci = Components.interfaces;

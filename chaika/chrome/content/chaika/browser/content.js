@@ -4,7 +4,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import('resource://chaika-modules/ChaikaRedirector.js');
-Cu.import('resource://chaika-modules/URLUtils.js');
+Cu.import('resource://chaika-modules/utils/URLUtils.js');
 
 
 /**

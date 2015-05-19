@@ -123,7 +123,7 @@
             Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
-            Components.utils.import("resource://chaika-modules/URLUtils.js", this);
+            Components.utils.import("resource://chaika-modules/utils/URLUtils.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
 
             this.classList.add('chaika-browser-menu');
@@ -757,7 +757,7 @@
         <!--
         /**
          * スレッドの表示オプションを変更する
-         * @param {String} aOption 表���オプション "l30", "45-", ""(すべて表示) など
+         * @param {String} aOption 表示オプション "l30", "45-", ""(すべて表示) など
          * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
          */
         -->
