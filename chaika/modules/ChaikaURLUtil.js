@@ -1,13 +1,13 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaURLUtil"];
+'use strict';
 
+this.EXPORTED_SYMBOLS = ["ChaikaURLUtil"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import("resource://chaika-modules/ChaikaServer.js");
+let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
 const BBS_DOMAINS = [
