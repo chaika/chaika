@@ -45,6 +45,7 @@ let URLUtils = {
 
 
     /**
+     * Returns true if a URL indicates the page in chaika-view mode.
      * @param {String} aURL
      * @return {Bool}
      */
@@ -54,6 +55,7 @@ let URLUtils = {
 
 
     /**
+     * Returns true if a URL indicates the page is in BBS service, i.e., a board or a thread.
      * @param {String} aURL
      * @return {Bool}
      */
@@ -75,6 +77,8 @@ let URLUtils = {
 
 
     /**
+     * Returns true if a URL indicates the page is a board.
+     * ("Board" is a home page of list of threads about a certain topic.)
      * @param {String} aURL
      * @return {Bool}
      */
@@ -84,6 +88,7 @@ let URLUtils = {
 
 
     /**
+     * Returns true if a URL indicates the page is a thread.
      * @param {String} aURL
      * @return {Bool}
      */
@@ -93,6 +98,7 @@ let URLUtils = {
 
 
     /**
+     * Convert a chaika-mode URL to a normal-mode URL.
      * @param {String} aURL
      * @return {String}
      */
@@ -103,6 +109,7 @@ let URLUtils = {
 
 
     /**
+     * Convert a normal-mode URL to a chaika-mode URL
      * @param {String} aURL
      * @return {String}
      */
