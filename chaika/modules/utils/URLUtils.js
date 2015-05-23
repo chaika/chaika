@@ -177,16 +177,16 @@ ThreadFilter.prototype = {
 
     parse(str, upos) {
         if(str.contains(',') || str.contains('+')){
-            return str.split(/,\+/).map((range) => this._parseRange(range));
+            return str.split(/,\+/).map((range) => this._parseRange(range, upos));
         }else{
             // A blank filter means a request for all posts from the first.
             if(str === ''){
-                return [this._parseRange('1-')];
+                return [this._parseRange('1-', upos)];
             }
 
             // 'n' means a request for all posts except for the first.
             if(str === 'n'){
-                return [this._parseRange('2-')];
+                return [this._parseRange('2-', upos)];
             }
 
             // Simple number
@@ -197,7 +197,7 @@ ThreadFilter.prototype = {
             if(str.contains('n')){
                 return [this._parseRange(str.replace(/n/g, ''))];
             }else{
-                let _range = this._parseRange(str);
+                let _range = this._parseRange(str, upos);
 
                 if(_range.includes(1)){
                     return [_range];
