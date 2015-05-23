@@ -356,21 +356,7 @@ var ChaikaCore_ = {
     */
     getServerURL: function ChaikaCore_getServerURL(){
        if(!this._serverURL){
-           var port = 0;
-           try{
-               var appInfo = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULAppInfo);
-               if(appInfo.name == "Firefox"){
-                   port = this.pref.getInt("server_port.firefox");
-               }else if(appInfo.name == "SeaMonkey"){
-                   port = this.pref.getInt("server_port.seamonkey");
-               }else{
-                   port = this.pref.getInt("server_port.other");
-               }
-           }catch(ex){
-               this.logger.error(ex);
-               port = this.pref.getInt("server_port.other");
-           }
-
+           var port = this.pref.getInt('server.port');
            var spec = "http://127.0.0.1:" + port;
            var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
            this._serverURL = ioService.newURI(spec, null, null);
