@@ -11,6 +11,9 @@ let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
+// We are hard-coding these constants for now,
+// just until finishing the implementation of Pluggable Board Definition and Pluggable Dat Fetching;
+// These will and should be removed on released version.
 const BBS_DOMAINS = [
     '2ch.net',
     'bbspink.com',
