@@ -53,16 +53,16 @@
         <caption class="setting-description" label="ローカルサーバ" />
 
         <hbox align="center">
-            <label value="使用するポート *:" />
+            <label value="使用するポート:" />
             <textbox type="number" min="1" max="65535" size="3"
                      preference="extensions.chaika.server.port" />
         </hbox>
 
-        <checkbox label="サーバの立ち上げに失敗したときに自動的に代替ポートを探す *"
+        <checkbox label="サーバの立ち上げに失敗したときに自動的に代替ポートを探す"
                   preference="extensions.chaika.server.port.retry"
                   tooltiptext="指定したポートが開いていなかった場合に, 空きポートを自動的に探します. ブックマークや開いていたスレッドが一時的に使用できなくなることがあります." />
 
-        <checkbox label="使用するポートを毎回ランダムに選択する *"
+        <checkbox label="使用するポートを毎回ランダムに選択する"
                   preference="extensions.chaika.server.port.randomization"
                   tooltiptext="外部からの意図しないスレッド読み込みを防ぎ, セキュリティ・プライバシーが向上しますが, ブックマークや開いていたスレッドは再起動のたびに無効になります." />
     </groupbox>
