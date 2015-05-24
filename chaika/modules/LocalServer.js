@@ -24,7 +24,6 @@ let LocalServer = {
 
     _startup() {
         this._start(Prefs.get('server.port'));
-        this._registerSkinDirectory();
 
         Prefs.branch.addObserver('server.port', this, false);
         Prefs.branch.addObserver('thread_skin', this, false);
@@ -45,11 +44,20 @@ let LocalServer = {
 
 
     /**
-     * Starting up the local server, listening up the given port.
-     *
+     * Starting up the local server.
      * @param {Number} port the port upon which listening should happen.
      */
     _start(port) {
+        this._listen(port);
+        this._registerSkinDirectory();
+    },
+
+
+    /**
+     * Listening up the given port.
+     * @param {Number} port the port upon which listening should happen.
+     */
+    _listen(port) {
         this._server = new HttpServer();
 
         // port randomization
@@ -61,7 +69,7 @@ let LocalServer = {
         try{
             // Listen the port to establish the local server
             this._server.start(port);
-            Logger.info("Start listening port " + port);
+            Logger.info("The local server is started, listening port " + port);
 
             // Save the original port number to restore it later
             let origPort = Prefs.get('server.port');
@@ -87,7 +95,9 @@ let LocalServer = {
 
 
     _stop() {
-        this._server.stop();
+        this._server.stop(() => {});
+
+        Logger.info('The local server is stopped.');
     },
 
 
