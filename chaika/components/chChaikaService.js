@@ -22,8 +22,8 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaCore.js");
         ChaikaCore._startup();
 
-        Components.utils.import("resource://chaika-modules/ChaikaServer.js");
-        ChaikaServer._startup();
+        Components.utils.import("resource://chaika-modules/LocalServer.js");
+        LocalServer._startup();
 
         Components.utils.import('resource://chaika-modules/ChaikaHttpController.js');
         ChaikaHttpController._startup();
@@ -65,7 +65,7 @@ ChaikaService.prototype = {
         ChaikaRoninLogin._quit();
         ChaikaAboneManager._quit();
         ChaikaHttpController._quit();
-        ChaikaServer._quit();
+        LocalServer._quit();
         ChaikaBBSMenu._quit();
         ChaikaCore._quit();
         Logger.uninit();
