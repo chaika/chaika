@@ -486,15 +486,15 @@ var ResInfo = {
                     }, []);
 
                     anchors.forEach((anchor) => {
-                        let [begin, end] = anchor.split('-');
+                        let [start, end] = anchor.split('-');
 
-                        begin = begin - 0;
-                        end = end ? end - 0 : begin;
+                        start = start - 0;
+                        end = end ? end - 0 : start;
 
-                        if(begin < 1) begin = 1;
+                        if(start < 1) start = 1;
                         if(end > 1001) end = 1001;
 
-                        for(let i = begin; i <= end; i++){
+                        for(let i = start; i <= end; i++){
                             let refNode = $.id('res' + i);
 
                             //範囲外レスはスキップ
@@ -1055,10 +1055,10 @@ Popup.Res = {
         let anchors = target.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g);
 
         Promise.all(anchors.map((anchor) => {
-            let [begin, end] = anchor.split('-');
-            if(!end) end = begin;
+            let [start, end] = anchor.split('-');
+            if(!end) end = start;
 
-            return this._createContent(begin-0, end-0);
+            return this._createContent(start-0, end-0);
         })).then((popupContents) => {
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
@@ -1076,30 +1076,30 @@ Popup.Res = {
 
     /**
      * ポップアップの内容を作成する
-     * @param {Number} aBegin アンカの開始番号
+     * @param {Number} aStart アンカの開始番号
      * @param {Number} aEnd アンカの終了番号
      */
-    _createContent: function(aBegin, aEnd){
+    _createContent: function(aStart, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
         //降順アンカ補正
-        if(aBegin > aEnd) [aEnd, aBegin] = [aBegin, aEnd];
+        if(aStart > aEnd) [aEnd, aStart] = [aStart, aEnd];
 
         //枠外補正
-        if(aBegin < 1) aBegin = 1;
+        if(aStart < 1) aStart = 1;
 
         //POPUP_LIMIT より多い時は省略する
-        let tmpStart = aBegin;
+        let tmpStart = aStart;
         let omitRes = 0;
-        if(POPUP_LIMIT && (aEnd - aBegin) > POPUP_LIMIT){
-            aBegin = aEnd - POPUP_LIMIT;
-            omitRes = aBegin - tmpStart;
+        if(POPUP_LIMIT && (aEnd - aStart) > POPUP_LIMIT){
+            aStart = aEnd - POPUP_LIMIT;
+            omitRes = aStart - tmpStart;
         }
 
         var resNodes = document.createDocumentFragment();
 
         var promise = new Promise((resolve, reject) => {
-            this._fetchResNodes(aBegin, aEnd).then(
+            this._fetchResNodes(aStart, aEnd).then(
                 (posts) => {
                     resNodes.appendChild(posts);
 
@@ -1116,7 +1116,7 @@ Popup.Res = {
 
                     resNodes.appendChild(
                         $.node({ 'p': {
-                            text: '>>' + aBegin + '-' + failedRangeEnd + ' の取得中にエラーが発生しました'
+                            text: '>>' + aStart + '-' + failedRangeEnd + ' の取得中にエラーが発生しました'
                         }})
                     );
 
@@ -1137,17 +1137,17 @@ Popup.Res = {
 
     /**
      * レスの内容を取得する
-     * @param {Number} aBegin アンカの開始番号
+     * @param {Number} aStart アンカの開始番号
      * @param {Number} aEnd アンカの終了番号
      */
-    _fetchResNodes: function(aBegin, aEnd){
+    _fetchResNodes: function(aStart, aEnd){
         var promise = new Promise((resolve, reject) => {
             let resNodes = document.createDocumentFragment();
 
             //表示域内にある場合はそこから取ってくる
             //通常, 表示域外にある可能性が高いのは, アンカ範囲のうち先頭部分であるから,
             //後ろから順に取得していくことにする
-            for(var i = aEnd; i >= aBegin; i--){
+            for(var i = aEnd; i >= aStart; i--){
                 let resNode = $.id('res' + i);
                 if(!resNode) break;
 
@@ -1157,7 +1157,7 @@ Popup.Res = {
             }
 
             //すべて域内だった場合はこれで終了
-            if(i < aBegin){
+            if(i < aStart){
                 return resolve(resNodes);
             }else{
                 aEnd = i;
@@ -1170,7 +1170,7 @@ Popup.Res = {
             req.addEventListener('load', (event) => {
 
                 if(req.status !== 200 || !req.responseText){
-                    console.error('Fail in getting >>' + aBegin + '-' + aEnd, 'status:', req.status);
+                    console.error('Fail in getting >>' + aStart + '-' + aEnd, 'status:', req.status);
                     return reject([resNodes, aEnd]);
                 }
 
@@ -1199,7 +1199,7 @@ Popup.Res = {
                 return resolve(resNodes);
             }, false);
 
-            req.open('GET', SERVER_URL + EXACT_URL + aBegin + "-" + aEnd + "n", true);
+            req.open('GET', SERVER_URL + EXACT_URL + aStart + "-" + aEnd + "n", true);
             req.overrideMimeType('text/html; charset=Shift_JIS');
             req.send(null);
         });

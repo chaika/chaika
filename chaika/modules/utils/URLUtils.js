@@ -226,9 +226,9 @@ ThreadFilter.prototype = {
         }
 
 
-        let [begin, end] = str.split('-');
+        let [start, end] = str.split('-');
 
-        return new Range(begin || undefined, end || undefined);
+        return new Range(start || undefined, end || undefined);
     }
 
 };
