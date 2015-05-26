@@ -16,8 +16,16 @@ let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
 
+/**
+ * Serving skin files and threads using httpd.js server.
+ * @class
+ */
 let LocalServer = {
 
+    /**
+     * URL string representing this server.
+     * @type {String}
+     */
     get serverURL() {
         return 'http://127.0.0.1:' + Prefs.get('server.port');
     },
@@ -97,6 +105,9 @@ let LocalServer = {
     },
 
 
+    /**
+     * Stop listening the port.
+     */
     _stop() {
         this._server.stop(() => {});
 
@@ -113,6 +124,9 @@ let LocalServer = {
     },
 
 
+    /**
+     * Register the skin directory to this server.
+     */
     _registerSkinDirectory() {
         let path = this._getSkinDir();
         let skinDir = new FileUtils.File(path);
@@ -123,6 +137,11 @@ let LocalServer = {
     },
 
 
+    /**
+     * Path of the skin directory.
+     * If a user doesn't specify a skin, Default skin will be selected.
+     * @return {String}
+     */
     _getSkinDir() {
         let path;
         let skinName = Prefs.getUniChar('thread_skin');
@@ -138,6 +157,9 @@ let LocalServer = {
     },
 
 
+    /**
+     * Registering the error handlers that may occur in serving a thread HTML.
+     */
     _registerThreadErrorHandler() {
         this._server.registerErrorHandler(400, ThreadErrorHandler[400]);
         this._server.registerErrorHandler(404, ThreadErrorHandler[404]);
