@@ -12,24 +12,24 @@ this.EXPORTED_SYMBOLS = ["Range"];
  * @param {Number} end = Infinity The end value of the range (exclusive).
  */
 function Range(start = 1, end = Infinity){
-    this._start = start;
-    this._end = end;
+    this.start = start;
+    this.end = end;
     this._value = start;
 }
 
 Range.prototype = {
 
     toString() {
-        return 'Range [' + this._start + ' ... ' + this._end + ']';
+        return 'Range [' + this.start + ' ... ' + this.end + ']';
     },
 
     includes(searchValue) {
-        return searchValue >= this._start &&
-               searchValue <= this._end;
+        return searchValue >= this.start &&
+               searchValue <= this.end;
     },
 
     next() {
-        return this._value < this._end ?
+        return this._value < this.end ?
             { value: this._value++, done: false } :
             { done: true };
     }
