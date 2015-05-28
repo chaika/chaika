@@ -13,6 +13,7 @@ let { HttpServer, HTTP_400, HTTP_404 } = Cu.import('resource://chaika-modules/li
 let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
+let { ChaikaAboneManager } = Cu.import('resource://chaika-modules/ChaikaAboneManager.js', {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
 
@@ -54,7 +55,7 @@ let LocalServer = {
 
     /**
      * Starting up the local server.
-     * @param {Number} port the port upon which listening should happen.
+     * @param {Number} port The port upon which listening should happen.
      */
     _start(port) {
         this._listen(port);
@@ -66,7 +67,7 @@ let LocalServer = {
 
     /**
      * Listening up the given port.
-     * @param {Number} port the port upon which listening should happen.
+     * @param {Number} port The port upon which listening should happen.
      */
     _listen(port) {
         this._server = new HttpServer();
@@ -198,24 +199,196 @@ let ThreadHandler = {
             throw HTTP_400;
         }
 
+        if(url.contains('DEBUG_STATUS_400')){
+            throw HTTP_400;
+        }
+
+        if(url.contains('DEBUG_STATUS_404')){
+            throw HTTP_404;
+        }
+
+
         response.processAsync();
         response.setHeader("Content-Type", "text/html; charset=Shift_JIS");
 
-        //let thread = new Thread(threadURL);
+        let writer = new this.ThreadWriter(url, response);
 
-        response.write(`${url} is a thread!`);
-        response.finish();
+        writer.write().then(() => {
+            response.finish();
+        });
+    },
+};
+
+
+
+/**
+ * Writing the content of the thread which has the given url, to the response.
+ * @param  {String} url      a url for a therad to write.
+ * @param  {nsIHttpResponse} response a HTTP response to which the thread will be written
+ * @constructor
+ */
+ThreadHandler.ThreadWriter = function(url, response) {
+    /**
+     * a url string that represents this thread.
+     * @type {String}
+     */
+    this.url = url;
+
+    /**
+     * HTTP Response
+     * @type {nsIHttpResponse}
+     */
+    this.response = response;
+
+    /**
+     * Thread
+     * @type {Thread}
+     */
+    this.thread = ThreadFactory.create(url);
+
+    /**
+     * Counter of number of posts in this thread.
+     * @type {Object}
+     */
+    this._postCounters = {
+        local: 0,
+        fetched: 0,
+        displayed: 0,
+    };
+};
+
+ThreadHandler.ThreadWriter.prototype = {
+
+    statusText: {
+        OK: "(｀・ω・´)「OK」",
+        ARCHIVED: "( ーωー)「DAT 落ち」",
+        NOT_MODIFIED: "( ーωー)「新着なし」",
+        OFFLINE: "( ーωー)「オフライン」",
+        LOG_PICKUP: "( ーωー)「ログピックアップモード」",
+        LOG_COLLAPSED: "(´・ω・`)「あぼーん発生。スレッドのログを削除した後再読み込みして下さい。」",
+        NETWORK_ERROR: "(´・ω・`)「ネットワークエラー」",
+        ERROR: "(´・ω・`)「エラー」",
+    },
+
+
+    /**
+     * Write the given range of or specified posts of this thread to the response's output.
+     * @return {Promise<void>}
+     */
+    write() {
+        this.fetcher = new ThreadFetcher(this.url);
+        this.parser = new ThreadParser(this.url);
+        this.builder = new ThreadBuilder(this.url);
+
+        let localContent = OS.Files.read(this.thread.source, { encoding: 'Shift_JIS' });
+        let remoteContent = this.fetcher.fetch(this.thread);
+
+        return this.thread.title.then((title) => {
+            return this.builder.buildHeader(title);
+        }).then((headerHTML) => {
+            return this.response.write(headerHTML);
+        }).then(() => {
+            return localContent;
+        }).then((content) => {
+            return this._buildPostsFromText(content, true);
+        }).then((postHTMLs) => {
+            return this.response.write(postHTMLs.join(''));
+        }).then(() => {
+            return remoteContent;
+        }).then((content) => {
+            return this._buildPostsFromText(content, false);
+        }).then((postHTMLs) => {
+            return this.response.write(postHTMLs.join(''));
+        }).then(() => {
+            return this._getFetchStatus();
+        }).then((status) => {
+            return this.builder.buildFooter(status);
+        }).then((footerHTML) => {
+            return this.response.write(footerHTML);
+        });
+    },
+
+
+    /**
+     * Building HTML strings from a given text
+     * that represents a series of posts. (e.g., a part of a dat)
+     * @param  {String}  text  A text consists of a series of posts in this thread.
+     * @param  {Boolean} isLocal true if the text is came from the local source file.
+     * @return {Promise<String>}
+     */
+    _buildPostsFromText(text, isLocal) {
+        let posts = this.parser.parseChunk(text);
+
+        // Store the number of posts to replace <XXRESCOUNT/> tags in Footer.html later.
+        if(isLocal){
+            this._postCounters.local = posts.length;
+        }else{
+            this._postCounters.fetched = posts.length;
+        }
+
+        return this.thread.filter.apply(posts, isLocal).then((postsToShow) => {
+            this._postCounters.displayed += postsToShow.length;
+
+            return Promise.all(postsToShow.map((post) => {
+                return this._buildPost(post);
+            }));
+        });
+    },
+
+
+    /**
+     * Building HTML strings from a text that
+     * represents a one post. (e.g., a one-line of a dat file)
+     * @param  {String} post  Text representing a one post.
+     * @return {Promise<String>}
+     */
+    _buildPost(post) {
+        return Promise.resolve().then(() => {
+            let postJSON = this.parser.parsePost(post);
+            let hitNGData = ChaikaAboneManager.shouldAbone(postJSON);
+
+            if(hitNGData !== undefined){
+                postJSON.aboned = true;
+                postJSON.ngdata = hitNGData;
+            }
+
+            return postJSON;
+        }).then((postJSON) => {
+            return this.builder.buildPost(postJSON);
+        });
+    },
+
+
+    /**
+     * Returns some status information about this fetchting and writing the thread.
+     * @return {Promise<StatusInfo>}
+     */
+    _getFetchStatus() {
+        return OS.File.stat(this.thread.source).then((fileStat) => {
+            return {
+                datSize: fileStat.size,
+                datSizeKB: Math.round(fileStat.size / 1024),
+                statusText: this.statusText[this.fetcher.stat.statusText],
+                newResCount: this._postCounters.fetched,
+                allResCount: this._postCounters.local + this._postCounters.fetched,
+                getResCount: this._postCounters.displayed,
+            };
+        });
     }
 
 };
 
 
 
+/**
+ * a Error handler that may cause in fetchting and writing a thread's content.
+ * @class
+ */
 let ThreadErrorHandler = {
 
     /**
      * 400 Bad Request, in our cases this means
-     * the user specified URL doesn't represent a thread page.
+     * the specified url doesn't represent a thread page.
      */
     400(metadata, response) {
         response.setStatusLine('1.1', 400, 'Bad Request');
@@ -234,12 +407,10 @@ let ThreadErrorHandler = {
                             color: black;
                             font-size: 13.5px;
                             margin: 1em 3em;
+                            line-height: 1.8
                         }
                         ul{
                             list-style-type: square;
-                        }
-                        p{
-                            padding-left: 1em;
                         }
                         .url{
                             font-family: monospace;
@@ -248,18 +419,114 @@ let ThreadErrorHandler = {
                 </head>
                 <body>
                     <h1>400 Bad Request</h1>
-                    <p>
-                        指定された URL <span class="url">${url}</span>
-                        はスレッドを表していないようです。
-                    </p>
-                    <h2>解決策</h2>
-                    <ul>
-                        <li><a href="${url}">chaika を用いないでページを表示する</a></li>
-                    </ul>
+                    <section>
+                        <h2>原因</h2>
+                        <ul>
+                            <li>
+                                指定された URL <span class="url">${url}</span>
+                                はスレッドを表していないようです。
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>解決策</h2>
+                        <ul>
+                            <li><a href="${url}">chaika を用いないでページを表示する</a></li>
+                        </ul>
+                    </section>
                 </body>
             </html>`;
 
           response.bodyOutputStream.write(body, body.length);
-    }
+    },
 
+
+    /**
+     * 404 Not Found, in our cases this means
+     * we can't find any appropriate sources for the specified url.
+     */
+    404(metadata, response) {
+        response.setStatusLine('1.1', 404, 'Not Found');
+        response.setHeader("Content-Type", "text/html;charset=utf-8", false);
+
+        let url = FileIO.escapeHTML(metadata.path.replace(/^\/thread\//, ''));
+        let body = `
+            <html>
+                <head>
+                    <meta charset="utf-8" />
+                    <link rel="shortcut icon" href="/icon.png" />
+                    <title>404 Not Found [chaika]</title>
+                    <style>
+                        body{
+                            background-color: #eee;
+                            color: black;
+                            font-size: 13.5px;
+                            margin: 1em 3em;
+                            line-height: 1.8;
+                        }
+                        ul{
+                            list-style-type: square;
+                        }
+                        .url{
+                            font-family: monospace;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>404 Not Found</h1>
+                    <section>
+                        <h2>原因</h2>
+                        <ul>
+                            <li>
+                                指定されたスレッド <span class="url">${url}</span>
+                                のデータを掲示板から取得することができませんでした。
+                                これには以下の原因が考えられます。
+                                <ul>
+                                    <li>
+                                        chaika からのアクセスが制限されている。
+                                    </li>
+                                    <li>
+                                        いわゆる dat 落ちなどが発生してスレッドがアーカイブ化されており、
+                                        chaika からはそのデータが取得できない状態にある。
+                                    </li>
+                                    <li>
+                                        スレッドが削除された。または、URL に誤りがある。
+                                    </li>
+                                    <li>
+                                        読み込まれているスレッド取得プラグインの
+                                        いずれにも対応していない掲示板である。
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>
+                                chaika のログフォルダには該当するスレッドがありませんでした。
+                            </li>
+                        </ul>
+                    </section>
+                    <section>
+                        <h2>解決策</h2>
+                        <ul>
+                            <li>
+                                <a href="${url}?chaika_force_browser=1">chaika を用いないでスレッドを表示する</a>
+                            </li>
+                            <li>
+                                <a href="https://www.google.co.jp/search?q=${encodeURIComponent(url)}">
+                                    スレッドの URL を Google で検索する
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#">掲示板に対するプラグインを探す</a>
+                            </li>
+                            <li>
+                                <a href="#">
+                                    スレッドのデータ(dat ファイルなど)を入手して chaika で閲覧する
+                                </a>
+                            </li>
+                        </ul>
+                    </section>
+                </body>
+            </html>`;
+
+          response.bodyOutputStream.write(body, body.length);
+    },
 };
