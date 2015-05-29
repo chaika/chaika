@@ -280,6 +280,8 @@ ThreadHandler.ThreadWriter.prototype = {
         this.parser = new ThreadParser(this.url);
         this.builder = new ThreadBuilder(this.url);
 
+        // Load both local and remote sources of this thread here asynchronously
+        // so that they are processed parallely.
         let localContent = OS.Files.read(this.thread.source, { encoding: 'Shift_JIS' });
         let remoteContent = this.fetcher.fetch(this.thread);
 
@@ -310,9 +312,9 @@ ThreadHandler.ThreadWriter.prototype = {
 
 
     /**
-     * Building HTML strings from a given text
+     * Building HTML strings parallely from a given text
      * that represents a series of posts. (e.g., a part of a dat)
-     * @param  {String}  text  A text consists of a series of posts in this thread.
+     * @param  {String}  text  A text consists of a series of posts on this thread.
      * @param  {Boolean} isLocal true if the text is came from the local source file.
      * @return {Promise<String>}
      */
