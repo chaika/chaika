@@ -261,10 +261,10 @@ ThreadHandler.ThreadWriter.prototype = {
 
     statusText: {
         OK: "(｀・ω・´)「OK」",
-        ARCHIVED: "( ーωー)「DAT 落ち」",
-        NOT_MODIFIED: "( ーωー)「新着なし」",
-        OFFLINE: "( ーωー)「オフライン」",
-        LOG_PICKUP: "( ーωー)「ログピックアップモード」",
+        ARCHIVED: "( ｰωｰ)「DAT 落ち」",
+        NOT_MODIFIED: "( ｰωｰ)「新着なし」",
+        OFFLINE: "( ｰωｰ)「オフライン」",
+        LOG_PICKUP: "( ｰωｰ)「ログピックアップモード」",
         LOG_COLLAPSED: "(´・ω・`)「あぼーん発生。スレッドのログを削除した後再読み込みして下さい。」",
         NETWORK_ERROR: "(´・ω・`)「ネットワークエラー」",
         ERROR: "(´・ω・`)「エラー」",
