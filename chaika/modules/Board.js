@@ -20,6 +20,34 @@ function Board(url){
 
 Board.prototype = {
 
+    get url() {
+        if(!this._url){
+            this._url = this.origURL.replace('/test/read.cgi/', '/')
+                                    .replace(/[^\/]+\/?$/, '');
+        }
+
+        return this._url;
+    },
+
+
+    get title() {
+
+    },
+
+
+    get subjectURL() {
+        return this._url + 'subject.txt';
+    },
+
+
+    get settingsURL() {
+        return this._url + 'SETTING.TXT';
+    },
+
+
+    get metadata() {
+
+    }
 
 };
 

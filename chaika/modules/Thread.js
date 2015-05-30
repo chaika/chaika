@@ -24,17 +24,7 @@ function Thread(aURL){
     this.origURL = aURL;
 }
 
-Thread.prorotype = {
-
-    /**
-     * @type {String}
-     */
-    get id() {
-        let match = this.origURL.match(/\/\d+\//g);
-
-        return match[match.length-1];
-    },
-
+Thread.prototype = {
 
     /**
      * a Board object to which this thread belongs.
@@ -65,7 +55,7 @@ Thread.prorotype = {
      * @type {String}
      */
     get url() {
-        if(this._url){
+        if(!this._url){
             this._url = this.origURL.replace(/[^\/]+$/, '');
         }
 
@@ -226,6 +216,8 @@ ThreadMetadata.prototype = {
     _init() {
         this._row = ThreadDB.conn.then((conn) => {
             return conn.executeCached(this.SQL_SELECT, { url: this._url });
+        }).then((rows) => {
+            return rows && rows.length > 0 ? rows[0] : null;
         });
     },
 
@@ -238,13 +230,17 @@ ThreadMetadata.prototype = {
      */
     get(key) {
         return this._row.then((row) => {
+            if(!row){
+                throw new Error('The metadata of this thread is not stored yet.');
+            }
+
             return row.getResultByName(key);
         });
     },
 
 
     set(map) {
-        return Promise.all([ThreadDB.conn, this._row]).then((conn, row) => {
+        return Promise.all([ThreadDB.conn, this._row]).then(([conn, row]) => {
             let data = {};
 
             data.url = this._url;
@@ -253,11 +249,11 @@ ThreadMetadata.prototype = {
                 if(map[key] !== undefined){
                     data[key] = map[key];
                 }else{
-                    data[key] = row.getResultByName(key);
+                    data[key] = row ? row.getResultByName(key) : null;
                 }
             });
 
-            if(row.getResultByName('_rowid_')){
+            if(row){
                 return conn.executeCached(this.SQL_UPDATE, data);
             }else{
                 return conn.executeCached(this.SQL_INSERT, data);
@@ -291,7 +287,7 @@ let ThreadDB = {
             let exist = yield conn.tableExists('threads');
 
             if(!exist){
-                yield conn.execute(this.SQL_TABLE_CREATION);
+                yield conn.execute(ThreadDB.SQL_TABLE_CREATION);
             }
 
             return conn;
