@@ -13,6 +13,10 @@ let { HttpServer, HTTP_400, HTTP_404 } = Cu.import('resource://chaika-modules/li
 let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
+let { Thread } = Cu.import('resource://chaika-modules/Thread.js', {});
+let { ThreadFetcher } = Cu.import('resource://chaika-modules/ThreadFetcher.js', {});
+let { ThreadParser } = Cu.import('resource://chaika-modules/ThreadParser.js', {});
+let { ThreadBuilder } = Cu.import('resource://chaika-modules/ThreadBuilder.js', {});
 let { ChaikaAboneManager } = Cu.import('resource://chaika-modules/ChaikaAboneManager.js', {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
@@ -244,7 +248,7 @@ ThreadHandler.ThreadWriter = function(url, response) {
      * Thread
      * @type {Thread}
      */
-    this.thread = ThreadFactory.create(url);
+    this.thread = new Thread(url);
 
     /**
      * Counter of number of posts in this thread.
@@ -278,35 +282,65 @@ ThreadHandler.ThreadWriter.prototype = {
     write() {
         this.fetcher = new ThreadFetcher(this.url);
         this.parser = new ThreadParser(this.url);
-        this.builder = new ThreadBuilder(this.url);
+        this.builder = new ThreadBuilder(this.url, LocalServer.serverURL);
 
         // Load both local and remote sources of this thread here asynchronously
         // so that they are processed parallely.
-        let localContent = OS.Files.read(this.thread.source, { encoding: 'Shift_JIS' });
-        let remoteContent = this.fetcher.fetch(this.thread);
+        let option = { encoding: 'Shift_JIS' };
+        let localPosts = OS.Files.read(this.thread.source, option).then((content) => {
+            return this.parser.parseChunk(content);
+        });
+        let remotePosts = this.fetcher.fetch(this.thread).then((content) => {
+            return this.parser.parseChunk(content);
+        });
 
-        return this.thread.title.then((title) => {
+        // the title of this thread is available in the local/remote source or at the database.
+        let sources = [
+            this.thread.metadata.get('title'),
+            localPosts.then((posts) => posts[0].title),
+            remotePosts.then((posts) => posts[0].title)
+        ];
+
+        return this._fetchTitle(sources).then((title) => {
+            this.thread.metadata.set({ title });
+
             return this.builder.buildHeader(title);
         }).then((headerHTML) => {
             return this.response.write(headerHTML);
         }).then(() => {
-            return localContent;
-        }).then((content) => {
-            return this._buildPostsFromText(content, true);
-        }).then((postHTMLs) => {
-            return this.response.write(postHTMLs.join(''));
-        }).then(() => {
-            return remoteContent;
-        }).then((content) => {
-            return this._buildPostsFromText(content, false);
-        }).then((postHTMLs) => {
-            return this.response.write(postHTMLs.join(''));
+            return Promise.all([
+                localPosts.then((posts) => this._buildPosts(posts, true)),
+                remotePosts.then((posts) => this._buildPosts(posts, false))
+            ]);
+        }).then(([local, remote]) => {
+            return this.response.write(local.concat(remote).join(''));
         }).then(() => {
             return this._getFetchStatus();
         }).then((status) => {
             return this.builder.buildFooter(status);
         }).then((footerHTML) => {
             return this.response.write(footerHTML);
+        }).catch((err) => {
+            Logger.error(err);
+        });
+    },
+
+
+    _fetchTitle(sources) {
+        if(sources.length <= 0){
+            return Promise.reject('Thread title is unknown.');
+        }
+
+        let source = sources.unshift();
+
+        return source.then((title) => {
+            if(title){
+                return title;
+            }else{
+                return this._fetchTitle(sources);
+            }
+        }).catch((err) => {
+            return this._fetchTitle(sources);
         });
     },
 
@@ -318,9 +352,7 @@ ThreadHandler.ThreadWriter.prototype = {
      * @param  {Boolean} isLocal true if the text is came from the local source file.
      * @return {Promise<String>}
      */
-    _buildPostsFromText(text, isLocal) {
-        let posts = this.parser.parseChunk(text);
-
+    _buildPosts(posts, isLocal) {
         // Store the number of posts to replace <XXRESCOUNT/> tags in Footer.html later.
         if(isLocal){
             this._postCounters.local = posts.length;
@@ -332,7 +364,7 @@ ThreadHandler.ThreadWriter.prototype = {
             this._postCounters.displayed += postsToShow.length;
 
             return Promise.all(postsToShow.map((post) => {
-                return this._buildPost(post);
+                return this._buildPost(post, isLocal);
             }));
         });
     },
@@ -344,9 +376,19 @@ ThreadHandler.ThreadWriter.prototype = {
      * @param  {String} post  Text representing a one post.
      * @return {Promise<String>}
      */
-    _buildPost(post) {
-        return Promise.resolve().then(() => {
+    _buildPost(post, isLocal) {
+        return this.thread.metadata.get('title').then((title) => {
             let postJSON = this.parser.parsePost(post);
+
+            // Add some metadata which is not written in the source file.
+            postJSON.new = !isLocal;
+            postJSON.title = title;
+            postJSON.thread_url = this.thread.url;
+            postJSON.board_url = this.thread.board.url;
+
+            return postJSON;
+        }).then((postJSON) => {
+            // Determining whether this post should aboned or not.
             let hitNGData = ChaikaAboneManager.shouldAbone(postJSON);
 
             if(hitNGData !== undefined){

@@ -2,16 +2,16 @@
 
 'use strict';
 
-this.EXPORTED_SYMBOLS = ["Thread", "ThreadMetadata"];
+this.EXPORTED_SYMBOLS = ["Thread", "ThreadDB"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 let { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
 let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
+let { Sqlite } = Cu.import('resource://gre/modules/Sqlite.jsm', {});
+let { Task } = Cu.import('resource://gre/modules/Task.jsm', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
-let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { Board } = Cu.import("resource://chaika-modules/Board.js", {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
@@ -30,7 +30,9 @@ Thread.prorotype = {
      * @type {String}
      */
     get id() {
+        let match = this.origURL.match(/\/\d+\//g);
 
+        return match[match.length-1];
     },
 
 
@@ -52,7 +54,7 @@ Thread.prorotype = {
      * @type {String}
      */
     get source() {
-        let path = OS.Path.join(FileIO.Path.logDir, this.board.id, this.id);
+        let path = OS.Path.join(FileIO.Path.logDir, this.board.id, this.id + '.dat');
 
         return path;
     },
@@ -95,6 +97,19 @@ Thread.prorotype = {
         }
 
         return this._filter;
+    },
+
+
+    /**
+     * Accessor for metadata of this thread, such as title, state, # of fetched posts.
+     * @type {ThreadMetadata}
+     */
+    get metadata() {
+        if(!this._metadata){
+            this._metadata = new ThreadMetadata(this.url);
+        }
+
+        return this._metadata;
     }
 };
 
@@ -182,6 +197,110 @@ ThreadFilter.prototype = {
         let [start, end] = str.split('-');
 
         return new Range(start || undefined, end || undefined);
+    }
+
+};
+
+
+
+function ThreadMetadata(url){
+    this._url = url;
+
+    this._init();
+}
+
+ThreadMetadata.prototype = {
+
+    SQL_SELECT: "SELECT * FROM threads WHERE url=:url",
+
+    SQL_UPDATE: `UPDATE threads
+                 SET title=:title,
+                     closed=:closed,
+                     fetched_index=:fetched_index,
+                     read_index=:read_index
+                 WHERE url=:url`,
+
+    SQL_INSERT: "INSERT INTO threads VALUES (:url, :title, :closed, :fetched_index, :read_index)",
+
+
+    _init() {
+        this._row = ThreadDB.conn.then((conn) => {
+            return conn.executeCached(this.SQL_SELECT, { url: this._url });
+        });
+    },
+
+
+    /**
+     * Getting a value that has a given key name from the threads' database.
+     * @param  {String} key key name. See ThreadDB.SQL_TABLE_CREATION for available keys.
+     * @return {Promise<String|Boolean>}     the value.
+     * @see TheadDB.SQL_TABLE_CREATION
+     */
+    get(key) {
+        return this._row.then((row) => {
+            return row.getResultByName(key);
+        });
+    },
+
+
+    set(map) {
+        return Promise.all([ThreadDB.conn, this._row]).then((conn, row) => {
+            let data = {};
+
+            data.url = this._url;
+
+            ['title', 'closed', 'fetched_index', 'read_index'].forEach((key) => {
+                if(map[key] !== undefined){
+                    data[key] = map[key];
+                }else{
+                    data[key] = row.getResultByName(key);
+                }
+            });
+
+            if(row.getResultByName('_rowid_')){
+                return conn.executeCached(this.SQL_UPDATE, data);
+            }else{
+                return conn.executeCached(this.SQL_INSERT, data);
+            }
+        });
+    }
+
+};
+
+
+
+let ThreadDB = {
+
+    SQL_TABLE_CREATION: `
+        CREATE TABLE threads(
+            url           TEXT NOT NULL UNIQUE, /* a url of a thread. */
+            title         TEXT,                 /* a title of a thread. */
+            closed        BOOLEAN,              /* true if a thread is already ended,
+                                                   i.e., no one can post a comment
+                                                   to the thread any more. */
+            fetched_index INTEGER DEFAULT 0,    /* # of posts downloaded in the local disk. */
+            read_index    INTEGER DEFAULT 0     /* # of posts a user has read. */
+        );`,
+
+
+    startup() {
+        let path = OS.Path.join(FileIO.Path.logDir, 'threads.sqlite');
+
+        this.conn = Task.spawn(function* () {
+            let conn = yield Sqlite.openConnection({ path });
+            let exist = yield conn.tableExists('threads');
+
+            if(!exist){
+                yield conn.execute(this.SQL_TABLE_CREATION);
+            }
+
+            return conn;
+        });
+    },
+
+
+    quit() {
+        this.conn.then((conn) => conn.close());
     }
 
 };
