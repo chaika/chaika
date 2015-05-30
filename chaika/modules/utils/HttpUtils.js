@@ -48,6 +48,9 @@ let HttpUtils = {
      *                       to the Internet, "@chaika" means setting up a proxy specified
      *                       at the chaika's setting panel, and "host:port" means
      *                       get the connection proxied with a given proxy.
+     * @note This method creates a new nsIHttpChannel instance,
+     *       so keep in mind you should call this method
+     *       before you make any customization to the channel.
      */
     proxify(target, proxy) {
         let hph = Services.io.getProtocolHandler("http").QueryInterface(Ci.nsIHttpProtocolHandler);
