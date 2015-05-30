@@ -28,6 +28,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/Thread.js");
         ThreadDB.startup();
 
+        Components.utils.import("resource://chaika-modules/ThreadBuilder.js");
+        Templates.init();
+
         Components.utils.import('resource://chaika-modules/ChaikaHttpController.js');
         ChaikaHttpController._startup();
 
@@ -71,6 +74,7 @@ ChaikaService.prototype = {
         LocalServer._quit();
         ChaikaBBSMenu._quit();
         ThreadDB.quit();
+        ThreadBuilder.uninit();
         ChaikaCore._quit();
         Logger.uninit();
     },

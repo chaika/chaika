@@ -213,7 +213,7 @@ let ThreadHandler = {
 
 
         response.processAsync();
-        response.setHeader("Content-Type", "text/html; charset=Shift_JIS");
+        response.setHeader("Content-Type", "text/html; charset=utf-8");
 
         let writer = new this.ThreadWriter(url, response);
 
@@ -280,30 +280,30 @@ ThreadHandler.ThreadWriter.prototype = {
      * @return {Promise<void>}
      */
     write() {
-        this.fetcher = new ThreadFetcher(this.url);
-        this.parser = new ThreadParser(this.url);
-        this.builder = new ThreadBuilder(this.url, LocalServer.serverURL);
+        this.fetcher = new ThreadFetcher(this.thread);
+        this.parser = new ThreadParser(this.thread);
+        this.builder = new ThreadBuilder(this.thread, LocalServer.serverURL);
 
         // Load both local and remote sources of this thread here asynchronously
         // so that they are processed parallely.
         let option = { encoding: 'Shift_JIS' };
-        let localPosts = OS.Files.read(this.thread.source, option).then((content) => {
-            return this.parser.parseChunk(content);
+        let localPosts = OS.File.read(this.thread.source, option).then((content) => {
+            return this.parser.parseChunk(FileIO.toUTF8Octets(content));
         });
         let remotePosts = this.fetcher.fetch(this.thread).then((content) => {
-            return this.parser.parseChunk(content);
+            return this.parser.parseChunk(FileIO.toUTF8Octets(content));
         });
+
 
         // the title of this thread is available in the local/remote source or at the database.
         let sources = [
             this.thread.metadata.get('title'),
-            localPosts.then((posts) => posts[0].title),
-            remotePosts.then((posts) => posts[0].title)
+            localPosts.then((posts) => this.parser.parsePost(posts[0]).title),
+            remotePosts.then((posts) => this.parser.parsePost(posts[0]).title)
         ];
 
         return this._fetchTitle(sources).then((title) => {
-            this.thread.metadata.set({ title });
-
+            //this.thread.metadata.set({ title });
             return this.builder.buildHeader(title);
         }).then((headerHTML) => {
             return this.response.write(headerHTML);
@@ -321,7 +321,7 @@ ThreadHandler.ThreadWriter.prototype = {
         }).then((footerHTML) => {
             return this.response.write(footerHTML);
         }).catch((err) => {
-            Logger.error(err);
+            Cu.reportError(err);
         });
     },
 
@@ -331,7 +331,7 @@ ThreadHandler.ThreadWriter.prototype = {
             return Promise.reject('Thread title is unknown.');
         }
 
-        let source = sources.unshift();
+        let source = sources.shift();
 
         return source.then((title) => {
             if(title){
@@ -340,6 +340,7 @@ ThreadHandler.ThreadWriter.prototype = {
                 return this._fetchTitle(sources);
             }
         }).catch((err) => {
+            Cu.reportError(err);
             return this._fetchTitle(sources);
         });
     },
@@ -363,8 +364,8 @@ ThreadHandler.ThreadWriter.prototype = {
         return this.thread.filter.apply(posts, isLocal).then((postsToShow) => {
             this._postCounters.displayed += postsToShow.length;
 
-            return Promise.all(postsToShow.map((post) => {
-                return this._buildPost(post, isLocal);
+            return Promise.all(postsToShow.map((post, index) => {
+                return this._buildPost(post, index, isLocal);
             }));
         });
     },
@@ -374,13 +375,15 @@ ThreadHandler.ThreadWriter.prototype = {
      * Building HTML strings from a text that
      * represents a one post. (e.g., a one-line of a dat file)
      * @param  {String} post  Text representing a one post.
+     * @param {Number} index
      * @return {Promise<String>}
      */
-    _buildPost(post, isLocal) {
+    _buildPost(post, index, isLocal) {
         return this.thread.metadata.get('title').then((title) => {
             let postJSON = this.parser.parsePost(post);
 
             // Add some metadata which is not written in the source file.
+            postJSON.number = index + 1;
             postJSON.new = !isLocal;
             postJSON.title = title;
             postJSON.thread_url = this.thread.url;

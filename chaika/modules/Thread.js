@@ -191,6 +191,11 @@ ThreadFilter.prototype = {
         let [start, end] = str.split('-');
 
         return new Range(start || undefined, end || undefined);
+    },
+
+
+    apply(posts, isLocal) {
+        return Promise.resolve(posts);
     }
 
 };
@@ -235,7 +240,8 @@ ThreadMetadata.prototype = {
     get(key) {
         return this._row.then((row) => {
             if(!row){
-                throw new Error('The metadata of this thread is not stored yet.');
+                Logger.warn('The metadata of this thread is not stored yet.');
+                return null;
             }
 
             return row.getResultByName(key);

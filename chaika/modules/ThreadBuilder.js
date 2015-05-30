@@ -2,12 +2,12 @@
 
 'use strict';
 
-this.EXPORTED_SYMBOLS = ["ThreadBuilder"];
+this.EXPORTED_SYMBOLS = ["ThreadBuilder", 'Templates'];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
-let { OS, TextEncoder, TextDecoder } = Cu.import("resource://gre/modules/osfile.jsm", {});
+let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
 let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
@@ -17,10 +17,18 @@ let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 let Templates = {
 
     init() {
-        if(this._skinName === undefined){
-            this._skinName = Prefs.get('thread_skin');
-            this._updateTemplates();
-        }
+        this._updateTemplates();
+        Prefs.branch.addObserver('thread_skin', this, false);
+    },
+
+
+    uninit() {
+        Prefs.branch.removeObserver('thread_skin', this, false);
+    },
+
+
+    observe() {
+        this._updateTemplates();
     },
 
 
@@ -30,10 +38,11 @@ let Templates = {
      * @return {String}
      */
     _getSkinDir() {
+        let skinName = Prefs.get('thread_skin');
         let path;
 
-        if(this._skinName){
-            path = OS.Path.join(FileIO.Path.dataDir, 'skin', this._skinName);
+        if(skinName){
+            path = OS.Path.join(FileIO.Path.dataDir, 'skin', skinName);
         }else{
             // Default skin
             path = OS.Path.join(FileIO.Path.defaultsDir, 'skin');
@@ -57,7 +66,9 @@ let Templates = {
         files.forEach((name) => {
             let path = OS.Path.join(this._getSkinDir(), name + '.html');
 
-            this[name] = OS.File.read(path, { encoding: 'Shift_JIS' });
+            this[name] = OS.File.read(path, { encoding: 'Shift_JIS' }).then((template) => {
+                return FileIO.toUTF8Octets(template);
+            });
         });
     }
 };
@@ -67,20 +78,9 @@ let Templates = {
 function ThreadBuilder(thread, serverURL){
     this._thread = thread;
     this._serverURL = serverURL;
-    this._encoder = new TextEncoder('utf-8');
-    this._decoder = new TextDecoder('Shift_JIS');
 }
 
 ThreadBuilder.prototype = {
-
-    /**
-     * Converting a encoding of given string from utf-8 to Shift_JIS.
-     * @param  {String} utfString a string whose encoding is utf-8.
-     * @return {String}           Converted string.
-     */
-    _toSJIS(utfString) {
-        return this._decoder(this._encoder(utfString));
-    },
 
 
     /**
@@ -96,9 +96,6 @@ ThreadBuilder.prototype = {
         let aaFontName = Prefs.getUniChar("thread_aa_font_name");
         let aaFontSize = Prefs.get("thread_aa_font_size");
         let aaLineSpace = Prefs.get("thread_aa_line_space");
-
-        fontName = this._toSJIS(fontName);
-        aaFontName = this._toSJIS(aaFontName);
 
         return template.replace(/<SKINPATH\/>/g, skinPath)
                        .replace(/<THREADURL\/>/g, this._thread.url)
@@ -149,7 +146,7 @@ ThreadBuilder.prototype = {
                        'Res';
 
         return Templates[tempName].then((template) => {
-            let ngdata = this._toSJIS(FileIO.escapeHTML(post.ngdata.title || post.ngdata));
+            let ngdata = post.ngdata ? FileIO.escapeHTML(post.ngdata.title || post.ngdata) : '';
 
             return template.replace(/<PLAINNUMBER\/>/g, post.number)
                            .replace(/<NUMBER\/>/g, post.number)
@@ -173,7 +170,3 @@ ThreadBuilder.prototype = {
 
 
 };
-
-
-
-Templates.init();
