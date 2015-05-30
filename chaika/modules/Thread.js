@@ -32,7 +32,7 @@ Thread.prototype = {
      */
     get board() {
         if(!this._board){
-            this._board = new Board(this.origURL);
+            this._board = new Board(this.url);
         }
 
         return this._board;
@@ -44,7 +44,11 @@ Thread.prototype = {
      * @type {String}
      */
     get source() {
-        let path = OS.Path.join(FileIO.Path.logDir, this.board.id, this.id + '.dat');
+        let uri = Services.io.newURI(this.board.url, null, null);
+        let boardID = '/' + '2ch' + uri.path;
+        let threadID = this.origURL.match(/\/(\d{9,10})/)[1];
+
+        let path = OS.Path.join(FileIO.Path.logDir, ...(boardID + threadID + '.dat').split('/'));
 
         return path;
     },
