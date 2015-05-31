@@ -322,13 +322,14 @@ ThreadHandler.ThreadWriter.prototype = {
             return this.response.write(footerHTML);
         }).catch((err) => {
             Cu.reportError(err);
+            this.response.write(err);
         });
     },
 
 
     _fetchTitle(sources) {
         if(sources.length <= 0){
-            return Promise.reject('Thread title is unknown.');
+            return Promise.reject('chaika was not able to obtain the title of this thread.');
         }
 
         let source = sources.shift();
