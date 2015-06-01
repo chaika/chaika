@@ -21,10 +21,10 @@ let HttpUtils = {
         delete this.userAgent;
 
         let promise = new Promise((resolve) => {
-            AddonManager.getAddonById('chaika@chaika.xrea.jp', (addon) => resolve(addon));
+            AddonManager.getAddonByID('chaika@chaika.xrea.jp', (addon) => resolve(addon));
         });
 
-        promise.then((chaika) => {
+        this.userAgent = promise.then((chaika) => {
             let ph = Cc["@mozilla.org/network/protocol;1?name=http"]
                                         .getService(Ci.nsIHttpProtocolHandler);
 
@@ -35,7 +35,7 @@ let HttpUtils = {
             return `Monazilla/1.0.0 (${chaika.name}/${chaika.version};${oscpu};${appName}/${appVersion})`;
         });
 
-        return (this.userAgent = promise);
+        return this.userAgent;
     },
 
 

@@ -7,7 +7,9 @@ this.EXPORTED_SYMBOLS = ["AbstractPluginLoader"];
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { Task } = Cu.import('resource://gre/modules/Task.jsm', {});
 let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
+let { HttpUtils } = Cu.import('resource://chaika-modules/utils/HttpUtils.js', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
@@ -29,8 +31,7 @@ let AbstractPluginLoader = {
      * @optional
      */
     get systemDir() {
-        delete this.systemDir;
-        return (this.systemDir = OS.Path.join(FileIO.Path.defaltsDir, 'plugins', this.name));
+        return OS.Path.join(FileIO.Path.defaultsDir, 'plugins', this.name);
     },
 
 
@@ -41,20 +42,7 @@ let AbstractPluginLoader = {
      * @optional
      */
     get userDir() {
-        delete this.userDir;
-        return (this.userDir = OS.Path.join(FileIO.Path.dataDir, 'plugins', this.name));
-    },
-
-
-    /**
-     * a regular expression which specifies what should a name of plugin's main script file be like.
-     * If not specified, /\.{name}\.js$/ will be used.
-     * @type {RegExp}
-     * @optional
-     */
-    get mainFileRegExp() {
-        delete this.include;
-        return (this.include = new RegExp(`\\.${this.name}\\.js$`));
+        return OS.Path.join(FileIO.Path.dataDir, 'plugins', this.name);
     },
 
 
@@ -65,14 +53,24 @@ let AbstractPluginLoader = {
 
 
     startup() {
-        this._loadFromDir(this.systemDir);
-        this._loadFromDir(this.userDir);
+        return Promise.all([
+            OS.File.makeDir(this.systemDir, { from: FileIO.Path.defaultsDir }),
+            OS.File.makeDir(this.userDir, { from: FileIO.Path.dataDir })
+        ]).then(() => {
+            return this._loadFromDir(this.systemDir);
+        }).then(() => {
+            return this._loadFromDir(this.userDir);
+        }).catch((err) => {
+            Cu.reportError(err);
+        });
     },
 
 
     _loadFromDir(pluginsDirPath) {
         this._fetchPluginFolders(pluginsDirPath).then((plugins) => {
             return Promise.all(plugins.map((plugin) => this._load(plugin)));
+        }).catch((err) => {
+            Cu.reportError(err);
         });
     },
 
@@ -94,15 +92,15 @@ let AbstractPluginLoader = {
 
 
     _load(pluginDir) {
-        let packageJSON = OS.Path.join(pluginDir.path, 'package.json');
+        const that = this;
+        let packagePath = OS.Path.join(pluginDir.path, 'package.json');
 
-        // We use "packaqe" as a argument name instead of "package"
-        // in order to avoid using the reserved word in strict mode.
-        this._loadPackageJSON(packageJSON).then((packaqe) => {
-            return this.packages[packaqe.id] = packaqe;
-        }).then((packaqe) => {
-            let sandbox = this._getSandboxWithPermissions(packaqe.permissions);
-            let scriptPath = OS.Path.join(pluginDir.path, packaqe.src || 'main.js');
+        return Task.spawn(function* (){
+            // We use "packaqe" as a variable's name instead of "package"
+            // in order to avoid using the reserved word in strict mode.
+            let packaqe = yield that._loadPackageJSON(packagePath);
+            let sandbox = yield that._getSandboxWithPermissions(packaqe.permissions);
+            let scriptPath = OS.Path.join(pluginDir.path, 'main.js');
 
             Services.scriptloader.loadSubScriptWithOptions(
                 OS.Path.toFileURI(scriptPath),
@@ -112,12 +110,16 @@ let AbstractPluginLoader = {
                     ignoreCache: true
                 }
             );
+
+            // Export
+            that.packaqe[packaqe.id] = packaqe;
+            that.plugins[packaqe.id] = sandbox[sandbox.EXPORTED_SYMBOL];
         });
     },
 
 
     _loadPackageJSON(jsonPath) {
-        return OS.File.read(jsonPath).then((content) => {
+        return OS.File.read(jsonPath, { encoding: 'utf-8' }).then((content) => {
             return JSON.parse(content);
         });
     },
@@ -137,24 +139,17 @@ let AbstractPluginLoader = {
         let options = {
             sandboxName: `chaika-plugins-${this.name}`,
             wantExportHelpers: true,
-            wantComponents: permissions.components,
-            wantGlobalProperties: permissions,
-            wantXrays: !permissions['disable-xrays']
+            wantComponents: !!permissions.components,
+            wantGlobalProperties: permissions['global-props'] || [],
+            wantXrays: false, //!permissions['disable-xrays']
         };
 
         let sandbox = Cu.Sandbox(principal, options);
 
-        const that = this;
-        const utils = {
-            exports: new Proxy({}, {
-                set(obj, prop, value) {
-                    that.plugins[prop] = value;
-                }
-            })
-        };
+        return HttpUtils.userAgent.then((userAgent) => {
+            sandbox.CHAIKA_USER_AGENT = Cu.cloneInto(userAgent, sandbox, { cloneFunctions: true });
 
-        Cu.cloneInto(utils, sandbox, { cloneFunctions: true, wrapReflectors: true });
-
-        return sandbox;
+            return sandbox;
+        });
     }
 };
