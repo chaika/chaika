@@ -25,7 +25,7 @@ let AbstractPluginLoader = {
 
     /**
      * a path string of the directory in which system-side plugins are stored.
-     * If not specified, {defaultsDir}/plugins/{name} will be used.
+     * If not overridden, {defaultsDir}/plugins/{name} will be used.
      * @type {String}
      * @optional
      */
@@ -36,7 +36,7 @@ let AbstractPluginLoader = {
 
     /**
      * a path string of the directory in which third-party plugins are stored.
-     * If not specified, {dataDir}/plugins/{name} will be used.
+     * If not overridden, {dataDir}/plugins/{name} will be used.
      * @type {String}
      * @optional
      */
@@ -45,9 +45,17 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * a namespace for references to each plugin's body objects defined in main.js
+     * @type {Object}
+     */
     plugins: {},
 
 
+    /**
+     * a namespace for references to each plugin's package objects defined in package.json
+     * @type {Object}
+     */
     packages: {},
 
 
@@ -65,6 +73,11 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * Loading all plugins under a given directory.
+     * @param  {String} pluginsDirPath a path string
+     * @return {Promise<void>}
+     */
     _loadFromDir(pluginsDirPath) {
         this._fetchPluginFolders(pluginsDirPath).then((plugins) => {
             return Promise.all(plugins.map((plugin) => this._load(plugin)));
@@ -74,6 +87,11 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * Fetchting all plugin folders under a given directory.
+     * @param  {String} pluginsDirPath a path string
+     * @return {Promise<Array<File>>} an array of plugin folders.
+     */
     _fetchPluginFolders(pluginsDirPath) {
         let iterator = new OS.File.DirectoryIterator(pluginsDirPath);
         let pluginFolders = [];
@@ -90,6 +108,12 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * Loading a given plugin to `this.plugins` using a sandbox with some restrictions
+     * that are defined in "permissions" of package.json.
+     * @param  {String} pluginDir a path string
+     * @return {Promise<void>}
+     */
     _load(pluginDir) {
         let packagePath = OS.Path.join(pluginDir.path, 'package.json');
 
@@ -116,6 +140,11 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * Loading package.json and returns the result of parsing.
+     * @param  {String} jsonPath a path string to load.
+     * @return {Object}          loaded JSON object
+     */
     _loadPackageJSON(jsonPath) {
         return OS.File.read(jsonPath, { encoding: 'utf-8' }).then((content) => {
             return JSON.parse(content);
@@ -123,6 +152,11 @@ let AbstractPluginLoader = {
     },
 
 
+    /**
+     * Creating a sandbox with a given principal and extra permissions.
+     * @param  {Object} permissions
+     * @return {nsISandbox}
+     */
     _getSandboxWithPermissions(permissions) {
         let principal;
 
