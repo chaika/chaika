@@ -6,8 +6,8 @@
 
     const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-    let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
-    let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
+    let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
+    let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
     let { SearchPluginLoader } = Cu.import("resource://chaika-modules/plugins/SearchPluginLoader.js", {});
 
 
@@ -25,7 +25,7 @@
             this._engineMenu = engineMenu;
 
             this._createMenu(engineMenu);
-            this.setSearchEngine(ChaikaCore.pref.getChar('bbsmenu.search.default_engine_name'));
+            this.setSearchEngine(Prefs.get('bbsmenu.search.default_engine_name'));
         },
 
         /**
@@ -62,14 +62,9 @@
          * @see SearchBox#_onSuccess
          */
         search: function(query){
-            let promise = SearchPluginLoader.plugins[this._engine].search(
-                ChaikaCore.io.escapeHTML(query)
-            );
-
-            console.log(promise);
-            console.log(Cu.waiveXrays(promise));
-
-            return promise.then(this._onSuccess);
+            return SearchPluginLoader.plugins[this._engine].search(
+                FileIO.escapeHTML(query)
+            ).then(this._onSuccess);
         },
 
 
@@ -100,7 +95,7 @@
 
             results.forEach((board) => {
                 let boardItem = doc.createElement('board');
-                let boardTitle = ChaikaCore.io.unescapeHTML(board.title);
+                let boardTitle = FileIO.unescapeHTML(board.title);
 
                 boardItem.setAttribute('title', boardTitle);
                 boardItem.setAttribute('url', board.url || '');
@@ -112,7 +107,7 @@
 
                     board.threads.forEach((thread) => {
                         let threadItem = doc.createElement('thread');
-                        let threadTitle = ChaikaCore.io.unescapeHTML(thread.title);
+                        let threadTitle = FileIO.unescapeHTML(thread.title);
 
                         if(thread.post){
                             threadTitle += ' [' + thread.post + ']';
