@@ -37,8 +37,8 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
         ChaikaAboneManager._startup();
 
-        Components.utils.import("resource://chaika-modules/ChaikaSearch.js");
-        ChaikaSearch._startup();
+        Components.utils.import("resource://chaika-modules/plugins/SearchPluginLoader.js");
+        SearchPluginLoader.startup();
 
         Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
         ChaikaRoninLogin._startup();

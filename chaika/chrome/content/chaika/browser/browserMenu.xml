@@ -122,7 +122,7 @@
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
-            Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
+            Components.utils.import("resource://chaika-modules/plugins/SearchPluginLoader.js", this);
             Components.utils.import("resource://chaika-modules/utils/URLUtils.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
 
@@ -205,16 +205,19 @@
             <body><![CDATA[
                 let searchMenu = document.getAnonymousElementByAttribute(this, "anonid", "search-thread");
 
-                this.ChaikaSearch.plugins.forEach(plugin => {
-                    if(!plugin.url) return;
+                let packages = this.SearchPluginLoader.packages;
+                let plugins = this.SearchPluginLoader.plugins;
+
+                for(let id in packages){
+                    if(!plugins[id].url) continue;
 
                     let menuitem = document.createElement('menuitem');
 
-                    menuitem.setAttribute('label', plugin.name + ' で検索');
-                    menuitem.setAttribute('anonid', plugin.id);
+                    menuitem.setAttribute('label', packages[id].name + ' で検索');
+                    menuitem.setAttribute('anonid', id);
 
                     searchMenu.appendChild(menuitem);
-                });
+                }
             ]]></body>
         </method>
 
@@ -570,7 +573,7 @@
                 var sidebarMode = this.ChaikaCore.pref.getBool('browser.browsermenu.find_2ch_in_sidebar');
 
                 if(!sidebarMode){
-                    let plugin = this.ChaikaSearch.getPlugin(aID);
+                    let plugin = this.SearchPluginLoader.plugins[aID];
                     let term = aTerm;
 
                     if(plugin.charset.toUpperCase() !== 'UTF-8'){

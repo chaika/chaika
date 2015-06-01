@@ -36,7 +36,7 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-Components.utils.import('resource://chaika-modules/ChaikaSearch.js');
+Components.utils.import('resource://chaika-modules/plugins/SearchPluginLoader.js');
 
 
 var gBbsmenuPane = {
@@ -48,19 +48,20 @@ var gBbsmenuPane = {
     _createEngineMenu: function(){
         let menulist = document.getElementById('searchEngineList');
         let menupopup = document.createElement('menupopup');
+        let packages = SearchPluginLoader.packages;
 
-        ChaikaSearch.plugins.forEach(plugin => {
+        for(let id in packages){
             let menuitem = document.createElement('menuitem');
 
-            menuitem.setAttribute('label', plugin.name);
-            menuitem.setAttribute('value', plugin.id);
+            menuitem.setAttribute('label', packages[id].name);
+            menuitem.setAttribute('value', id);
 
-            if(!plugin.search){
+            if(!SearchPluginLoader.plugins[id].search){
                 menuitem.setAttribute('disabled', 'true');
             }
 
             menupopup.appendChild(menuitem);
-        });
+        }
 
         menulist.appendChild(menupopup);
 

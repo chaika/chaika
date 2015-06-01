@@ -1,12 +1,10 @@
 /* See license.txt for terms of usage */
 
-var Dig2ch = {
+'use strict';
 
-    id: '00.dig.2ch.net',
+let EXPORTED_SYMBOL = "Dig2ch";
 
-    name: '2ch検索 (dig.2ch.net)',
-
-    version: '2.0.0',
+let Dig2ch = {
 
     charset: 'utf-8',
 
@@ -15,16 +13,14 @@ var Dig2ch = {
     search: function(query){
         return new Promise((resolve, reject) => {
             const url = 'http://dig.2ch.net/?json=1&keywords=' + encodeURIComponent(query);
-            const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
-            let req = XMLHttpRequest();
+            let req = new XMLHttpRequest();
 
             req.addEventListener('error', reject, false);
             req.addEventListener('load', () => {
                 if(req.status !== 200 || !req.responseText){
-                    reject('Unable to connect. (status: ' + this._req.status + ')');
+                    reject('Unable to connect. (status: ' + req.status + ')');
                     return;
                 }
-
 
                 let json = JSON.parse(req.responseText);
 

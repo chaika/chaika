@@ -1,0 +1,16 @@
+{
+    "id": "01.ff2ch.syoboi.jp",
+
+    "name": "2ch検索 (ff2ch.syoboi.jp)",
+
+    "version": "2.0.0",
+
+    "updateURL": "https://raw.githubusercontent.com/chaika/chaika/develop/chaika/chrome/content/chaika/defaults/plugin/search/ff2ch.syoboi.jp/update.json",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "XMLHttpRequest" ]
+    }
+}

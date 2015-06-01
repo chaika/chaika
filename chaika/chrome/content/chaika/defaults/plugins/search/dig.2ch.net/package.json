@@ -1,0 +1,16 @@
+{
+    "id": "00.dig.2ch.net",
+
+    "name": "2ch検索 (dig.2ch.net)",
+
+    "version": "2.0.0",
+
+    "updateURL": "https://raw.githubusercontent.com/chaika/chaika/develop/chaika/chrome/content/chaika/defaults/plugin/search/dig.2ch.net/update.json",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "XMLHttpRequest" ]
+    }
+}

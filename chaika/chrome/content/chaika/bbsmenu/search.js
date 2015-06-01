@@ -8,7 +8,7 @@
 
     let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
-    let { ChaikaSearch }  = Cu.import("resource://chaika-modules/ChaikaSearch.js", {});
+    let { SearchPluginLoader } = Cu.import("resource://chaika-modules/plugins/SearchPluginLoader.js", {});
 
 
     function SearchBox(){
@@ -33,13 +33,16 @@
          * @param {Node} root メニューのルートノード
          */
         _createMenu: function(root){
-            ChaikaSearch.plugins.forEach(plugin => {
-                if(!plugin.search) return;
+            let packages = SearchPluginLoader.packages;
+            let plugins = SearchPluginLoader.plugins;
+
+            for(let id in packages){
+                if(!plugins[id].search) continue;
 
                 let menuitem = document.createElement('menuitem');
 
-                menuitem.setAttribute('label', plugin.name);
-                menuitem.setAttribute('value', plugin.id);
+                menuitem.setAttribute('label', packages[id].name);
+                menuitem.setAttribute('value', id);
                 menuitem.setAttribute('type', 'radio');
                 menuitem.setAttribute('name', 'search-engine-list');
 
@@ -48,7 +51,7 @@
                 });
 
                 root.appendChild(menuitem);
-            });
+            }
         },
 
 
@@ -59,8 +62,12 @@
          * @see SearchBox#_onSuccess
          */
         search: function(query){
-            let plugin = ChaikaSearch.getPlugin(this._engine);
-            let promise = plugin.search(ChaikaCore.io.escapeHTML(query));
+            let promise = SearchPluginLoader.plugins[this._engine].search(
+                ChaikaCore.io.escapeHTML(query)
+            );
+
+            console.log(promise);
+            console.log(Cu.waiveXrays(promise));
 
             return promise.then(this._onSuccess);
         },
@@ -148,7 +155,7 @@
 
             engineNode.setAttribute('checked', 'true');
             this._engineMenu.selectedItem = engineNode;
-            this._searchBox.emptyText = ChaikaSearch.getPlugin(aID).name;
+            this._searchBox.emptyText = SearchPluginLoader.packages[aID].name;
         }
 
     };

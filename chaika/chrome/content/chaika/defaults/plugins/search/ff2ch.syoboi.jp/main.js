@@ -1,13 +1,10 @@
 /* See license.txt for terms of usage */
 
+'use strict';
 
-var Ff2ch = {
+let EXPORTED_SYMBOL = 'Ff2ch';
 
-    id: '01.ff2ch.syoboi.jp',
-
-    name: '2ch検索 (ff2ch.syoboi.jp)',
-
-    version: '1.0.1',
+let Ff2ch = {
 
     charset: 'utf-8',
 
@@ -16,8 +13,7 @@ var Ff2ch = {
     search: function(query){
         return new Promise((resolve, reject) => {
             const url = 'http://ff2ch.syoboi.jp/?alt=rss&q=' + encodeURIComponent(query);
-            const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
-            let req = XMLHttpRequest();
+            let req = new XMLHttpRequest();
 
             req.addEventListener('error', reject, false);
             req.addEventListener('load', () => {

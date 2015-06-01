@@ -16,7 +16,6 @@ let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
 let AbstractPluginLoader = {
 
-
     /**
      * name for this type of plugins. e.g.) "search" for search plugins.
      * @type {String}
@@ -92,14 +91,13 @@ let AbstractPluginLoader = {
 
 
     _load(pluginDir) {
-        const that = this;
         let packagePath = OS.Path.join(pluginDir.path, 'package.json');
 
-        return Task.spawn(function* (){
+        return Task.spawn((function* (){
             // We use "packaqe" as a variable's name instead of "package"
             // in order to avoid using the reserved word in strict mode.
-            let packaqe = yield that._loadPackageJSON(packagePath);
-            let sandbox = yield that._getSandboxWithPermissions(packaqe.permissions);
+            let packaqe = yield this._loadPackageJSON(packagePath);
+            let sandbox = yield this._getSandboxWithPermissions(packaqe.permissions);
             let scriptPath = OS.Path.join(pluginDir.path, 'main.js');
 
             Services.scriptloader.loadSubScriptWithOptions(
@@ -112,9 +110,9 @@ let AbstractPluginLoader = {
             );
 
             // Export
-            that.packaqe[packaqe.id] = packaqe;
-            that.plugins[packaqe.id] = sandbox[sandbox.EXPORTED_SYMBOL];
-        });
+            this.packages[packaqe.id] = packaqe;
+            this.plugins[packaqe.id] = sandbox[sandbox.EXPORTED_SYMBOL];
+        }).bind(this));
     },
 
 
@@ -141,7 +139,6 @@ let AbstractPluginLoader = {
             wantExportHelpers: true,
             wantComponents: !!permissions.components,
             wantGlobalProperties: permissions['global-props'] || [],
-            wantXrays: false, //!permissions['disable-xrays']
         };
 
         let sandbox = Cu.Sandbox(principal, options);

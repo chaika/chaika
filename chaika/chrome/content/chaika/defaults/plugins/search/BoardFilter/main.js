@@ -1,15 +1,12 @@
 /* See license.txt for terms of usage */
 
+'use strict';
+
 Components.utils.import("resource://chaika-modules/ChaikaBBSMenu.js");
 
+let EXPORTED_SYMBOL = "BoardFilter";
 
-var BoardFilter = {
-
-    id: '99.chaika.filter.board',
-
-    name: '板名フィルタ',
-
-    version: '2.0.0',
+let BoardFilter = {
 
     charset: 'utf-8',
 

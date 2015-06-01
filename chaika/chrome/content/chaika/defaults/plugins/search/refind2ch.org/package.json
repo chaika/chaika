@@ -1,0 +1,16 @@
+{
+    "id": "02.refind2ch.org",
+
+    "name": "スレッド検索 (refind2ch.org)",
+
+    "version": "1.0.0",
+
+    "updateURL": "https://raw.githubusercontent.com/chaika/chaika/develop/chaika/chrome/content/chaika/defaults/plugin/search/refind2ch.org/update.json",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "XMLHttpRequest" ]
+    }
+}

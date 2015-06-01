@@ -1,17 +1,10 @@
 /* See license.txt for terms of usage */
 
-const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+'use strict';
 
-Cu.import("resource://chaika-modules/ChaikaCore.js");
+let EXPORTED_SYMBOL = 'Refind2ch';
 
-
-var Refind2ch = {
-
-    id: '02.refind2ch.org',
-
-    name: 'スレッド検索 (refind2ch.org)',
-
-    version: '1.0.0',
+let Refind2ch = {
 
     charset: 'utf-8',
 
@@ -20,8 +13,7 @@ var Refind2ch = {
     search: function(query){
         return new Promise((resolve, reject) => {
             const url = 'http://refind2ch.org/search?q=' + encodeURIComponent(query);
-            const XMLHttpRequest = Components.Constructor("@mozilla.org/xmlextras/xmlhttprequest;1");
-            let req = XMLHttpRequest();
+            let req = new XMLHttpRequest();
 
             req.addEventListener('error', reject, false);
             req.addEventListener('load', () => {
@@ -32,20 +24,12 @@ var Refind2ch = {
                     return;
                 }
 
-                if(req.status !== 200 || !req.responseText){
+                if(req.status !== 200 || !req.response){
                     reject('Unable to connect or parse the response. (status: ' + req.status + ')');
                     return;
                 }
 
-
-                let parser = Cc["@mozilla.org/xmlextras/domparser;1"].createInstance(Ci.nsIDOMParser);
-                let doc = parser.parseFromString("<root xmlns:html='http://www.w3.org/1999/xhtml'/>", "text/xml");
-                let parserUtils = Cc["@mozilla.org/parserutils;1"].getService(Ci.nsIParserUtils);
-                let fragment = parserUtils.parseFragment(req.responseText, 0, false, null, doc.documentElement);
-
-                doc.documentElement.appendChild(fragment);
-
-
+                let doc = req.response;
                 let results = doc.querySelectorAll('#search_results > .thread_url');
                 let boards = [];
 
@@ -77,8 +61,8 @@ var Refind2ch = {
             }, false);
 
             req.open("GET", url, true);
-            req.setRequestHeader('User-Agent', ChaikaCore.getUserAgent());
-            req.overrideMimeType('text/html; charset=utf-8');
+            req.setRequestHeader('User-Agent', CHAIKA_USER_AGENT);
+            req.responseType = 'document';
             req.send(null);
         });
     },
