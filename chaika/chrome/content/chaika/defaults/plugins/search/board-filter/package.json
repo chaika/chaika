@@ -1,0 +1,16 @@
+{
+    "id": "99.chaika.board-filter",
+
+    "name": "板名フィルタ",
+
+    "version": "2.0.0",
+
+    "updateURL": "https://raw.githubusercontent.com/chaika/chaika/develop/chaika/chrome/content/chaika/defaults/plugin/search/board-filter/update.json",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "components": true
+    }
+}
