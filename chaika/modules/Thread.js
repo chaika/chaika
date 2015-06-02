@@ -2,12 +2,11 @@
 
 'use strict';
 
-this.EXPORTED_SYMBOLS = ["Thread", "ThreadDB"];
+this.EXPORTED_SYMBOLS = ["ThreadFactory", "ThreadDB"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
-let { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
+let { BoardPluginLoader } = Cu.import('resource://chaika-modules/plugins/BoardPluginLoader.js', {});
 let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
 let { Sqlite } = Cu.import('resource://gre/modules/Sqlite.jsm', {});
 let { Task } = Cu.import('resource://gre/modules/Task.jsm', {});
@@ -17,7 +16,36 @@ let { Board } = Cu.import("resource://chaika-modules/Board.js", {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
 
+let ThreadFactory = {
+
+    create(url) {
+        let thread = new Thread(url);
+        let plugin = BoardPluginLoader.get(url).thread;
+
+        return new Proxy(thread, {
+            get(target, name) {
+                if(name in plugin){
+                    return plugin[name];
+                }
+
+                if(name in target){
+                    return target[name];
+                }
+
+                return undefined;
+            }
+        });
+    }
+
+};
+
+
+
 /**
+ * URL manipulation and data accessing accosiated with a Thread.
+ * Some methods are left to be abstract method,
+ * which are expected to be implemented by board plugins loaded by BoardPluginLoader.
+ *
  * @param {String} aURL
  */
 function Thread(aURL){
@@ -40,45 +68,38 @@ Thread.prototype = {
 
 
     /**
+     * a relative path of thread's source from FileIO.Path.logDir.
+     * @abstract
+     * @return {String}
+     */
+    get sourcePath() {},
+
+
+    /**
      * a path string of thread's source, e.g., a dat file on 2ch-like BBS, in the local disk.
      * @type {String}
      */
     get source() {
-        let uri = Services.io.newURI(this.board.url, null, null);
-        let boardID = '/' + '2ch' + uri.path;
-        let threadID = this.origURL.match(/\/(\d{9,10})/)[1];
-
-        let path = OS.Path.join(FileIO.Path.logDir, ...(boardID + threadID + '.dat').split('/'));
-
+        let path = OS.Path.join(FileIO.Path.logDir, ...this.sourcePath.split('/'));
         return path;
     },
 
 
     /**
      * URL string without any filter strings.
+     * @abstract
      * @type {String}
      */
-    get url() {
-        if(!this._url){
-            this._url = this.origURL.replace(/[^\/]+$/, '');
-        }
-
-        return this._url;
-    },
+    get url() {},
 
 
     /**
      * Thread filter string that represents a range or
      * specific numbers of posts in a thread to show.
+     * @abstract
      * @type {String}
      */
-    get filterStr() {
-        if(!this._filterStr){
-            this._filterStr = this.origURL.replace(/^.*\//, '');
-        }
-
-        return this._filterStr;
-    },
+    get filterStr() {},
 
 
     /**

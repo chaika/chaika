@@ -1,0 +1,14 @@
+{
+    "id": "chaika.2ch-compatible",
+
+    "name": "2ch互換掲示板",
+
+    "version": "1.0.0",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "URL" ]
+    }
+}

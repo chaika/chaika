@@ -1,0 +1,14 @@
+{
+    "id": "chaika.to.machi",
+
+    "name": "まちBBS (machi.to)",
+
+    "version": "1.0.0",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "URL" ]
+    }
+}

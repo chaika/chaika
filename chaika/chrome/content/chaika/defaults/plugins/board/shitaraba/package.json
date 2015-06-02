@@ -1,0 +1,14 @@
+{
+    "id": "chaika.shitaraba",
+
+    "name": "したらば掲示板",
+
+    "version": "1.0.0",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "URL" ]
+    }
+}

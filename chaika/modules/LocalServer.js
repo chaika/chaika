@@ -13,7 +13,7 @@ let { HttpServer, HTTP_400, HTTP_404 } = Cu.import('resource://chaika-modules/li
 let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
-let { Thread } = Cu.import('resource://chaika-modules/Thread.js', {});
+let { ThreadFactory } = Cu.import('resource://chaika-modules/Thread.js', {});
 let { ThreadFetcher } = Cu.import('resource://chaika-modules/ThreadFetcher.js', {});
 let { ThreadParser } = Cu.import('resource://chaika-modules/ThreadParser.js', {});
 let { ThreadBuilder } = Cu.import('resource://chaika-modules/ThreadBuilder.js', {});
@@ -248,7 +248,7 @@ ThreadHandler.ThreadWriter = function(url, response) {
      * Thread
      * @type {Thread}
      */
-    this.thread = new Thread(url);
+    this.thread = ThreadFactory.create(url);
 
     /**
      * Counter of number of posts in this thread.

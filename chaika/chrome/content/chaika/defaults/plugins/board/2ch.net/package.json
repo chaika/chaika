@@ -1,0 +1,14 @@
+{
+    "id": "chaika.net.2ch",
+
+    "name": "2ch.net",
+
+    "version": "1.0.0",
+
+    "author": "nodaguti",
+
+    "permissions": {
+        "system": true,
+        "global-props": [ "URL" ]
+    }
+}
