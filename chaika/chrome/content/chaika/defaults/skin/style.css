@@ -65,6 +65,41 @@ body {
 }
 
 
+/* ***** ***** メニュー ***** ***** */
+
+.menu{
+    background-color: rgba(60, 60, 60, 0.85);
+    border: 1px solid #555;
+    font-size: 0.9em;
+    line-height: 1.0;
+    font-weight: normal;
+    padding: 0;
+    margin: 0;
+    cursor: default;
+    list-style-type: none;
+}
+
+.menu > li{
+    display: block;
+    margin: 0;
+    padding: 1px;
+    list-style-type: none;
+    color: #fff;
+}
+
+.menu > li > a{
+    color: #fff;
+    font-size: 0.9em;
+    display: block;
+    padding: 4px 8px;
+    text-decoration: none;
+}
+
+.menu > li > a:hover{
+    background-color: rgba(60, 60, 60, 1.0);
+}
+
+
 /* ***** ***** ヘッダー ***** ***** */
 
 header{
@@ -120,7 +155,7 @@ nav {
     padding: 0 8px;
 }
 
-nav ul{
+nav > ul{
     padding: 0;
     margin: 0;
     cursor: default;
@@ -140,26 +175,11 @@ nav > ul > li{
 }
 
 nav > ul > li > ul{
-    background-color: rgba(60, 60, 60, 0.85);
-    border: 1px solid #555;
-    font-weight: normal;
     display: none;
 }
 
 nav > ul:hover > li > ul{
     display: block;
-}
-
-nav > ul > li > ul > li > a{
-    color: #fff;
-    font-size: 0.9em;
-    display: block;
-    padding: 4px 8px;
-    text-decoration: none;
-}
-
-nav > ul > li > ul > li > a:hover{
-    background-color: rgba(60, 60, 60, 1.0);
 }
 
 
@@ -313,6 +333,8 @@ nav > ul > li > ul > li > a:hover{
 
 /* ***** ***** ハイライトレス ***** ***** */
 
+/* *** NGEx *** */
+
 .resDateImportant{
     color: #E63;
 }
@@ -328,6 +350,23 @@ nav > ul > li > ul > li > a:hover{
 [data-aboned="false"] .resHeaderAboneContent{
     color: #888;
     font-size: 90%;
+}
+
+/* *** 自分の書き込み・自分への返信 *** */
+
+.my-post,
+.reply-to-me{
+    background-color: #ff9500;  /* Chameleon orange for highlight */
+}
+
+.my-post .resName:before{
+    content: '\81EA\5206\003A\0020';  /* "自分: " */
+    color: black;
+}
+
+.reply-to-me .resName:before{
+    content: '\8FD4\4FE1\003A\0020';  /* "返信: " */
+    color: black;
 }
 
 
@@ -353,6 +392,7 @@ nav > ul > li > ul > li > a:hover{
 .popup *,
 .popup .resHeaderAboneContent:before{
     color: #EEE !important;
+    background-color: initial !important;
 }
 
 
@@ -394,6 +434,13 @@ nav > ul > li > ul > li > a:hover{
 }
 
 
+/* ***** ***** レスメニュー ***** ***** */
+
+#resPopupMenu{
+    display: none;
+}
+
+
 /* ***** ***** 設定画面 ***** ***** */
 
 #settings{
@@ -413,10 +460,6 @@ nav > ul > li > ul > li > a:hover{
 
 #settings-buttonset{
     text-align: right;
-}
-
-#settings input{
-    color: black !important;
 }
 
 label{

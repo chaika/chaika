@@ -315,6 +315,38 @@ var Effects = {
 };
 
 
+var Notifications = {
+
+    _getPermission(){
+        return new Promise((resolve, reject) => {
+            if(Notification.permission === 'granted'){
+                resolve();
+            }else if(Notification.permission === 'denied'){
+                reject();
+            }else{
+                Notification.requestPermission((permission) => {
+                    if(permission === 'granted'){
+                        resolve();
+                    }else{
+                        reject();
+                    }
+                });
+            }
+        });
+    },
+
+
+    notify(message) {
+        this._getPermission().then(() => {
+            new Notification('chaika', {
+                body: message,
+                icon: SERVER_URL + 'icon.png'
+            });
+        });
+    }
+
+};
+
 
 /**
  * 設定項目を扱う
@@ -342,6 +374,11 @@ var Prefs = {
         // ショートカットキー
         'pref-enable-shortcut': true,
         'pref-enable-resjump': true,
+
+        // 返信通知
+        'pref-enable-reply-notification': true,
+        'pref-highlight-my-posts': true,
+        'pref-highlight-replies-to-me': true,
     },
 
 
@@ -447,6 +484,12 @@ var ThreadInfo = {
 var ResInfo = {
 
     startup: function(){
+        this.countPosts();
+        this.markAndCheckReplyToMyPosts();
+    },
+
+
+    countPosts() {
         let enableRefCount = Prefs.get('pref-enable-referred-count');
         let enablePostsCount = Prefs.get('pref-enable-posts-count');
 
@@ -532,6 +575,60 @@ var ResInfo = {
                 });
             }
         }
+    },
+
+
+    markAndCheckReplyToMyPosts() {
+        let enableNotification = Prefs.get('pref-enable-reply-notification');
+        let enableHighlightMe = Prefs.get('pref-highlight-my-posts');
+        let enableHighlightReplies = Prefs.get('pref-highlight-replies-to-me');
+
+        let myPostNums = Prefs.get('my-posts') || {};
+        let myIDs = Prefs.get('my-ids') || {};
+        let myPosts = [];
+
+        if(myPostNums[EXACT_URL]){
+            myPosts = myPosts.concat(myPostNums[EXACT_URL].map((resNumber) => {
+                return $.selector('article[data-number="' + resNumber + '"]');
+            }));
+        }
+
+        if(myIDs[EXACT_URL]){
+            myPosts = myPosts.concat(myIDs[EXACT_URL].map((resID) => {
+                return $.selectorAll('article[data-id="' + resID + '"]');
+            }));
+
+            // flatten
+            myPosts = Array.prototype.concat.apply([], myPosts);
+        }
+
+        myPosts.forEach((res) => {
+            let resNum = $.klass('resNumber', res);
+
+            res.classList.add('my-post');
+
+            if(enableHighlightMe){
+                res.classList.add('highlighted');
+            }
+
+            if(resNum.dataset.referred){
+                if(enableNotification && res.classList.contains('newRes')){
+                    Notifications.notify('あなたが投稿したレスに返信があります.');
+                }
+
+                resNum.dataset.referred.split(',').forEach((refID) => {
+                    let resNode = $.id(refID);
+
+                    if(resNode){
+                        resNode.classList.add('reply-to-me');
+
+                        if(enableHighlightReplies){
+                            resNode.classList.add('highlighted');
+                        }
+                    }
+                });
+            }
+        });
     }
 
 };
@@ -612,30 +709,49 @@ var ResCommand = {
 
     startup: function(){
         document.addEventListener('click', this, false);
+        document.addEventListener('contextmenu', this, false);
     },
 
 
     handleEvent: function(aEvent){
         let target = aEvent.originalTarget;
-        let container = $.parentByClass('resContainer', target, true);
 
         // HTML 外要素の場合
         if(!(target instanceof HTMLElement)) return;
 
-        // レス要素外の場合
-        if(!container) return;
-
 
         switch(target.className){
-            case 'resNumber':
-                this.replyTo(target.textContent);
-                break;
-
-            default:
-                if($.parentByClass('resHeader', target, true) && container.dataset.aboned === 'true'){
-                    this.toggleCollapse(container);
+            case 'resNumber': {
+                if(aEvent.button === 0){  // Left click
+                    this.replyTo(target.textContent);
+                }else if(aEvent.button === 2){  // Right click
+                    aEvent.preventDefault();
+                    aEvent.stopPropagation();
+                    this.showPopupMenu(target.textContent, aEvent.clientX, aEvent.clientY);
                 }
-                break;
+            }
+            break;
+
+            default: {
+                let resPopupMenu = $.parentByClass('resPopupMenu', target);
+
+                if(resPopupMenu && target.dataset.command){
+                    $.hide(resPopupMenu);
+                    this[target.dataset.command](resPopupMenu.dataset.target);
+                    return;
+                }
+
+                $.hide($.id('resPopupMenu'));
+
+                let container = $.parentByClass('resContainer', target, true);
+                let header = $.parentByClass('resHeader', target, true);
+
+                if(header && container.dataset.aboned === 'true'){
+                    this.toggleCollapse(container);
+                    return;
+                }
+            }
+            break;
         }
     },
 
@@ -664,7 +780,71 @@ var ResCommand = {
      */
     toggleCollapse: function(resContainer){
         resContainer.classList.toggle('collapsed');
-    }
+    },
+
+
+    /**
+     * レスの内容をコピーする
+     * @param {Number} resNumber
+     */
+     copy(resNumber) {
+         alert('Not implemented.');
+     },
+
+
+     /**
+      * 自分のレスとして登録する
+      * @param {Number} resNumber
+      */
+     markAsMyPost(resNumber) {
+         let database = Prefs.get('my-posts') || {};
+
+         if(!database[EXACT_URL]){
+             database[EXACT_URL] = [];
+         }
+
+         database[EXACT_URL].push(resNumber);
+
+         Prefs.set('my-posts', database);
+         ResInfo.markAndCheckReplyToMyPosts();
+     },
+
+
+     /**
+      * 自分のIDとして登録する
+      * @param {Number} resNumber
+      */
+     markAsMyID(resNumber) {
+         let res = $.selector('article[data-number="' + resNumber + '"]');
+         let id = res.dataset.id;
+         let database = Prefs.get('my-ids') || {};
+
+         if(!database[EXACT_URL]){
+             database[EXACT_URL] = [];
+         }
+
+         database[EXACT_URL].push(id);
+
+         Prefs.set('my-ids', database);
+         ResInfo.markAndCheckReplyToMyPosts();
+     },
+
+
+    /**
+     * レスポップアップメニューを表示する
+     * @param {Number} resNumber 呼び出し元のレス番号
+     */
+     showPopupMenu(resNumber, x, y) {
+         let popup = $.id('resPopupMenu');
+
+         popup.dataset.target = resNumber;
+         $.css(popup, {
+             position: 'fixed',
+             top: y + 'px',
+             left: x + 'px',
+         });
+         $.show(popup);
+     }
 
 };
 
