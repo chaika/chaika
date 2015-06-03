@@ -337,7 +337,7 @@ nav > ul:hover > li > ul{
 
 /* *** NGEx *** */
 
-[data-aboned="false"] .resHeader[data-ngtitle]:after{
+[data-aboned="false"] .resHeader:not([data-ngtitle=""]):after{
     content: " (" attr(data-ngtitle) ")";
     display: inline-block;
     padding-right: 1em;
