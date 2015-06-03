@@ -103,7 +103,7 @@ body {
 /* ***** ***** ヘッダー ***** ***** */
 
 header{
-    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
@@ -125,7 +125,7 @@ header:after{
 /* スレッドタイトル */
 
 header > h1{
-    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     float: left;
     margin: 0;
     padding: 0;
