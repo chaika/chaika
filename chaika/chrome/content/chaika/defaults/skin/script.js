@@ -593,8 +593,8 @@ var ResInfo = {
             }));
         }
 
-        if(myIDs[EXACT_URL]){
-            myPosts = myPosts.concat(myIDs[EXACT_URL].map((resID) => {
+        if(myIDs[BOARD_URL]){
+            myPosts = myPosts.concat(myIDs[BOARD_URL].map((resID) => {
                 return $.selectorAll('article[data-id="' + resID + '"]');
             }));
 
@@ -819,11 +819,11 @@ var ResCommand = {
          let id = res.dataset.id;
          let database = Prefs.get('my-ids') || {};
 
-         if(!database[EXACT_URL]){
-             database[EXACT_URL] = [];
+         if(!database[BOARD_URL]){
+             database[BOARD_URL] = [];
          }
 
-         database[EXACT_URL].push(id);
+         database[BOARD_URL].push(id);
 
          Prefs.set('my-ids', database);
          ResInfo.markAndCheckReplyToMyPosts();
