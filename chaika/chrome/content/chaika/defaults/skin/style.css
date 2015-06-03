@@ -300,19 +300,16 @@ nav > ul:hover > li > ul{
     display: none;
 }
 
-.collapsed .resHeaderAboneContent:before {
-    content: "ABONE";
+.collapsed .resHeader:after {
+    content: "ABONE (" attr(data-ngtitle) ")";
     display: inline-block;
     padding-right: 1em;
     font-weight: bold;
     color: #369;
-    font-size: 1.1em;
+    font-size: 93%;
 }
 
-.collapsed .resHeaderAboneContent{
-    color: #888;
-    font-size: 90%;
-}
+
 
 /** 展開時 **/
 
@@ -326,38 +323,31 @@ nav > ul:hover > li > ul{
     padding: 12px 35px 12px 25px;
 }
 
-[data-aboned="true"]:not(.collapsed) .resHeaderAboneContent{
-    display: none;
+[data-aboned="true"]:not(.collapsed) .resHeader:after{
+    content: "";
 }
 
 
 /* ***** ***** ハイライトレス ***** ***** */
 
-/* *** NGEx *** */
-
-.resDateImportant{
-    color: #E63;
-}
-
-[data-aboned="false"] .resHeaderAboneContent:not(:empty):before{
-    content: "(";
-}
-
-[data-aboned="false"] .resHeaderAboneContent:not(:empty):after{
-    content: ")";
-}
-
-[data-aboned="false"] .resHeaderAboneContent{
-    color: #888;
-    font-size: 90%;
-}
-
-/* *** 自分の書き込み・自分への返信 *** */
-
-.my-post,
-.reply-to-me{
+.highlighted{
     background-color: #ff9500;  /* Chameleon orange for highlight */
 }
+
+
+/* *** NGEx *** */
+
+[data-aboned="false"] .resHeader[data-ngtitle]:after{
+    content: " (" attr(data-ngtitle) ")";
+    display: inline-block;
+    padding-right: 1em;
+    font-weight: bold;
+    color: #369;
+    font-size: 95%;
+}
+
+
+/* *** 自分の書き込み・自分への返信 *** */
 
 .my-post .resName:before{
     content: '\81EA\5206\003A\0020';  /* "自分: " */

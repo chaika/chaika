@@ -486,6 +486,7 @@ var ResInfo = {
     startup: function(){
         this.countPosts();
         this.markAndCheckReplyToMyPosts();
+        this.highlightHighlightedPosts();
     },
 
 
@@ -628,6 +629,15 @@ var ResInfo = {
                     }
                 });
             }
+        });
+    },
+
+
+    highlightHighlightedPosts() {
+        let posts = $.klass('highlightedRes', null, true);
+
+        posts.forEach((post) => {
+            $.parentByClass('resContainer', post).classList.add('highlighted');
         });
     }
 
@@ -980,20 +990,20 @@ var AboneHandler = {
         for(let i=0, l=aboneCandidates.length; i<l; i++){
             if(aboneCandidates[i].textContent.contains(ngWord)){
                 let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
-                let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes);
+                let resHeader = $.klass('resHeader', aboneRes);
 
                 //NGワードが追加された場合
                 if(aboneAdded && aboneRes.dataset.aboned !== 'true'){
                     aboneRes.classList.add('collapsed');
                     aboneRes.dataset.aboned = 'true';
-                    $.attrs(aboneResHeader, { 'text': ngWord });
+                    resHeader.dataset.ngtitle = ngWord;
                 }
 
                 //NGワードが削除された場合
                 if(!aboneAdded && aboneRes.dataset.aboned === 'true'){
                     aboneRes.classList.remove('collapsed');
                     aboneRes.dataset.aboned = 'false';
-                    aboneResHeader.textContent = '';
+                    resHeader.dataset.ngtitle = '';
                 }
             }
         }
