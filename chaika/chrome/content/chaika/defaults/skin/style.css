@@ -226,11 +226,13 @@ nav > ul:hover > li > ul{
 /* ***** ***** レス ***** ***** */
 
 .resContainer {
-    margin: 0.5em 15px 0.5em 15px;
+    margin-bottom: 2em;
+    margin-left: 15px;
+    padding-left: 5px;
+    border-left: 5px solid transparent;
 }
 
 .resHeader {
-    padding: 2px 4px;
     font-size: 0.8em;
     font-weight: normal;
 }
@@ -302,8 +304,8 @@ nav > ul:hover > li > ul{
 }
 
 .resBody {
-    margin: 0 0 20px 0;
-    padding: 12px 35px 12px 25px;
+    padding-top: 0.6em;
+    padding-left: 25px;
     color: var(--in-content-text-color);
 }
 
@@ -348,7 +350,7 @@ nav > ul:hover > li > ul{
 /* ***** ***** ハイライトレス ***** ***** */
 
 .highlighted{
-    background-color: var(--in-content-border-highlight);
+    border-left: 5px solid var(--in-content-border-highlight);
 }
 
 
