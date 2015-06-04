@@ -65,7 +65,7 @@
 
     /* chaika colors */
     --chaika-inverted-color: #fff;
-    --chaika-inverted-background: rgba(60, 60, 60, 0.85);
+    --chaika-inverted-background: rgba(60, 60, 60, 0.8);
     --chaika-inverted-item-hover: rgba(60, 60, 60, 1.0);
     --chaika-highlight-color: #ff9500;
     --chaika-warning-color: #d74345;  /* https://people.mozilla.org/~jgruen/chameleon/old/#nav5 */
