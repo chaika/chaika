@@ -566,18 +566,26 @@ var ResInfo = {
         let enableHighlightMe = Prefs.get('pref-highlight-my-posts');
         let enableHighlightReplies = Prefs.get('pref-highlight-replies-to-me');
 
-        let myPostNums = Prefs.get('my-posts') || {};
-        let myIDs = Prefs.get('my-ids') || {};
+        let myPostNums = (Prefs.get('my-posts') || {})[EXACT_URL];
+        let myIDs = (Prefs.get('my-ids') || {})[BOARD_URL];
         let myPosts = [];
 
-        if(myPostNums[EXACT_URL]){
-            myPosts = myPosts.concat(myPostNums[EXACT_URL].map((resNumber) => {
+        // reset states
+        $.selectorAll('.my-post, .reply-to-me').forEach((post) => {
+            post.classList.remove('my-post');
+            post.classList.remove('reply-to-me');
+            post.classList.remove('highlighted');
+        });
+
+        // collect posts
+        if(myPostNums){
+            myPosts = myPosts.concat(myPostNums.map((resNumber) => {
                 return $.selector('article[data-number="' + resNumber + '"]');
             }));
         }
 
-        if(myIDs[BOARD_URL]){
-            myPosts = myPosts.concat(myIDs[BOARD_URL].map((resID) => {
+        if(myIDs){
+            myPosts = myPosts.concat(myIDs.map((resID) => {
                 return $.selectorAll('article[data-id="' + resID + '"]');
             }));
 
@@ -585,6 +593,7 @@ var ResInfo = {
             myPosts = Array.prototype.concat.apply([], myPosts);
         }
 
+        //mark posts
         myPosts.forEach((res) => {
             let resNum = $.klass('resNumber', res);
 
@@ -729,7 +738,7 @@ var ResCommand = {
 
                 if(resPopupMenu && target.dataset.command){
                     $.hide(resPopupMenu);
-                    this[target.dataset.command](resPopupMenu.dataset.target);
+                    this[target.dataset.command](resPopupMenu.dataset.target - 0);
                     return;
                 }
 
@@ -785,7 +794,8 @@ var ResCommand = {
 
 
      /**
-      * 自分のレスとして登録する
+      * 与えられたレス番号を自分のレスとして登録する
+      * すでに登録されていた場合は削除する
       * @param {Number} resNumber
       */
      markAsMyPost(resNumber) {
@@ -795,7 +805,13 @@ var ResCommand = {
              database[EXACT_URL] = [];
          }
 
-         database[EXACT_URL].push(resNumber);
+         let index = database[EXACT_URL].indexOf(resNumber);
+
+         if(index !== -1){
+            database[EXACT_URL].splice(index, 1);
+        }else{
+            database[EXACT_URL].push(resNumber);
+        }
 
          Prefs.set('my-posts', database);
          ResInfo.markAndCheckReplyToMyPosts();
@@ -815,7 +831,13 @@ var ResCommand = {
              database[BOARD_URL] = [];
          }
 
-         database[BOARD_URL].push(id);
+         let index = database[BOARD_URL].indexOf(id);
+
+         if(index !== -1){
+            database[BOARD_URL].splice(index, 1);
+        }else{
+            database[BOARD_URL].push(id);
+        }
 
          Prefs.set('my-ids', database);
          ResInfo.markAndCheckReplyToMyPosts();
