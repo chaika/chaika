@@ -764,6 +764,38 @@ var ThreadCommand = {
 
 
     /**
+     * 次のハイライトされたレスへ移動する
+     */
+    scrollToNextHighlightedRes: function(){
+        let current = this._getCurrentRes();
+        let currentNum = current.dataset.number;
+        let next = $.selector(`article[data-number="${currentNum}"] ~ .highlighted`);
+
+        if(next){
+            $.scrollToElement(next);
+        }
+    },
+
+
+    /**
+     * 前のハイライトされたレスへ移動する
+     */
+    scrollToPrevHighlightedRes: function(){
+        let current = this._getCurrentRes();
+        let prev = current.previousElementSibling;
+
+        while(!prev.classList.contains('highlighted') && prev.classList.contains('resContainer')){
+            prev = prev.previousElementSibling;
+        }
+
+        if(prev.classList.contains('highlighted')){
+            $.scrollToElement(prev);
+        }
+
+    },
+
+
+    /**
      * スレッドを再読込する
      */
     reload: function(){
@@ -957,6 +989,8 @@ var ShortcutHandler = {
         'n': function(){ ThreadCommand.scrollToNewMark(); },
         'j': function(){ ThreadCommand.scrollToNextRes(); },
         'k': function(){ ThreadCommand.scrollToPrevRes(); },
+        'u': function(){ ThreadCommand.scrollToNextHighlightedRes(); },
+        'i': function(){ ThreadCommand.scrollToPrevHighlightedRes(); },
         'f': function(){ window.scrollByPages(1); },
         'b': function(){ window.scrollByPages(-1); },
     },
