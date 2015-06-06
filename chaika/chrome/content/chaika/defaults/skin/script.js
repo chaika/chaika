@@ -941,11 +941,13 @@ var ShortcutHandler = {
 
     /**
      * ショートカットキーと機能とのマッピング
-     * 押した順に + で結合される.
-     * 例えば Control, Shift, Enter の順で押せば Ctrl+Shift+Enter となる.
-     * キーの名称は
+     * 修飾キーの名称は
+     *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+     * を, キーの名称は
      *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
-     * を, 機能については ThreadCommand, ResCommand を参照.
+     * を, 機能については
+     *    ThreadCommand, ResCommand
+     * を参照.
      */
     keyMap: {
         'Control+Enter': function(){ ThreadCommand.write(); },
@@ -961,10 +963,10 @@ var ShortcutHandler = {
 
 
     /**
-     * 押したキーを格納するスタック
+     * 押した数字キーを格納するスタック
      * @type {Array.<String>}
      */
-    _keyStack: [],
+    _numKeyStack: [],
 
 
     /**
@@ -985,26 +987,36 @@ var ShortcutHandler = {
         if(aEvent.defaultPrevented) return;
         if(/(?:textarea|input|select|button)/i.test(aEvent.target.tagName)) return;
 
+        let keyStr = aEvent.key.toLowerCase();
 
-        this._keyStack.push(aEvent.key);
-
-        let keyStr = this._keyStack.join('+');
+        [
+            'Alt', 'AltGraph', 'CapsLock', 'Control', 'Fn', 'FnLock', 'Hyper', 'Meta', 'NumLock',
+            'OS', 'ScrollLock', 'Shift', 'Super', 'Symbol', 'SymbolLock'
+        ].forEach((key) => {
+            if(aEvent.getModifierState(key)){
+                keyStr = key + '+' + keyStr;
+            }
+        });
 
         if(this.keyMap[keyStr]){
             aEvent.preventDefault();
-            this.keyMap[keyStr].call();
+            this.keyMap[keyStr]();
+            this._numKeyStack.length = 0;
+        }
 
-        }else if(Prefs.get('pref-enable-resjump') && /^[\d\+]+$/.test(keyStr)){
+        // Press number keys to move to the position of the specific post.
+        if(Prefs.get('pref-enable-resjump') && /^\d$/.test(aEvent.key)){
             aEvent.preventDefault();
-            ResCommand.scrollTo(keyStr.replace(/\+/g, ''));
+
+            this._numKeyStack.push(aEvent.key);
+            ResCommand.scrollTo(this._numKeyStack.join(''));
+
+            if(this._timer){
+                clearTimeout(this._timer);
+            }
+
+            this._timer = setTimeout(() => { this._numKeyStack.length = 0; }, this._threshold);
         }
-
-
-        if(this._timer){
-            clearTimeout(this._timer);
-        }
-
-        this._timer = setTimeout(() => { this._keyStack = []; }, this._threshold);
     }
 };
 
