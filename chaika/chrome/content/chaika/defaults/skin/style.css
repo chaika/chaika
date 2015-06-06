@@ -369,21 +369,25 @@ nav > ul:hover > li > ul{
 
 /* *** 自分の書き込み・自分への返信 *** */
 
-.highlighted.my-post{
-    border-color: var(--in-content-border-color);
-}
-
 .highlighted.reply-to-me{
     border-color: var(--in-content-border-focus);
 }
 
-.my-post .resName:before{
-    content: '\81EA\5206\003A\0020';  /* "自分: " */
+.reply-to-me .resName:before{
+    content: '\8FD4\4FE1\003A\0020';  /* "返信: " */
     color: var(--in-content-text-color);
 }
 
-.reply-to-me .resName:before{
-    content: '\8FD4\4FE1\003A\0020';  /* "返信: " */
+/**
+ * 「自分」の表示を「返信」に優先させるため,
+ * より下にルールを記述する.
+ */
+.highlighted.my-post{
+    border-color: var(--in-content-border-color);
+}
+
+.my-post .resName:before{
+    content: '\81EA\5206\003A\0020';  /* "自分: " */
     color: var(--in-content-text-color);
 }
 
