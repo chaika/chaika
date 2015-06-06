@@ -219,6 +219,27 @@ var $ = {
                 formElement.checked = aValue;
                 break;
 
+            case 'select-one':
+            case 'select-multiple': {
+                if(!Array.isArray(aValue)) return;
+
+                while(formElement.hasChildNodes()){
+                    formElement.removeChild(formElement.firstChild);
+                }
+
+                aValue.forEach((v) => {
+                    let option = document.createElement('option');
+
+                    $.attrs(option, {
+                        value: v,
+                        text: v,
+                    });
+
+                    formElement.add(option);
+                });
+            }
+            break;
+
             default:
                 formElement.value = aValue;
                 break;
@@ -369,6 +390,7 @@ var Prefs = {
 
         $.id('settings').addEventListener('change', this._onPrefChanged.bind(this), false);
         $.id('settings').addEventListener('blur', this._onPrefChanged.bind(this), false);
+        $.id('settings').addEventListener('keydown', this._onKeydown.bind(this), false);
     },
 
 
@@ -411,6 +433,7 @@ var Prefs = {
     set: function(key, value){
         try{
             localStorage.setItem(key, JSON.stringify(value));
+            this._loadPrefs();
         }catch(ex){
             console.warn('The change is ignored and will not be saved ' +
                          'because writing to the local storage is prohibited by the user.');
@@ -427,15 +450,62 @@ var Prefs = {
 
             $.setValue(prefNode, value);
         });
+
+        let listNodes = $.selectorAll('[id^="list-"]');
+
+        listNodes.forEach((listNode) => {
+            let key = listNode.id;
+            let value = this.get(key) || [];
+
+            $.setValue(listNode, value[BOARD_URL] || value[EXACT_URL] || value);
+        });
     },
 
 
     _onPrefChanged: function(aEvent){
         let target = aEvent.originalTarget;
         let key = target.id;
+
+        if(!key.startsWith('pref-')) return;
+
         let value = $.getValue(target);
 
         this.set(key, value);
+    },
+
+
+    _onKeydown: function(aEvent){
+        if(aEvent.key !== 'Backspace' && aEvent.key !== 'Delete') return;
+
+        let target = aEvent.target;
+
+        switch(target.id){
+            case 'list-my-posts': {
+                let selected = target.selectedOptions[0];
+                let id = selected.value;
+                let database = Prefs.get('list-my-posts');
+                let index = database[EXACT_URL].indexOf(id);
+
+                database[EXACT_URL].splice(index, 1);
+                Prefs.set('list-my-posts', database);
+                target.remove(target.selectedIndex);
+                ResInfo.markAndCheckReplyToMyPosts();
+            }
+            break;
+
+            case 'list-my-ids': {
+                let selected = target.selectedOptions[0];
+                let id = selected.value;
+                let database = Prefs.get('list-my-ids');
+                let index = database[BOARD_URL].indexOf(id);
+
+                database[BOARD_URL].splice(index, 1);
+                Prefs.set('list-my-ids', database);
+                target.remove(target.selectedIndex);
+                ResInfo.markAndCheckReplyToMyPosts();
+            }
+            break;
+        }
     }
 };
 
@@ -566,8 +636,8 @@ var ResInfo = {
         let enableHighlightMe = Prefs.get('pref-highlight-my-posts');
         let enableHighlightReplies = Prefs.get('pref-highlight-replies-to-me');
 
-        let myPostNums = (Prefs.get('my-posts') || {})[EXACT_URL];
-        let myIDs = (Prefs.get('my-ids') || {})[BOARD_URL];
+        let myPostNums = (Prefs.get('list-my-posts') || {})[EXACT_URL];
+        let myIDs = (Prefs.get('list-my-ids') || {})[BOARD_URL];
         let myPosts = [];
 
         // reset states
@@ -799,7 +869,7 @@ var ResCommand = {
       * @param {Number} resNumber
       */
      markAsMyPost(resNumber) {
-         let database = Prefs.get('my-posts') || {};
+         let database = Prefs.get('list-my-posts') || {};
 
          if(!database[EXACT_URL]){
              database[EXACT_URL] = [];
@@ -813,7 +883,7 @@ var ResCommand = {
             database[EXACT_URL].push(resNumber);
         }
 
-         Prefs.set('my-posts', database);
+         Prefs.set('list-my-posts', database);
          ResInfo.markAndCheckReplyToMyPosts();
      },
 
@@ -825,7 +895,7 @@ var ResCommand = {
      markAsMyID(resNumber) {
          let res = $.selector('article[data-number="' + resNumber + '"]');
          let id = res.dataset.id;
-         let database = Prefs.get('my-ids') || {};
+         let database = Prefs.get('list-my-ids') || {};
 
          if(!database[BOARD_URL]){
              database[BOARD_URL] = [];
@@ -839,7 +909,7 @@ var ResCommand = {
             database[BOARD_URL].push(id);
         }
 
-         Prefs.set('my-ids', database);
+         Prefs.set('list-my-ids', database);
          ResInfo.markAndCheckReplyToMyPosts();
      },
 

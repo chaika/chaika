@@ -480,6 +480,10 @@ fieldset{
     margin-bottom: 1em;
 }
 
+select{
+    width: 40%;
+}
+
 fieldset > fieldset{
     border: none;
     margin: 0.5em 0;
