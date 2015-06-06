@@ -61,6 +61,7 @@
     --in-content-page-background: #fbfbfb;
     --in-content-text-color: #333;
     --in-content-border-highlight: #ff9500;
+    --in-content-border-focus: #0095dd;
     --in-content-border-color: #c1c1c1;
 
     /* chaika colors */
@@ -367,6 +368,14 @@ nav > ul:hover > li > ul{
 
 
 /* *** 自分の書き込み・自分への返信 *** */
+
+.highlighted.my-post{
+    border-color: var(--in-content-border-color);
+}
+
+.highlighted.reply-to-me{
+    border-color: var(--in-content-border-focus);
+}
 
 .my-post .resName:before{
     content: '\81EA\5206\003A\0020';  /* "自分: " */
