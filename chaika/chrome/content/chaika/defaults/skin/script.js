@@ -858,9 +858,9 @@ var ResCommand = {
      * レスの内容をコピーする
      * @param {Number} resNumber
      */
-     copy(resNumber) {
-         alert('Not implemented.');
-     },
+    copy(resNumber) {
+        alert('Not implemented.');
+    },
 
 
      /**
@@ -868,67 +868,67 @@ var ResCommand = {
       * すでに登録されていた場合は削除する
       * @param {Number} resNumber
       */
-     markAsMyPost(resNumber) {
-         let database = Prefs.get('list-my-posts') || {};
+    markAsMyPost(resNumber) {
+        let database = Prefs.get('list-my-posts') || {};
 
-         if(!database[EXACT_URL]){
-             database[EXACT_URL] = [];
-         }
+        if(!database[EXACT_URL]){
+            database[EXACT_URL] = [];
+        }
 
-         let index = database[EXACT_URL].indexOf(resNumber);
+        let index = database[EXACT_URL].indexOf(resNumber);
 
-         if(index !== -1){
+        if(index !== -1){
             database[EXACT_URL].splice(index, 1);
         }else{
             database[EXACT_URL].push(resNumber);
         }
 
-         Prefs.set('list-my-posts', database);
-         ResInfo.markAndCheckReplyToMyPosts();
-     },
+        Prefs.set('list-my-posts', database);
+        ResInfo.markAndCheckReplyToMyPosts();
+    },
 
 
-     /**
-      * 自分のIDとして登録する
-      * @param {Number} resNumber
-      */
-     markAsMyID(resNumber) {
-         let res = $.selector('article[data-number="' + resNumber + '"]');
-         let id = res.dataset.id;
-         let database = Prefs.get('list-my-ids') || {};
+    /**
+     * 自分のIDとして登録する
+     * @param {Number} resNumber
+     */
+    markAsMyID(resNumber) {
+        let res = $.selector('article[data-number="' + resNumber + '"]');
+        let id = res.dataset.id;
+        let database = Prefs.get('list-my-ids') || {};
 
-         if(!database[BOARD_URL]){
-             database[BOARD_URL] = [];
-         }
+        if(!database[BOARD_URL]){
+            database[BOARD_URL] = [];
+        }
 
-         let index = database[BOARD_URL].indexOf(id);
+        let index = database[BOARD_URL].indexOf(id);
 
-         if(index !== -1){
+        if(index !== -1){
             database[BOARD_URL].splice(index, 1);
         }else{
             database[BOARD_URL].push(id);
         }
 
-         Prefs.set('list-my-ids', database);
-         ResInfo.markAndCheckReplyToMyPosts();
-     },
+        Prefs.set('list-my-ids', database);
+        ResInfo.markAndCheckReplyToMyPosts();
+    },
 
 
     /**
      * レスポップアップメニューを表示する
      * @param {Number} resNumber 呼び出し元のレス番号
      */
-     showPopupMenu(resNumber, x, y) {
-         let popup = $.id('resPopupMenu');
+    showPopupMenu(resNumber, x, y) {
+        let popup = $.id('resPopupMenu');
 
-         popup.dataset.target = resNumber;
-         $.css(popup, {
-             position: 'fixed',
-             top: y + 'px',
-             left: x + 'px',
-         });
-         $.show(popup);
-     }
+        popup.dataset.target = resNumber;
+        $.css(popup, {
+            position: 'fixed',
+            top: y + 'px',
+            left: x + 'px',
+        });
+        $.show(popup);
+    }
 
 };
 
