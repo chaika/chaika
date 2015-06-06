@@ -225,24 +225,6 @@ var $ = {
         }
     },
 
-    /**
-     * 簡易テンプレートから文字列を生成
-     * @param {String} template テンプレート 置換する場所を @@ で指定する
-     * @param {String} args 可変引数 テンプレート文字列の @@ を初めから順に置換する
-     * @example $.template('@@ is a @@.', 'This', 'pen') //=> This is a pen.
-     * @return {String} 置換後の文字列
-     */
-    template: function(...args){
-        var template = args.shift();
-        var count = 0;
-
-        template = template.replace('@@', function(){
-            return args[count++];
-        }, 'g');
-
-        return template;
-    },
-
 
     /**
      * 指定した要素までスクロールする
