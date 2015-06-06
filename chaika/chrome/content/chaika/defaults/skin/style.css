@@ -480,26 +480,22 @@ fieldset{
     margin-bottom: 1em;
 }
 
-fieldset > div{
-    font-size: 90%;
-    margin: 0.5em 0 0 1.5em;
-}
-
-fieldset > section{
+fieldset > fieldset{
+    border: none;
     margin: 0.5em 0;
-}
-
-fieldset > section > h1{
-    font-size: 100%;
-    font-weight: normal;
     padding: 0;
-    margin: 0;
 }
 
-fieldset > section > label{
+.inline-form label{
     display: inline-block;
 }
 
-fieldset > section > label:first-of-type{
-    margin-left: 1em;
+.desc{
+    font-size: 90%;
+    margin: 0.5em 0 0 1.5em;
+    padding: 0;
+}
+
+ul.desc{
+    list-style-type: square;
 }

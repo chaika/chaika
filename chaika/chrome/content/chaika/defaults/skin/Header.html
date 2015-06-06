@@ -72,13 +72,13 @@
             <input type="checkbox" id="pref-enable-non-strict-image-detection"> 画像リンクの判定を緩くする
         </label>
 
-        <section>
-            <h1>次の種類のポップアップを上方向に表示する:</h1>
+        <fieldset class="inline-form">
+            <legend>次の種類のポップアップを上方向に表示する:</legend>
             <label><input type="checkbox" id="pref-invert-res-popup-dir" /> アンカー</label>
             <label><input type="checkbox" id="pref-invert-image-popup-dir" /> 画像</label>
             <label><input type="checkbox" id="pref-invert-id-popup-dir" /> ID</label>
             <label><input type="checkbox" id="pref-invert-refres-popup-dir" /> 逆参照</label>
-        </section>
+        </fieldset>
 
         <label>
             レスポップアップの最大表示レス数 (0で無制限):
@@ -90,7 +90,7 @@
         <legend>ショートカットキー</legend>
         <label><input type="checkbox" id="pref-enable-shortcut" /> ショートカットキーを有効にする *</label>
         <label><input type="checkbox" id="pref-enable-resjump" /> 数字キーによるレスジャンプを有効にする</label>
-        <div>キーマッピングの設定は直接 <a href="<SKINPATH/>script.js">script.js</a> を編集して下さい</div>
+        <div class="desc">キーマッピングの設定は直接 <a href="<SKINPATH/>script.js">script.js</a> を編集して下さい</div>
     </fieldset>
 
     <fieldset>
@@ -99,15 +99,19 @@
         <label><input type="checkbox" id="pref-highlight-my-posts" /> 自分のレスを強調する *</label>
         <label><input type="checkbox" id="pref-highlight-replies-to-me" /> 自分への返信を強調する *</label>
 
-        <div>動作には「被参照数を表示する」を有効にする必要があります.</div>
-        <div>
-            <a href="https://developer.mozilla.org/ja/docs/WebAPI/Using_Web_Notifications">通知は Firefox を通じて行われます</a>.
-            通知の許可を求めるダイアログが出た場合には許可を押してください.
-        </div>
+        <ul class="desc">
+            <li>動作には「被参照数を表示する」を有効にする必要があります.</li>
+            <li>
+                <a href="https://developer.mozilla.org/ja/docs/WebAPI/Using_Web_Notifications">通知は Firefox を通じて行われます</a>.
+                通知の許可を求めるダイアログが出た場合には許可を押してください.
+            </li>
+        </ul>
     </fieldset>
 
-    <div>* の付いている設定はリロード後に反映されます.</div>
-    <div>設定を保存するには Cookie を有効にして下さい.</div>
+    <ul class="desc">
+        <li>* の付いている設定はリロード後に反映されます.</li>
+        <li>設定を保存するには Cookie を有効にして下さい.</li>
+    </ul>
 
     <div id="settings-buttonset">
         <input type="button" value="OK" onclick="Prefs.close();" />
