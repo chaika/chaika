@@ -588,7 +588,6 @@ var ResInfo = {
                         end = end ? end - 0 : begin;
 
                         if(begin < 1) begin = 1;
-                        if(end > 1001) end = 1001;
 
                         for(let i = begin; i <= end; i++){
                             let refNode = $.id('res' + i);
