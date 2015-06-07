@@ -64,12 +64,12 @@
             <legend>アンカー</legend>
             <label>
                 書き込み内のアンカー数が
-                <input type="text" size="5" id="pref-limit-number-of-anchors" />
+                <input type="number" id="pref-limit-number-of-anchors" />
                 以上の場合に無視する (0で無制限)
             </label>
             <label>
                 アンカーの範囲が
-                <input type="text" size="5" id="pref-limit-range-of-anchor" />
+                <input type="number" id="pref-limit-range-of-anchor" />
                 レス以上のアンカーを無視する (0で無制限)
             </label>
         </fieldset>
@@ -92,8 +92,9 @@
             </fieldset>
 
             <label>
-                レスポップアップの最大表示レス数 (0で無制限):
-                <input type="text" size="5" id="pref-max-posts-in-popup" />
+                ポップアップに表示するレスの数を
+                <input type="number" id="pref-max-posts-in-popup" />
+                以下に制限する (0で無制限)
             </label>
         </fieldset>
 

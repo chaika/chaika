@@ -513,6 +513,11 @@ fieldset{
     margin-bottom: 1em;
 }
 
+input[type="number"]{
+    text-align: right;
+    width: 3em;
+}
+
 select{
     width: 40%;
 }
