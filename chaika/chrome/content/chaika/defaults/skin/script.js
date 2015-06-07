@@ -987,7 +987,7 @@ var ResCommand = {
             }
 
             if(!end){
-                return { start, end };
+                return { start, end: start };
             }
 
             if(end < start){
@@ -1409,7 +1409,7 @@ Popup.Res = {
         Promise.all(anchors.map((anchor) => {
             let { start, end } = anchor;
 
-            return this._createContent(start, end || start);
+            return this._createContent(start, end);
         })).then((popupContents) => {
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
