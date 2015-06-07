@@ -54,13 +54,23 @@
 
 <div id="settings" class="popup">
     <fieldset>
-        <legend>被参照</legend>
+        <legend>書き込みの情報</legend>
         <label><input type="checkbox" id="pref-enable-referred-count" /> 被参照数を表示する *</label>
+        <label><input type="checkbox" id="pref-enable-posts-count" /> ID ごとの発言数を表示する *</label>
     </fieldset>
 
     <fieldset>
-        <legend>ID表示</legend>
-        <label><input type="checkbox" id="pref-enable-posts-count" /> 発言数を表示する *</label>
+        <legend>アンカー</legend>
+        <label>
+            書き込み内のアンカー数が
+            <input type="text" size="5" id="pref-limit-number-of-anchors" />
+            以上の場合に無視する (0で無制限)
+        </label>
+        <label>
+            アンカーの範囲が
+            <input type="text" size="5" id="pref-limit-range-of-anchor" />
+            レス以上のアンカーを無視する (0で無制限)
+        </label>
     </fieldset>
 
     <fieldset>

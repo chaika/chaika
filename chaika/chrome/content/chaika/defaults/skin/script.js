@@ -357,11 +357,13 @@ var Notifications = {
 var Prefs = {
 
     defaultValue: {
-        // 被参照
+        // 書き込みの情報
         'pref-enable-referred-count': true,
-
-        // ID 表示
         'pref-enable-posts-count': true,
+
+        // アンカー
+        'pref-limit-number-of-anchors': 5,
+        'pref-limit-range-of-anchor': 15,
 
         // ポップアップ
         'pref-include-self-post': false,
@@ -574,43 +576,32 @@ var ResInfo = {
 
             //逆参照
             if(enableRefCount){
-                let anchors = $.klass('resPointer', resNode, true);
+                let anchors = ResCommand.getAnchors(resNode);
 
-                if(anchors && anchors.length > 0){
-                    anchors = anchors.reduce((ary, node) => {
-                        return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
-                    }, []);
+                anchors.forEach((anchor) => {
+                    let { start, end } = anchor;
 
-                    anchors.forEach((anchor) => {
-                        let [begin, end] = anchor.split('-');
+                    for(let i = start; i <= end; i++){
+                        let refNode = $.id('res' + i);
 
-                        begin = begin - 0;
-                        end = end ? end - 0 : begin;
+                        //範囲外レスはスキップ
+                        if(!refNode) continue;
 
-                        if(begin < 1) begin = 1;
+                        let refNumber = $.klass('resNumber', refNode);
 
-                        for(let i = begin; i <= end; i++){
-                            let refNode = $.id('res' + i);
-
-                            //範囲外レスはスキップ
-                            if(!refNode) continue;
-
-                            let refNumber = $.klass('resNumber', refNode);
-
-                            if(!refNumber.dataset.referred){
-                                refNumber.dataset.referred = resNode.id;
-                            }else{
-                                refNumber.dataset.referred += ',' + resNode.id;
-                            }
-
-                            if(!refNumber.dataset.referredNum){
-                                refNumber.dataset.referredNum = 1;
-                            }else{
-                                refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
-                            }
+                        if(!refNumber.dataset.referred){
+                            refNumber.dataset.referred = resNode.id;
+                        }else{
+                            refNumber.dataset.referred += ',' + resNode.id;
                         }
-                    });
-                }
+
+                        if(!refNumber.dataset.referredNum){
+                            refNumber.dataset.referredNum = 1;
+                        }else{
+                            refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
+                        }
+                    }
+                });
             }
         });
 
@@ -959,7 +950,59 @@ var ResCommand = {
             left: x + 'px',
         });
         $.show(popup);
-    }
+    },
+
+
+    /**
+     * アンカの情報を得る
+     * @param {Number|Node} post 対象のレス
+     * @param {Boolean} [ignoreLimits=false] アンカ数上限などの制限を無視するか
+     */
+    getAnchors(post, ignoreLimits){
+        let resNode = post instanceof Element ? post : $.selector(`article[data-number="${post}"]`);
+        let anchors = resNode.classList.contains('resPointer') ?
+                        [ resNode ] :
+                        $.klass('resPointer', resNode, true);
+
+        if(!anchors || !anchors.length) return [];
+
+        let numberLimit = Prefs.get('pref-limit-number-of-anchors') - 0;
+        let rangeLimit = Prefs.get('pref-limit-range-of-anchor') - 0;
+
+        // Exceeded the limit of # anchors in a post.
+        if(!ignoreLimits && numberLimit && anchors.length >= numberLimit){
+            return [];
+        }
+
+        anchors = anchors.reduce((ary, node) => {
+            return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
+        }, []).map((anc) => {
+            let [start, end = 0] = anc.split('-');
+
+            start = start - 0;
+            end = end - 0;
+
+            if(!start || start <= 0){
+                return null;
+            }
+
+            if(!end){
+                return { start, end };
+            }
+
+            if(end < start){
+                [start, end] = [end, start];
+            }
+
+            if(!ignoreLimits && rangeLimit && (end - start + 1) >= rangeLimit){
+                return null;
+            }
+
+            return { start, end };
+        }).filter((anc) => !!anc);
+
+        return anchors;
+    },
 
 };
 
@@ -1360,19 +1403,22 @@ var Popup = {
 Popup.Res = {
 
     mouseover: function(aEvent){
-        let target = aEvent.target;
-        let anchors = target.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g);
+        let link = aEvent.target;
+        let anchors = ResCommand.getAnchors(link);
 
         Promise.all(anchors.map((anchor) => {
-            let [begin, end] = anchor.split('-');
-            if(!end) end = begin;
+            let { start, end } = anchor;
 
-            return this._createContent(begin-0, end-0);
+            return this._createContent(start, end || start);
         })).then((popupContents) => {
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
 
             popupContents.forEach((content) => fragment.appendChild(content));
+
+            if(!$.selector('.resContainer', fragment)){
+                return;
+            }
 
             if(Prefs.get('pref-delay-popup')){
                 Popup.showPopupDelay(aEvent, fragment, "ResPopup", shouldInvert);
@@ -1391,15 +1437,10 @@ Popup.Res = {
     _createContent: function(aBegin, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
-        //降順アンカ補正
-        if(aBegin > aEnd) [aEnd, aBegin] = [aBegin, aEnd];
-
-        //枠外補正
-        if(aBegin < 1) aBegin = 1;
-
         //POPUP_LIMIT より多い時は省略する
         let tmpStart = aBegin;
         let omitRes = 0;
+
         if(POPUP_LIMIT && (aEnd - aBegin) > POPUP_LIMIT){
             aBegin = aEnd - POPUP_LIMIT;
             omitRes = aBegin - tmpStart;
