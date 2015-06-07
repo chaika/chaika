@@ -509,17 +509,12 @@ label{
     display: block;
 }
 
+.inline-form label{
+    display: inline-block;
+}
+
 fieldset{
     margin-bottom: 1em;
-}
-
-input[type="number"]{
-    text-align: right;
-    width: 3em;
-}
-
-select{
-    width: 40%;
 }
 
 fieldset > fieldset{
@@ -528,8 +523,21 @@ fieldset > fieldset{
     padding: 0;
 }
 
-.inline-form label{
-    display: inline-block;
+#settings input,
+#settings select,
+#settings button{
+    font-size: 100%;
+    color: var(--chaika-inverted-color);
+    border: 1px solid var(--chaika-inverted-color);
+}
+
+input[type="number"]{
+    text-align: right;
+    width: 4em;
+}
+
+select{
+    width: 40%;
 }
 
 .desc{
