@@ -1015,13 +1015,27 @@ var ShortcutHandler = {
 
     /**
      * ショートカットキーと機能とのマッピング
-     * 修飾キーの名称は
-     *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
-     * を, キーの名称は
-     *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
-     * を, 機能については
-     *    ThreadCommand, ResCommand
-     * を参照.
+     *
+     * @note
+     *    押したキーの名称の前に, 押された修飾キーがアルファベット順に + で結合されます.
+     *    修飾キーの名称は
+     *       https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+     *    を, キーの名称は
+     *       https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
+     *    を参照してください.
+     *
+     * @example
+     *    押すキー -> 記述する文字列
+     *       w -> "w" (実際に入力されるキーが名称となる)
+     *       / -> "/" (記号の場合も同様)
+     *     Enter -> "Enter" (一部のキーは特別に名前が付いている)
+     *    Control, w -> "Control+w" (修飾キーと共に押した場合は + で結合される)
+     *    Shift, w -> "Shift+w" (Shiftキー+アルファベットでは特例としてアルファベットが大文字にならずに結合)
+     *    Shift, 2 -> "Shift+@" (実際に入力される記号が名称となる. 例は US キーボードの場合.)
+     *    Command, Shift, w -> "Shift+Meta+w" (修飾キーはアルファベット順で結合する)
+     *    Shift -> "Shift+Shift" (修飾キーのみの場合は処理の都合上特殊な表記になってしまう)
+     * @note 機能はキーを押した時に実行する関数をそのまま記述してください.
+     * @see ThreadCommand, ResCommand
      */
     keyMap: {
         'Control+Enter': function(){ ThreadCommand.write(); },
@@ -1063,7 +1077,12 @@ var ShortcutHandler = {
         if(aEvent.defaultPrevented) return;
         if(/(?:textarea|input|select|button)/i.test(aEvent.target.tagName)) return;
 
-        let keyStr = aEvent.key.toLowerCase();
+        let keyStr = aEvent.key;
+
+        // Shift を押した場合などにアルファベットが大文字になるのを修正する
+        if(keyStr.length === 1){
+            keyStr = keyStr.toLowerCase()
+        }
 
         [
             'Alt', 'AltGraph', 'CapsLock', 'Control', 'Fn', 'FnLock', 'Hyper', 'Meta', 'NumLock',
