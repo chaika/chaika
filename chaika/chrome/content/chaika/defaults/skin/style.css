@@ -470,7 +470,7 @@ nav > ul:hover > li > ul{
     display: none;
     position: fixed;
     top: 1em;
-    bottom: calc(5%);
+    bottom: 5%;
     right: 1em;
     width: 50%;
     overflow: auto;
@@ -497,7 +497,6 @@ nav > ul:hover > li > ul{
     left: 0;
     right: 0;
     bottom: 0.5em;
-    margin: 0;
 }
 
 #settings-footer-buttons{
