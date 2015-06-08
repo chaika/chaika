@@ -1084,9 +1084,14 @@ var ShortcutHandler = {
             keyStr = keyStr.toLowerCase()
         }
 
+        // 修飾キーの状態を調査する
+        // キーの名称は
+        //    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+        // より取得.
+        // NumLock などの XXXLock 系のキーは, 混乱のもとになるので調査しない.
+        //    ref. http://jbbs.shitaraba.net/bbs/read.cgi/computer/44179/1426703154/864-865
         [
-            'Alt', 'AltGraph', 'CapsLock', 'Control', 'Fn', 'FnLock', 'Hyper', 'Meta', 'NumLock',
-            'OS', 'ScrollLock', 'Shift', 'Super', 'Symbol', 'SymbolLock'
+            'Alt', 'AltGraph', 'Control', 'Fn', 'Hyper', 'Meta', 'OS', 'Shift', 'Super', 'Symbol',
         ].forEach((key) => {
             if(aEvent.getModifierState(key)){
                 keyStr = key + '+' + keyStr;
