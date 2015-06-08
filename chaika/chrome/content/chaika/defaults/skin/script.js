@@ -560,7 +560,7 @@ var ResInfo = {
         resNodes.forEach((resNode) => {
             // ID別発言数
             if(enablePostsCount){
-                let id = $.klass('resID', resNode).dataset.id;
+                let id = resNode.dataset.id;
 
                 if(id && !(id.startsWith('???'))){
                     if(!(id in idTable)){
@@ -610,7 +610,7 @@ var ResInfo = {
             for(let id in idTable){
                 if(typeof idTable[id] !== 'number') continue;
 
-                let idNodes = $.selectorAll('.resContainer[data-id*="' + id + '"] > .resHeader > .resHeaderContent');
+                let idNodes = $.selectorAll('.resContainer[data-id="' + id + '"] > .resHeader > .resHeaderContent');
                 if(!idNodes) continue;
 
                 idNodes.forEach((idNode) => {
