@@ -186,7 +186,7 @@
             return () => {
                 let args = Array.from(arguments);
 
-                return target._root[name](args);
+                return target._root[name](...args);
             };
         }
 

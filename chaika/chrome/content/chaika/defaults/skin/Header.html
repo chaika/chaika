@@ -20,6 +20,7 @@
     <script>
         var SERVER_URL = "<SERVERURL/>";
         var EXACT_URL  = "<THREADURL/>";
+        var BOARD_URL = "<BOARDURL/>";
     </script>
 </head>
 
@@ -34,7 +35,7 @@
     <nav>
         <ul>
             <li><a>MENU</a>
-                <ul>
+                <ul class="menu">
                     <li><a href="chaika://board/<BOARDURL/>">スレッド一覧</a></li>
                     <li><a href="chaika://post/<THREADURL/>">書き込み</a></li>
                     <li><a href="<SERVERURL/><THREADURL/>">全件表示</a></li>
@@ -52,50 +53,117 @@
 </header>
 
 <div id="settings" class="popup">
-    <fieldset>
-        <legend>被参照</legend>
-        <label><input type="checkbox" id="pref-enable-referred-count" /> 被参照数を表示する *</label>
-    </fieldset>
+    <div id="settings-body">
+        <fieldset>
+            <legend>書き込みの情報</legend>
+            <label><input type="checkbox" id="pref-enable-referred-count" /> 被参照数を表示する *</label>
+            <label><input type="checkbox" id="pref-enable-posts-count" /> ID ごとの発言数を表示する *</label>
+        </fieldset>
 
-    <fieldset>
-        <legend>ID表示</legend>
-        <label><input type="checkbox" id="pref-enable-posts-count" /> 発言数を表示する *</label>
-    </fieldset>
+        <fieldset>
+            <legend>アンカー</legend>
+            <label>
+                書き込み内のアンカー数が
+                <input type="number" id="pref-limit-number-of-anchors" />
+                以上の場合に無視する (0で無制限)
+            </label>
+            <label>
+                アンカーの範囲が
+                <input type="number" id="pref-limit-range-of-anchor" />
+                レス以上のアンカーを無視する (0で無制限)
+            </label>
+        </fieldset>
 
-    <fieldset>
-        <legend>ポップアップ</legend>
-        <label><input type="checkbox" id="pref-include-self-post" /> ID ポップアップで自身のレスを含める</label>
-        <label><input type="checkbox" id="pref-disable-single-id-popup" /> 「このレスのみ」のポップアップを表示しない</label>
-        <label><input type="checkbox" id="pref-delay-popup" /> ポップアップ表示を遅延させる</label>
-        <label title="リンク末尾だけでなく, リンク中に画像拡張子のような文字列がある場合も画像と判定するようになります.">
-            <input type="checkbox" id="pref-enable-non-strict-image-detection"> 画像リンクの判定を緩くする
-        </label>
+        <fieldset>
+            <legend>ポップアップ</legend>
+            <label><input type="checkbox" id="pref-include-self-post" /> ID ポップアップで自身のレスを含める</label>
+            <label><input type="checkbox" id="pref-disable-single-id-popup" /> 「このレスのみ」のポップアップを表示しない</label>
+            <label><input type="checkbox" id="pref-delay-popup" /> ポップアップ表示を遅延させる</label>
+            <label title="リンク末尾だけでなく, リンク中に画像拡張子のような文字列がある場合も画像と判定するようになります.">
+                <input type="checkbox" id="pref-enable-non-strict-image-detection"> 画像リンクの判定を緩くする
+            </label>
 
-        <section>
-            <h1>次の種類のポップアップを上方向に表示する:</h1>
-            <label><input type="checkbox" id="pref-invert-res-popup-dir" /> アンカー</label>
-            <label><input type="checkbox" id="pref-invert-image-popup-dir" /> 画像</label>
-            <label><input type="checkbox" id="pref-invert-id-popup-dir" /> ID</label>
-            <label><input type="checkbox" id="pref-invert-refres-popup-dir" /> 逆参照</label>
-        </section>
+            <fieldset class="inline-form">
+                <legend>次の種類のポップアップを上方向に表示する:</legend>
+                <label><input type="checkbox" id="pref-invert-res-popup-dir" /> アンカー</label>
+                <label><input type="checkbox" id="pref-invert-image-popup-dir" /> 画像</label>
+                <label><input type="checkbox" id="pref-invert-id-popup-dir" /> ID</label>
+                <label><input type="checkbox" id="pref-invert-refres-popup-dir" /> 逆参照</label>
+            </fieldset>
 
-        <label>
-			レスポップアップの最大表示レス数 (0で無制限):
-            <input type="text" size="5" id="pref-max-posts-in-popup" />
-        </label>
-    </fieldset>
+            <label>
+                ポップアップに表示するレスの数を
+                <input type="number" id="pref-max-posts-in-popup" />
+                以下に制限する (0で無制限)
+            </label>
+        </fieldset>
 
-    <fieldset>
-    	<legend>ショートカットキー</legend>
-    	<label><input type="checkbox" id="pref-enable-shortcut" /> ショートカットキーを有効にする *</label>
-    	<label><input type="checkbox" id="pref-enable-resjump" /> 数字キーによるレスジャンプを有効にする</label>
-    	<div>キーマッピングの設定は直接 <a href="<SKINPATH/>script.js">script.js</a> を編集して下さい</div>
-    </fieldset>
+        <fieldset>
+            <legend>ショートカットキー</legend>
+            <label title="デフォルトのショートカットキー:
+Control+Enter, Shift+Enter, w: 書き込みウィザードを開く
+r: ページをリロードする
+n: 新着レスの位置へ移動する
+j: 次のレスへ移動する
+k: 前のレスへ移動する
+u: 次のハイライトされたレスへ移動する
+i: 前のハイライトされたレスへ移動する
+f: 1画面分次へスクロールする
+b: 1画面分前へスクロールする"><input type="checkbox" id="pref-enable-shortcut" /> ショートカットキーを有効にする *</label>
+            <label><input type="checkbox" id="pref-enable-resjump" /> 数字キーによるレスジャンプを有効にする</label>
+            <div class="desc">
+                キーマッピングの設定は直接
+                <a href="<SKINPATH/>script.js">script.js</a>
+                の <code>keyMap</code> を編集して下さい
+            </div>
+        </fieldset>
 
-    <div>* の付いている設定はリロード後に反映されます.</div>
-    <div>設定を保存するには Cookie を有効にして下さい.</div>
+        <fieldset>
+            <legend>自己書き込みと返信</legend>
+            <label><input type="checkbox" id="pref-enable-reply-notification" /> 自分のレスに返信があったとき通知する *</label>
+            <label><input type="checkbox" id="pref-highlight-my-posts" /> 自分のレスを強調する *</label>
+            <label><input type="checkbox" id="pref-highlight-replies-to-me" /> 自分への返信を強調する *</label>
 
-    <div id="settings-buttonset">
-        <input type="button" value="OK" onclick="Prefs.close();" />
+            <fieldset>
+                <legend>スレ内の自分のレス番号 (Delete キーで削除)</legend>
+                <select id="list-my-posts" size="3"></select>
+            </fieldset>
+
+            <fieldset>
+                <legend>板内の自分の ID (Delete キーで削除)</legend>
+                <select id="list-my-ids" size="3"></select>
+            </fieldset>
+
+            <ul class="desc">
+                <li>動作には「被参照数を表示する」を有効にする必要があります.</li>
+                <li>
+                    <a href="https://developer.mozilla.org/ja/docs/WebAPI/Using_Web_Notifications"
+                       target="_blank">通知は Firefox を通じて行われます</a>.
+                    通知の許可を求めるダイアログが出た場合には許可を押してください.
+                </li>
+            </ul>
+        </fieldset>
+    </div>
+    <div id="settings-footer">
+        <ul class="desc">
+            <li>* の付いている設定はリロード後に反映されます.</li>
+            <li>
+                設定を保存するには Cookie を有効にして下さい.
+                (<a href="https://github.com/chaika/chaika/issues/204"
+                    title="Cookie を Firefox 終了時に消す設定にしているとデフォルトスキンの設定が消える・Issue #204・chaika/chaika・GitHub"
+                    target="_blank">詳細</a>)
+            </li>
+        </ul>
+
+        <div id="settings-footer-buttons">
+            <button onclick="Prefs.close();">OK</button>
+        </div>
     </div>
 </div>
+
+<ul id="resPopupMenu" class="menu resPopupMenu" data-target="">
+    <li><a data-command="replyTo">返信...</a></li>
+    <hr />
+    <li><a data-command="markAsMyPost" title="レス番号を自分の書き込みとしてマークします. このスレッド内でのみ有効です.">自分のレスとしてマーク/解除</a></li>
+    <li><a data-command="markAsMyID" title="IDを自分のIDとしてマークします. 設定は板内で共有されます.">自分のIDとしてマーク/解除</a></li>
+</ul>
