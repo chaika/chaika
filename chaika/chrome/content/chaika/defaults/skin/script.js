@@ -161,7 +161,7 @@ var $ = {
         if(attrs instanceof Object){
             for(let name in attrs){
                 if(name === 'children'){
-                    if(!attrs.children instanceof Node){
+                    if(!(attrs.children instanceof Node)){
                         attrs.children = $.node(attrs.children);
                     }
 
@@ -881,7 +881,63 @@ var ResCommand = {
      * @param {Number} resNumber
      */
     copy(resNumber) {
-        alert('Not implemented.');
+        let res = $.selector('article[data-number="' + resNumber + '"]');
+        let number = res.dataset.number;
+        let name = $.klass('resName', res).textContent;
+        let mail = $.klass('resMail', res).textContent;
+        let date = $.klass('resDate', res).textContent;
+        let id = $.klass('resID', res).textContent;
+        let ip = $.klass('resIP', res).textContent;
+        let host = $.klass('resHost', res).textContent;
+        let beid = $.klass('resBeID', res).textContent;
+        let body = $.klass('resBody', res).textContent.replace(/  /g, '\n')
+                                                      .replace(/(^ +| +$)/g, '');
+
+        let str = `${number} 名前：${name}[${mail}] 投稿日：${date}`;
+
+        if(id) str += ` ID:${id}`;
+        if(ip) str += ` 発信元：${ip}`;
+        if(host) str += ` HOST：${host}`;
+        if(beid) str += ` ${beid}`;
+
+        str += "\n" + body;
+
+        let modal = $.node({
+            div: {
+                id: 'modal-copy',
+                children: {
+                    textarea: {
+                        id: 'modal-copy-textarea',
+                        text: str,
+                        style: 'height: 100%; width: 100%;'
+                    }
+                }
+            }
+        });
+
+        $.css(modal, {
+            position: 'fixed',
+            'z-index': '999',
+            top: '40%',
+            bottom: '40%',
+            left: '5%',
+            right: '5%',
+        });
+
+        $.css(document.body, {
+            opacity: '0.7'
+        });
+
+        document.body.appendChild(modal);
+
+        $.id('modal-copy-textarea').select();
+
+        modal.addEventListener('copy', (e) => {
+            e.target.remove();
+            $.css(document.body, {
+                opacity: '1.0'
+            });
+        });
     },
 
 
