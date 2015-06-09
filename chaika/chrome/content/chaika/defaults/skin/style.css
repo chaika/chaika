@@ -137,7 +137,7 @@ header{
     line-height: 1.0;
 }
 
-header:after{
+header::after{
     content: '';
     clear: both;
 }
@@ -248,7 +248,7 @@ nav > ul:hover > li > ul{
     color: var(--chaika-highlight-color);
 }
 
-.resNumber[data-referred]:after{
+.resNumber[data-referred]::after{
     content: "(" attr(data-referred-num) ")";
     font-weight: normal;
     font-size: 90%;
@@ -268,11 +268,11 @@ nav > ul:hover > li > ul{
     font-weight: normal;
 }
 
-.resMail:before{
+.resMail::before{
     content: "[";
 }
 
-.resMail:after{
+.resMail::after{
     content: "]";
 }
 
@@ -284,23 +284,23 @@ nav > ul:hover > li > ul{
     text-decoration: underline;
 }
 
-.resID:not(:empty):before{
+.resID:not(:empty)::before{
     content: "ID:";
 }
 
-.resIP:not(:empty):before{
+.resIP:not(:empty)::before{
     content: "\767a\4fe1\5143\3a";
 }
 
-.resHost:not(:empty):before{
+.resHost:not(:empty)::before{
     content: "HOST:";
 }
 
-.resBeID:not(:empty):before{
+.resBeID:not(:empty)::before{
     content: "Be:";
 }
 
-.resHeaderContent[data-id-posts-all]:not([data-id-posts-all="1"]):after{
+.resHeaderContent[data-id-posts-all]:not([data-id-posts-all="1"])::after{
     content: " (" attr(data-id-posts-index) "/" attr(data-id-posts-all) ")";
 }
 
@@ -320,7 +320,7 @@ nav > ul:hover > li > ul{
     display: none;
 }
 
-.collapsed .resHeader:after {
+.collapsed .resHeader::after {
     content: "ABONE (" attr(data-ngtitle) ")";
     display: inline-block;
     padding-right: 1em;
@@ -343,7 +343,7 @@ nav > ul:hover > li > ul{
     padding: 12px 35px 12px 25px;
 }
 
-[data-aboned="true"]:not(.collapsed) .resHeader:after{
+[data-aboned="true"]:not(.collapsed) .resHeader::after{
     content: "";
 }
 
@@ -357,7 +357,7 @@ nav > ul:hover > li > ul{
 
 /* *** NGEx *** */
 
-[data-aboned="false"] .resHeader:not([data-ngtitle=""]):after{
+[data-aboned="false"] .resHeader:not([data-ngtitle=""])::after{
     content: " (" attr(data-ngtitle) ")";
     display: inline-block;
     padding-right: 1em;
@@ -373,7 +373,7 @@ nav > ul:hover > li > ul{
     border-color: var(--in-content-border-focus);
 }
 
-.reply-to-me .resName:before{
+.reply-to-me .resName::before{
     content: '\8FD4\4FE1\003A\0020';  /* "返信: " */
     color: var(--in-content-text-color);
 }
@@ -386,7 +386,7 @@ nav > ul:hover > li > ul{
     border-color: var(--in-content-border-color);
 }
 
-.my-post .resName:before{
+.my-post .resName::before{
     content: '\81EA\5206\003A\0020';  /* "自分: " */
     color: var(--in-content-text-color);
 }
@@ -412,7 +412,7 @@ nav > ul:hover > li > ul{
 }
 
 .popup *,
-.popup .resHeaderAboneContent:before{
+.popup .resHeaderAboneContent::before{
     color: var(--chaika-inverted-color) !important;
     background-color: initial !important;
 }
@@ -451,7 +451,7 @@ nav > ul:hover > li > ul{
     display: none;
 }
 
-.error:after{
+.error::after{
     content: "Load Error";
 }
 
