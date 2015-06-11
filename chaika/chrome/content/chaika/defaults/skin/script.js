@@ -1140,28 +1140,26 @@ var AboneHandler = {
                 return;
         }
 
-        let aboneCandidates = $.klass(className);
+        let targets = $.klass(className);
 
-        for(let i=0, l=aboneCandidates.length; i<l; i++){
-            if(aboneCandidates[i].textContent.contains(ngWord)){
-                let aboneRes = aboneCandidates[i].closest('.resContainer');
-                let resHeader = $.klass('resHeader', aboneRes);
+        targets.forEach((target) => {
+            if(!target.textContent.contains(ngWord)) return;
 
-                //NGワードが追加された場合
-                if(aboneAdded && aboneRes.dataset.aboned !== 'true'){
-                    aboneRes.classList.add('collapsed');
-                    aboneRes.dataset.aboned = 'true';
-                    resHeader.dataset.ngtitle = ngWord;
-                }
+            let res = target.closest('.resContainer');
+            let header = $.klass('resHeader', res);
 
-                //NGワードが削除された場合
-                if(!aboneAdded && aboneRes.dataset.aboned === 'true'){
-                    aboneRes.classList.remove('collapsed');
-                    aboneRes.dataset.aboned = 'false';
-                    resHeader.dataset.ngtitle = '';
-                }
+            if(aboneAdded && res.dataset.aboned !== 'true'){
+                res.classList.add('collapsed');
+                res.dataset.aboned = 'true';
+                header.dataset.ngtitle = ngWord;
             }
-        }
+
+            if(!aboneAdded && res.dataset.aboned === 'true'){
+                res.classList.remove('collapsed');
+                res.dataset.aboned = 'false';
+                header.dataset.ngtitle = '';
+            }
+        });
     },
 
 
