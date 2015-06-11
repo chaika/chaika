@@ -54,28 +54,6 @@ var $ = {
         return Array.from((parent || document).querySelectorAll(selector));
     },
 
-    /**
-     * class から親要素を取得
-     * @param {String} className class 名
-     * @param {Node} element 起点の要素
-     * @param {Boolean} [includeSelf=false] 自分自身を対象に含めるか否か
-     * @return {Node}
-     */
-    parentByClass: function(className, element, includeSelf){
-        if(!element) return null;
-
-        if(includeSelf && element.classList.contains(className)){
-            return element;
-        }
-
-        while(element = element.parentNode){
-            if(element.classList && element.classList.contains(className)){
-                return element;
-            }
-        }
-
-        return null;
-    },
 
     /**
      * TextRectangle を取得
@@ -688,7 +666,7 @@ var ResInfo = {
         let posts = $.klass('highlightedRes', null, true);
 
         posts.forEach((post) => {
-            $.parentByClass('resContainer', post).classList.add('highlighted');
+            post.closest('.resContainer').classList.add('highlighted');
         });
     }
 
@@ -729,7 +707,7 @@ var ThreadCommand = {
         while(!res){
             let element = document.elementFromPoint(left, top);
 
-            res = $.parentByClass('resContainer', element, true);
+            res = element.closest('.resContainer');
             top += 8;
         }
 
@@ -826,7 +804,7 @@ var ResCommand = {
             break;
 
             default: {
-                let resPopupMenu = $.parentByClass('resPopupMenu', target);
+                let resPopupMenu = target.closest('.resPopupMenu');
 
                 if(resPopupMenu && target.dataset.command){
                     $.hide(resPopupMenu);
@@ -836,8 +814,8 @@ var ResCommand = {
 
                 $.hide($.id('resPopupMenu'));
 
-                let container = $.parentByClass('resContainer', target, true);
-                let header = $.parentByClass('resHeader', target, true);
+                let container = target.closest('.resContainer');
+                let header = target.closest('.resHeader');
 
                 if(header && container.dataset.aboned === 'true'){
                     this.toggleCollapse(container);
@@ -1166,7 +1144,7 @@ var AboneHandler = {
 
         for(let i=0, l=aboneCandidates.length; i<l; i++){
             if(aboneCandidates[i].textContent.contains(ngWord)){
-                let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
+                let aboneRes = aboneCandidates[i].closest('.resContainer');
                 let resHeader = $.klass('resHeader', aboneRes);
 
                 //NGワードが追加された場合
@@ -1327,7 +1305,7 @@ var Popup = {
 
 
         //親ポップアップがある場合は記録する
-        var parent = $.parentByClass('popup', aEvent.relatedTarget, true);
+        var parent = aEvent.relatedTarget.closest('.popup');
 
         if(parent){
             popupNode.dataset.parent = $.attrs(parent, 'id');
@@ -1374,7 +1352,7 @@ var Popup = {
         }
 
         //今マウスが乗っているポップアップ要素
-        let hoveredPopup = $.parentByClass('popup', aEvent.relatedTarget, true);
+        let hoveredPopup = aEvent.relatedTarget.closest('.popup');
 
 
         //自分自身が hovered の時は消さない
@@ -1622,7 +1600,7 @@ Popup.ID = {
 
 
         //同じIDを持つレスを取得する
-        var selfNumber = $.parentByClass('resContainer', target).dataset.number;
+        var selfNumber = target.closest('.resContainer').dataset.number;
         var selector = Prefs.get('pref-include-self-post') ?
                 "body > .resContainer[data-id*='" + resID + "']" :
                 "body > .resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
@@ -1671,7 +1649,7 @@ Popup.Image = {
 
         image.addEventListener('load', function(){
             if(Prefs.get('pref-invert-image-popup-dir')){
-                let popupNode = $.parentByClass('popup', this);
+                let popupNode = this.closest('.popup');
                 Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted);
             }
         }, false);
