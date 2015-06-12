@@ -265,7 +265,7 @@ var Effects = {
 
         if(option.remove){
             element.addEventListener('animationend', function(){
-                this.parentNode.removeChild(this);
+                this.remove();
             });
         }
     },
@@ -280,7 +280,7 @@ var Effects = {
 
         if(option.remove){
             element.addEventListener('animationend', function(){
-                this.parentNode.removeChild(this);
+                this.remove();
             });
         }
     },
