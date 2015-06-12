@@ -324,7 +324,7 @@ var Notifications = {
      * @return {Promise<Notification>}
      */
     notify(message, tag = 'chaika') {
-        this._getPermission().then(() => {
+        return this._getPermission().then(() => {
             // Returning the generated Notification Object
             // so that the caller can use this object to manipurate
             // and the below code won't be eliminated by JS engine and GC.
@@ -659,7 +659,19 @@ var ResInfo = {
                         ref.classList.add('reply-to-me');
 
                         if(enableNotification && ref.classList.contains('resNew')){
-                            Notifications.notify('あなたが投稿したレスに返信があります.');
+                            Notifications.notify(
+                                `あなたが投稿したレスに返信があります. (>>${ref.dataset.number})\n` +
+                                'クリックすると返信のレスまでスクロールします.',
+                                'chaika-reply-notification-' + ref.dataset.number
+                            ).then((n) => {
+                                // click-to-scroll
+                                n.addEventListener('click', () => {
+                                    let target = n.body.match(/>>(\d+)/);
+                                    if(!target) return;
+
+                                    ResCommand.scrollTo(target[1]);
+                                });
+                            });
                         }
 
                         if(enableHighlightReplies){
