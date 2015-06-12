@@ -1401,7 +1401,12 @@ var Popup = {
         while(popup.dataset.parent){
             popup = $.id(popup.dataset.parent);
 
-            //今マウスが乗っているところまできたら終了
+            // マウスの動きによっては親ポップアップが先に消されることもある
+            if(!popup){
+                break;
+            }
+
+            // 今マウスが乗っているところまできたら終了
             if(hoveredPopup && popup.id === hoveredPopup.id){
                 break;
             }
