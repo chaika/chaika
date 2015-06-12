@@ -1325,7 +1325,7 @@ var Popup = {
 
 
         //親ポップアップがある場合は記録する
-        var parent = aEvent.relatedTarget.closest('.popup');
+        var parent = aEvent.relatedTarget && aEvent.relatedTarget.closest('.popup');
 
         if(parent){
             popupNode.dataset.parent = $.attrs(parent, 'id');
