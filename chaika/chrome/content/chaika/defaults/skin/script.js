@@ -549,8 +549,10 @@ var ResInfo = {
             // ID別発言数
             if(enablePostsCount){
                 let id = resNode.dataset.id;
+                let isEmptyID = !!Number.parseInt(id.trim());
+                let isAnonymousID = id.startsWith('???');
 
-                if(id && !(id.startsWith('???'))){
+                if(id && !isEmptyID && !isAnonymousID){
                     if(!(id in idTable)){
                         idTable[id] = 1;
                     }else{
