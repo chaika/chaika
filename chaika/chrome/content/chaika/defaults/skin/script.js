@@ -317,12 +317,22 @@ var Notifications = {
     },
 
 
-    notify(message) {
+    /**
+     * Notification API を利用して通知を表示する
+     * @param  {String} message 本文に表示する文章
+     * @param  {String} [tag='chaika'] 通知のタグ
+     * @return {Promise<Notification>}
+     */
+    notify(message, tag = 'chaika') {
         this._getPermission().then(() => {
-            new Notification('chaika', {
+            // Returning the generated Notification Object
+            // so that the caller can use this object to manipurate
+            // and the below code won't be eliminated by JS engine and GC.
+            return (new Notification('chaika', {
+                tag: tag,
                 body: message,
                 icon: SERVER_URL + 'icon.png'
-            });
+            }));
         });
     }
 
@@ -642,18 +652,18 @@ var ResInfo = {
             }
 
             if(resNum.dataset.referred){
-                if(enableNotification && res.classList.contains('newRes')){
-                    Notifications.notify('あなたが投稿したレスに返信があります.');
-                }
-
                 resNum.dataset.referred.split(',').forEach((refID) => {
-                    let resNode = $.id(refID);
+                    let ref = $.id(refID);
 
-                    if(resNode){
-                        resNode.classList.add('reply-to-me');
+                    if(ref){
+                        ref.classList.add('reply-to-me');
+
+                        if(enableNotification && ref.classList.contains('resNew')){
+                            Notifications.notify('あなたが投稿したレスに返信があります.');
+                        }
 
                         if(enableHighlightReplies){
-                            resNode.classList.add('highlighted');
+                            ref.classList.add('highlighted');
                         }
                     }
                 });
