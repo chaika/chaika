@@ -100,7 +100,7 @@ pref("extensions.chaika.login.p2.password", "");
 pref("extensions.chaika.bbsmenu.add_chaika_boards", true);
 pref("extensions.chaika.bbsmenu.open_favs_in_scratchpad", true);
 pref('extensions.chaika.bbsmenu.search.default_engine_name', '00.dig.2ch.net');
-pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://menu.2ch.net/bbsmenu.html");
+pref("extensions.chaika.bbsmenu.bbsmenu_html_url", "http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html");
 pref("extensions.chaika.bbsmenu.bbsmenu_html_charset", "Shift_JIS");
 pref("extensions.chaika.bbsmenu.toggle_open_container", false);
 pref("extensions.chaika.bbsmenu.tree_size", "small");
