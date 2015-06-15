@@ -1,45 +1,4 @@
-#==============================================================================
-# 読み込みをブロックするファイルをハッシュ値で設定するファイル
-# NGFiles.txt のサンプル
-#==============================================================================
-#
-# ■ ファイルの書式 (基本的にJane互換です)
-#
-# 　 文字コード：UTF-8
-# 　 改行コード：どれでも可
-# 　 フォーマット：[ハッシュ値]=*[ファイルの説明]
-# 　 コメント：行頭に ; ' # // の何れか
-#
-# ■ 例
-#
-# 　 ハッシュ値 VJPH6HS5UHR5LQN1NPA92AB773 のファイルをブロックする場合:
-#       VJPH6HS5UHR5LQN1NPA92AB773=*グロ
-#
-# 　 ※ハッシュ値はMD5をスクランブルした NGFiles.txt 独自のものです。
-#     NGFiles.txt 編集ソフト等を使うことで求めることができます。
-#     または, 以下のコードをブラウザーコンソールにて実行してください(行頭の「#」は削除してください)。
-#
-#           var url = "ブロックしたい画像のURL";
-#           var obj = {};
-#           Components.utils.import("resource://chaika-modules/ChaikaHttpController.js", obj);
-#           var chc = obj.ChaikaHttpController;
-#           chc._startup();
-#           var md5 = chc.ngfiles._getMD5(Services.io.newURI(url, null, null));
-#           var hash = chc.ngfiles._getHash(md5);
-#           Services.console.logStringMessage("The hash of " + url + " is " + hash);
-#           chc._quit();
-#
-# ■ 注意
-#
-# 　 NGFiles.txt は実験的機能です。
-# 　 同じファイルを実質2回読みこむようになるので、読み込み速度が低下します。
-# 　 そのため、とりあえずファイルの URL の末尾が jpg, jpeg, png, gif, bmp
-# 　 で終わるファイルのみをチェックします。
-# 　 また、すでにキャッシュされているファイルは今のところブロックできないので、
-#      機能を有効にしたのちにキャッシュをすべて削除することを推奨します。
-#
-# 　 ブロックされた場合、ブラウザには画像の代わりに about:blank が返されます。
-# 　 また(過去ログ取得時と同様の)アラートでブロックされた旨を表示します。
-#
-# 　 以上のリスクを承知のうえで機能を有効にする場合は、about:config より
-# 　 extensions.chaika.ngfiles.enabled を true に変更して下さい。
+# ImageViewURLReplace.dat は, 画像の読み込みをハッシュ値によってブロックするための設定ファイルです.
+# 詳細な設定方法は
+#    https://github.com/chaika/chaika/wiki/NGFiles.txt
+# を参照して下さい.
