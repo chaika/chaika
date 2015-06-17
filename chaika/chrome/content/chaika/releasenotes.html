@@ -218,9 +218,6 @@
                 </aside>
             </li>
             <li class="changed">
-                コンテキストメニューだけで有効な検索プラグインも設定画面に表示されるようになりました
-            </li>
-            <li class="changed">
                 デフォルトの検索エンジンが dig.2ch.net に変更されました
                 (<a href="https://github.com/chaika/chaika/issues/251">#251</a>)
             </li>
@@ -229,6 +226,9 @@
                 <a href="http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html">http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html</a>
                 に変更されました
                 (<a href="https://github.com/chaika/chaika/issues/303">#303</a>)
+            </li>
+            <li class="changed">
+                コンテキストメニューだけで有効な検索プラグインも設定画面に表示されるようになりました
             </li>
             <li class="removed">
                 <a href="http://search.2ch.net">search.2ch.net</a>
@@ -248,7 +248,11 @@
         <h3>掲示板への対応</h3>
         <ul>
             <li class="fixed">
-                ID のないしたらばの板にて無意味な ID: が表示されてしまう問題を修正しました
+                ID のないしたらばの板にて無意味な ID が表示されてしまう問題を修正しました
+            </li>
+            <li class="fixed">
+                古いスキンにおいて, 1.7.0 から即時あぼーんが動作しなくなっていた問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
             </li>
         </ul>
     </section>
@@ -313,7 +317,7 @@
             <li class="new">
                 新しい Firefox のデザイン
                 <a href="https://people.mozilla.org/~jgruen/chameleon/">Chameleon Style</a>
-                を参考に, ハイライトされたレスのデザインを変更し, スキン内で使用していた色の数を減らしました
+                を参考に, ハイライトされたレスのデザインを変更するとともに, スキン内で使用していた色の数を減らしました
                 (<a href="https://github.com/chaika/chaika/issues/296">#296</a>)
             </li>
             <li class="changed">
@@ -327,10 +331,6 @@
                 &gt;&gt;1000 を超えるレスに対しポップアップや発言数カウントが動作しない問題を修正しました
                 (<a href="https://github.com/chaika/chaika/issues/266">#266</a>)
             </li>
-            <li class="fixed">
-                古いスキンにおいて, 1.7.0 から即時あぼーんが動作しなくなっていた問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
-            </li>
         </ul>
     </section>
 
@@ -342,7 +342,7 @@
                 (<a href="https://github.com/chaika/chaika/issues/281">#281</a>)
             </li>
             <li class="new">
-                スレッド一覧およびログマネージャにて Firefox の新しいデザインである
+                スレッド一覧, ログマネージャ, リリースノートにて Firefox の新しいデザインである
                 <a href="https://people.mozilla.org/~jgruen/chameleon/">Chameleon Style</a>
                 を導入しました
                 (<a href="https://github.com/chaika/chaika/issues/272">#272</a>)
@@ -382,7 +382,7 @@
                  <a href="https://github.com/chaika/chaika/issues/275">#275</a>)
             </li>
             <li class="removed">
-                複数箇所を選択し, コンテキストメニューからそれぞれを別の条件として NGEx に登録する機能が削除されました
+                e10s への対応の難しさから, 複数箇所を選択し, コンテキストメニューからそれぞれ別の条件として NGEx に登録する機能が削除されました
                 (<a href="https://github.com/chaika/chaika/issues/277">#277</a>)
             </li>
         </ul>
