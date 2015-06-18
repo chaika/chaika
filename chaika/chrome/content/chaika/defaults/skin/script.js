@@ -389,7 +389,7 @@ var Prefs = {
 
 
     startup: function(){
-        this._loadPrefs();
+        this._populateSettingsPanel();
 
         $.id('settings').addEventListener('change', this._onPrefChanged.bind(this), false);
         $.id('settings').addEventListener('blur', this._onPrefChanged.bind(this), false);
@@ -436,7 +436,7 @@ var Prefs = {
     set: function(key, value){
         try{
             localStorage.setItem(key, JSON.stringify(value));
-            this._loadPrefs();
+            this._populateSettingsPanel();
         }catch(ex){
             console.warn('The change is ignored and will not be saved ' +
                          'because writing to the local storage is prohibited by the user.');
@@ -447,7 +447,7 @@ var Prefs = {
     /**
      * 設定画面へ設定値を反映させる
      */
-    _loadPrefs: function(){
+    _populateSettingsPanel: function(){
         let prefNodes = $.selectorAll('[id^="pref-"]');
 
         prefNodes.forEach((prefNode) => {
