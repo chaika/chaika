@@ -577,10 +577,8 @@ var ResInfo = {
             // ID別発言数
             if(enablePostsCount){
                 let id = resNode.dataset.id;
-                let isEmptyID = Number.parseInt(id.trim(), 10) === 0;
-                let isAnonymousID = id.startsWith('???');
 
-                if(id && !isEmptyID && !isAnonymousID){
+                if(!ResCommand.isAnonymousID(id)){
                     if(!(id in idTable)){
                         idTable[id] = 1;
                     }else{
@@ -1034,6 +1032,19 @@ var ResCommand = {
 
         return anchors;
     },
+
+
+    /**
+     * ID が匿名かどうか調べる
+     * @param {String} id
+     * @return {Boolean}
+     */
+    isAnonymousID (id) {
+        let isEmptyID = !id || Number.parseInt(id.trim(), 10) === 0;
+        let isAnonymousID = id.startsWith('???');
+
+        return isEmptyID || isAnonymousID;
+    }
 
 };
 
@@ -1716,7 +1727,7 @@ Popup.ID = {
         }
 
         // ID が無い場合, ID が匿名である場合にはポップアップしない
-        if(!resID || resID.startsWith('???')) return;
+        if(ResCommand.isAnonymousID(resID)) return;
 
         //同じIDを持つレスを取得する
         var selfNumber = target.closest('.resContainer').dataset.number;
