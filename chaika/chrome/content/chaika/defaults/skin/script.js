@@ -1,5 +1,7 @@
 /* See license.txt for terms of usage */
 
+'use strict';
+
 /* *** Utils *** */
 var $ = {
 
