@@ -951,6 +951,10 @@ var ResCommand = {
         let id = res.dataset.id;
         let database = Prefs.get('list-my-ids') || {};
 
+        if(this.isAnonymousID(id)){
+            return;
+        }
+
         if(!database[BOARD_URL]){
             database[BOARD_URL] = [];
         }
