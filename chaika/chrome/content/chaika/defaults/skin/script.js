@@ -683,33 +683,36 @@ var ResInfo = {
             }
 
             if(resNum.dataset.referred){
+                let firstReplyNum;
+                let repliesNum = 0;
+
                 resNum.dataset.referred.split(',').forEach((refID) => {
                     let ref = $.id(refID);
 
-                    if(ref){
-                        ref.classList.add('reply-to-me');
+                    ref.classList.add('reply-to-me');
 
-                        if(enableNotification && ref.classList.contains('resNew')){
-                            Notifications.notify(
-                                `あなたが投稿したレスに返信があります. (>>${ref.dataset.number})\n` +
-                                'クリックすると返信のレスまでスクロールします.',
-                                'chaika-reply-notification-' + ref.dataset.number
-                            ).then((n) => {
-                                // click-to-scroll
-                                n.addEventListener('click', () => {
-                                    let target = n.body.match(/>>(\d+)/);
-                                    if(!target) return;
+                    if(ref.classList.contains('resNew')){
+                        firstReplyNum = firstReplyNum || ref.dataset.number;
+                        repliesNum++;
+                    }
 
-                                    ResCommand.scrollTo(target[1]);
-                                });
-                            });
-                        }
-
-                        if(enableHighlightReplies){
-                            ref.classList.add('highlighted');
-                        }
+                    if(enableHighlightReplies){
+                        ref.classList.add('highlighted');
                     }
                 });
+
+                if(enableNotification && repliesNum){
+                    Notifications.notify(
+                        `あなたの投稿に ${repliesNum} 件の新着の返信があります.\n` +
+                        `クリックすると先頭の返信レス (>>${firstReplyNum}) を表示します.`,
+                        'chaika-reply-notification'
+                    ).then((n) => {
+                        // click-to-scroll
+                        n.addEventListener('click', () => {
+                            ResCommand.scrollTo(firstReplyNum);
+                        });
+                    });
+                }
             }
         });
     },
