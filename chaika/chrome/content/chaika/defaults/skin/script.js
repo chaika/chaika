@@ -672,7 +672,8 @@ var ResInfo = {
             myPosts = Array.prototype.concat.apply([], myPosts);
         }
 
-        // Marking the posts
+        let repliesCount = 0;
+
         myPosts.forEach((res) => {
             let resNum = $.klass('resNumber', res);
 
@@ -683,38 +684,36 @@ var ResInfo = {
             }
 
             if(resNum.dataset.referred){
-                let firstReplyNum;
-                let repliesNum = 0;
-
                 resNum.dataset.referred.split(',').forEach((refID) => {
                     let ref = $.id(refID);
 
                     ref.classList.add('reply-to-me');
 
                     if(ref.classList.contains('resNew')){
-                        firstReplyNum = firstReplyNum || ref.dataset.number;
-                        repliesNum++;
+                        repliesCount++;
                     }
 
                     if(enableHighlightReplies){
                         ref.classList.add('highlighted');
                     }
                 });
-
-                if(enableNotification && repliesNum){
-                    Notifications.notify(
-                        `あなたの投稿に ${repliesNum} 件の新着の返信があります.\n` +
-                        `クリックすると先頭の返信レス (>>${firstReplyNum}) を表示します.`,
-                        'chaika-reply-notification'
-                    ).then((n) => {
-                        // click-to-scroll
-                        n.addEventListener('click', () => {
-                            ResCommand.scrollTo(firstReplyNum);
-                        });
-                    });
-                }
             }
         });
+
+        if(enableNotification && repliesCount){
+            let firstReplyNum = $.klass('reply-to-me', null, true)[0].dataset.number;
+
+            Notifications.notify(
+                `あなたの投稿に ${repliesCount} 件の新着の返信があります.\n` +
+                `クリックすると先頭の返信レス (>>${firstReplyNum}) を表示します.`,
+                'chaika-reply-notification'
+            ).then((n) => {
+                // click-to-scroll
+                n.addEventListener('click', () => {
+                    ResCommand.scrollTo(firstReplyNum);
+                });
+            });
+        }
     },
 
 
