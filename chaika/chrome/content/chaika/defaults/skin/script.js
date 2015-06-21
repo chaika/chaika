@@ -658,18 +658,15 @@ var ResInfo = {
 
         // Collecting "My Posts"
         if(myPostNums){
-            myPosts = myPosts.concat(myPostNums.map((resNumber) => {
+            myPosts = myPostNums.map((resNumber) => {
                 return $.selector('article[data-number="' + resNumber + '"]');
-            }));
+            });
         }
 
         if(myIDs){
-            myPosts = myPosts.concat(myIDs.map((resID) => {
-                return $.selectorAll('article[data-id="' + resID + '"]');
-            }));
-
-            // flatten
-            myPosts = Array.prototype.concat.apply([], myPosts);
+            myPosts = myIDs.reduce((arr, id) => {
+                return arr.concat($.selectorAll('article[data-id="' + id + '"]'));
+            }, myPosts);
         }
 
         let repliesCount = 0;
