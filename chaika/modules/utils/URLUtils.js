@@ -15,15 +15,29 @@ let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {}
 // just until finishing the implementation of Pluggable Board Definition and Pluggable Dat Fetching;
 // These will and should be removed on released version.
 const BBS_DOMAINS = [
-    '2ch.net',
-    'bbspink.com',
-    'machi.to',
+    '.2ch.net',
+    '.bbspink.com',
+    '.machi.to',
+    '.2ch.sc',
+    '.open2ch.net',
+    '.jikkyo.org',
+    'next2ch.net',
+    'blogban.net',
+    'plusvip.jp',
+    'katsu.ula.cc',
     'jbbs.livedoor.jp',
     'jbbs.shitaraba.net'
 ];
 
 
 const EXCLUDE_DOMAINS = [
+    "developer.2ch.net",
+    "api.2ch.net",
+    "be.2ch.net",
+    "dig.2ch.net",
+    "notice.2ch.net",
+    "stats.2ch.net",
+    "ronin.bbspink.com",
     "find.2ch.net",
     "info.2ch.net",
     "epg.2ch.net",
@@ -67,7 +81,9 @@ let URLUtils = {
         if(this.isChaikafied(aURL)){
             return true;
         }
-
+        if(aURL.contains('.html')){
+            return false;
+        }
 
         let url = Services.io.newURI(aURL, null, null);
 
