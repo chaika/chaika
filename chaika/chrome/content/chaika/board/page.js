@@ -620,7 +620,7 @@ function showBrowser(aTab){
     if(aTab){
         document.getElementById("popTools").hidePopup();
     }
-    ChaikaCore.browser.openURL(gBoard.url, aTab);
+    ChaikaCore.browser.openThread(gBoard.url, aTab, false, true, false);
 }
 
 function openLogsDir(){
