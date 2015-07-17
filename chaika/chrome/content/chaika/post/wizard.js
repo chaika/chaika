@@ -784,7 +784,7 @@ var FormPage = {
 
         let boardURL = gBoard.url.spec;
         let titleSpec = ((gWizType == WIZ_TYPE_RES) ? gThread.title : gBoard.getTitle());
-        let lines = ChaikaCore.io.readString(defaultDataFile, "UTF-8")
+        let lines = ChaikaCore.io.readString(defaultDataFile, "Shift_JIS")
                                  .split(/[\n\r]+/);
 
         for(let i=0; i<lines.length; i++){
