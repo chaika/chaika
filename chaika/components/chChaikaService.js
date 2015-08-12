@@ -17,6 +17,8 @@ function ChaikaService(){
 ChaikaService.prototype = {
 
     _startup: function ChaikaService__startup(){
+        Components.utils.import("resource://chaika-modules/utils/Logger.js");
+
         Components.utils.import("resource://chaika-modules/ChaikaCore.js");
         ChaikaCore._startup();
 
@@ -41,6 +43,9 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
         ChaikaContentReplacer._startup();
 
+        Components.utils.import('resource://chaika-modules/ChaikaBBSMenu.js');
+        ChaikaBBSMenu._startup();
+
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
@@ -61,7 +66,9 @@ ChaikaService.prototype = {
         ChaikaAboneManager._quit();
         ChaikaHttpController._quit();
         ChaikaServer._quit();
+        ChaikaBBSMenu._quit();
         ChaikaCore._quit();
+        Logger.uninit();
     },
 
 

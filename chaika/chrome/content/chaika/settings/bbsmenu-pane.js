@@ -50,12 +50,14 @@ var gBbsmenuPane = {
         let menupopup = document.createElement('menupopup');
 
         ChaikaSearch.plugins.forEach(plugin => {
-            if(!plugin.search) return;
-
             let menuitem = document.createElement('menuitem');
 
             menuitem.setAttribute('label', plugin.name);
             menuitem.setAttribute('value', plugin.id);
+
+            if(!plugin.search){
+                menuitem.setAttribute('disabled', 'true');
+            }
 
             menupopup.appendChild(menuitem);
         });
@@ -72,9 +74,15 @@ var gBbsmenuPane = {
         ChaikaCore.io.reveal(pluginDir);
     },
 
-    resetBbsmenuURL: function(){
+    resetBBSMenuURL: function(){
         var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
         pref.value = pref.defaultValue;
+    },
+
+    addFavoriteBoard: function(){
+        let favBoardsFile = ChaikaCore.getDataDir();
+        favBoardsFile.appendRelativePath('favorite_boards.xml');
+        ChaikaCore.io.reveal(favBoardsFile);
     }
 
 };

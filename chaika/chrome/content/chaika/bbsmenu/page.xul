@@ -10,22 +10,19 @@
 <page id="bookmarksPanel"
       title="BBSMENU [chaika]"
       class="bbsmenuPage"
-      onload="Page.startup()"
-      onunload="Page.shutdown()"
+      onload="Page.startup();"
+      onunload="Page.shutdown();"
       xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<script type="application/javascript" src="chrome://global/content/nsDragAndDrop.js" />
-<script type="application/javascript" src="chrome://chaika/content/bbsmenu/page.js" />
-
 <popupset>
-    <menupopup id="searchModeMenu" />
+    <menupopup id="searchEngineMenu" />
 
     <menupopup id="historyMenuContext"
                style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)" />
 
     <menupopup id="treeContextMenu"
                style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-               onpopupshowing="return Tree.showContext(event)" />
+               onpopupshowing="return true;" />
 </popupset>
 
 <hbox align="center">
@@ -34,26 +31,24 @@
              emptytext=""
              flex="1"
              type="search"
-             timeout="2000"
-             oncommand="if(this.value === '') SearchBox.search('')"
-             onkeypress="if(event.keyCode === KeyEvent.DOM_VK_RETURN) SearchBox.search(this.value)">
+             timeout="1000">
         <box>
-            <dropmarker popup="searchModeMenu" class="plain" />
+            <dropmarker popup="searchEngineMenu" />
         </box>
     </textbox>
 
-    <menubar id="mainMenubar" class="plain">
-        <menu id="historyMenu" label="履歴" class="plain menu-iconic">
+    <menubar id="mainMenubar">
+        <menu id="historyMenu" label="履歴" class="menu-iconic">
             <menupopup style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#historyMenuPopup)"
                        position="after_end"
                        tooltiptext=""
                        itemContext="historyMenuContext" />
         </menu>
 
-        <menu id="toolsMenu" label="ツール" class="plain menu-iconic">
+        <menu id="toolsMenu" label="ツール" class="menu-iconic">
             <menupopup id="toolsMenuPopup" position="after_end">
-                <menuitem label="BBSMENU を更新" oncommand="BbsmenuUpdater.update()" />
-                <menuitem label="外部板を追加" oncommand="Bbsmenu.openOutsideXML()" />
+                <menuitem label="BBSMENU を更新" oncommand="Page.updateBBSMENU()" />
+                <menuitem label="外部板を追加" oncommand="Page.addFavoriteBoard()" />
                 <menuseparator />
                 <menu label="マネージャを開く">
                     <menupopup>
@@ -88,24 +83,26 @@
 
 <notificationbox id="notification" />
 
-<tree id="bookmarks-view"
-      class="sidebar-placesTree bbsmenuTree"
+<tree id="bbsmenuTree"
+      class="sidebar-placesTree"
       hidecolumnpicker="true"
       flex="1"
-      openedCategories=""
-      persist="openedCategories"
       context="treeContextMenu">
 
     <treecols>
         <treecol id="title" flex="1" primary="true" hideheader="true" />
     </treecols>
 
-    <treechildren id="bookmarks-view-children"
+    <treechildren id="bbsmenuTree-children"
                   class="sidebar-placesTreechildren"
                   flex="1"
-                  onclick="Tree.click(event)"
-                  ondblclick="Tree.click(event)" />
+                  onclick="Page._treeView.handleClick(event)" />
 
 </tree>
+
+<script type="application/javascript" src="notification.js" />
+<script type="application/javascript" src="tree.js" />
+<script type="application/javascript" src="search.js" />
+<script type="application/javascript" src="page.js" />
 
 </page>

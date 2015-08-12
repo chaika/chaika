@@ -4,849 +4,1059 @@
 
 <html>
 <head>
-    <meta charset="utf-8" />
-    <link rel="shortcut icon" href="chrome://chaika/content/icon.png" />
-    <title>リリースノート [chaika]</title>
-    <script>
-        window.addEventListener('DOMContentLoaded', function(){
-            if(location.search.contains('updated=1')){
-                document.body.classList.add('updated');
-            }
-
-            window.removeEventListener('DOMContentLoaded', arguments.callee, false);
-        }, false);
-    </script>
-    <style>
-        body{
-            background-color: #eee;
-            color: black;
-            font-size: 13.5px;
+<meta charset="utf-8" />
+<link rel="shortcut icon" href="chrome://chaika/content/icon.png" />
+<link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
+<title>リリースノート [chaika]</title>
+<script>
+    window.addEventListener('DOMContentLoaded', function(){
+        if(location.search.contains('updated=1')){
+            document.body.classList.add('updated');
         }
 
-        article{
-            margin: 1em 3em;
-        }
+        window.removeEventListener('DOMContentLoaded', arguments.callee, false);
+    }, false);
+</script>
+<style>
+    body{
+        margin: 40px 48px;
+        line-height: 1.5;
+    }
 
-        h1{
-            text-shadow: -1px 1px 0 rgba(255, 255, 255, 1);
-        }
+    h3{
+        text-indent: 1.5em;
+    }
 
-        ul{
-            list-style-type: none;
-        }
+    ul{
+        list-style-type: none;
+    }
 
-        ul.list{
-            list-style-type: square;
-        }
+    ul.list{
+        list-style-type: square;
+    }
 
-        p:first-child{
-            margin-top: 0;
-        }
+    p:first-child{
+        margin-top: 0;
+    }
 
-        p:last-child{
-            margin-bottom: 0;
-        }
-
-
-        header > h1{
-            font-size: 200%;
-            margin-left: 10px;
-        }
-
-
-        #updated{
-            display: none;
-            padding: 10px 0;
-        }
-
-        #updated > h1{
-            font-size: 180%;
-            margin: 8px 0;
-        }
-
-        .updated #updated{
-            display: block;
-        }
-
-        .updated #updated + section > h1{
-            color: red;
-        }
+    p:last-child{
+        margin-bottom: 0;
+    }
 
 
-        section > p{
-            margin-left: 40px;
-        }
+    #updated{
+        display: none;
+        margin: 2.5em 0;
+        padding: 16px;
+        background-color: #ebebeb;
+        border: 1px solid var(--in-content-table-border-color);
+        color: var(--in-content-text-color);
+    }
 
-        section > ul{
-            width: 90%;
-            margin-bottom: 50px;
-        }
-
-        section > ul > li{
-            margin: 0;
-            padding: 0.5em 0 0.5em 5px;
-            border-bottom: 1px rgba(0, 0, 0, 0.25) dotted;
-            clear: both;
-        }
-
-        section > ul > li:before{
-            content: '';
-            display: block;
-            width: 1em;
-            height: 2em;
-            float: left;
-            margin: 0.1em 8px 0 0;
-            background-repeat: no-repeat;
-            background-position: left top;
-            background-size: 1em;
-        }
-
-        section > ul > li > ul.list{
-            margin: 0.5em 0 0.5em 1em;
-        }
-
-        aside.info{
-            font-size: 90%;
-            width: 80%;
-            margin: 1em 0 1em 3em;
-            opacity: 0.75;
-        }
-
-        aside.info:before{
-            content: '';
-            width: 20px;
-            height: 20px;
-            display: block;
-            margin-right: 10px;
-            background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QURBgExDnlXEgAAAhdJREFUWMPtl79rU1EUxz+mQUpBEcliL3SOOBTEgy4BEXFph1IFBzsV6lCcFcHSQECMCC4u/gV26NBChOKaweGAuClB0OlSimQoDbRRU5cbeDzy7r2PJtGh3+29e3587z0/7rlwin+MM3mEReQCMA9UgDJQckttoAU0gYaq/hwqARGZAdaAJWAyIN4FNoCaqn4L2Z7wLVarVTqdziqwDVwHihF8J4BZ4KEx5pcx5qO19jj3CYhIEXgLLJ8wzJvAA1XtDlosZO18SM4B7gHvRKQQHQJ37M8Chj8Ad4DnwDngmkf2MtC11jaDIXAJ9wWY8hjsAZdUdc/pFIDvwEwgOWdV9WsoBGsB531j7f6HqvaAvYDOWaDmzQFX50sRcZ0EHiX0bgFXI/QWRGQ6+SNdVvMRdd7HaxG5DxwAN7MSOoUisAi8yQpBJWeG3wBuR/aHgT7SiuUchuaSeQC8By5G6JV9BEo5CHxS1d1EHnQj9UrBRjROpAm0x+Cz7SPQGgOBlo9AcwwEmj4CDdflRoUesJVJwE0yGyMk0FDVH6EqqAGHI3D+G1iPGkhE5DFQDxh8AuwnvuvAeY/8C1V9Oqg3D8IrQNwwkYV6jt3vuFs2biCx1h4bY7aBK26YOAl2gLuqepRrKLXW/jHGbLqqqIQG2IyYvwRWspznGcvLLjkXIm6+nivndVX9POyHybS7z30Pk610qZ3iv8ZfRbeUiox602IAAAAASUVORK5CYII=) no-repeat left top;
-            background-size: 20px;
-        }
-
-        aside.info > :first-child{
-            margin-top: -1.5em;
-        }
-
-        aside.info > *{
-            margin-left: 30px;
-        }
+    .updated #updated{
+        display: block;
+    }
 
 
-        footer{
-            margin-top: 80px;
-            border-top: 1.5px solid rgba(0, 0, 0, 0.2);
-            box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
-            font-size: 80%;
-            color: #555;
-        }
+    section > p{
+        margin-left: 40px;
+    }
+
+    section > ul{
+        width: 90%;
+        margin-bottom: 50px;
+    }
+
+    section > ul > li{
+        margin: 0;
+        padding: 0.5em 0 0.5em 5px;
+        border-bottom: 1px rgba(0, 0, 0, 0.25) dotted;
+        clear: both;
+    }
+
+    section > ul > li:before{
+        content: '';
+        display: block;
+        width: 1em;
+        height: 2em;
+        float: left;
+        margin: 0.1em 8px 0 0;
+        background-repeat: no-repeat;
+        background-position: left top;
+        background-size: 1em;
+    }
+
+    section > ul > li > ul.list{
+        margin: 0.5em 0 0.5em 1em;
+    }
+
+    aside.info{
+        font-size: 90%;
+        width: 80%;
+        margin: 1em 0 1em 3em;
+    }
+
+    aside.info:before{
+        content: '';
+        width: 20px;
+        height: 20px;
+        display: block;
+        margin-right: 10px;
+        background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QURBgExDnlXEgAAAhdJREFUWMPtl79rU1EUxz+mQUpBEcliL3SOOBTEgy4BEXFph1IFBzsV6lCcFcHSQECMCC4u/gV26NBChOKaweGAuClB0OlSimQoDbRRU5cbeDzy7r2PJtGh3+29e3587z0/7rlwin+MM3mEReQCMA9UgDJQckttoAU0gYaq/hwqARGZAdaAJWAyIN4FNoCaqn4L2Z7wLVarVTqdziqwDVwHihF8J4BZ4KEx5pcx5qO19jj3CYhIEXgLLJ8wzJvAA1XtDlosZO18SM4B7gHvRKQQHQJ37M8Chj8Ad4DnwDngmkf2MtC11jaDIXAJ9wWY8hjsAZdUdc/pFIDvwEwgOWdV9WsoBGsB531j7f6HqvaAvYDOWaDmzQFX50sRcZ0EHiX0bgFXI/QWRGQ6+SNdVvMRdd7HaxG5DxwAN7MSOoUisAi8yQpBJWeG3wBuR/aHgT7SiuUchuaSeQC8By5G6JV9BEo5CHxS1d1EHnQj9UrBRjROpAm0x+Cz7SPQGgOBlo9AcwwEmj4CDdflRoUesJVJwE0yGyMk0FDVH6EqqAGHI3D+G1iPGkhE5DFQDxh8AuwnvuvAeY/8C1V9Oqg3D8IrQNwwkYV6jt3vuFs2biCx1h4bY7aBK26YOAl2gLuqepRrKLXW/jHGbLqqqIQG2IyYvwRWspznGcvLLjkXIm6+nivndVX9POyHybS7z30Pk610qZ3iv8ZfRbeUiox602IAAAAASUVORK5CYII=) no-repeat left top;
+        background-size: 20px;
+    }
+
+    aside.info > :first-child{
+        margin-top: -1.5em;
+    }
+
+    aside.info > *{
+        margin-left: 30px;
+    }
 
 
-        /* *** アイコン *** */
+    footer{
+        margin-top: 80px;
+        border-top: 1.5px solid rgba(0, 0, 0, 0.2);
+        box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+        font-size: 80%;
+    }
 
-        /* 新機能: 星 */
-        .new:before{
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYMAPEqCYbHAeiPeTq9kAiP9DsQI5BsxHMqCfVM0OQPweyYD3UDGc/vxPJgbpBfvvPRmaQXoEkJ1MqgEG6F4pIEFzAjEhjwvPR9bAhGbAQSJiaCM+A/yJMACnGgEcIf0eixjOjPMfLfUJQHE/mlwANgPWQyX340j7BlA5jICEOf8+LpPRQAAsBYIAQIABAGFTZWF4e3sHAAAAAElFTkSuQmCC);
-        }
 
-        /* バグ修正: チェック */
-        .fixed:before{
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHBJREFUeNpi/P//PwMlgImBUkCGCwRQ9JJoAEjzeSCeT44BMM3/oXg+SC8TLudhEd8PxAb4wgDFeXhs/o/NCxjOI6SZkAEwhTg1YwtEbIbg1IwrFnAZMh9nGsISjbjCg2gD8MUIhgGMA56ZKDYAIMAADEBwpEggEUwAAAAASUVORK5CYII=);
-        }
+    /* *** アイコン *** */
 
-        /* 変更: 鉛筆 */
-        .changed:before{
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIdJREFUeNpi+P//PwMIEwl4gbgdiBvgIiQYANK8HKQFiueTYgC6ZrghTETYLADEs4A4AqssARfgspkoLxDWjMcA4jTjMIB4zVgMIE0zFgNI0wwExETjAiBOxCmL5IL50DjfRYzN2Az4j2bIfKJyB5oB/4nWCAUsSGxGBjIAsgH/SdAHtwwgwACYfIPu05/AsQAAAABJRU5ErkJggg==);
-        }
+    /* 新機能: 星 */
+    .new:before{
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJVJREFUeNpiYMAPEqCYbHAeiPeTq9kAiP9DsQI5BsxHMqCfVM0OQPweyYD3UDGc/vxPJgbpBfvvPRmaQXoEkJ1MqgEG6F4pIEFzAjEhjwvPR9bAhGbAQSJiaCM+A/yJMACnGgEcIf0eixjOjPMfLfUJQHE/mlwANgPWQyX340j7BlA5jICEOf8+LpPRQAAsBYIAQIABAGFTZWF4e3sHAAAAAElFTkSuQmCC);
+    }
 
-        /* 削除: マイナス */
-        .removed:before{
-            background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC9JREFUeNpi/P//PwMlgImBQjBqAAMDC4hgZGQkKyqAMcg4DMKAcTQlDgIDAAIMAFXeChvgRcFcAAAAAElFTkSuQmCC);
-        }
-    </style>
+    /* バグ修正: チェック */
+    .fixed:before{
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHBJREFUeNpi/P//PwMlgImBUkCGCwRQ9JJoAEjzeSCeT44BMM3/oXg+SC8TLudhEd8PxAb4wgDFeXhs/o/NCxjOI6SZkAEwhTg1YwtEbIbg1IwrFnAZMh9nGsISjbjCg2gD8MUIhgGMA56ZKDYAIMAADEBwpEggEUwAAAAASUVORK5CYII=);
+    }
+
+    /* 変更: 鉛筆 */
+    .changed:before{
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAIdJREFUeNpi+P//PwMIEwl4gbgdiBvgIiQYANK8HKQFiueTYgC6ZrghTETYLADEs4A4AqssARfgspkoLxDWjMcA4jTjMIB4zVgMIE0zFgNI0wwExETjAiBOxCmL5IL50DjfRYzN2Az4j2bIfKJyB5oB/4nWCAUsSGxGBjIAsgH/SdAHtwwgwACYfIPu05/AsQAAAABJRU5ErkJggg==);
+    }
+
+    /* 削除: マイナス */
+    .removed:before{
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAC9JREFUeNpi/P//PwMlgImBQjBqAAMDC4hgZGQkKyqAMcg4DMKAcTQlDgIDAAIMAFXeChvgRcFcAAAAAElFTkSuQmCC);
+    }
+</style>
 </head>
 <body>
 
-<header>
-    <h1>chaika リリースノート</h1>
-</header>
+<h1>chaika release notes</h1>
 
-<article>
-    <section id="updated">
-        <h1>chaika が新しいバージョンへと更新されました。</h1>
-        <p>
-            ご利用ありがとうございます。<br />
-            公式サイト等へのリンクはページ下部をご覧ください。
-        </p>
-    </section>
+<section id="updated">
+    <h2>chaika が新しいバージョンへと更新されました。</h2>
+    <p>
+        ご利用ありがとうございます。<br />
+        公式サイト等へのリンクはページ下部をご覧ください。
+    </p>
+</section>
 
+<section>
+    <h2>1.8.0 - 2015/XX/XX</h2>
 
     <section>
-        <h1>1.7.3 - 2014/12/31</h1>
+        <h3>NEWS</h3>
         <ul>
             <li class="new">
-                コンテキストメニューの区切り線を非表示にすることができるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/197">#197</a>)
+                <a href="https://github.com/chaika/chaika/wiki/%E9%96%8B%E7%99%BA%E6%96%B9%E9%87%9D">chaika の開発方針が明文化されました</a>
             </li>
-
             <li class="changed">
-                AA 判定の処理が向上しました
-                (<a href="https://github.com/chaika/chaika/pull/226">#226</a>)
-            </li>
-
-            <li class="fixed">
-                Linux においてスレッド一覧の日にち表示が正しく行われない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/221">#221</a>)
-            </li>
-            <li class="fixed">
-                一部の環境でスキンの受信に失敗しスレッドが正常に表示できない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/224">#224</a>)
+                chaika の開発目的が 2ch.net 専用ブラウザから汎用掲示板ブラウザへと変更されました
+                (<a href="https://github.com/chaika/chaika/issues/265">#265</a>)
             </li>
         </ul>
     </section>
 
     <section>
-        <h1>1.7.2 - 2014/12/27</h1>
+        <h3>板一覧 (BBSMENU, サイドバー)</h3>
         <ul>
             <li class="new">
-                NGEx や置換マネージャの条件を入れ子にできるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/148">#148</a>)
-            </li>
-            <li class="new">
-                NGEx の有効期限をプリセットから選べるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/147">#147</a>)
-            </li>
-            <li class="new">
-                NGEx や置換マネージャの編集欄がウィンドウサイズに応じて広がるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/132">#132</a>)
-            </li>
-            <li class="new">
-                あぼーんマネージャや置換マネージャで項目を削除するときに確認ダイアログを表示するようになりました
-                (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+                複数の BBSMENU を合成して表示することができるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/246">#246</a>)
                 <aside class="info">
                     <p>
-                        ダイアログの表示は設定から OFF にすることができます。
+                        詳しい設定の方法は
+                        <a href="https://github.com/chaika/chaika/wiki/BBSMENU%E3%81%AE%E7%B7%A8%E9%9B%86">BBSMENUの編集</a>
+                        をご参照下さい.
                     </p>
                 </aside>
             </li>
             <li class="new">
-                AA マネージャ, NGEx, 置換マネージャの項目リスト部分においてコンテキストメニューが実装されました
-                (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+                それぞれのサイトの Favicon がアイコンとして表示されるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/250">#250</a>)
+            </li>
+            <li class="new">
+                板一覧のなかに区切り線を表示することができるようになりました
+            </li>
+            <li class="new">
+                内蔵の検索プラグインとして,
+                <a href="http://dig.2ch.net/">dig2ch.net</a>,
+                <a href="http://refind2ch.org/">refind2ch.net</a>
+                向けの検索プラグインを追加しました
+                (<a href="https://github.com/chaika/chaika/issues/251">#251</a>)
+            </li>
+            <li class="new">
+                1ヶ月おきに自動的に BBSMENU を更新するようになりました
+            </li>
+            <li class="new">
+                外部板を追加する際に, favorite_boards.xml が Firefox 内蔵のエディタである
+                <a href="https://developer.mozilla.org/ja/docs/Tools/Scratchpad">スクラッチパッド</a>
+                で開くようになりました
+                (<a href="https://github.com/chaika/chaika/issues/283">#283</a>)
                 <aside class="info">
                     <p>
-                        コンテキストメニューから新規項目の追加や削除が行えるようになりました。
+                        <code>extensions.chaika.bbsmenu.open_favs_in_scratchpad</code>
+                        を <code>false</code> に変更することで, 以前の挙動に戻して好みのエディタで編集することができるようになります.
                     </p>
                 </aside>
             </li>
-            <li class="new">
-                置換マネージャにおいて ReplaceStr.txt 形式のデータをインポートできるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/10">#10</a>)
+            <li class="changed">
+                デフォルトの検索エンジンが dig.2ch.net に変更されました
+                (<a href="https://github.com/chaika/chaika/issues/251">#251</a>)
             </li>
-            <li class="new">
-                サイドバーの「ツール」メニューから各マネージャやフォルダを開けるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/182">#182</a>)
+            <li class="changed">
+                デフォルトの BBSMENU 取得元が
+                <a href="http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html">http://kita.jikkyo.org/cbm/cbm.cgi/20.p0.m0/-all/bbsmenu.html</a>
+                に変更されました
+                (<a href="https://github.com/chaika/chaika/issues/303">#303</a>)
             </li>
-            <li class="new">
-                置換マネージャを開くメニューがコンテキストメニューに追加されました
-                (<a href="https://github.com/chaika/chaika/issues/179">#179</a>)
+            <li class="changed">
+                コンテキストメニューだけで有効な検索プラグインも設定画面に表示されるようになりました
             </li>
-            <li class="new">
-                まちBBS のホスト表示に対応しました
-                (<a href="https://github.com/chaika/chaika/issues/201">#201</a>)
-            </li>
-            <li class="new">
-                ImageViewURLReplace.dat に関する通知の表示を、通知のオプションから無効化できるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/164">#164</a>)
-            </li>
-            <li class="new">
-                板一覧でキーボートショートカットを実装しました
-                (<a href="https://github.com/chaika/chaika/issues/171">#171</a>)
-                <aside class="info">
-                    <p>
-                        デフォルトのショートカットは以下のとおりです。
-                    </p>
-                    <ul class="list">
-                        <li>選択したスレッドを開く: Enter</li>
-                        <li>選択したスレッドを新規タブで開く: Ctrl+Enter, Alt+Enter</li>
-                        <li>スレッド一覧を更新する: r</li>
-                        <li>検索欄にフォーカスを移す: f</li>
-                        <li>下のスレッドへフォーカスを移す: j, ↓</li>
-                        <li>上のスレッドへフォーカスを移す: k, ↑</li>
-                        <li>1ページ分下へ移動する: Space</li>
-                        <li>1ページ分上へ移動する: Shift+Space</li>
-                    </ul>
-                </aside>
-            </li>
-            <li class="new">
-                デフォルトスキンに関して以下の改善を行いました
-                <ul class="list">
-                    <li>
-                        ヘッダー部分に新着レス数やスレッドサイズなどの表示を追加しました
-                    </li>
-                    <li>
-                        エラーが発生した際にページ下部のステータス表示を強調するようになりました
-                        (<a href="https://github.com/chaika/chaika/issues/219">#219</a>)
-                    </li>
-                    <li>
-                        ポップアップの左部分に余白をあけることで逆参照がたどりやすくなりました
-                        (<a href="https://github.com/chaika/chaika/issues/161">#161</a>)
-                    </li>
-                    <li>
-                        ポップアップを上方向に表示するオプションを実装しました
-                        (<a href="https://github.com/chaika/chaika/issues/162">#162</a>)
-                    </li>
-                    <li>
-                        画像かどうかの判定を緩くするオプションを実装しました
-                    </li>
-                    <li>
-                        ポップアップが消えやすい問題を修正しました
-                        (<a href="https://github.com/chaika/chaika/issues/163">#163</a>)
-                    </li>
-                    <li>
-                        ID が空のときに発言数カウントが正しく動作しない問題を修正しました
-                        (<a href="https://github.com/chaika/chaika/issues/165">#165</a>)
-                    </li>
-                    <li>
-                        ID 抽出ポップアップにて他のポップアップの内容が含まれる問題を修正しました
-                    </li>
-                    <li>
-                        ポップアップの遅延が常に無効になっていた問題を修正しました
-                    </li>
-                    <li>
-                        ウィンドウの高さが低い場合にオプションが見切れてしまう問題を修正しました
-                    </li>
-                </ul>
-            </li>
-
             <li class="removed">
-                NGEx や置換マネージャのウィンドウサイズを自動的に変更する機能を廃止しました
-                (<a href="https://github.com/chaika/chaika/issues/170">#170</a>)
+                <a href="http://search.2ch.net">search.2ch.net</a>
+                向けの検索プラグインが削除されました
+                (<a href="https://github.com/chaika/chaika/issues/251">#251</a>)
             </li>
+            <li class="fixed">
+                一部の掲示板が chaika を用いて開かれない問題を修正しました
+            </li>
+            <li class="fixed">
+                文字サイズを中・大にしたときの表示が改善されました
+            </li>
+        </ul>
+    </section>
 
+    <section>
+        <h3>掲示板への対応</h3>
+        <ul>
+            <li class="fixed">
+                ID のないしたらばの板にて無意味な ID が表示されてしまう問題を修正しました
+            </li>
+            <li class="fixed">
+                古いスキンにおいて, 1.7.0 から即時あぼーんが動作しなくなっていた問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>スレッドの表示 (ローカルサーバ)</h3>
+        <ul>
+            <li class="new">
+                ローカルサーバが httpd.js ベースの新しいものとなり, 処理を非同期に行うようになりました
+            </li>
+            <li class="new">
+                使用するポートが使えない場合に自動的に他の空いているポートを探すようになりました
+                (<a href="https://github.com/chaika/chaika/issues/264">#264</a>)
+                <aside class="info">
+                    <p>
+                        この機能は設定画面から OFF にすることができます.
+                    </p>
+                </aside>
+            </li>
+            <li class="new">
+                使用するポートを設定画面から変更することができるようになりました
+                <aside class="info">
+                    <p>
+                        使用するポートをアプリケーションごとに設定する
+                        <code>extensions.chaika.server.port.firefox</code>
+                        などは廃止されました.
+                        ポートを変更して chaika を使用されていた方は再度設定をお願い致します.
+                    </p>
+                </aside>
+            </li>
+            <li class="new">
+                使用するポートを起動毎にランダムに選択する機能が追加されました
+            </li>
+        </ul>
+    </section>
+
+    <section>
+        <h3>デフォルトスキン</h3>
+        <ul>
+            <li class="new">
+                自分の書き込みを登録し, それに対する返信が投稿されたときに通知を行う機能を追加しました
+                (<a href="https://github.com/chaika/chaika/issues/295">#295</a>)
+                <aside class="info">
+                    <p>
+                        レス番号を右クリックして表示できるメニューから設定を行うことができます.
+                        また, スキンの設定画面から登録済みの内容を編集することができます.
+                    </p>
+                </aside>
+            </li>
+            <li class="new">
+                ハイライトされたレスへ移動するためのショートカットキー(u, i)を追加しました
+                (<a href="https://github.com/chaika/chaika/issues/298">#298</a>)
+            </li>
+            <li class="new">
+                逆参照などを処理する際に, 一つのレス内のアンカ数やアンカの範囲を制限することができるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/223">#223</a>)
+            </li>
+            <li class="new">
+                ID の代わりに発信元やホスト名が表示される掲示板においても発言数カウントが動作するようになりました
+                (<a href="https://github.com/chaika/chaika/issues/300">#300</a>)
+            </li>
+            <li class="new">
+                新しい Firefox のデザイン
+                <a href="https://people.mozilla.org/~jgruen/chameleon/">Chameleon Style</a>
+                を参考に, ハイライトされたレスのデザインを変更するとともに, スキン内で使用していた色の数を減らしました
+                (<a href="https://github.com/chaika/chaika/issues/296">#296</a>)
+            </li>
             <li class="changed">
-                外部板を追加する方法が変更されました
-                (<a href="https://github.com/chaika/chaika/issues/155">#155</a>)
-                <aside class="info">
-                    <p>
-                        outside.xml を編集している場合には移行作業が必要となります。
-                        詳細につきましては
-                        <a href="https://github.com/chaika/chaika/wiki/%E5%A4%96%E9%83%A8%E6%9D%BF">Wiki</a>
-                        をご覧ください。
-                    </p>
-                    <p>
-                        この変更に伴い, 以下の機能が追加されました。
-                    </p>
-                    <ul class="list">
-                        <li>chaika 関連の板を自動的に一覧に追加するかどうかを設定できるようになりました。</li>
-                        <li>板一覧の「ツール」メニューから外部板を追加するファイルを開けるようになりました。</li>
-                    </ul>
-                </aside>
+                設定画面のデザインが変更され, OK ボタンが押しやすくなりました
             </li>
+            <li class="fixed">
+                意図しないときにショートカットキーが反応してしまう問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/297">#297</a>)
+            </li>
+            <li class="fixed">
+                &gt;&gt;1000 を超えるレスに対しポップアップや発言数カウントが動作しない問題を修正しました
+                (<a href="https://github.com/chaika/chaika/issues/266">#266</a>)
+            </li>
+        </ul>
+    </section>
 
+    <section>
+        <h3>その他</h3>
+        <ul>
+            <li class="new">
+                コンテキストメニューの項目に現在選択している文字列が表示されるようになりました
+                (<a href="https://github.com/chaika/chaika/issues/281">#281</a>)
+            </li>
+            <li class="new">
+                スレッド一覧, ログマネージャ, リリースノートにて Firefox の新しいデザインである
+                <a href="https://people.mozilla.org/~jgruen/chameleon/">Chameleon Style</a>
+                を導入しました
+                (<a href="https://github.com/chaika/chaika/issues/272">#272</a>)
+            </li>
+            <li class="new">
+                <a href="https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox">e10s</a>
+                (electrolysis, マルチプロセス化 Firefox) への対応を進めました
+                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
+            </li>
             <li class="changed">
-                スレッド一覧でのハイライト表示のコントラスト差が軽減されました
-                (<a href="https://github.com/chaika/chaika/issues/217">#217</a>)
-            </li>
-
-            <li class="fixed">
-                スタートページを about:config に設定している場合に、起動時にツールバーボタンが常に表示される問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/159">#159</a>)
-            </li>
-            <li class="fixed">
-                不具合報告テンプレートにセキュリティやプライバシーに関わる情報が含まれる可能性がある問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/168">#168</a>)
-            </li>
-            <li class="fixed">
-                スレッド一覧において板URLを条件に設定したNGExや置換が動作しない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/187">#187</a>,
-                <a href="https://github.com/chaika/chaika/issues/200">#200</a>)
-            </li>
-            <li class="fixed">
-                板へのリンクに対して「リンク先を chaika で開く」が動作しない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/189">#189</a>)
-            </li>
-            <li class="fixed">
-                コンテキストメニューをフラットにしている場合に、ブラウザのコンテキストメニューが動作しなくなることがある問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/190">#190</a>)
-            </li>
-            <li class="fixed">
-                リンク中に「|」が含まれる場合にリンクが途切れてしまう問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/180">#180</a>)
-            </li>
-            <li class="fixed">
-                Aero 環境下でサイドバーのフォルダアイコンが見切れる問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/188">#188</a>)
-            </li>
-            <li class="fixed">
-                Firefox 31 以下で AA マネージャが動作しない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/215">#215</a>)
-            </li>
-            <li class="fixed">
-                Firefox 36 以降で板一覧が更新できない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/158">#158</a>)
-            </li>
-            <li class="fixed">
-                その他軽微なバグ修正や改善を行いました
-                (<a href="https://github.com/chaika/chaika/issues/127">#127</a>,
-                 <a href="https://github.com/chaika/chaika/issues/156">#156</a>,
-                 <a href="https://github.com/chaika/chaika/issues/166">#166</a>,
-                 <a href="https://github.com/chaika/chaika/issues/167">#167</a>,
-                 <a href="https://github.com/chaika/chaika/issues/178">#178</a>,
-                 <a href="https://github.com/chaika/chaika/issues/214">#214</a>,
-                 <a href="https://github.com/chaika/chaika/issues/217">#217</a>,
-                 <a href="https://github.com/chaika/chaika/issues/218">#218</a>)
-            </li>
-        </ul>
-    </section>
-
-    <section>
-        <h1>1.7.1 - 2014/11/2</h1>
-        <ul>
-            <li class="new">
-                置換マネージャによりレスの内容やスレタイを置換できるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/142">#142</a>)
-            </li>
-            <li class="new">
-                ツールバーボタンを押すことでサイドバーが開くようになりました
-                (<a href="https://github.com/chaika/chaika/issues/98">#98</a>)
-            </li>
-            <li class="new">
-                デフォルトスキンでレス番号をクリックして返信できるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/130">#130</a>)
-            </li>
-            <li class="new">
-                デフォルトスキンでキーボートショートカットを実装しました
-                (<a href="https://github.com/chaika/chaika/issues/131">#131</a>)
+                いくつかのデフォルト設定値が変更されました
+                (<a href="https://github.com/chaika/chaika/issues/240">#240</a>)
                 <aside class="info">
                     <p>
-                        デフォルトのショートカットは以下のとおりです。
-                        変更する場合には script.js 内の <code>ShortcutHandler</code> 部分を直接編集して下さい。
+                        変更されたものは以下の通りです.
+                        これらは
+                        <a href="https://github.com/chaika/chaika/wiki/%E3%82%A2%E3%83%B3%E3%82%B1%E3%83%BC%E3%83%88%E7%B5%90%E6%9E%9C%282014.11.3%29#%E3%83%87%E3%83%95%E3%82%A9%E3%83%AB%E3%83%88%E8%A8%AD%E5%AE%9A%E5%80%A4%E3%81%AE%E5%A4%89%E6%9B%B4">使用状況のアンケート</a>
+                        に基づく変更です.
+                        <ul class="list">
+                            <li>「スレッド一覧を開いた時に自動的に一覧を更新する」をデフォルトで有効にしました</li>
+                            <li>「2ch スレッド URL を自動的に chaika で開く」をデフォルトで有効にしました</li>
+                            <li>「ウィザードを自動的に閉じる」をデフォルトで有効にしました</li>
+                            <li>スレッド一覧において「新しいタブで開く」をデフォルトで有効にしました</li>
+                            <li>「Be アイコンの表示」をデフォルトで有効にしました</li>
+                        </ul>
                     </p>
-                    <ul class="list">
-                        <li>書き込み: Ctrl + Enter, Shift + Enter, w</li>
-                        <li>再読み込み: r</li>
-                        <li>新着レスへ移動: n</li>
-                        <li>次のレスへ移動: j</li>
-                        <li>前のレスへ移動: k</li>
-                        <li>次のページヘ移動: f</li>
-                        <li>前のページヘ移動: b</li>
-                        <li>レス番号へ移動: レス番号を数字で入力</li>
-                    </ul>
                 </aside>
             </li>
-            <li class="new">
-                ImageViewURLReplace.dat にて変更された URL を表示した場合に元の URL へ移動するかを尋ねるようになりました
-                (<a href="https://github.com/chaika/chaika/issues/65">#65</a>)
+            <li class="changed">
+                ソースコードを整理し, 非標準な機能の削除を進めました
+                (<a href="https://github.com/chaika/chaika/issues/267">#267</a>,
+                 <a href="https://github.com/chaika/chaika/issues/269">#269</a>)
             </li>
-            <li class="fixed">
-                したらばの仕様変更によりスレッドが立てられなくなっていた問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/150">#150</a>)
+            <li class="changed">
+                minVersion が Firefox 38 に引き上げられました
+                (<a href="https://github.com/chaika/chaika/issues/85">#85</a>,
+                 <a href="https://github.com/chaika/chaika/issues/275">#275</a>)
             </li>
-            <li class="fixed">
-                コンテキストメニューをフラットにすると正しく動作しなくなる問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/143">#143</a>)
-            </li>
-            <li class="fixed">
-                Google の検索結果でリンク先に関するコンテキストメニューが表示されない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/153">#153</a>)
-            </li>
-            <li class="fixed">
-                NGEx で対象が空文字の場合に正しく条件を判定できない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/151">#151</a>)
-            </li>
-            <li class="fixed">
-                NG データが1つしかない場合にその NG データを削除できない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/152">#152</a>)
-            </li>
-            <li class="fixed">
-                サイドバー検索において一部の文字が検索できない問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/136">#136</a>)
-            </li>
-            <li class="fixed">
-                スレッド一覧やスレッド表示で一部の文字が文字化けする問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/135">#135</a>,
-                 <a href="https://github.com/chaika/chaika/issues/149">#149</a>)
-            </li>
-            <li class="fixed">
-                Cookie が無効な場合にデフォルトスキンの全機能が使用できなくなる問題を修正しました
-                (<a href="https://github.com/chaika/chaika/issues/129">#129</a>)
+            <li class="removed">
+                e10s への対応の難しさから, 複数箇所を選択し, コンテキストメニューからそれぞれ別の条件として NGEx に登録する機能が削除されました
+                (<a href="https://github.com/chaika/chaika/issues/277">#277</a>)
             </li>
         </ul>
     </section>
+</section>
 
-    <section>
-        <h1>1.7.0 - 2014/10/14</h1>
-        <ul>
-            <li class="new">あぼーん方法に NGEx を追加
-                (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)
-                <aside class="info">
-                    <p>正規表現による指定、複数条件の組み合わせ、スレッドあぼーん、自動NGIDなど
-                    多様な方法であぼーんを行うことが可能になりました。</p>
-                    <p>chaika 1.6.3 以前で同様の機能を提供していた
-                    chaikaAboneEx, Chaika Abone Helper を利用されていた方は、
-                    <a href="http://bbs2ch.sourceforge.jp/uploader/upload.php?page=all">移行ツール</a>
-                    を利用してデータを移行することができます。</p>
-                </aside>
-            </li>
-            <li class="new">AA マネージャを実装
-                (<a href="https://github.com/chaika/chaika/issues/6">#6</a>,
-                 <a href="https://github.com/chaika/chaika/issues/7">#7</a>)
-                 <ul class="list">
-                    <li>GUI から AA の追加、編集、削除、フォルダの移動などが行える機能を追加</li>
-                    <li>AAList.txt からのインポートに対応</li>
-                    <li>コンテキストメニューからの登録に対応</li>
-                 </ul>
-            </li>
-            <li class="new">ツールバーボタンを刷新
-                (<a href="https://github.com/chaika/chaika/issues/19">#19</a>)
+
+<section>
+    <h2>1.7.3 - 2014/12/31</h2>
+    <ul>
+        <li class="new">
+            コンテキストメニューの区切り線を非表示にすることができるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/197">#197</a>)
+        </li>
+
+        <li class="changed">
+            AA 判定の処理が向上しました
+            (<a href="https://github.com/chaika/chaika/pull/226">#226</a>)
+        </li>
+
+        <li class="fixed">
+            Linux においてスレッド一覧の日にち表示が正しく行われない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/221">#221</a>)
+        </li>
+        <li class="fixed">
+            一部の環境でスキンの受信に失敗しスレッドが正常に表示できない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/224">#224</a>)
+        </li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.7.2 - 2014/12/27</h2>
+    <ul>
+        <li class="new">
+            NGEx や置換マネージャの条件を入れ子にできるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/148">#148</a>)
+        </li>
+        <li class="new">
+            NGEx の有効期限をプリセットから選べるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/147">#147</a>)
+        </li>
+        <li class="new">
+            NGEx や置換マネージャの編集欄がウィンドウサイズに応じて広がるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/132">#132</a>)
+        </li>
+        <li class="new">
+            あぼーんマネージャや置換マネージャで項目を削除するときに確認ダイアログを表示するようになりました
+            (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+            <aside class="info">
+                <p>
+                    ダイアログの表示は設定から OFF にすることができます。
+                </p>
+            </aside>
+        </li>
+        <li class="new">
+            AA マネージャ, NGEx, 置換マネージャの項目リスト部分においてコンテキストメニューが実装されました
+            (<a href="https://github.com/chaika/chaika/issues/184">#184</a>)
+            <aside class="info">
+                <p>
+                    コンテキストメニューから新規項目の追加や削除が行えるようになりました。
+                </p>
+            </aside>
+        </li>
+        <li class="new">
+            置換マネージャにおいて ReplaceStr.txt 形式のデータをインポートできるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/10">#10</a>)
+        </li>
+        <li class="new">
+            サイドバーの「ツール」メニューから各マネージャやフォルダを開けるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/182">#182</a>)
+        </li>
+        <li class="new">
+            置換マネージャを開くメニューがコンテキストメニューに追加されました
+            (<a href="https://github.com/chaika/chaika/issues/179">#179</a>)
+        </li>
+        <li class="new">
+            まちBBS のホスト表示に対応しました
+            (<a href="https://github.com/chaika/chaika/issues/201">#201</a>)
+        </li>
+        <li class="new">
+            ImageViewURLReplace.dat に関する通知の表示を、通知のオプションから無効化できるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/164">#164</a>)
+        </li>
+        <li class="new">
+            板一覧でキーボートショートカットを実装しました
+            (<a href="https://github.com/chaika/chaika/issues/171">#171</a>)
+            <aside class="info">
+                <p>
+                    デフォルトのショートカットは以下のとおりです。
+                </p>
                 <ul class="list">
-                    <li>アイコンが各 OS のツールバーボタンにマッチするよう新しいものに変更されました
-                        (Thanks <a href="http://anago.2ch.net/test/read.cgi/software/1403350012/283">&gt;&gt;283</a>
-                         for creating icons)
-                    </li>
-                    <li>Australis および テーマ適用時の表示に対応しました</li>
-                    <li>ボタンを任意の位置に移動できるようになりました</li>
-                    <li>コンテキストメニューと内容が完全に共通化されました</li>
-                    <li>サイドバーを開閉するボタンは削除されました</li>
+                    <li>選択したスレッドを開く: Enter</li>
+                    <li>選択したスレッドを新規タブで開く: Ctrl+Enter, Alt+Enter</li>
+                    <li>スレッド一覧を更新する: r</li>
+                    <li>検索欄にフォーカスを移す: f</li>
+                    <li>下のスレッドへフォーカスを移す: j, ↓</li>
+                    <li>上のスレッドへフォーカスを移す: k, ↑</li>
+                    <li>1ページ分下へ移動する: Space</li>
+                    <li>1ページ分上へ移動する: Shift+Space</li>
                 </ul>
-            </li>
-            <li class="new">サイドバー・コンテキストメニューの検索機能をプラグイン化
-                (<a href="https://github.com/chaika/chaika/issues/62">#62</a>)
-                <aside class="info">
-                    <p>
-                        <a href="http://dig.2ch.net/">dig.2ch.net</a>,
-                        <a href="http://search.2ch.net/">search.2ch.net</a>,
-                        <a href="http://ff2ch.syoboi.jp/">ff2ch.syoboi.jp</a>
-                        での検索に対応しました。
-                    </p>
-                    <p>新規プラグインのインストール方法など詳細については
-                    <a href="https://github.com/chaika/chaika/wiki/%E6%A4%9C%E7%B4%A2%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3">オンラインマニュアル</a>
-                    を参照して下さい。</p>
-                </aside>
-            </li>
-            <li class="new">デフォルトスキンを改善
+            </aside>
+        </li>
+        <li class="new">
+            デフォルトスキンに関して以下の改善を行いました
+            <ul class="list">
+                <li>
+                    ヘッダー部分に新着レス数やスレッドサイズなどの表示を追加しました
+                </li>
+                <li>
+                    エラーが発生した際にページ下部のステータス表示を強調するようになりました
+                    (<a href="https://github.com/chaika/chaika/issues/219">#219</a>)
+                </li>
+                <li>
+                    ポップアップの左部分に余白をあけることで逆参照がたどりやすくなりました
+                    (<a href="https://github.com/chaika/chaika/issues/161">#161</a>)
+                </li>
+                <li>
+                    ポップアップを上方向に表示するオプションを実装しました
+                    (<a href="https://github.com/chaika/chaika/issues/162">#162</a>)
+                </li>
+                <li>
+                    画像かどうかの判定を緩くするオプションを実装しました
+                </li>
+                <li>
+                    ポップアップが消えやすい問題を修正しました
+                    (<a href="https://github.com/chaika/chaika/issues/163">#163</a>)
+                </li>
+                <li>
+                    ID が空のときに発言数カウントが正しく動作しない問題を修正しました
+                    (<a href="https://github.com/chaika/chaika/issues/165">#165</a>)
+                </li>
+                <li>
+                    ID 抽出ポップアップにて他のポップアップの内容が含まれる問題を修正しました
+                </li>
+                <li>
+                    ポップアップの遅延が常に無効になっていた問題を修正しました
+                </li>
+                <li>
+                    ウィンドウの高さが低い場合にオプションが見切れてしまう問題を修正しました
+                </li>
+            </ul>
+        </li>
+
+        <li class="removed">
+            NGEx や置換マネージャのウィンドウサイズを自動的に変更する機能を廃止しました
+            (<a href="https://github.com/chaika/chaika/issues/170">#170</a>)
+        </li>
+
+        <li class="changed">
+            外部板を追加する方法が変更されました
+            (<a href="https://github.com/chaika/chaika/issues/155">#155</a>)
+            <aside class="info">
+                <p>
+                    outside.xml を編集している場合には移行作業が必要となります。
+                    詳細につきましては
+                    <a href="https://github.com/chaika/chaika/wiki/%E5%A4%96%E9%83%A8%E6%9D%BF">Wiki</a>
+                    をご覧ください。
+                </p>
+                <p>
+                    この変更に伴い, 以下の機能が追加されました。
+                </p>
                 <ul class="list">
-                    <li>表示範囲外アンカーのポップアップに対応 (<a href="https://github.com/chaika/chaika/issues/2">#2</a>)</li>
-                    <li>ID別発言数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
-                    <li>被参照数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
-                    <li>逆参照ポップアップ機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
-                    <li>あぼーんされる原因となったNGワードを表示する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
-                    <li>あぼーんの削除を即時に反映する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
-                    <li>設定画面を実装 (<a href="https://github.com/chaika/chaika/issues/69">#69</a>)</li>
-                    <li>Favicon を追加 (<a href="https://github.com/chaika/chaika/issues/1">#1</a>)</li>
-                    <li>ポップアップの挙動を改善 (<a href="https://github.com/chaika/chaika/issues/21">#21</a>)</li>
-                    <li>スレッドリダイレクタが有効の場合にスレッドのブラウザ表示ができない問題を修正</li>
+                    <li>chaika 関連の板を自動的に一覧に追加するかどうかを設定できるようになりました。</li>
+                    <li>板一覧の「ツール」メニューから外部板を追加するファイルを開けるようになりました。</li>
                 </ul>
-            </li>
-            <li class="new">書き込みウィザードに不具合報告テンプレートの挿入機能を追加
-                (<a href="https://github.com/chaika/chaika/issues/70">#70</a>)</li>
-            <li class="new">投稿時に誤爆を警告する機能を追加
-                (<a href="https://github.com/chaika/chaika/issues/61">#61</a>)</li>
-            <li class="new">書き込みウィザードの警告を強調する機能を追加
-                (<a href="https://github.com/chaika/chaika/issues/52">#52</a>)</li>
-            <li class="new">ログマネージャにおいてダブルクリックでスレッドを開く機能を追加
-                (<a href="https://github.com/chaika/chaika/issues/25">#25</a>)</li>
-            <li class="new">サイドバーにオンラインヘルプを開くメニューを追加
-                (<a href="https://github.com/chaika/chaika/issues/23">#23</a>)</li>
+            </aside>
+        </li>
 
-            <li class="new">浪人に暫定的に対応
-                (<a href="https://github.com/chaika/chaika/issues/53">#53</a>)
-                <aside class="info">
-                    <p>環境によっては ログインできない・浪人経由で書き込めない・浪人経由で過去ログが取得できない
-                    などの問題が発生することが報告されており、現在調査中です。</p>
-                </aside>
-            </li>
-            <li class="new">p2 に関する詳細設定が設定画面からできるよう改善
-                (<a href="https://github.com/chaika/chaika/issues/5">#5</a>)
-                <aside class='info'>
-                    <p><a href="http://akid.s17.xrea.com/">rep2</a> や
-                    <a href="http://p2.moritapo.jp">p2.moritapo.jp</a>
-                    へ対応させるには設定の書き換えが必要です。</p>
-                </aside>
-            </li>
-            <li class="new">Be 2.0 および Pink ちゃんねるの Be に対応
-                (<a href="https://github.com/chaika/chaika/issues/56">#56</a>,
-                 <a href="https://github.com/chaika/chaika/issues/80">#80</a>)</li>
-            <li class="new">png 形式の Be アイコン および Emoticons に対応
-                (<a href="https://github.com/chaika/chaika/issues/64">#64</a>,
-                 <a href="https://github.com/chaika/chaika/issues/67">#67</a>)</li>
+        <li class="changed">
+            スレッド一覧でのハイライト表示のコントラスト差が軽減されました
+            (<a href="https://github.com/chaika/chaika/issues/217">#217</a>)
+        </li>
 
-            <li class="changed">AA レスの判定アルゴリズムを改善
-                (<a href="https://github.com/chaika/chaika/issues/66">#66</a>)</li>
-            <li class="changed">板の移転をより積極的に通知するよう改善</li>
-            <li class="changed">ImageViewURLReplace.dat によるリンクの置き換え処理を高速化
-                (<a href="https://github.com/chaika/chaika/issues/29">#29</a>)</li>
-            <li class="changed">ログマネージャにおいて上部に板名を表示するよう変更
-                (<a href="https://github.com/chaika/chaika/issues/26">#26</a>)</li>
-            <li class="changed">あぼーんの設定ファイル, kakikomi.txt, ImageViewURLReplace.dat, NGFiles.txt
-                のエンコーディングを Shift_JIS から UTF-8 へ変更
-                (<a href="https://github.com/chaika/chaika/issues/48">#48</a>)</li>
+        <li class="fixed">
+            スタートページを about:config に設定している場合に、起動時にツールバーボタンが常に表示される問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/159">#159</a>)
+        </li>
+        <li class="fixed">
+            不具合報告テンプレートにセキュリティやプライバシーに関わる情報が含まれる可能性がある問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/168">#168</a>)
+        </li>
+        <li class="fixed">
+            スレッド一覧において板URLを条件に設定したNGExや置換が動作しない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/187">#187</a>,
+            <a href="https://github.com/chaika/chaika/issues/200">#200</a>)
+        </li>
+        <li class="fixed">
+            板へのリンクに対して「リンク先を chaika で開く」が動作しない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/189">#189</a>)
+        </li>
+        <li class="fixed">
+            コンテキストメニューをフラットにしている場合に、ブラウザのコンテキストメニューが動作しなくなることがある問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/190">#190</a>)
+        </li>
+        <li class="fixed">
+            リンク中に「|」が含まれる場合にリンクが途切れてしまう問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/180">#180</a>)
+        </li>
+        <li class="fixed">
+            Aero 環境下でサイドバーのフォルダアイコンが見切れる問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/188">#188</a>)
+        </li>
+        <li class="fixed">
+            Firefox 31 以下で AA マネージャが動作しない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/215">#215</a>)
+        </li>
+        <li class="fixed">
+            Firefox 36 以降で板一覧が更新できない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/158">#158</a>)
+        </li>
+        <li class="fixed">
+            その他軽微なバグ修正や改善を行いました
+            (<a href="https://github.com/chaika/chaika/issues/127">#127</a>,
+             <a href="https://github.com/chaika/chaika/issues/156">#156</a>,
+             <a href="https://github.com/chaika/chaika/issues/166">#166</a>,
+             <a href="https://github.com/chaika/chaika/issues/167">#167</a>,
+             <a href="https://github.com/chaika/chaika/issues/178">#178</a>,
+             <a href="https://github.com/chaika/chaika/issues/214">#214</a>,
+             <a href="https://github.com/chaika/chaika/issues/217">#217</a>,
+             <a href="https://github.com/chaika/chaika/issues/218">#218</a>)
+        </li>
+    </ul>
+</section>
 
-            <li class="fixed">&gt;&gt;1 が透明あぼーんされるとスレッドが正しく表示できない問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/117">#117</a>)</li>
-            <li class="fixed">正しく過去ログが取得できないことがある問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/105">#105</a>)</li>
-            <li class="fixed">書き込みウィザードが最小化できない問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/55">#55</a>)</li>
-            <li class="fixed">板においてコンテキストメニューの「コピー」が正しく動作しない問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/107">#107</a>)</li>
-            <li class="fixed">URL に特定の文字列が含まれる場合に表示が崩れる問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/49">#49</a>)</li>
-            <li class="fixed">1.6.1 のときからアンカーリンクの部分が不正な HTML になっていた問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/110">#110</a>,
-                 <a href="https://github.com/chaika/chaika/issues/">#124</a>)</li>
-            <li class="fixed">したらば掲示板でトリップのプレビューが文字化けする問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/96">#96</a>)</li>
-            <li class="fixed">したらば掲示板で特定の文字を含むスレッドのタイトルがスレッド一覧で正しく表示されない問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/103">#103</a>)</li>
-        </ul>
-    </section>
-
-    <section>
-        <h1>1.6.3 - 2013/11/17</h1>
-        <ul>
-            <li class="changed"><a href="http://blog.livedoor.jp/bbsnews/archives/54661274.html">したらば掲示板のドメイン変更</a>に対応
-                (<a href="https://github.com/chaika/chaika/issues/41">#41</a>)</li>
-            <li class="fixed">実体参照を用いて書かれた文字が文字化けすることがある問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/36">#36</a>)</li>
-        </ul>
-    </section>
-
-    <section>
-        <h1>1.6.2 - 2013/10/13</h1>
-        <ul>
-            <li class="new"><a href="http://2ch.tora3.net/">Rokka システム</a>
-                に暫定的に対応 (<a href="https://github.com/chaika/chaika/issues/38">#38</a>)</li>
-            <li class="new">「chaika および掲示板上でのみ表示する」オプションが有効の場合でも、
-                掲示板へのリンク上では常にリンク先関連のコンテキストメニューを表示するオプションを追加
-                (<a href="https://github.com/chaika/chaika/issues/28">#28</a>)</li>
-            <li class="new">chaika 内蔵の「次のスレッドを検索」機能を使う場合に検索文字列を最適化するようにした
-                (<a href="https://github.com/chaika/chaika/issues/30">#30</a>)
-                <aside class="info">
-                    <p>スレッドタイトルの後半にあるパート番号と思われる数字の除去を試みるようになりました。</p>
-                </aside>
-            </li>
-            <li class="changed">chaika が取得した dat ファイルの更新日時をサーバー側の最終更新日時と一致させるようにした
-                (<a href="https://github.com/chaika/chaika/issues/40">#40</a>)
-                <aside class="info">
-                    <p>以前は chaika が dat を取得してディスクに書き込んだ日時となっていました。</p>
-                </aside>
-            </li>
-            <li class="fixed">FoxAge2ch が存在する環境で、FoxAge2ch に登録されていないスレッドに対して「次のスレッドを検索」が実行できない問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/44">#44</a>)</li>
-            <li class="fixed">Firefox 24 以降において、デフォルトスキンであぼーんされたレスの表示が崩れる問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/42">#42</a>)</li>
-            <li class="fixed">Firefox 24 以降において、書き込みウィザードで警告が出る問題を修正
-                (<a href="https://github.com/chaika/chaika/issues/39">#39</a>)</li>
-        </ul>
-    </section>
-
-    <section>
-        <h1>1.6.1 - 2013/6/1</h1>
-        <ul>
-            <li class="new">コンテキストメニューを大幅に拡充し, 以下の項目を追加
+<section>
+    <h2>1.7.1 - 2014/11/2</h2>
+    <ul>
+        <li class="new">
+            置換マネージャによりレスの内容やスレタイを置換できるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/142">#142</a>)
+        </li>
+        <li class="new">
+            ツールバーボタンを押すことでサイドバーが開くようになりました
+            (<a href="https://github.com/chaika/chaika/issues/98">#98</a>)
+        </li>
+        <li class="new">
+            デフォルトスキンでレス番号をクリックして返信できるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/130">#130</a>)
+        </li>
+        <li class="new">
+            デフォルトスキンでキーボートショートカットを実装しました
+            (<a href="https://github.com/chaika/chaika/issues/131">#131</a>)
+            <aside class="info">
+                <p>
+                    デフォルトのショートカットは以下のとおりです。
+                    変更する場合には script.js 内の <code>ShortcutHandler</code> 部分を直接編集して下さい。
+                </p>
                 <ul class="list">
-                    <li>右クリックあぼーん機能</li>
-                    <li>スレッドタイトルなどのコピー</li>
-                    <li>find.2ch.net/板/スレッド内での検索</li>
-                    <li>次のスレッドの検索</li>
-                    <li>スキンの変更</li>
-                    <li>スレッドへの書き込み</li>
-                    <li>スレッドのログ削除</li>
-                    <li>chaika/ブラウザ表示の切り替え</li>
-                    <li>レス表示範囲の変更</li>
-                    <li>スレッド一覧画面の表示</li>
-                    <li>サイドバー表示の切り替え</li>
-                    <li>オプション画面の表示</li>
+                    <li>書き込み: Ctrl + Enter, Shift + Enter, w</li>
+                    <li>再読み込み: r</li>
+                    <li>新着レスへ移動: n</li>
+                    <li>次のレスへ移動: j</li>
+                    <li>前のレスへ移動: k</li>
+                    <li>次のページヘ移動: f</li>
+                    <li>前のページヘ移動: b</li>
+                    <li>レス番号へ移動: レス番号を数字で入力</li>
                 </ul>
-                <aside class="info">
-                    <p>「次のスレッドの検索」はFoxAge2chがインストールされている環境では、FoxAge2chの次スレ検索機能を使用します。
-                        未インストール環境では、スレッドタイトルで板内検索を行います。</p>
-                </aside>
-            </li>
-            <li class="new">ツールバーボタンのメニューをコンテキストメニューと同じく拡充</li>
-            <li class="new">コンテキストメニューに関する設定項目を拡充</li>
-            <li class="new">ツールバーボタンを表示するかどうかの設定を追加</li>
-            <li class="new">末尾が「!」のIDに対応</li>
-            <li class="new">書きこみウィザードの「ツール」に常に最前面にする設定を追加</li>
-            <li class="new">V2Cなどと同様のAA判定方法を追加し, 従来の方法と併用するようにした</li>
-            <li class="new">板一覧からスレッドを開く際, TreeStyleTabがある環境ではスレッドを板一覧の子タブとして開くようにした</li>
-            <li class="new">デフォルトスキンで騙しAAの表示に対応</li>
-            <li class="new">URLの末尾に「?chaika_force_browser=1」を追加することでスレッドリダイレクタを一時的に無効化する機能を追加</li>
-            <li class="new">URLの末尾に「?chaika_disable_abone=1」を追加することであぼーん処理を一時的に無効化する機能を追加</li>
-            <li class="new"><a href="http://janesoft.net/janestyle/help/view/NGfiles.html">NGFiles.txt</a>に対応
-                <aside class="info">
-                    <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「NGFiles.txt」をお読み下さい。</p>
-                </aside>
-            </li>
-            <li class="new"><a href="http://janesoft.net/janestyle/help/first/ImageViewURLReplace.html">ImageViewURLReplace.dat</a>に対応
-                <aside class="info">
-                    <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「ImageViewURLReplace.dat」をお読み下さい。</p>
-                </aside>
-            </li>
-            <li class="changed">スレッドの書き出し処理を大幅に高速化</li>
-            <li class="changed">設定画面のデザインを変更</li>
-            <li class="fixed">みみずんからログを取得したときに毎回あぼーん発生になってしまう問題を修正</li>
-            <li class="fixed">レス中で特定の文字の後にあるID:にリンクが貼られない問題を修正</li>
-            <li class="fixed">書きこみプレビューでトリップの前に空白がない問題を修正</li>
-            <li class="fixed">Firefox 22以降でサイドバーが表示されない問題を修正</li>
-            <li class="fixed">従来のAA判定方法に誤りがあったのを修正</li>
-            <li class="fixed">Firefox 20以降で即時あぼーんが動作しない問題を修正</li>
-            <li class="fixed">サイドバーでの2ch検索(HTML版)が動作しなくなっていた問題を修正</li>
-            <li class="fixed">ブラウザーで一度ログインしないとchaikaからp2にログインできなくなっていた問題を修正</li>
-            <li class="fixed">レス本文などに特定の文字列が含まれる場合にスレッドの表示が崩れる問題を修正</li>
-        </ul>
-    </section>
+            </aside>
+        </li>
+        <li class="new">
+            ImageViewURLReplace.dat にて変更された URL を表示した場合に元の URL へ移動するかを尋ねるようになりました
+            (<a href="https://github.com/chaika/chaika/issues/65">#65</a>)
+        </li>
+        <li class="fixed">
+            したらばの仕様変更によりスレッドが立てられなくなっていた問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/150">#150</a>)
+        </li>
+        <li class="fixed">
+            コンテキストメニューをフラットにすると正しく動作しなくなる問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/143">#143</a>)
+        </li>
+        <li class="fixed">
+            Google の検索結果でリンク先に関するコンテキストメニューが表示されない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/153">#153</a>)
+        </li>
+        <li class="fixed">
+            NGEx で対象が空文字の場合に正しく条件を判定できない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/151">#151</a>)
+        </li>
+        <li class="fixed">
+            NG データが1つしかない場合にその NG データを削除できない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/152">#152</a>)
+        </li>
+        <li class="fixed">
+            サイドバー検索において一部の文字が検索できない問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/136">#136</a>)
+        </li>
+        <li class="fixed">
+            スレッド一覧やスレッド表示で一部の文字が文字化けする問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/135">#135</a>,
+             <a href="https://github.com/chaika/chaika/issues/149">#149</a>)
+        </li>
+        <li class="fixed">
+            Cookie が無効な場合にデフォルトスキンの全機能が使用できなくなる問題を修正しました
+            (<a href="https://github.com/chaika/chaika/issues/129">#129</a>)
+        </li>
+    </ul>
+</section>
 
-    <section>
-        <h1>1.6.0 - 2013/02/11</h1>
-        <ul>
-            <li class="new">p2経由での書き込みに対応
-                <aside class="info">
-                    <p>初めてp2経由でBeを有効にして書き込む場合、<a href="http://info.2ch.net/wiki/index.php?p2.2ch.net#content_1_9">p2.2ch.net
-                    にて設定する必要があります</a>。</p>
-                </aside>
-            </li>
-            <li class="new">リリースノートページの追加</li>
-            <li class="new">更新後初回起動時にリリースノートを自動で表示するようにした</li>
-            <li class="new">書き込みプレビューを表示するかどうかの設定を追加</li>
-            <li class="new">以下の場合に警告するかどうかの設定を追加
-                <ul class="list">
-                    <li>ログを削除する時</li>
-                    <li>書き込みウィザードを閉じる時</li>
-                    <li>fusianasan</li>
-                    <li>Beが有効な時 (Be関連板を除く)</li>
-                    <li>p2が有効な時</li>
-                </ul>
-            </li>
-            <li class="new">Be関連板で書き込む際に自動的にBeを有効にする機能を追加</li>
-            <li class="new">書き込みが終わるごとにBe, p2を無効にする機能を追加</li>
-            <li class="new">レス中の不正なタグを無効化する機能を追加</li>
-            <li class="new">ログマネージャ、スレッド一覧、トラブルシューティング情報にfaviconを追加</li>
-            <li class="changed">Be、 p2、●のパスワードをログインマネージャで保管するように変更
-                <aside class="info">
-                    <p>これまでパスワードは平文で保存されていましたが、ログインマネージャを使うことにより暗号化された状態で保存されるようになり、
-                        セキュリティが大幅に向上しました。
-                    </p>
-                    <p>なお、従来の保存先である extensions.chaika.maru_password / extensions.chaika.login.be.password / extensions.chaika.login.p2.password は空文字のまま残りますが、これは内部処理で使用しているためであり不具合ではありません。</p>
-                </aside>
-            </li>
-            <li class="changed">スレッド一覧の「購読中」ボタンを「既読」ボタンへと名称を変更</li>
-            <li class="changed">Beのアカウントの設定を設定画面から行うように変更</li>
-            <li class="changed">defaultmail.txtで空白以外が指定されている板のスレッドへ書き込む際は、ウィザードのsageチェックボックスの値を記憶しないよう変更</li>
-            <li class="changed">設定ウィンドウのサイズを内容に応じて変化するように変更</li>
-            <li class="changed">板のSETTING.TXTを取得してから3ヶ月以上経っていたら更新するように変更</li>
-            <li class="changed">連鎖あぼーん機能とアンカー修正機能が共に無効の時はアンカーの詳細解析をしないよう変更</li>
-            <li class="changed">デフォルトスキンのスクリプトを書きなおしたことで速度が向上した</li>
-            <li class="changed">minVersionをFirefox 17に変更</li>
-            <li class="fixed">範囲が非常に大きいアンカーを含むレスがあるとメモリ不足になってスレッドが読み込めなくなる問題を修正</li>
-            <li class="fixed">Firefox 18以降でトラブルシューティング情報が動かない問題を修正</li>
-            <li class="fixed">defaultmail.txtで設定されたメールアドレスと書き込みウィザードのsageチェックボックスの値が矛盾することがある問題を修正</li>
-            <li class="fixed">書き込みウィザードのプレビュー画面で「&quot;」が不要に実体参照へ変換されていた問題を修正</li>
-            <li class="fixed">ログマネージャ, 書き込みウィザード, HTML版2ch検索等でスレッドタイトルの実体参照がデコードされていない問題を修正</li>
-            <li class="fixed">RSS版2ch検索で特定の文字を実体参照化しないと検索できない問題を修正</li>
-            <li class="fixed">アンカー修正機能が無効の時に飛べないリンク先が貼られることがある問題を修正</li>
-        </ul>
-    </section>
+<section>
+    <h2>1.7.0 - 2014/10/14</h2>
+    <ul>
+        <li class="new">あぼーん方法に NGEx を追加
+            (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)
+            <aside class="info">
+                <p>正規表現による指定、複数条件の組み合わせ、スレッドあぼーん、自動NGIDなど
+                多様な方法であぼーんを行うことが可能になりました。</p>
+                <p>chaika 1.6.3 以前で同様の機能を提供していた
+                chaikaAboneEx, Chaika Abone Helper を利用されていた方は、
+                <a href="http://bbs2ch.osdn.jp/uploader/upload.php?page=all">移行ツール</a>
+                を利用してデータを移行することができます。</p>
+            </aside>
+        </li>
+        <li class="new">AA マネージャを実装
+            (<a href="https://github.com/chaika/chaika/issues/6">#6</a>,
+             <a href="https://github.com/chaika/chaika/issues/7">#7</a>)
+             <ul class="list">
+                <li>GUI から AA の追加、編集、削除、フォルダの移動などが行える機能を追加</li>
+                <li>AAList.txt からのインポートに対応</li>
+                <li>コンテキストメニューからの登録に対応</li>
+             </ul>
+        </li>
+        <li class="new">ツールバーボタンを刷新
+            (<a href="https://github.com/chaika/chaika/issues/19">#19</a>)
+            <ul class="list">
+                <li>アイコンが各 OS のツールバーボタンにマッチするよう新しいものに変更されました
+                    (Thanks <a href="http://anago.2ch.net/test/read.cgi/software/1403350012/283">&gt;&gt;283</a>
+                     for creating icons)
+                </li>
+                <li>Australis および テーマ適用時の表示に対応しました</li>
+                <li>ボタンを任意の位置に移動できるようになりました</li>
+                <li>コンテキストメニューと内容が完全に共通化されました</li>
+                <li>サイドバーを開閉するボタンは削除されました</li>
+            </ul>
+        </li>
+        <li class="new">サイドバー・コンテキストメニューの検索機能をプラグイン化
+            (<a href="https://github.com/chaika/chaika/issues/62">#62</a>)
+            <aside class="info">
+                <p>
+                    <a href="http://dig.2ch.net/">dig.2ch.net</a>,
+                    <a href="http://search.2ch.net/">search.2ch.net</a>,
+                    <a href="http://ff2ch.syoboi.jp/">ff2ch.syoboi.jp</a>
+                    での検索に対応しました。
+                </p>
+                <p>新規プラグインのインストール方法など詳細については
+                <a href="https://github.com/chaika/chaika/wiki/%E6%A4%9C%E7%B4%A2%E3%83%97%E3%83%A9%E3%82%B0%E3%82%A4%E3%83%B3">オンラインマニュアル</a>
+                を参照して下さい。</p>
+            </aside>
+        </li>
+        <li class="new">デフォルトスキンを改善
+            <ul class="list">
+                <li>表示範囲外アンカーのポップアップに対応 (<a href="https://github.com/chaika/chaika/issues/2">#2</a>)</li>
+                <li>ID別発言数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                <li>被参照数カウント機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                <li>逆参照ポップアップ機能を追加 (<a href="https://github.com/chaika/chaika/issues/3">#3</a>)</li>
+                <li>あぼーんされる原因となったNGワードを表示する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
+                <li>あぼーんの削除を即時に反映する機能を追加 (<a href="https://github.com/chaika/chaika/issues/22">#22</a>)</li>
+                <li>設定画面を実装 (<a href="https://github.com/chaika/chaika/issues/69">#69</a>)</li>
+                <li>Favicon を追加 (<a href="https://github.com/chaika/chaika/issues/1">#1</a>)</li>
+                <li>ポップアップの挙動を改善 (<a href="https://github.com/chaika/chaika/issues/21">#21</a>)</li>
+                <li>スレッドリダイレクタが有効の場合にスレッドのブラウザ表示ができない問題を修正</li>
+            </ul>
+        </li>
+        <li class="new">書き込みウィザードに不具合報告テンプレートの挿入機能を追加
+            (<a href="https://github.com/chaika/chaika/issues/70">#70</a>)</li>
+        <li class="new">投稿時に誤爆を警告する機能を追加
+            (<a href="https://github.com/chaika/chaika/issues/61">#61</a>)</li>
+        <li class="new">書き込みウィザードの警告を強調する機能を追加
+            (<a href="https://github.com/chaika/chaika/issues/52">#52</a>)</li>
+        <li class="new">ログマネージャにおいてダブルクリックでスレッドを開く機能を追加
+            (<a href="https://github.com/chaika/chaika/issues/25">#25</a>)</li>
+        <li class="new">サイドバーにオンラインヘルプを開くメニューを追加
+            (<a href="https://github.com/chaika/chaika/issues/23">#23</a>)</li>
 
-    <section>
-        <h1>1.5.8 - 2013/02/02</h1>
-        <ul>
-            <li class="new">「最近アクセスしたスレッド」等が新しいタブで開くかどうかについて設定を反映するようにした</li>
-            <li class="new">SETTING.TXTに板名が書かれていない板ではページタイトルを板名に設定するようにした</li>
-            <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした
-                <aside class="info">
-                    <p>Web Fontなど、従来Internal Server Errorとなっていたファイルがスキンで使えるようになりました。</p>
-                </aside>
-            </li>
-            <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
-            <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正
-                <aside class="info">
-                    <p>本修正に伴い、透明削除があるスレッドのdatが過去のchaikaと非互換になりました。表示がおかしい場合にはdatを再取得して下さい。</p>
-                </aside>
-            </li>
-            <li class="fixed">ログピックアップモードの時に新着を取得しない問題を修正</li>
-            <li class="fixed">連鎖あぼーんが正しく動かないことがある問題を修正</li>
-            <li class="fixed">アンカー修正機能が有効な時にアンカーが誤って表示されることがある問題を修正</li>
-            <li class="fixed">その他軽微なバグの修正</li>
-        </ul>
-    </section>
+        <li class="new">浪人に暫定的に対応
+            (<a href="https://github.com/chaika/chaika/issues/53">#53</a>)
+            <aside class="info">
+                <p>環境によっては ログインできない・浪人経由で書き込めない・浪人経由で過去ログが取得できない
+                などの問題が発生することが報告されており、現在調査中です。</p>
+            </aside>
+        </li>
+        <li class="new">p2 に関する詳細設定が設定画面からできるよう改善
+            (<a href="https://github.com/chaika/chaika/issues/5">#5</a>)
+            <aside class='info'>
+                <p><a href="http://akid.s17.xrea.com/">rep2</a> や
+                <a href="http://p2.moritapo.jp">p2.moritapo.jp</a>
+                へ対応させるには設定の書き換えが必要です。</p>
+            </aside>
+        </li>
+        <li class="new">Be 2.0 および Pink ちゃんねるの Be に対応
+            (<a href="https://github.com/chaika/chaika/issues/56">#56</a>,
+             <a href="https://github.com/chaika/chaika/issues/80">#80</a>)</li>
+        <li class="new">png 形式の Be アイコン および Emoticons に対応
+            (<a href="https://github.com/chaika/chaika/issues/64">#64</a>,
+             <a href="https://github.com/chaika/chaika/issues/67">#67</a>)</li>
 
-    <section>
-        <h1>1.5.7 - 2013/01/14</h1>
-        <ul>
-            <li class="new">したらばでの新規スレッド作成機能を実装</li>
-            <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
-            <li class="new">HTML版の2ch検索を実装
-                <aside class="info">
-                    <p>about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで従来のRSSを用いた検索と切り替えることができます(デフォルトはRSS検索)。</p>
-                </aside>
-            </li>
-            <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装
-                <aside class="info">
-                    <p>本機能は実験的機能となっています。about:configよりextensions.chaika.thread_fix_invalid_anchorで切り替えることができます(デフォルトOFF)。</p>
-                </aside>
-            </li>
-            <li class="changed">maxVersionをFirefox 18に変更</li>
-            <li class="changed">minVersionをFirefox 10に変更</li>
-            <li class="fixed">Be IDがあるときにIDの末尾に余計なスペースが付加される問題を修正</li>
-            <li class="fixed">したらばやまちBBSの透明削除があるスレッドを開くとレス番がずれる問題を修正</li>
-            <li class="fixed">ID: の前に文字があるとIDのリンクが貼られない問題を修正</li>
-            <li class="fixed">特定環境下でスレッドの読み込みに時間がかかることがある問題を修正</li>
-            <li class="fixed">ツールバーアイコンが消えることがある問題を修正</li>
-            <li class="fixed">大きいアイコンにするとWindowsでツールバーボタンに画像が表示されなくなる問題を修正</li>
-            <li class="fixed">範囲指定のあるアンカー等で正しく連鎖あぼーんが働かない問題を修正</li>
-            <li class="fixed">Firefox 18以降でプロキシを「ブラウザの設定に従う」以外にするとスレッドが開けなくなる問題を修正</li>
-            <li class="fixed">Firefox 18以降で「直接接続する」が動作しない問題を修正</li>
-            <li class="fixed">Firefox 20以降でスレッド一覧が開けない問題を修正</li>
-        </ul>
-    </section>
+        <li class="changed">AA レスの判定アルゴリズムを改善
+            (<a href="https://github.com/chaika/chaika/issues/66">#66</a>)</li>
+        <li class="changed">板の移転をより積極的に通知するよう改善</li>
+        <li class="changed">ImageViewURLReplace.dat によるリンクの置き換え処理を高速化
+            (<a href="https://github.com/chaika/chaika/issues/29">#29</a>)</li>
+        <li class="changed">ログマネージャにおいて上部に板名を表示するよう変更
+            (<a href="https://github.com/chaika/chaika/issues/26">#26</a>)</li>
+        <li class="changed">あぼーんの設定ファイル, kakikomi.txt, ImageViewURLReplace.dat, NGFiles.txt
+            のエンコーディングを Shift_JIS から UTF-8 へ変更
+            (<a href="https://github.com/chaika/chaika/issues/48">#48</a>)</li>
 
-    <section>
-        <h1>1.5.6 - 2011/12/21</h1>
-        <ul>
-            <li class="changed">maxVersionをFirefox 10に変更</li>
-        </ul>
-    </section>
+        <li class="fixed">&gt;&gt;1 が透明あぼーんされるとスレッドが正しく表示できない問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/117">#117</a>)</li>
+        <li class="fixed">正しく過去ログが取得できないことがある問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/105">#105</a>)</li>
+        <li class="fixed">書き込みウィザードが最小化できない問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/55">#55</a>)</li>
+        <li class="fixed">板においてコンテキストメニューの「コピー」が正しく動作しない問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/107">#107</a>)</li>
+        <li class="fixed">URL に特定の文字列が含まれる場合に表示が崩れる問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/49">#49</a>)</li>
+        <li class="fixed">1.6.1 のときからアンカーリンクの部分が不正な HTML になっていた問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/110">#110</a>,
+             <a href="https://github.com/chaika/chaika/issues/">#124</a>)</li>
+        <li class="fixed">したらば掲示板でトリップのプレビューが文字化けする問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/96">#96</a>)</li>
+        <li class="fixed">したらば掲示板で特定の文字を含むスレッドのタイトルがスレッド一覧で正しく表示されない問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/103">#103</a>)</li>
+    </ul>
+</section>
 
-    <section>
-        <h1>1.5.5 - 2011/11/07</h1>
-        <ul>
-            <li class="changed">maxVersionをFirefox 8に変更</li>
-            <li class="changed">minVersionをFirefox 7に変更</li>
-        </ul>
-    </section>
+<section>
+    <h2>1.6.3 - 2013/11/17</h2>
+    <ul>
+        <li class="changed"><a href="http://blog.livedoor.jp/bbsnews/archives/54661274.html">したらば掲示板のドメイン変更</a>に対応
+            (<a href="https://github.com/chaika/chaika/issues/41">#41</a>)</li>
+        <li class="fixed">実体参照を用いて書かれた文字が文字化けすることがある問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/36">#36</a>)</li>
+    </ul>
+</section>
 
-    <section>
-        <h1>1.5.4 - 2011/10/03</h1>
-        <ul>
-            <li class="changed">maxVersionをFirefox 7に変更</li>
-        </ul>
-    </section>
+<section>
+    <h2>1.6.2 - 2013/10/13</h2>
+    <ul>
+        <li class="new"><a href="http://2ch.tora3.net/">Rokka システム</a>
+            に暫定的に対応 (<a href="https://github.com/chaika/chaika/issues/38">#38</a>)</li>
+        <li class="new">「chaika および掲示板上でのみ表示する」オプションが有効の場合でも、
+            掲示板へのリンク上では常にリンク先関連のコンテキストメニューを表示するオプションを追加
+            (<a href="https://github.com/chaika/chaika/issues/28">#28</a>)</li>
+        <li class="new">chaika 内蔵の「次のスレッドを検索」機能を使う場合に検索文字列を最適化するようにした
+            (<a href="https://github.com/chaika/chaika/issues/30">#30</a>)
+            <aside class="info">
+                <p>スレッドタイトルの後半にあるパート番号と思われる数字の除去を試みるようになりました。</p>
+            </aside>
+        </li>
+        <li class="changed">chaika が取得した dat ファイルの更新日時をサーバー側の最終更新日時と一致させるようにした
+            (<a href="https://github.com/chaika/chaika/issues/40">#40</a>)
+            <aside class="info">
+                <p>以前は chaika が dat を取得してディスクに書き込んだ日時となっていました。</p>
+            </aside>
+        </li>
+        <li class="fixed">FoxAge2ch が存在する環境で、FoxAge2ch に登録されていないスレッドに対して「次のスレッドを検索」が実行できない問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/44">#44</a>)</li>
+        <li class="fixed">Firefox 24 以降において、デフォルトスキンであぼーんされたレスの表示が崩れる問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/42">#42</a>)</li>
+        <li class="fixed">Firefox 24 以降において、書き込みウィザードで警告が出る問題を修正
+            (<a href="https://github.com/chaika/chaika/issues/39">#39</a>)</li>
+    </ul>
+</section>
 
-    <section>
-        <h1>1.5.3 - 2011/08/13</h1>
-        <ul>
-            <li class="changed">maxVersionをFirefox 6に変更</li>
-            <li class="changed">minVersionをFirefox 5に変更</li>
-            <li class="changed">marbletoolbarの背景グラデーションをSVGからCSSに変更</li>
-            <li class="fixed">Firefox 7でスレッド一覧が表示されない問題を修正</li>
-            <li class="fixed">Beの仕様変更に対応</li>
-        </ul>
-    </section>
+<section>
+    <h2>1.6.1 - 2013/6/1</h2>
+    <ul>
+        <li class="new">コンテキストメニューを大幅に拡充し, 以下の項目を追加
+            <ul class="list">
+                <li>右クリックあぼーん機能</li>
+                <li>スレッドタイトルなどのコピー</li>
+                <li>find.2ch.net/板/スレッド内での検索</li>
+                <li>次のスレッドの検索</li>
+                <li>スキンの変更</li>
+                <li>スレッドへの書き込み</li>
+                <li>スレッドのログ削除</li>
+                <li>chaika/ブラウザ表示の切り替え</li>
+                <li>レス表示範囲の変更</li>
+                <li>スレッド一覧画面の表示</li>
+                <li>サイドバー表示の切り替え</li>
+                <li>オプション画面の表示</li>
+            </ul>
+            <aside class="info">
+                <p>「次のスレッドの検索」はFoxAge2chがインストールされている環境では、FoxAge2chの次スレ検索機能を使用します。
+                    未インストール環境では、スレッドタイトルで板内検索を行います。</p>
+            </aside>
+        </li>
+        <li class="new">ツールバーボタンのメニューをコンテキストメニューと同じく拡充</li>
+        <li class="new">コンテキストメニューに関する設定項目を拡充</li>
+        <li class="new">ツールバーボタンを表示するかどうかの設定を追加</li>
+        <li class="new">末尾が「!」のIDに対応</li>
+        <li class="new">書きこみウィザードの「ツール」に常に最前面にする設定を追加</li>
+        <li class="new">V2Cなどと同様のAA判定方法を追加し, 従来の方法と併用するようにした</li>
+        <li class="new">板一覧からスレッドを開く際, TreeStyleTabがある環境ではスレッドを板一覧の子タブとして開くようにした</li>
+        <li class="new">デフォルトスキンで騙しAAの表示に対応</li>
+        <li class="new">URLの末尾に「?chaika_force_browser=1」を追加することでスレッドリダイレクタを一時的に無効化する機能を追加</li>
+        <li class="new">URLの末尾に「?chaika_disable_abone=1」を追加することであぼーん処理を一時的に無効化する機能を追加</li>
+        <li class="new"><a href="http://janesoft.net/janestyle/help/view/NGfiles.html">NGFiles.txt</a>に対応
+            <aside class="info">
+                <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「NGFiles.txt」をお読み下さい。</p>
+            </aside>
+        </li>
+        <li class="new"><a href="http://janesoft.net/janestyle/help/first/ImageViewURLReplace.html">ImageViewURLReplace.dat</a>に対応
+            <aside class="info">
+                <p>本機能は実験的機能です。詳しい使用方法については、プロファイル内の「chaika」フォルダにある「ImageViewURLReplace.dat」をお読み下さい。</p>
+            </aside>
+        </li>
+        <li class="changed">スレッドの書き出し処理を大幅に高速化</li>
+        <li class="changed">設定画面のデザインを変更</li>
+        <li class="fixed">みみずんからログを取得したときに毎回あぼーん発生になってしまう問題を修正</li>
+        <li class="fixed">レス中で特定の文字の後にあるID:にリンクが貼られない問題を修正</li>
+        <li class="fixed">書きこみプレビューでトリップの前に空白がない問題を修正</li>
+        <li class="fixed">Firefox 22以降でサイドバーが表示されない問題を修正</li>
+        <li class="fixed">従来のAA判定方法に誤りがあったのを修正</li>
+        <li class="fixed">Firefox 20以降で即時あぼーんが動作しない問題を修正</li>
+        <li class="fixed">サイドバーでの2ch検索(HTML版)が動作しなくなっていた問題を修正</li>
+        <li class="fixed">ブラウザーで一度ログインしないとchaikaからp2にログインできなくなっていた問題を修正</li>
+        <li class="fixed">レス本文などに特定の文字列が含まれる場合にスレッドの表示が崩れる問題を修正</li>
+    </ul>
+</section>
 
-    <section>
-        <h1>1.5.2 - 2011/07/08</h1>
-        <ul>
-            <li class="changed">起動初期化時にアドオン情報の取得を待たないようにした</li>
-        </ul>
-    </section>
+<section>
+    <h2>1.6.0 - 2013/02/11</h2>
+    <ul>
+        <li class="new">p2経由での書き込みに対応
+            <aside class="info">
+                <p>初めてp2経由でBeを有効にして書き込む場合、<a href="http://info.2ch.net/wiki/index.php?p2.2ch.net#content_1_9">p2.2ch.net
+                にて設定する必要があります</a>。</p>
+            </aside>
+        </li>
+        <li class="new">リリースノートページの追加</li>
+        <li class="new">更新後初回起動時にリリースノートを自動で表示するようにした</li>
+        <li class="new">書き込みプレビューを表示するかどうかの設定を追加</li>
+        <li class="new">以下の場合に警告するかどうかの設定を追加
+            <ul class="list">
+                <li>ログを削除する時</li>
+                <li>書き込みウィザードを閉じる時</li>
+                <li>fusianasan</li>
+                <li>Beが有効な時 (Be関連板を除く)</li>
+                <li>p2が有効な時</li>
+            </ul>
+        </li>
+        <li class="new">Be関連板で書き込む際に自動的にBeを有効にする機能を追加</li>
+        <li class="new">書き込みが終わるごとにBe, p2を無効にする機能を追加</li>
+        <li class="new">レス中の不正なタグを無効化する機能を追加</li>
+        <li class="new">ログマネージャ、スレッド一覧、トラブルシューティング情報にfaviconを追加</li>
+        <li class="changed">Be、 p2、●のパスワードをログインマネージャで保管するように変更
+            <aside class="info">
+                <p>これまでパスワードは平文で保存されていましたが、ログインマネージャを使うことにより暗号化された状態で保存されるようになり、
+                    セキュリティが大幅に向上しました。
+                </p>
+                <p>なお、従来の保存先である extensions.chaika.maru_password / extensions.chaika.login.be.password / extensions.chaika.login.p2.password は空文字のまま残りますが、これは内部処理で使用しているためであり不具合ではありません。</p>
+            </aside>
+        </li>
+        <li class="changed">スレッド一覧の「購読中」ボタンを「既読」ボタンへと名称を変更</li>
+        <li class="changed">Beのアカウントの設定を設定画面から行うように変更</li>
+        <li class="changed">defaultmail.txtで空白以外が指定されている板のスレッドへ書き込む際は、ウィザードのsageチェックボックスの値を記憶しないよう変更</li>
+        <li class="changed">設定ウィンドウのサイズを内容に応じて変化するように変更</li>
+        <li class="changed">板のSETTING.TXTを取得してから3ヶ月以上経っていたら更新するように変更</li>
+        <li class="changed">連鎖あぼーん機能とアンカー修正機能が共に無効の時はアンカーの詳細解析をしないよう変更</li>
+        <li class="changed">デフォルトスキンのスクリプトを書きなおしたことで速度が向上した</li>
+        <li class="changed">minVersionをFirefox 17に変更</li>
+        <li class="fixed">範囲が非常に大きいアンカーを含むレスがあるとメモリ不足になってスレッドが読み込めなくなる問題を修正</li>
+        <li class="fixed">Firefox 18以降でトラブルシューティング情報が動かない問題を修正</li>
+        <li class="fixed">defaultmail.txtで設定されたメールアドレスと書き込みウィザードのsageチェックボックスの値が矛盾することがある問題を修正</li>
+        <li class="fixed">書き込みウィザードのプレビュー画面で「&quot;」が不要に実体参照へ変換されていた問題を修正</li>
+        <li class="fixed">ログマネージャ, 書き込みウィザード, HTML版2ch検索等でスレッドタイトルの実体参照がデコードされていない問題を修正</li>
+        <li class="fixed">RSS版2ch検索で特定の文字を実体参照化しないと検索できない問題を修正</li>
+        <li class="fixed">アンカー修正機能が無効の時に飛べないリンク先が貼られることがある問題を修正</li>
+    </ul>
+</section>
 
-    <section>
-        <h1>〜1.5.1</h1>
-        <p>
-            1.5.1以前のリリースノートについては、<a href="http://chaika.xrea.jp/index.php/blog/">公式サイト</a>をご覧ください。
-        </p>
-    </section>
-</article>
+<section>
+    <h2>1.5.8 - 2013/02/02</h2>
+    <ul>
+        <li class="new">「最近アクセスしたスレッド」等が新しいタブで開くかどうかについて設定を反映するようにした</li>
+        <li class="new">SETTING.TXTに板名が書かれていない板ではページタイトルを板名に設定するようにした</li>
+        <li class="new">Content-Typeが不明なスキンのファイルはtext/plainとして送信するようにした
+            <aside class="info">
+                <p>Web Fontなど、従来Internal Server Errorとなっていたファイルがスキンで使えるようになりました。</p>
+            </aside>
+        </li>
+        <li class="fixed">dat落ちしたスレッドを表示した時にログが二重になることがある問題を修正</li>
+        <li class="fixed">したらばやまちBBSの透明削除があるスレッドをログピックアップモードで表示すると表示されるレスがずれる問題を修正
+            <aside class="info">
+                <p>本修正に伴い、透明削除があるスレッドのdatが過去のchaikaと非互換になりました。表示がおかしい場合にはdatを再取得して下さい。</p>
+            </aside>
+        </li>
+        <li class="fixed">ログピックアップモードの時に新着を取得しない問題を修正</li>
+        <li class="fixed">連鎖あぼーんが正しく動かないことがある問題を修正</li>
+        <li class="fixed">アンカー修正機能が有効な時にアンカーが誤って表示されることがある問題を修正</li>
+        <li class="fixed">その他軽微なバグの修正</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.7 - 2013/01/14</h2>
+    <ul>
+        <li class="new">したらばでの新規スレッド作成機能を実装</li>
+        <li class="new">過去ログ取得時のアラートにchaikaのアイコンを表示するようにした</li>
+        <li class="new">HTML版の2ch検索を実装
+            <aside class="info">
+                <p>about:configよりextensions.chaika.bbsmenu.find2ch.use_rssで従来のRSSを用いた検索と切り替えることができます(デフォルトはRSS検索)。</p>
+            </aside>
+        </li>
+        <li class="new">不正なアンカー（全角＞、カンマ区切りなど）を自動で修正する機能を実装
+            <aside class="info">
+                <p>本機能は実験的機能となっています。about:configよりextensions.chaika.thread_fix_invalid_anchorで切り替えることができます(デフォルトOFF)。</p>
+            </aside>
+        </li>
+        <li class="changed">maxVersionをFirefox 18に変更</li>
+        <li class="changed">minVersionをFirefox 10に変更</li>
+        <li class="fixed">Be IDがあるときにIDの末尾に余計なスペースが付加される問題を修正</li>
+        <li class="fixed">したらばやまちBBSの透明削除があるスレッドを開くとレス番がずれる問題を修正</li>
+        <li class="fixed">ID: の前に文字があるとIDのリンクが貼られない問題を修正</li>
+        <li class="fixed">特定環境下でスレッドの読み込みに時間がかかることがある問題を修正</li>
+        <li class="fixed">ツールバーアイコンが消えることがある問題を修正</li>
+        <li class="fixed">大きいアイコンにするとWindowsでツールバーボタンに画像が表示されなくなる問題を修正</li>
+        <li class="fixed">範囲指定のあるアンカー等で正しく連鎖あぼーんが働かない問題を修正</li>
+        <li class="fixed">Firefox 18以降でプロキシを「ブラウザの設定に従う」以外にするとスレッドが開けなくなる問題を修正</li>
+        <li class="fixed">Firefox 18以降で「直接接続する」が動作しない問題を修正</li>
+        <li class="fixed">Firefox 20以降でスレッド一覧が開けない問題を修正</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.6 - 2011/12/21</h2>
+    <ul>
+        <li class="changed">maxVersionをFirefox 10に変更</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.5 - 2011/11/07</h2>
+    <ul>
+        <li class="changed">maxVersionをFirefox 8に変更</li>
+        <li class="changed">minVersionをFirefox 7に変更</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.4 - 2011/10/03</h2>
+    <ul>
+        <li class="changed">maxVersionをFirefox 7に変更</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.3 - 2011/08/13</h2>
+    <ul>
+        <li class="changed">maxVersionをFirefox 6に変更</li>
+        <li class="changed">minVersionをFirefox 5に変更</li>
+        <li class="changed">marbletoolbarの背景グラデーションをSVGからCSSに変更</li>
+        <li class="fixed">Firefox 7でスレッド一覧が表示されない問題を修正</li>
+        <li class="fixed">Beの仕様変更に対応</li>
+    </ul>
+</section>
+
+<section>
+    <h2>1.5.2 - 2011/07/08</h2>
+    <ul>
+        <li class="changed">起動初期化時にアドオン情報の取得を待たないようにした</li>
+    </ul>
+</section>
+
+<section>
+    <h2>〜1.5.1</h2>
+    <p>
+        1.5.1以前のリリースノートについては、<a href="http://chaika.xrea.jp/index.php/blog/">公式サイト</a>をご覧ください。
+    </p>
+</section>
 
 <footer>
     <ul class="list">

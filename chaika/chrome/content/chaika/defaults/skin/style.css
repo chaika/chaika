@@ -1,6 +1,6 @@
-/* See license.txt for terms of usage */
-
 @charset 'utf-8';
+
+/* See license.txt for terms of usage */
 
 /* ***** ***** Animations ***** ***** */
 
@@ -53,36 +53,91 @@
 }
 
 
+/* ***** ***** Colors ***** ***** */
+
+:root{
+    /* Chameleon Style Colors from chrome://global/skin/in-content/common.css */
+    --in-content-page-color: #424e5a;
+    --in-content-page-background: #fbfbfb;
+    --in-content-text-color: #333;
+    --in-content-border-highlight: #ff9500;
+    --in-content-border-focus: #0095dd;
+    --in-content-border-color: #c1c1c1;
+
+    /* chaika colors */
+    --chaika-inverted-color: #fff;
+    --chaika-inverted-background: rgba(60, 60, 60, 0.8);
+    --chaika-inverted-item-hover: rgba(60, 60, 60, 1.0);
+    --chaika-highlight-color: #ff9500;
+    --chaika-warning-color: #d74345;  /* https://people.mozilla.org/~jgruen/chameleon/old/#nav5 */
+    --chaika-post-name-color: #369;
+}
+
+
+/* ***** ***** General ***** ***** */
 
 html {
-    background-color: #F6F6F6;
+    color: var(--in-content-page-color);
+    background-color: var(--in-content-page-background);
     line-height: 1.5;
 }
 
 body {
-    color: #111;
     margin: 4.5em 0 0 0;
+}
+
+
+/* ***** ***** メニュー ***** ***** */
+
+.menu{
+    margin: 0;
+    padding: 0;
+    cursor: default;
+    line-height: 1.0;
+    font-weight: normal;
+    color: var(--chaika-inverted-color);
+    background-color: var(--chaika-inverted-background);
+    list-style-type: none;
+}
+
+.menu > li{
+    display: block;
+    margin: 0;
+    padding: 1px;
+    color: var(--chaika-inverted-color);
+    list-style-type: none;
+}
+
+.menu > li > a{
+    display: block;
+    padding: 4px 8px;
+    color: var(--chaika-inverted-color);
+    font-size: 0.9em;
+    text-decoration: none;
+}
+
+.menu > li > a:hover{
+    background-color: var(--chaika-inverted-item-hover);
 }
 
 
 /* ***** ***** ヘッダー ***** ***** */
 
 header{
-    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     position: fixed;
     top: 0;
     left: 0;
     margin: 0;
     padding: 0.6em;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.65);
-    color: #eee;
+    color: var(--chaika-inverted-color);
+    background-color: var(--chaika-inverted-background);
     font-size: 0.9em;
     line-height: 1.0;
-    border-bottom: 1px solid #222;
 }
 
-header:after{
+header::after{
     content: '';
     clear: both;
 }
@@ -90,7 +145,7 @@ header:after{
 /* スレッドタイトル */
 
 header > h1{
-    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     float: left;
     margin: 0;
     padding: 0;
@@ -103,7 +158,6 @@ header > h1{
     margin-left: 1em;
     font-size: 80%;
     font-weight: normal;
-    color: #ddd;
 }
 
 #thread-info[data-populated="false"]{
@@ -117,10 +171,10 @@ nav {
     text-align: right;
     position: fixed;
     right: 0;
-    padding: 0 8px;
+    padding-right: 0.5em;
 }
 
-nav ul{
+nav > ul{
     padding: 0;
     margin: 0;
     cursor: default;
@@ -130,9 +184,7 @@ nav ul{
 nav li{
     display: block;
     margin: 0;
-    padding: 1px;
     list-style-type: none;
-    color: #fff;
 }
 
 nav > ul > li{
@@ -140,26 +192,11 @@ nav > ul > li{
 }
 
 nav > ul > li > ul{
-    background-color: rgba(60, 60, 60, 0.85);
-    border: 1px solid #555;
-    font-weight: normal;
     display: none;
 }
 
 nav > ul:hover > li > ul{
     display: block;
-}
-
-nav > ul > li > ul > li > a{
-    color: #fff;
-    font-size: 0.9em;
-    display: block;
-    padding: 4px 8px;
-    text-decoration: none;
-}
-
-nav > ul > li > ul > li > a:hover{
-    background-color: rgba(60, 60, 60, 1.0);
 }
 
 
@@ -171,53 +208,47 @@ nav > ul > li > ul > li > a:hover{
     margin-left: 50%;
     transform: translate(-50%);
     padding: 3px 18px;
-    border: 1px solid #BBB;
+    border: 1px solid var(--in-content-border-color);
     border-radius: 6px;
     text-align: center;
     font-size: 0.7em;
-    color: #888;
 }
 
 :-moz-any(
     footer[data-status^="\0028\00B4\30FB\03C9\30FB\0060\0029"], /* (´・ω・`) */
     footer[data-status="\0028\0020\FF70\03C9\FF70\0029\300C\0044\0041\0054\0020\843D\3061\300D"] /* ( ｰωｰ)「DAT 落ち」 */
 ) > #status{
-    background-color: #777;
-    color: white;
-    border-color: transparent;
+    border: 2px solid var(--chaika-warning-color);
+    color: var(--chaika-warning-color);
+    font-weight: bold;
 }
 
 
 /* ***** ***** レス ***** ***** */
 
 .resContainer {
-    margin: 0.5em 15px 0.5em 15px;
+    margin-bottom: 2em;
+    margin-left: 15px;
+    padding-left: 5px;
+    border-left: 5px solid transparent;
 }
 
 .resHeader {
-    background-color: transparent;
-    padding: 2px 4px;
     font-size: 0.8em;
     font-weight: normal;
-    color: #777;
-}
-
-.resBody {
-    margin: 0 0 20px 0;
-    padding: 12px 35px 12px 25px;
 }
 
 .resNumber {
     font-weight: bold;
-    color: #111;
+    color: var(--in-content-text-color);
     cursor: pointer;
 }
 
 .resNew .resNumber {
-    color: #E63;
+    color: var(--chaika-highlight-color);
 }
 
-.resNumber[data-referred]:after{
+.resNumber[data-referred]::after{
     content: "(" attr(data-referred-num) ")";
     font-weight: normal;
     font-size: 90%;
@@ -226,19 +257,22 @@ nav > ul > li > ul > li > a:hover{
 .resName {
     font-weight: bold;
     font-size: 1.1em;
-    color: #369;
+    color: var(--chaika-post-name-color);
 }
 
+/**
+ * Name-text generated by BBS System
+ * e.g.) http://ex14.vip2ch.com/test/read.cgi/part4vip/1431931779/30
+ */
 .resSystem {
     font-weight: normal;
-    color: #477;
 }
 
-.resMail:before{
+.resMail::before{
     content: "[";
 }
 
-.resMail:after{
+.resMail::after{
     content: "]";
 }
 
@@ -250,24 +284,30 @@ nav > ul > li > ul > li > a:hover{
     text-decoration: underline;
 }
 
-.resID:not(:empty):before{
+.resID:not(:empty)::before{
     content: "ID:";
 }
 
-.resIP:not(:empty):before{
+.resIP:not(:empty)::before{
     content: "\767a\4fe1\5143\3a";
 }
 
-.resHost:not(:empty):before{
+.resHost:not(:empty)::before{
     content: "HOST:";
 }
 
-.resBeID:not(:empty):before{
+.resBeID:not(:empty)::before{
     content: "Be:";
 }
 
-.resHeaderContent[data-id-posts-all]:not([data-id-posts-all="1"]):after{
+.resHeaderContent[data-id-posts-all]:not([data-id-posts-all="1"])::after{
     content: " (" attr(data-id-posts-index) "/" attr(data-id-posts-all) ")";
+}
+
+.resBody {
+    padding-top: 0.6em;
+    padding-left: 25px;
+    color: var(--in-content-text-color);
 }
 
 
@@ -280,19 +320,16 @@ nav > ul > li > ul > li > a:hover{
     display: none;
 }
 
-.collapsed .resHeaderAboneContent:before {
-    content: "ABONE";
+.collapsed .resHeader::after {
+    content: "ABONE (" attr(data-ngtitle) ")";
     display: inline-block;
     padding-right: 1em;
     font-weight: bold;
     color: #369;
-    font-size: 1.1em;
+    font-size: 93%;
 }
 
-.collapsed .resHeaderAboneContent{
-    color: #888;
-    font-size: 90%;
-}
+
 
 /** 展開時 **/
 
@@ -306,40 +343,64 @@ nav > ul > li > ul > li > a:hover{
     padding: 12px 35px 12px 25px;
 }
 
-[data-aboned="true"]:not(.collapsed) .resHeaderAboneContent{
-    display: none;
+[data-aboned="true"]:not(.collapsed) .resHeader::after{
+    content: "";
 }
 
 
 /* ***** ***** ハイライトレス ***** ***** */
 
-.resDateImportant{
-    color: #E63;
+.highlighted{
+    border-left: 5px solid var(--in-content-border-highlight);
 }
 
-[data-aboned="false"] .resHeaderAboneContent:not(:empty):before{
-    content: "(";
+
+/* *** NGEx *** */
+
+[data-aboned="false"] .resHeader:not([data-ngtitle=""])::after{
+    content: " (" attr(data-ngtitle) ")";
+    display: inline-block;
+    padding-right: 1em;
+    font-weight: bold;
+    color: #369;
+    font-size: 95%;
 }
 
-[data-aboned="false"] .resHeaderAboneContent:not(:empty):after{
-    content: ")";
+
+/* *** 自分の書き込み・自分への返信 *** */
+
+.highlighted.reply-to-me{
+    border-color: var(--in-content-border-focus);
 }
 
-[data-aboned="false"] .resHeaderAboneContent{
-    color: #888;
-    font-size: 90%;
+.reply-to-me .resName::before{
+    content: '\8FD4\4FE1\003A\0020';  /* "返信: " */
+    color: var(--in-content-text-color);
+}
+
+/**
+ * 「自分」の表示を「返信」に優先させるため,
+ * より下にルールを記述する.
+ */
+.highlighted.my-post{
+    border-color: var(--in-content-border-color);
+}
+
+.my-post .resName::before{
+    content: '\81EA\5206\003A\0020';  /* "自分: " */
+    color: var(--in-content-text-color);
 }
 
 
 /* ***** ***** ポップアップ ***** ***** */
 
 .popup {
-    font-size: 0.8em;
+    position: absolute;
     padding: 5px;
     border-radius: 8px;
     box-shadow: #333 0 0 12px;
-    background-color: rgba(60, 60, 60, 0.85);
-    position: absolute;
+    font-size: 0.8em;
+    background-color: var(--chaika-inverted-background);
 }
 
 .popupInner {
@@ -351,8 +412,9 @@ nav > ul > li > ul > li > a:hover{
 }
 
 .popup *,
-.popup .resHeaderAboneContent:before{
-    color: #EEE !important;
+.popup .resHeaderAboneContent::before{
+    color: var(--chaika-inverted-color) !important;
+    background-color: initial !important;
 }
 
 
@@ -389,8 +451,17 @@ nav > ul > li > ul > li > a:hover{
     display: none;
 }
 
-.error:after{
+.error::after{
     content: "Load Error";
+}
+
+
+/* ***** ***** レスメニュー ***** ***** */
+
+#resPopupMenu{
+    display: none;
+    font-size: 0.9em;
+    z-index: 999;
 }
 
 
@@ -399,11 +470,10 @@ nav > ul > li > ul > li > a:hover{
 #settings{
     display: none;
     position: fixed;
-    top: 0;
-    right: 0;
-    line-height: 1.8;
-    padding: 1em;
-    max-height: 90%;
+    top: 1em;
+    bottom: 5%;
+    right: 1em;
+    width: 50%;
     overflow: auto;
 }
 
@@ -411,41 +481,72 @@ nav > ul > li > ul > li > a:hover{
     display: block;
 }
 
-#settings-buttonset{
-    text-align: right;
+#settings-body{
+    position: absolute;
+    top: 1em;
+    left: 0;
+    right: 0;
+    bottom: 4.5em;
+    overflow: auto;
+    line-height: 1.8;
+    border-bottom: 1px solid var(--chaika-inverted-color);
+    padding: 0 0.5em;
 }
 
-#settings input{
-    color: black !important;
+#settings-footer{
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.5em;
+}
+
+#settings-footer-buttons{
+    position: absolute;
+    right: 0.5em;
+    bottom: 0;
 }
 
 label{
     display: block;
 }
 
+.inline-form label{
+    display: inline-block;
+}
+
 fieldset{
     margin-bottom: 1em;
 }
 
-fieldset > div{
+fieldset > fieldset{
+    border: none;
+    margin: 0.5em 0;
+    padding: 0;
+}
+
+#settings input,
+#settings select,
+#settings button{
+    font-size: 100%;
+    color: var(--chaika-inverted-color);
+    border: 1px solid var(--chaika-inverted-color);
+}
+
+input[type="number"]{
+    text-align: right;
+    width: 4em;
+}
+
+select{
+    width: 40%;
+}
+
+.desc{
     font-size: 90%;
     margin: 0.5em 0 0 1.5em;
+    padding: 0;
 }
 
-fieldset > section{
-    margin: 0.5em 0;
-}
-
-fieldset > section > h1{
-    font-size: 100%;
-    font-weight: normal;
-    padding: 0; margin: 0;
-}
-
-fieldset > section > label{
-    display: inline-block;
-}
-
-fieldset > section > label:first-of-type{
-    margin-left: 1em;
+ul.desc{
+    list-style-type: square;
 }

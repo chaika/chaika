@@ -2,6 +2,7 @@
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import('resource://chaika-modules/ChaikaHttpController.js');
 
 
@@ -202,7 +203,7 @@ chContentHandler.prototype = {
             return;
         }
 
-        if(contextHost && ChaikaCore.getServerURL().hostPort !== contextHost){
+        if(contextHost && ChaikaServer.serverURL.hostPort !== contextHost){
             // 内部サーバ外から呼ばれたなら終了
             ChaikaCore.logger.warning(contextWin.location +" : "+ url.spec);
             return;

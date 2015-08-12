@@ -2,51 +2,19 @@
 
 EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
+Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
-
-
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
-}
-
 
 
 function ThreadServerScript(){
@@ -384,7 +352,7 @@ Thread2ch.prototype = {
      */
     sanitizeHTML: function(aStr){
         //実体参照を保護する
-        aStr = aStr.replace("&#", "_&#_", "g")  // &#169; など
+        aStr = aStr.replace(/&#/g, "_&#_")  // &#169; など
                    .replace(/&([a-zA-Z0-9]+?);/g, '_&_$1;');  // &copy; など
 
         //sanitize
@@ -393,14 +361,14 @@ Thread2ch.prototype = {
         var sanitizedStr = this._serializer.serializeToString(fragment);
 
         //serializeで余計に挿入されるxmlns属性を削除
-        sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g');
+        sanitizedStr = sanitizedStr.replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '');
 
         //実体参照を元に戻す
-        sanitizedStr = sanitizedStr.replace("_&amp;#_", "&#", "g")
+        sanitizedStr = sanitizedStr.replace(/_&amp;#_/g, "&#")
                                    .replace(/_&amp;_([a-zA-Z0-9]+?);/g, '&$1;');
 
         // <br /> をもとに戻す
-        sanitizedStr = sanitizedStr.replace('<br />', '<br>', 'g');
+        sanitizedStr = sanitizedStr.replace(/<br \/>/g, '<br>');
 
         return sanitizedStr;
     },
@@ -449,8 +417,8 @@ Thread2ch.prototype = {
 
 
         //特殊な名前欄の置換
-        resName = resName.replace("</b>", '<span class="resSystem">', "g")
-                            .replace("<b>", "</span>", "g");
+        resName = resName.replace(/<\/b>/g, '<span class="resSystem">')
+                            .replace(/<b>/g, "</span>");
 
         //日付中のHTMLを除去
         if(resDate.contains("<")){
@@ -788,7 +756,7 @@ Thread2ch.prototype = {
     },
 
 
-    datDownload: function(aKako){
+    datDownload: function(aKako, aDisableRange){
         this._maruMode = false;
         this._mimizunMode = false;
 
@@ -840,15 +808,21 @@ Thread2ch.prototype = {
         this._aboneChecked = true;
         this._threadAbone = false;
 
-        // 差分GET
-        if(this.thread.datFile.exists() && this.thread.lastModified){
-            let lastModified = this.thread.lastModified;
-            let range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
+        // Set If-Modified-Since
+        if(this.thread.lastModified){
+            this.httpChannel.setRequestHeader("If-Modified-Since", this.thread.lastModified, false);
+        }
+
+        if(!aDisableRange && this.thread.datFile.exists()){
+            // 差分 GET
+            // あぼーんされたか調べるために1byte余計に取得する
+            let begin = this.thread.datFile.fileSize - 1;
+
             this.httpChannel.setRequestHeader("Accept-Encoding", "", false);
-            this.httpChannel.setRequestHeader("If-Modified-Since", lastModified, false);
-            this.httpChannel.setRequestHeader("Range", "bytes=" + range + "-", false);
+            this.httpChannel.setRequestHeader("Range", "bytes=" + begin + "-", false);
             this._aboneChecked = false;
         }else{
+            // 全取得
             this.httpChannel.setRequestHeader("Accept-Encoding", "gzip", false);
         }
 
@@ -989,8 +963,7 @@ Thread2ch.prototype = {
                 this.close();
                 return;
             case 416: //あぼーん
-                this.write(this.converter.getFooter("abone"));
-                this.close();
+                this._onThreadCollapsed();
                 return;
             default: // HTTP エラー
                 this.write(this.converter.getFooter(httpStatus));
@@ -998,9 +971,9 @@ Thread2ch.prototype = {
                 return;
         }
 
-        if(this._threadAbone){ //あぼーん
-            this.write(this.converter.getFooter("abone"));
-            this.close();
+        //あぼーん発生時
+        if(this._threadAbone){
+            this._onThreadCollapsed();
             return;
         }
 
@@ -1020,6 +993,32 @@ Thread2ch.prototype = {
         this.close();
         this._data = null;
     },
+
+
+    /**
+     * あぼーんが発生して dat が正常に差分取得できなくなったときに呼ばれる
+     */
+    _onThreadCollapsed: function(){
+        if(ChaikaCore.pref.getBool('dat.self-repair.enabled')){
+            // dat の自動修復
+            ChaikaCore.logger.warning('The dat file of this thread seems to be collapsed. ' +
+                                      'Recapture the whole dat to repair.');
+
+            this.thread.lineCount = this._logLineCount;
+            this._readLogCount = this._logLineCount;
+            this.datDownload(false, true);
+
+            // dat が壊れる (あぼーんされた部分が残っている dat になってしまうので, 次回の range がおかしくなる)
+            // ため, うらで dat を取得しなおして置き換える
+            //    (dat の取得処理とブラウザへの出力処理が分離されていないので応急処置)
+            let downloader = new ChaikaDownloader(this.thread.datURL, this.thread.datFile);
+            downloader.download();
+        }else{
+            this.write(this.converter.getFooter("abone"));
+            this.close();
+        }
+    },
+
 
     datSave: function(aDatContent){
                 // 書き込みのバッティングを避ける
@@ -1133,7 +1132,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
             line = [
                 resName,
                 resMail,
-                resDate + ' ID:' + resID,
+                resDate + (resID ? ' ID:' + resID : ''),
                 resMes,
                 threadTitle
             ].join('<>');
@@ -1485,8 +1484,8 @@ ThreadConverter.prototype = {
      * @param aString string 置換される文字列
      */
     _replaceBaseTag: function(aString){
-        var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
-        var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
+        var skinURISpec = ChaikaServer.serverURL.resolve("./skin/");
+        var serverURLSpec = ChaikaServer.serverURL.resolve("./thread/");
         var fontName = ChaikaCore.pref.getUniChar("thread_font_name");
         var fontSize = ChaikaCore.pref.getInt("thread_font_size");
         var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
@@ -1559,7 +1558,7 @@ ThreadConverter.prototype = {
             //置換文字列で特殊な意味を持つ$をエスケープする
             for(let i=0, l=arguments.length; i<l; i++){
                 if(typeof arguments[i] === 'string'){
-                    arguments[i] = arguments[i].replace('$', '&#36;', 'g');
+                    arguments[i] = arguments[i].replace(/\$/g, '&#36;');
                 }
             }
 
@@ -1659,7 +1658,7 @@ ThreadConverter.prototype = {
         var lineCount = aMessage.match(/<br>/g);
 
         if(lineCount && lineCount.length >= 3){
-            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ￣
+            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ‾
             // \x81\x5e = ／, \x81_ = ＼, \x84\xaa = ━, \x81i = （, \x81j = ）
             // 半角空白は、英文中に多く含まれるためカウントから外す
             let aaSymbols = /(?:\x81\x40|\x81F|\x81b|\x84\xab|\x81P|\x81\x5e|\x81_|\x84\xaa|\x81i|\x81j|[^\x81-\xfc][_:;\|\/\\\(\)])/g;

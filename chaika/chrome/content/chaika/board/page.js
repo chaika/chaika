@@ -238,9 +238,10 @@ var BoardTree = {
 
     initTree: function BoardTree_initTree(aNoFocus){
         this.tree = document.getElementById("boardTree");
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
 
+        this.changeTreeSize();
         setPageTitle();
+
         if(this.firstInitBoardTree){
             ChaikaCore.history.visitPage(gBoard.url,
                     ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
@@ -259,7 +260,7 @@ var BoardTree = {
             searchStr = "%" + searchStr + "%";
             gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
         }else{
-            var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
+            var filterLimit = Number(document.getElementById("filterGroup").value);
             gBoard.refresh(filterLimit);
         }
 
@@ -348,8 +349,11 @@ var BoardTree = {
 
     changeTreeSize: function BoardTree_changeTreeSize(){
         this.tree.collapsed = true;
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
-        setTimeout(function(){ BoardTree.tree.collapsed = false }, 0);
+
+        this.tree.className = this.tree.className.replace(/tree-text-\W+/g, '');
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
+
+        setTimeout(() => this.tree.collapsed = false, 0);
     },
 
     click: function BoardTree_click(aEvent){
@@ -377,7 +381,6 @@ var BoardTree = {
                 this.openThread(aEvent.ctrlKey || aEvent.altKey);
                 break;
 
-            case 'Spacebar':  // For Firefox 28-
             case ' ':
                 if(aEvent.shiftKey){
                     this.tree._moveByPage(-1, 0, aEvent);
@@ -521,7 +524,6 @@ var BoardTree = {
 };
 
 function setStatus(aString){
-    document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0;
     document.getElementById("lblStatus").value = aString;
 }
 

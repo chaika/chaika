@@ -5,6 +5,7 @@ Components.utils.import("resource://gre/modules/FormHistory.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
@@ -322,7 +323,7 @@ var FormPage = {
 
         //このレスにレス
         if(gWizType == WIZ_TYPE_RES && gThread.url.fileName){
-            var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+            var res = ">>" + gThread.url.fileName.replace(/,/g, "\n>>") + "\n";
             this._messeageForm.value = res;
         }
 
@@ -659,15 +660,26 @@ var FormPage = {
         relatedAddons.then((addonList) => {
             template += "【ユーザーエージェント】" + userAgent + '\n';
             template += "【使用スキン】" + skinName + '\n';
-            template += "【関連アドオン】\n" + (addonList.join('\n') || '(なし)');
-            template += '\n\n';
+
+            if(addonList.length > 0){
+                template += "【関連アドオン】\n" + addonList.join('\n') + '\n\n';
+            }else{
+                template += '【関連アドオン】(なし)\n';
+            }
+
+            if(userAgent.contains('pre')){
+                template += '【コミットハッシュ】※ コミットハッシュは git rev-parse HEAD にて取得できます\n\n';
+            }
 
             if(detailed){
                 let changedPrefs = this._getChangedPrefList();
                 template += '【変更した設定値】\n' + changedPrefs.join('\n') + '\n\n';
             }
 
-            template += '【不具合の内容・再現手順】\n';
+            template += '【不具合の再現手順】\n' +
+                        '1. \n\n' +
+                        '【期待される現象・結果】\n\n' +
+                        '【実際に起こる現象・結果】\n';
 
             this._messeageForm.value += template;
         });
@@ -989,12 +1001,10 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        let serverURL = ChaikaCore.getServerURL();
-
         ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
             'chaika-post-finished', {
                 url: gThread.plainURL.spec,
-                host: serverURL.hostPort
+                host: ChaikaServer.serverURL.hostPort
         });
     }
 

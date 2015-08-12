@@ -115,11 +115,8 @@
                                 break;
 
                             default:
-                                if(target.matches &&  // For Firefox 34+
-                                   target.matches('.expire-preset menuitem') ||
-                                   target.mozMatchesSelector &&  // For Firefox 33-
-                                   target.mozMatchesSelector('.expire-preset menuitem')){
-                                        this._setExpirePreset(target.value);
+                                if(target.matches('.expire-preset menuitem')){
+                                    this._setExpirePreset(target.value);
                                 }
                         }
                         break;

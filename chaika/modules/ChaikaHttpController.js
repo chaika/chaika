@@ -1,22 +1,12 @@
 /* See license.txt for terms of usage */
 
-
 EXPORTED_SYMBOLS = ["ChaikaHttpController"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
-try{
-    //Firefox 25+
-    Components.utils.import("resource://gre/modules/Promise.jsm");
-}catch(ex){
-    //Firefox 24
-    Components.utils.import("resource://gre/modules/commonjs/sdk/core/promise.js");
-}
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://chaika-modules/ChaikaCore.js");
+Cu.import("resource://chaika-modules/ChaikaServer.js");
 
 
 /**
@@ -44,8 +34,6 @@ var ChaikaHttpController = {
         pref.addObserver("extensions.chaika.refController.enabled", this, true);
         pref.addObserver('extensions.chaika.imageViewURLReplace.enabled', this, true);
         pref.addObserver('extensions.chaika.ngfiles.enabled', this, true);
-
-        this._serverURL = ChaikaCore.getServerURL();
     },
 
 
@@ -72,10 +60,10 @@ var ChaikaHttpController = {
             if(!httpChannel.referrer) return;
 
             // リファラが内部サーバ以外なら終了
-            if(this._serverURL.hostPort !== httpChannel.referrer.hostPort) return;
+            if(ChaikaServer.serverURL.hostPort !== httpChannel.referrer.hostPort) return;
 
             // 読み込むリソースが内部サーバなら終了
-            if(this._serverURL.hostPort === httpChannel.URI.hostPort) return;
+            if(ChaikaServer.serverURL.hostPort === httpChannel.URI.hostPort) return;
 
 
             //リファラ制御
@@ -447,46 +435,40 @@ ChaikaIvurRequest.prototype = {
      * Cookieを取得する
      */
     fetchCookie: function(){
-        let defer = Promise.defer();
+        return new Promise((resolve, reject) => {
+            this._request.open('GET', this._ivurObj.referrer, true);
 
-//        this._request.timeout = this.timeout;
-        this._request.open('GET', this._ivurObj.referrer, true);
+            this._request.addEventListener('error', reject, false);
+            this._request.addEventListener('load', (event) => {
+                let req = event.target;
+                let channel = req.channel;
 
-        this._request.addEventListener('load', (event) => {
-            let req = event.target;
-            let channel = req.channel;
-
-            if(req.status !== 200 || !req.responseText || !channel){
-                return defer.reject(req.status);
-            }
-
-            try{
-                let cookie = channel.getResponseHeader('Set-Cookie');
-
-                if(!cookie){
-                    defer.reject(req.status);
-                }else{
-                    defer.resolve(cookie);
+                if(req.status !== 200 || !req.responseText || !channel){
+                    reject(req.status);
+                    return;
                 }
-            }catch(ex){
-                defer.reject(ex);
+
+                try{
+                    let cookie = channel.getResponseHeader('Set-Cookie');
+
+                    if(!cookie){
+                        reject(req.status);
+                    }else{
+                        resolve(cookie);
+                    }
+                }catch(ex){
+                    reject(ex);
+                }
+            }, false);
+
+            this._request.setRequestHeader('Referer', this._ivurObj.cookie.referrer);
+
+            if(this._ivurObj.userAgent){
+                this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
             }
-        }, false);
 
-        this._request.addEventListener('error', (err) => {
-            defer.reject(err);
-        }, false);
-
-
-        this._request.setRequestHeader('Referer', this._ivurObj.cookie.referrer);
-
-        if(this._ivurObj.userAgent){
-            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
-        }
-
-        this._request.send(null);
-
-        return defer.promise;
+            this._request.send(null);
+        });
     },
 
 
@@ -495,38 +477,32 @@ ChaikaIvurRequest.prototype = {
      * @return {Promise.<RegExp>} スクレイピングした結果のRegExp
      */
     fetchExtract: function(){
-        let defer = Promise.defer();
+        return new Promise((resolve, reject) => {
+            this._request.open('GET', this._ivurObj.referrer, true);
 
-//        this._request.timeout = this.timeout;
-        this._request.open('GET', this._ivurObj.referrer, true);
+            this._request.addEventListener('error', reject, false);
+            this._request.addEventListener('load', (event) => {
+                let req = event.target;
 
-        this._request.addEventListener('load', (event) => {
-            let req = event.target;
+                if(req.status !== 200 || !req.responseText){
+                    reject(req.status);
+                    return;
+                }
 
-            if(req.status !== 200 || !req.responseText){
-                return defer.reject(req.status);
+                let regexp = new RegExp(this._ivurObj.extract.pattern);
+
+                resolve(req.responseText.match(regexp));
+            }, false);
+
+            this._request.setRequestHeader('Content-Type', 'text/html');
+            this._request.setRequestHeader('Referer', this._ivurObj.extract.referrer);
+
+            if(this._ivurObj.userAgent){
+                this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
             }
 
-            let regexp = new RegExp(this._ivurObj.extract.pattern);
-
-            defer.resolve(req.responseText.match(regexp));
-        }, false);
-
-        this._request.addEventListener('error', (event) => {
-            defer.reject(event.target.status);
-        }, false);
-
-
-        this._request.setRequestHeader('Content-Type', 'text/html');
-        this._request.setRequestHeader('Referer', this._ivurObj.extract.referrer);
-
-        if(this._ivurObj.userAgent){
-            this._request.setRequestHeader('User-Agent', this._ivurObj.userAgent);
-        }
-
-        this._request.send(null);
-
-        return defer.promise;
+            this._request.send(null);
+        });
     }
 };
 
@@ -667,7 +643,7 @@ ChaikaNGFiles.prototype = {
 
 
         //2文字ごとに16進数とみなして数値に変換する
-        md5 = Array.slice(md5.match(/../g));
+        md5 = md5.match(/../g);
         for(let i=0, l=md5.length; i<l; i++){
             md5[i] = parseInt(md5[i], 16);
         }

@@ -4,13 +4,13 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://gre/modules/Services.jsm");
 Cu.import('resource://chaika-modules/ChaikaRedirector.js');
-Cu.import('resource://chaika-modules/ChaikaURLUtil.js');
+Cu.import('resource://chaika-modules/utils/URLUtils.js');
 
 
 /**
  * Frame Script
  */
-var ChaikaBrowserContent = {
+let ChaikaBrowserContent = {
 
     init: function(){
         addMessageListener('chaika-skin-changed', this.handleMessage.bind(this));
@@ -19,7 +19,7 @@ var ChaikaBrowserContent = {
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
 
         // We should initialize ChaikaRedirector in the content process
-        // to allow nsIContentPolicy handle http requests made in the content.
+        // so that nsISimpleContentPolicy can handle http-requests made in the content.
         if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled")){
             ChaikaRedirector.init();
         }
@@ -28,12 +28,12 @@ var ChaikaBrowserContent = {
 
     handleMessage: function(message){
         if(!message.name.startsWith('chaika-')) return;
-        if(!ChaikaURLUtil.isChaikafied(content.location.href)) return;
+        if(!URLUtils.isChaikafied(content.location.href)) return;
 
 
         switch(message.name){
             case 'chaika-skin-changed':
-                if(ChaikaURLUtil.isThread(content.location.href)){
+                if(URLUtils.isThread(content.location.href)){
                     content.location.reload();
                 }
                 break;

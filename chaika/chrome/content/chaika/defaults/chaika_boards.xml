@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- See license.txt for terms of usage -->
+
+<!--
+    chaika 関連の板を板一覧に追加するためのファイルです。
+-->
+
+<bbsmenu>
+    <category title="chaika">
+        <board title="chaika 公式サイト" url="https://github.com/chaika/chaika" />
+        <board title="オンラインヘルプ" url="https://github.com/chaika/chaika/wiki" />
+        <board title="サポート掲示板" url="http://jbbs.shitaraba.net/computer/44179/" />
+        <board title="現行スレッド (Powered by refind2ch.org)"
+               url="http://refind2ch.org/search?q=chaika" />
+        <board title="bbs2chreader 公式サイト" url="http://bbs2ch.sourceforge.jp/" />
+    </category>
+</bbsmenu>

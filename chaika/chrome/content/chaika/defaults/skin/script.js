@@ -1,5 +1,7 @@
 /* See license.txt for terms of usage */
 
+'use strict';
+
 /* *** Utils *** */
 var $ = {
 
@@ -21,7 +23,7 @@ var $ = {
      */
     klass: function(className, parent, noExtract){
         let result = (parent || document).getElementsByClassName(className);
-        return noExtract || result.length > 1 ? Array.slice(result) : result[0];
+        return noExtract || result.length > 1 ? Array.from(result) : result[0];
     },
 
     /**
@@ -31,7 +33,7 @@ var $ = {
      * @return {Array.<Node>}
      */
     tag: function(tagName, parent){
-        return Array.slice((parent || document).getElementsByTagName(tagName));
+        return Array.from((parent || document).getElementsByTagName(tagName));
     },
 
     /**
@@ -51,31 +53,9 @@ var $ = {
      * @return {Array.<Node>}
      */
     selectorAll: function(selector, parent){
-        return Array.slice((parent || document).querySelectorAll(selector));
+        return Array.from((parent || document).querySelectorAll(selector));
     },
 
-    /**
-     * class から親要素を取得
-     * @param {String} className class 名
-     * @param {Node} element 起点の要素
-     * @param {Boolean} [includeSelf=false] 自分自身を対象に含めるか否か
-     * @return {Node}
-     */
-    parentByClass: function(className, element, includeSelf){
-        if(!element) return null;
-
-        if(includeSelf && element.classList.contains(className)){
-            return element;
-        }
-
-        while(element = element.parentNode){
-            if(element.classList && element.classList.contains(className)){
-                return element;
-            }
-        }
-
-        return null;
-    },
 
     /**
      * TextRectangle を取得
@@ -161,7 +141,7 @@ var $ = {
         if(attrs instanceof Object){
             for(let name in attrs){
                 if(name === 'children'){
-                    if(!attrs.children instanceof Node){
+                    if(!(attrs.children instanceof Node)){
                         attrs.children = $.node(attrs.children);
                     }
 
@@ -219,28 +199,31 @@ var $ = {
                 formElement.checked = aValue;
                 break;
 
+            case 'select-one':
+            case 'select-multiple': {
+                if(!Array.isArray(aValue)) return;
+
+                while(formElement.hasChildNodes()){
+                    formElement.removeChild(formElement.firstChild);
+                }
+
+                aValue.forEach((v) => {
+                    let option = document.createElement('option');
+
+                    $.attrs(option, {
+                        value: v,
+                        text: v,
+                    });
+
+                    formElement.add(option);
+                });
+            }
+            break;
+
             default:
                 formElement.value = aValue;
                 break;
         }
-    },
-
-    /**
-     * 簡易テンプレートから文字列を生成
-     * @param {String} template テンプレート 置換する場所を @@ で指定する
-     * @param {String} args 可変引数 テンプレート文字列の @@ を初めから順に置換する
-     * @example $.template('@@ is a @@.', 'This', 'pen') //=> This is a pen.
-     * @return {String} 置換後の文字列
-     */
-    template: function(...args){
-        var template = args.shift();
-        var count = 0;
-
-        template = template.replace('@@', function(){
-            return args[count++];
-        }, 'g');
-
-        return template;
     },
 
 
@@ -284,7 +267,7 @@ var Effects = {
 
         if(option.remove){
             element.addEventListener('animationend', function(){
-                this.parentNode.removeChild(this);
+                this.remove();
             });
         }
     },
@@ -299,7 +282,7 @@ var Effects = {
 
         if(option.remove){
             element.addEventListener('animationend', function(){
-                this.parentNode.removeChild(this);
+                this.remove();
             });
         }
     },
@@ -315,18 +298,75 @@ var Effects = {
 };
 
 
+/**
+ * Notifications API を利用した通知を扱う
+ * @class
+ */
+var Notifications = {
+
+    /**
+     * Notifications API に関する permission を得る
+     * @return {Promise<void>} Resolved if granted and rejected if denied.
+     * @note new Notification() をする前に必ず呼ぶこと.
+     */
+    _getPermission(){
+        return new Promise((resolve, reject) => {
+            if(Notification.permission === 'granted'){
+                resolve();
+            }else if(Notification.permission === 'denied'){
+                reject();
+            }else{
+                Notification.requestPermission((permission) => {
+                    if(permission === 'granted'){
+                        resolve();
+                    }else{
+                        reject();
+                    }
+                });
+            }
+        });
+    },
+
+
+    /**
+     * Notification API を利用して通知を表示する
+     * @param  {String} message 本文に表示する文章
+     * @param  {String} [tag='chaika'] 通知のタグ
+     * @return {Promise<Notification>}
+     */
+    notify(message, tag = 'chaika') {
+        return this._getPermission().then(() => {
+            // Returning the generated Notification Object
+            // so that the caller can use this object to manipurate
+            // and the below code won't be eliminated by JS engine and GC.
+            return (new Notification('chaika', {
+                tag: tag,
+                body: message,
+                icon: SERVER_URL + 'icon.png'
+            }));
+        });
+    }
+
+};
+
 
 /**
  * 設定項目を扱う
  */
 var Prefs = {
 
+    /**
+     * デフォルトの設定値
+     * @type {Object}
+     */
     defaultValue: {
-        // 被参照
+        // 書き込みの情報
         'pref-enable-referred-count': true,
-
-        // ID 表示
         'pref-enable-posts-count': true,
+
+        // アンカー
+        'pref-limit-number-of-anchors': 5,
+        'pref-limit-range-of-anchor': 15,
 
         // ポップアップ
         'pref-include-self-post': false,
@@ -342,14 +382,20 @@ var Prefs = {
         // ショートカットキー
         'pref-enable-shortcut': true,
         'pref-enable-resjump': true,
+
+        // 返信通知
+        'pref-enable-reply-notification': true,
+        'pref-highlight-my-posts': true,
+        'pref-highlight-replies-to-me': true,
     },
 
 
     startup: function(){
-        this._loadPrefs();
+        this._populateSettingsPanel();
 
         $.id('settings').addEventListener('change', this._onPrefChanged.bind(this), false);
         $.id('settings').addEventListener('blur', this._onPrefChanged.bind(this), false);
+        $.id('settings').addEventListener('keydown', this._onKeydown.bind(this), false);
     },
 
 
@@ -392,6 +438,7 @@ var Prefs = {
     set: function(key, value){
         try{
             localStorage.setItem(key, JSON.stringify(value));
+            this._populateSettingsPanel();
         }catch(ex){
             console.warn('The change is ignored and will not be saved ' +
                          'because writing to the local storage is prohibited by the user.');
@@ -399,7 +446,10 @@ var Prefs = {
     },
 
 
-    _loadPrefs: function(){
+    /**
+     * 設定画面へ設定値を反映させる
+     */
+    _populateSettingsPanel: function(){
         let prefNodes = $.selectorAll('[id^="pref-"]');
 
         prefNodes.forEach((prefNode) => {
@@ -408,15 +458,69 @@ var Prefs = {
 
             $.setValue(prefNode, value);
         });
+
+        let listNodes = $.selectorAll('[id^="list-"]');
+
+        listNodes.forEach((listNode) => {
+            let key = listNode.id;
+            let value = this.get(key) || [];
+
+            $.setValue(listNode, value[BOARD_URL] || value[EXACT_URL] || value);
+        });
     },
 
 
+    /**
+     * 設定画面にて設定値が変更された際に呼ばれる
+     */
     _onPrefChanged: function(aEvent){
         let target = aEvent.originalTarget;
         let key = target.id;
+
+        if(!key.startsWith('pref-')) return;
+
         let value = $.getValue(target);
 
         this.set(key, value);
+    },
+
+
+    /**
+     * 設定画面にてキーが押された時に呼ばれる
+     * @todo 実装が綺麗でないので見直す
+     */
+    _onKeydown: function(aEvent){
+        if(aEvent.key !== 'Backspace' && aEvent.key !== 'Delete') return;
+
+        let target = aEvent.target;
+
+        switch(target.id){
+            case 'list-my-posts': {
+                let selected = target.selectedOptions[0];
+                let id = selected.value;
+                let database = Prefs.get('list-my-posts');
+                let index = database[EXACT_URL].indexOf(id);
+
+                database[EXACT_URL].splice(index, 1);
+                Prefs.set('list-my-posts', database);
+                target.remove(target.selectedIndex);
+                ResInfo.markAndCheckReplyToMyPosts();
+            }
+            break;
+
+            case 'list-my-ids': {
+                let selected = target.selectedOptions[0];
+                let id = selected.value;
+                let database = Prefs.get('list-my-ids');
+                let index = database[BOARD_URL].indexOf(id);
+
+                database[BOARD_URL].splice(index, 1);
+                Prefs.set('list-my-ids', database);
+                target.remove(target.selectedIndex);
+                ResInfo.markAndCheckReplyToMyPosts();
+            }
+            break;
+        }
     }
 };
 
@@ -447,6 +551,16 @@ var ThreadInfo = {
 var ResInfo = {
 
     startup: function(){
+        this.countPosts();
+        this.markAndCheckReplyToMyPosts();
+        this.highlightHighlightedPosts();
+    },
+
+
+    /**
+     * 発言数と逆参照をカウントする
+     */
+    countPosts() {
         let enableRefCount = Prefs.get('pref-enable-referred-count');
         let enablePostsCount = Prefs.get('pref-enable-posts-count');
 
@@ -462,9 +576,9 @@ var ResInfo = {
         resNodes.forEach((resNode) => {
             // ID別発言数
             if(enablePostsCount){
-                let id = $.klass('resID', resNode).dataset.id;
+                let id = resNode.dataset.id;
 
-                if(id && !(id.startsWith('???'))){
+                if(!ResCommand.isAnonymousID(id)){
                     if(!(id in idTable)){
                         idTable[id] = 1;
                     }else{
@@ -478,44 +592,32 @@ var ResInfo = {
 
             //逆参照
             if(enableRefCount){
-                let anchors = $.klass('resPointer', resNode, true);
+                let anchors = ResCommand.getAnchors(resNode);
 
-                if(anchors && anchors.length > 0){
-                    anchors = anchors.reduce((ary, node) => {
-                        return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
-                    }, []);
+                anchors.forEach((anchor) => {
+                    let { start, end } = anchor;
 
-                    anchors.forEach((anchor) => {
-                        let [begin, end] = anchor.split('-');
+                    for(let i = start; i <= end; i++){
+                        let refNode = $.id('res' + i);
 
-                        begin = begin - 0;
-                        end = end ? end - 0 : begin;
+                        //範囲外レスはスキップ
+                        if(!refNode) continue;
 
-                        if(begin < 1) begin = 1;
-                        if(end > 1001) end = 1001;
+                        let refNumber = $.klass('resNumber', refNode);
 
-                        for(let i = begin; i <= end; i++){
-                            let refNode = $.id('res' + i);
-
-                            //範囲外レスはスキップ
-                            if(!refNode) continue;
-
-                            let refNumber = $.klass('resNumber', refNode);
-
-                            if(!refNumber.dataset.referred){
-                                refNumber.dataset.referred = resNode.id;
-                            }else{
-                                refNumber.dataset.referred += ',' + resNode.id;
-                            }
-
-                            if(!refNumber.dataset.referredNum){
-                                refNumber.dataset.referredNum = 1;
-                            }else{
-                                refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
-                            }
+                        if(!refNumber.dataset.referred){
+                            refNumber.dataset.referred = resNode.id;
+                        }else{
+                            refNumber.dataset.referred += ',' + resNode.id;
                         }
-                    });
-                }
+
+                        if(!refNumber.dataset.referredNum){
+                            refNumber.dataset.referredNum = 1;
+                        }else{
+                            refNumber.dataset.referredNum = refNumber.dataset.referredNum - 0 + 1;
+                        }
+                    }
+                });
             }
         });
 
@@ -524,7 +626,7 @@ var ResInfo = {
             for(let id in idTable){
                 if(typeof idTable[id] !== 'number') continue;
 
-                let idNodes = $.selectorAll('.resContainer[data-id*="' + id + '"] > .resHeader > .resHeaderContent');
+                let idNodes = $.selectorAll('.resContainer[data-id="' + id + '"] > .resHeader > .resHeaderContent');
                 if(!idNodes) continue;
 
                 idNodes.forEach((idNode) => {
@@ -532,6 +634,99 @@ var ResInfo = {
                 });
             }
         }
+    },
+
+
+    /**
+     * 自分のレスへの返信をチェックし, 自分のレスと返信にマークをつけ, 通知を行う
+     */
+    markAndCheckReplyToMyPosts() {
+        let enableNotification = Prefs.get('pref-enable-reply-notification');
+        let enableHighlightMe = Prefs.get('pref-highlight-my-posts');
+        let enableHighlightReplies = Prefs.get('pref-highlight-replies-to-me');
+
+        let myPostNums = (Prefs.get('list-my-posts') || {})[EXACT_URL];
+        let myIDs = (Prefs.get('list-my-ids') || {})[BOARD_URL];
+        let myPosts = [];
+
+        // Resetting previous states
+        $.selectorAll('.my-post, .reply-to-me').forEach((post) => {
+            post.classList.remove('my-post');
+            post.classList.remove('reply-to-me');
+            post.classList.remove('highlighted');
+        });
+
+        // Collecting "My Posts"
+        if(myPostNums){
+            myPosts = myPostNums.map((resNumber) => {
+                return $.selector('article[data-number="' + resNumber + '"]');
+            });
+        }
+
+        if(myIDs){
+            myPosts = myIDs.reduce((arr, id) => {
+                return arr.concat($.selectorAll('article[data-id="' + id + '"]'));
+            }, myPosts);
+        }
+
+        let repliesCount = 0;
+
+        myPosts.forEach((res) => {
+            let resNum = $.klass('resNumber', res);
+
+            res.classList.add('my-post');
+
+            if(enableHighlightMe){
+                res.classList.add('highlighted');
+            }
+
+            if(resNum.dataset.referred){
+                resNum.dataset.referred.split(',').forEach((refID) => {
+                    let ref = $.id(refID);
+
+                    ref.classList.add('reply-to-me');
+
+                    if(ref.classList.contains('resNew')){
+                        repliesCount++;
+                    }
+
+                    if(enableHighlightReplies){
+                        ref.classList.add('highlighted');
+                    }
+                });
+            }
+        });
+
+        if(enableNotification && repliesCount){
+            let firstReplyNum = $.klass('reply-to-me', null, true)[0].dataset.number;
+
+            Notifications.notify(
+                `あなたの投稿に ${repliesCount} 件の新着の返信があります.\n` +
+                `クリックすると先頭の返信レス (>>${firstReplyNum}) を表示します.`,
+                'chaika-reply-notification'
+            ).then((n) => {
+                // click-to-scroll
+                n.addEventListener('click', () => {
+                    ResCommand.scrollTo(firstReplyNum);
+                });
+            });
+        }
+    },
+
+
+    /**
+     * ハイライトレスと判定されたレスにハイライト用のクラスを追加する
+     * @note
+     *    chaika 側では, "名前", "本文" など個々の要素ごとに扱っており,
+     *    レス全体に 'highlighted' のようなクラスをつけることができない.
+     *    そのため, レス全体にスタイルを適用するにはスキン側でクラスを追加する必要がある.
+     */
+    highlightHighlightedPosts() {
+        let posts = $.klass('highlightedRes', null, true);
+
+        posts.forEach((post) => {
+            post.closest('.resContainer').classList.add('highlighted');
+        });
     }
 
 };
@@ -571,7 +766,7 @@ var ThreadCommand = {
         while(!res){
             let element = document.elementFromPoint(left, top);
 
-            res = $.parentByClass('resContainer', element, true);
+            res = element.closest('.resContainer');
             top += 8;
         }
 
@@ -596,6 +791,38 @@ var ThreadCommand = {
 
 
     /**
+     * 次のハイライトされたレスへ移動する
+     */
+    scrollToNextHighlightedRes: function(){
+        let current = this._getCurrentRes();
+        let currentNum = current.dataset.number;
+        let next = $.selector(`article[data-number="${currentNum}"] ~ .highlighted`);
+
+        if(next){
+            $.scrollToElement(next);
+        }
+    },
+
+
+    /**
+     * 前のハイライトされたレスへ移動する
+     */
+    scrollToPrevHighlightedRes: function(){
+        let current = this._getCurrentRes();
+        let prev = current.previousElementSibling;
+
+        while(!prev.classList.contains('highlighted') && prev.classList.contains('resContainer')){
+            prev = prev.previousElementSibling;
+        }
+
+        if(prev.classList.contains('highlighted')){
+            $.scrollToElement(prev);
+        }
+
+    },
+
+
+    /**
      * スレッドを再読込する
      */
     reload: function(){
@@ -612,30 +839,49 @@ var ResCommand = {
 
     startup: function(){
         document.addEventListener('click', this, false);
+        document.addEventListener('contextmenu', this, false);
     },
 
 
     handleEvent: function(aEvent){
         let target = aEvent.originalTarget;
-        let container = $.parentByClass('resContainer', target, true);
 
         // HTML 外要素の場合
         if(!(target instanceof HTMLElement)) return;
 
-        // レス要素外の場合
-        if(!container) return;
-
 
         switch(target.className){
-            case 'resNumber':
-                this.replyTo(target.textContent);
-                break;
-
-            default:
-                if($.parentByClass('resHeader', target, true) && container.dataset.aboned === 'true'){
-                    this.toggleCollapse(container);
+            case 'resNumber': {
+                if(aEvent.button === 0){  // Left click
+                    this.replyTo(target.textContent);
+                }else if(aEvent.button === 2){  // Right click
+                    aEvent.preventDefault();
+                    aEvent.stopPropagation();
+                    this.showPopupMenu(target.textContent, aEvent.clientX, aEvent.clientY);
                 }
-                break;
+            }
+            break;
+
+            default: {
+                let resPopupMenu = target.closest('.resPopupMenu');
+
+                if(resPopupMenu && target.dataset.command){
+                    $.hide(resPopupMenu);
+                    this[target.dataset.command](resPopupMenu.dataset.target - 0);
+                    return;
+                }
+
+                $.hide($.id('resPopupMenu'));
+
+                let container = target.closest('.resContainer');
+                let header = target.closest('.resHeader');
+
+                if(header && container.dataset.aboned === 'true'){
+                    this.toggleCollapse(container);
+                    return;
+                }
+            }
+            break;
         }
     },
 
@@ -664,6 +910,143 @@ var ResCommand = {
      */
     toggleCollapse: function(resContainer){
         resContainer.classList.toggle('collapsed');
+    },
+
+
+    /**
+     * 与えられたレス番号を自分のレスとして登録する
+     * すでに登録されていた場合は削除する
+     * @param {Number} resNumber
+     */
+    markAsMyPost(resNumber) {
+        let database = Prefs.get('list-my-posts') || {};
+
+        if(!database[EXACT_URL]){
+            database[EXACT_URL] = [];
+        }
+
+        let index = database[EXACT_URL].indexOf(resNumber);
+
+        if(index !== -1){
+            database[EXACT_URL].splice(index, 1);
+        }else{
+            database[EXACT_URL].push(resNumber);
+        }
+
+        Prefs.set('list-my-posts', database);
+        ResInfo.markAndCheckReplyToMyPosts();
+    },
+
+
+    /**
+     * 自分のIDとして登録する
+     * @param {Number} resNumber
+     */
+    markAsMyID(resNumber) {
+        let res = $.selector('article[data-number="' + resNumber + '"]');
+        let id = res.dataset.id;
+        let database = Prefs.get('list-my-ids') || {};
+
+        if(this.isAnonymousID(id)){
+            return;
+        }
+
+        if(!database[BOARD_URL]){
+            database[BOARD_URL] = [];
+        }
+
+        let index = database[BOARD_URL].indexOf(id);
+
+        if(index !== -1){
+            database[BOARD_URL].splice(index, 1);
+        }else{
+            database[BOARD_URL].push(id);
+        }
+
+        Prefs.set('list-my-ids', database);
+        ResInfo.markAndCheckReplyToMyPosts();
+    },
+
+
+    /**
+     * レスポップアップメニューを表示する
+     * @param {Number} resNumber 呼び出し元のレス番号
+     */
+    showPopupMenu(resNumber, x, y) {
+        let popup = $.id('resPopupMenu');
+
+        popup.dataset.target = resNumber;
+        $.css(popup, {
+            position: 'fixed',
+            top: y + 'px',
+            left: x + 'px',
+        });
+        $.show(popup);
+    },
+
+
+    /**
+     * アンカの情報を得る
+     * @param {Number|Node} post 対象のレス
+     * @param {Boolean} [ignoreLimits=false] アンカ数上限などの制限を無視するか
+     */
+    getAnchors(post, ignoreLimits){
+        let resNode = post instanceof Element ? post : $.selector(`article[data-number="${post}"]`);
+        let anchors = resNode.classList.contains('resPointer') ?
+                        [ resNode ] :
+                        $.klass('resPointer', resNode, true);
+
+        if(!anchors || !anchors.length) return [];
+
+        let numberLimit = Prefs.get('pref-limit-number-of-anchors') - 0;
+        let rangeLimit = Prefs.get('pref-limit-range-of-anchor') - 0;
+
+        // Exceeded the limit of # anchors in a post.
+        if(!ignoreLimits && numberLimit && anchors.length >= numberLimit){
+            return [];
+        }
+
+        anchors = anchors.reduce((ary, node) => {
+            return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
+        }, []).map((anc) => {
+            let [start, end = 0] = anc.split('-');
+
+            start = start - 0;
+            end = end - 0;
+
+            if(!start || start <= 0){
+                return null;
+            }
+
+            if(!end){
+                return { start, end: start };
+            }
+
+            if(end < start){
+                [start, end] = [end, start];
+            }
+
+            if(!ignoreLimits && rangeLimit && (end - start + 1) >= rangeLimit){
+                return null;
+            }
+
+            return { start, end };
+        }).filter((anc) => !!anc);
+
+        return anchors;
+    },
+
+
+    /**
+     * ID が匿名かどうか調べる
+     * @param {String} id
+     * @return {Boolean}
+     */
+    isAnonymousID (id) {
+        let isEmptyID = !id || Number.parseInt(id.trim(), 10) === 0;
+        let isAnonymousID = id.startsWith('???');
+
+        return isEmptyID || isAnonymousID;
     }
 
 };
@@ -677,11 +1060,27 @@ var ShortcutHandler = {
 
     /**
      * ショートカットキーと機能とのマッピング
-     * 押した順に + で結合される.
-     * 例えば Control, Shift, Enter の順で押せば Ctrl+Shift+Enter となる.
-     * キーの名称は
-     *    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
-     * を, 機能については ThreadCommand, ResCommand を参照.
+     *
+     * @note
+     *    押したキーの名称の前に, 押された修飾キーがアルファベット順に + で結合されます.
+     *    修飾キーの名称は
+     *       https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+     *    を, キーの名称は
+     *       https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent.key#Key_values
+     *    を参照してください.
+     *
+     * @example
+     *    押すキー -> 記述する文字列
+     *       w -> "w" (実際に入力されるキーが名称となる)
+     *       / -> "/" (記号の場合も同様)
+     *     Enter -> "Enter" (一部のキーは特別に名前が付いている)
+     *    Control, w -> "Control+w" (修飾キーと共に押した場合は + で結合される)
+     *    Shift, w -> "Shift+w" (Shiftキー+アルファベットでは特例としてアルファベットが大文字にならずに結合)
+     *    Shift, 2 -> "Shift+@" (実際に入力される記号が名称となる. 例は US キーボードの場合.)
+     *    Command, Shift, w -> "Shift+Meta+w" (修飾キーはアルファベット順で結合する)
+     *    Shift -> "Shift+Shift" (修飾キーのみの場合は処理の都合上特殊な表記になってしまう)
+     * @note 機能はキーを押した時に実行する関数をそのまま記述してください.
+     * @see ThreadCommand, ResCommand
      */
     keyMap: {
         'Control+Enter': function(){ ThreadCommand.write(); },
@@ -691,16 +1090,18 @@ var ShortcutHandler = {
         'n': function(){ ThreadCommand.scrollToNewMark(); },
         'j': function(){ ThreadCommand.scrollToNextRes(); },
         'k': function(){ ThreadCommand.scrollToPrevRes(); },
+        'u': function(){ ThreadCommand.scrollToNextHighlightedRes(); },
+        'i': function(){ ThreadCommand.scrollToPrevHighlightedRes(); },
         'f': function(){ window.scrollByPages(1); },
         'b': function(){ window.scrollByPages(-1); },
     },
 
 
     /**
-     * 押したキーを格納するスタック
+     * 押した数字キーを格納するスタック
      * @type {Array.<String>}
      */
-    _keyStack: [],
+    _numKeyStack: [],
 
 
     /**
@@ -721,26 +1122,46 @@ var ShortcutHandler = {
         if(aEvent.defaultPrevented) return;
         if(/(?:textarea|input|select|button)/i.test(aEvent.target.tagName)) return;
 
+        let keyStr = aEvent.key;
 
-        this._keyStack.push(aEvent.key);
+        // Shift を押した場合などにアルファベットが大文字になるのを修正する
+        if(keyStr.length === 1){
+            keyStr = keyStr.toLowerCase()
+        }
 
-        let keyStr = this._keyStack.join('+');
+        // 修飾キーの状態を調査する
+        // キーの名称は
+        //    https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/getModifierState
+        // より取得.
+        // NumLock などの XXXLock 系のキーは, 混乱のもとになるので調査しない.
+        //    ref. http://jbbs.shitaraba.net/bbs/read.cgi/computer/44179/1426703154/864-865
+        [
+            'Alt', 'AltGraph', 'Control', 'Fn', 'Hyper', 'Meta', 'OS', 'Shift', 'Super', 'Symbol',
+        ].forEach((key) => {
+            if(aEvent.getModifierState(key)){
+                keyStr = key + '+' + keyStr;
+            }
+        });
 
         if(this.keyMap[keyStr]){
             aEvent.preventDefault();
-            this.keyMap[keyStr].call();
+            this.keyMap[keyStr]();
+            this._numKeyStack.length = 0;
+        }
 
-        }else if(Prefs.get('pref-enable-resjump') && /^[\d\+]+$/.test(keyStr)){
+        // Press number keys to move to the position of the specific post.
+        if(Prefs.get('pref-enable-resjump') && /^\d$/.test(aEvent.key)){
             aEvent.preventDefault();
-            ResCommand.scrollTo(keyStr.replace(/\+/g, ''));
+
+            this._numKeyStack.push(aEvent.key);
+            ResCommand.scrollTo(this._numKeyStack.join(''));
+
+            if(this._timer){
+                clearTimeout(this._timer);
+            }
+
+            this._timer = setTimeout(() => { this._numKeyStack.length = 0; }, this._threshold);
         }
-
-
-        if(this._timer){
-            clearTimeout(this._timer);
-        }
-
-        this._timer = setTimeout(() => { this._keyStack = []; }, this._threshold);
     }
 };
 
@@ -771,6 +1192,12 @@ var AboneHandler = {
     },
 
 
+    /**
+     * 単純型の即時あぼーんを行う
+     * @param  {String} ngType     NG の種類 'name', 'mail', 'id', or 'word'
+     * @param  {String} ngWord     NG の内容
+     * @param  {Boolean} aboneAdded NG追加のイベントなら true
+     */
     _simpleOnDemandAbone: function(ngType, ngWord, aboneAdded){
         let className = "";
 
@@ -795,31 +1222,33 @@ var AboneHandler = {
                 return;
         }
 
-        let aboneCandidates = $.klass(className);
+        let targets = $.klass(className);
 
-        for(let i=0, l=aboneCandidates.length; i<l; i++){
-            if(aboneCandidates[i].textContent.contains(ngWord)){
-                let aboneRes = $.parentByClass('resContainer', aboneCandidates[i]);
-                let aboneResHeader = $.klass('resHeaderAboneContent', aboneRes);
+        targets.forEach((target) => {
+            if(!target.textContent.contains(ngWord)) return;
 
-                //NGワードが追加された場合
-                if(aboneAdded && aboneRes.dataset.aboned !== 'true'){
-                    aboneRes.classList.add('collapsed');
-                    aboneRes.dataset.aboned = 'true';
-                    $.attrs(aboneResHeader, { 'text': ngWord });
-                }
+            let res = target.closest('.resContainer');
+            let header = $.klass('resHeader', res);
 
-                //NGワードが削除された場合
-                if(!aboneAdded && aboneRes.dataset.aboned === 'true'){
-                    aboneRes.classList.remove('collapsed');
-                    aboneRes.dataset.aboned = 'false';
-                    aboneResHeader.textContent = '';
-                }
+            if(aboneAdded && res.dataset.aboned !== 'true'){
+                res.classList.add('collapsed');
+                res.dataset.aboned = 'true';
+                header.dataset.ngtitle = ngWord;
             }
-        }
+
+            if(!aboneAdded && res.dataset.aboned === 'true'){
+                res.classList.remove('collapsed');
+                res.dataset.aboned = 'false';
+                header.dataset.ngtitle = '';
+            }
+        });
     },
 
 
+    /**
+     * NGEx の即時あぼーんを行う
+     * @unimplemented
+     */
     _exOnDemandAbone: function(ngData, aboneAdded){
         // we ignore NGEx on-demand abone for the time being,
         // because it is difficult to implement.
@@ -828,14 +1257,24 @@ var AboneHandler = {
 };
 
 
+/**
+ * ポップアップを扱う
+ * @class
+ */
 var Popup = {
 
+    /**
+     * ポップアップを表示するまでの遅延時間
+     * @type {Number}
+     */
     POPUP_DELAY: 200,
+
 
     startup: function(){
         document.addEventListener('mouseover', this.mouseover, false);
         document.addEventListener('mouseout', this.mouseout, false);
     },
+
 
     mouseover: function(aEvent){
         var target = aEvent.originalTarget;
@@ -878,6 +1317,7 @@ var Popup = {
         }
     },
 
+
     mouseout: function(aEvent){
         var target = aEvent.originalTarget;
 
@@ -891,6 +1331,12 @@ var Popup = {
     },
 
 
+    /**
+     * ポップアップがウィンドウ領域を突き出ないよう位置を補正する
+     * @param  {Element} baseNode       基準となるノード
+     * @param  {Element} popupNode      ポップアップノード
+     * @param  {Boolean} invertDirection 反転しているか否か
+     */
     _adjustPopupPosition: function(baseNode, popupNode, invertDirection){
         let baseRect = $.rect(baseNode);
         let popupRect = $.rect(popupNode);
@@ -903,9 +1349,6 @@ var Popup = {
         let top = scrollY + baseRect.bottom - 2;
         let bottom = innerHeight - scrollY - baseRect.top - 2;
         let left = scrollX + baseRect.left;
-
-
-        // ウィンドウを突き出ないようにする補正
 
         //右端
         if(left + popupRect.width > scrollX + innerWidth){
@@ -922,7 +1365,6 @@ var Popup = {
             bottom = innerHeight - scrollY - popupRect.height;
         }
 
-
         $.css(popupNode, {
             top: !invertDirection ? top + 'px' : '',
             bottom: invertDirection ? bottom + 'px' : '',
@@ -931,6 +1373,13 @@ var Popup = {
     },
 
 
+    /**
+     * ポップアップを表示する
+     * @param  {Event} aEvent
+     * @param  {Element} aPopupContent   ポップアップの内容
+     * @param  {String} aAddClassName    ポップアップ要素に追加するクラス名
+     * @param  {Boolean} invertDirection ポップアップの向きを反転するか否か
+     */
     showPopup: function(aEvent, aPopupContent, aAddClassName, invertDirection){
         if(aPopupContent.length === 0) return;
 
@@ -960,7 +1409,7 @@ var Popup = {
 
 
         //親ポップアップがある場合は記録する
-        var parent = $.parentByClass('popup', aEvent.relatedTarget, true);
+        var parent = aEvent.relatedTarget && aEvent.relatedTarget.closest('.popup');
 
         if(parent){
             popupNode.dataset.parent = $.attrs(parent, 'id');
@@ -977,6 +1426,14 @@ var Popup = {
     },
 
 
+    /**
+     * ポップアップを遅延表示する
+     * @param  {Event} aEvent
+     * @param  {Element} aPopupContent   ポップアップの内容
+     * @param  {String} aAddClassName    ポップアップ要素に追加するクラス名
+     * @param  {Boolean} invertDirection ポップアップの向きを反転するか否か
+     * @param  {Number} aDelay           遅延時間
+     */
     showPopupDelay: function(aEvent, aPopupContent, aAddClassName, invertDirection, aDelay){
         if(this._popupTimeout){
             clearTimeout(this._popupTimeout);
@@ -988,6 +1445,9 @@ var Popup = {
     },
 
 
+    /**
+     * mouseout した要素に応じてポップアップを消す
+     */
     _fadeout: function(aEvent){
         //コンテキストメニューなどHTML要素外へマウスが移動した場合
         if(!aEvent.relatedTarget){
@@ -1007,7 +1467,7 @@ var Popup = {
         }
 
         //今マウスが乗っているポップアップ要素
-        let hoveredPopup = $.parentByClass('popup', aEvent.relatedTarget, true);
+        let hoveredPopup = aEvent.relatedTarget.closest('.popup');
 
 
         //自分自身が hovered の時は消さない
@@ -1036,7 +1496,12 @@ var Popup = {
         while(popup.dataset.parent){
             popup = $.id(popup.dataset.parent);
 
-            //今マウスが乗っているところまできたら終了
+            // マウスの動きによっては親ポップアップが先に消されることもある
+            if(!popup){
+                break;
+            }
+
+            // 今マウスが乗っているところまできたら終了
             if(hoveredPopup && popup.id === hoveredPopup.id){
                 break;
             }
@@ -1048,22 +1513,29 @@ var Popup = {
 };
 
 
+/**
+ * アンカーポップアップ
+ * @class
+ */
 Popup.Res = {
 
     mouseover: function(aEvent){
-        let target = aEvent.target;
-        let anchors = target.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g);
+        let link = aEvent.target;
+        let anchors = ResCommand.getAnchors(link);
 
         Promise.all(anchors.map((anchor) => {
-            let [begin, end] = anchor.split('-');
-            if(!end) end = begin;
+            let { start, end } = anchor;
 
-            return this._createContent(begin-0, end-0);
+            return this._createContent(start, end);
         })).then((popupContents) => {
             let fragment = document.createDocumentFragment();
             let shouldInvert = Prefs.get('pref-invert-res-popup-dir');
 
             popupContents.forEach((content) => fragment.appendChild(content));
+
+            if(!$.selector('.resContainer', fragment)){
+                return;
+            }
 
             if(Prefs.get('pref-delay-popup')){
                 Popup.showPopupDelay(aEvent, fragment, "ResPopup", shouldInvert);
@@ -1082,16 +1554,10 @@ Popup.Res = {
     _createContent: function(aBegin, aEnd){
         const POPUP_LIMIT = Prefs.get('pref-max-posts-in-popup');
 
-        //降順アンカ補正
-        if(aBegin > aEnd) [aEnd, aBegin] = [aBegin, aEnd];
-
-        //枠外補正
-        if(aBegin < 1) aBegin = 1;
-        if(aEnd > 1001) aEnd = 1001;
-
         //POPUP_LIMIT より多い時は省略する
         let tmpStart = aBegin;
         let omitRes = 0;
+
         if(POPUP_LIMIT && (aEnd - aBegin) > POPUP_LIMIT){
             aBegin = aEnd - POPUP_LIMIT;
             omitRes = aBegin - tmpStart;
@@ -1211,10 +1677,14 @@ Popup.Res = {
 };
 
 
+/**
+ * 逆参照ポップアップ
+ * @class
+ */
 Popup.RefRes = {
 
     mouseover: function(aEvent){
-        var target = aEvent.target;
+        let target = aEvent.target;
 
         //逆参照がなかったら終了
         if(!target.dataset.referred) return;
@@ -1232,15 +1702,21 @@ Popup.RefRes = {
             }
         });
 
+        let dir = Prefs.get('pref-invert-refres-popup-dir');
+
         if(Prefs.get('pref-delay-popup'))
-            Popup.showPopupDelay(aEvent, popupContent, "RefResPopup", Prefs.get('pref-invert-refres-popup-dir'));
+            Popup.showPopupDelay(aEvent, popupContent, "RefResPopup", dir);
         else
-            Popup.showPopup(aEvent, popupContent, "RefResPopup", Prefs.get('pref-invert-refres-popup-dir'));
+            Popup.showPopup(aEvent, popupContent, "RefResPopup", dir);
     }
 
 };
 
 
+/**
+ * ID ポップアップ
+ * @class
+ */
 Popup.ID = {
 
     mouseover: function(aEvent){
@@ -1253,18 +1729,17 @@ Popup.ID = {
             resID = RegExp.$1;
         }
 
-
-        if(!resID || resID.startsWith('???')) return;
-
+        // ID が無い場合, ID が匿名である場合にはポップアップしない
+        if(ResCommand.isAnonymousID(resID)) return;
 
         //同じIDを持つレスを取得する
-        var selfNumber = $.parentByClass('resContainer', target).dataset.number;
+        var selfNumber = target.closest('.resContainer').dataset.number;
         var selector = Prefs.get('pref-include-self-post') ?
                 "body > .resContainer[data-id*='" + resID + "']" :
                 "body > .resContainer[data-id*='" + resID + "']:not([data-number='" + selfNumber + "'])";
         var sameIDPosts = $.selectorAll(selector);
 
-
+        // 「このレスのみ」のポップアップが無効な場合
         if(!sameIDPosts.length && Prefs.get('pref-disable-single-id-popup')) return;
 
         //ポップアップを作成
@@ -1278,15 +1753,20 @@ Popup.ID = {
             popupContent.appendChild(postNode);
         });
 
+        var dir = Prefs.get('pref-invert-id-popup-dir');
 
         if(Prefs.get('pref-delay-popup'))
-            Popup.showPopupDelay(aEvent, popupContent, "IDPopup", Prefs.get('pref-invert-id-popup-dir'));
+            Popup.showPopupDelay(aEvent, popupContent, "IDPopup", dir);
         else
-            Popup.showPopup(aEvent, popupContent, "IDPopup", Prefs.get('pref-invert-id-popup-dir'));
+            Popup.showPopup(aEvent, popupContent, "IDPopup", dir);
     }
 };
 
 
+/**
+ * 画像ポップアップ
+ * @class
+ */
 Popup.Image = {
 
     mouseover: function(aEvent){
@@ -1307,22 +1787,28 @@ Popup.Image = {
 
         image.addEventListener('load', function(){
             if(Prefs.get('pref-invert-image-popup-dir')){
-                let popupNode = $.parentByClass('popup', this);
+                let popupNode = this.closest('.popup');
                 Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted);
             }
         }, false);
 
-
         var popupContent = $.node({ 'div': { children: image }});
+        var dir = Prefs.get('pref-invert-image-popup-dir');
 
         if(Prefs.get('pref-delay-popup')){
-            Popup.showPopupDelay(aEvent, popupContent, "ImagePopup", Prefs.get('pref-invert-image-popup-dir'));
+            Popup.showPopupDelay(aEvent, popupContent, "ImagePopup", dir);
         }else{
-            Popup.showPopup(aEvent, popupContent, "ImagePopup", Prefs.get('pref-invert-image-popup-dir'));
+            Popup.showPopup(aEvent, popupContent, "ImagePopup", dir);
         }
     },
 
 
+    /**
+     * URL が画像を示しているかどうかを返す
+     * @param  {String} url 調べる URL
+     * @return {Boolean} 画像なら true
+     * @note pref-enable-non-strict-image-detection によって判定方法が変わる
+     */
     _isImageLink: function(url){
         if(Prefs.get('pref-enable-non-strict-image-detection')){
             return this._detectImageLinkRoughly(url);
@@ -1332,11 +1818,21 @@ Popup.Image = {
     },
 
 
+    /**
+     * URL が画像を示しているかどうか拡張子から判断する
+     * @param  {String} url 調べる URL
+     * @return {Boolean} 画像なら true
+     */
     _detectImageLink: function(url){
         return (/\.(?:gif|jpe?g|png|svg|bmp|tiff?)$/i).test(url);
     },
 
 
+    /**
+     * URL が画像を示しているかどうか, URL 中に含まれるキーワードを基に判断する
+     * @param  {String} url 調べる URL
+     * @return {Boolean} 画像なら true
+     */
     _detectImageLinkRoughly: function(url){
         return (/\.(?:gif|jpe?g|png|svg|bmp|tiff?)/i).test(url);
     },
