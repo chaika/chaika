@@ -40,6 +40,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import('resource://gre/modules/Services.jsm');
 Cu.import('resource://chaika-modules/ChaikaCore.js');
+Cu.import('resource://chaika-modules/utils/Browser.js');
 Cu.import("resource://chaika-modules/ChaikaAboneManager.js");
 
 
@@ -52,7 +53,7 @@ var gAboneManager = {
         this.word = new AboneManagerView(ChaikaAboneManager.ABONE_TYPE_WORD);
         this.ex = new NGExAboneManagerView(ChaikaAboneManager.ABONE_TYPE_EX);
 
-        this._messageManager = ChaikaCore.browser.getGlobalMessageManager();
+        this._messageManager = Browser.getGlobalMessageManager();
 
         this._messageManager.addMessageListener('chaika-abone-add', this.listener);
         this._messageManager.addMessageListener('chaika-abone-remove', this.listener);

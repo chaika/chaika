@@ -155,3 +155,6 @@ let Redirector = {
         }
     }
 };
+
+
+Redirector.init();

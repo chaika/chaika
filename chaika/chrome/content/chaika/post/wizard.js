@@ -10,6 +10,7 @@ Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
+Components.utils.import('resource://chaika-modules/utils/Browser.js');
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -1001,7 +1002,7 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+        Browser.getGlobalMessageManager().broadcastAsyncMessage(
             'chaika-post-finished', {
                 url: gThread.plainURL.spec,
                 host: ChaikaServer.serverURL.hostPort

@@ -17,6 +17,7 @@
     <implementation>
         <constructor><![CDATA[
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+            Components.utils.import('resource://chaika-modules/Browser.js', this);
 
             //読み込み時にメニューを構築しておかないと、
             //設定画面のmenulistが初期状態で空になってしまう
@@ -130,7 +131,7 @@
                 this.ChaikaCore.pref.setUniChar('thread_skin', aSkinName);
 
                 if(this.ChaikaCore.pref.getBool('browser.browsermenu.reload_when_skin_changed')){
-                    this.ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                    this.Browser.getGlobalMessageManager().broadcastAsyncMessage(
                         'chaika-skin-changed', { name: aSkinName }
                     );
                 }

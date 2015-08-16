@@ -9,19 +9,12 @@
     let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
     let { ChaikaAddonInfo } = Cu.import('resource://chaika-modules/ChaikaAddonInfo.js', {});
     let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
-
-
-    /**
-     * Global Message Manager
-     */
-    let gMessageManager;
+    let { Browser } = Cu.import('resource://chaika-modules/utils/Browser.js', {});
 
 
     let Overlay = {
 
         start: function(){
-            gMessageManager = ChaikaCore.browser.getGlobalMessageManager();
-
             BrowserMenu.start();
             ContextMenu.start();
             ToolbarButton.start();
@@ -146,12 +139,14 @@
 
 
         start: function(){
-            gMessageManager.addMessageListener('chaika-browser-menu-command', this.listener);
+            Browser.getGlobalMessageManager()
+                   .addMessageListener('chaika-browser-menu-command', this.listener);
         },
 
 
         stop: function(){
-            gMessageManager.removeMessageListener('chaika-browser-menu-command', this.listener);
+            Browser.getGlobalMessageManager()
+                   .removeMessageListener('chaika-browser-menu-command', this.listener);
         },
 
 
