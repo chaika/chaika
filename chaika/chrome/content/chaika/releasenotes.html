@@ -165,11 +165,7 @@
         <h3>NEWS</h3>
         <ul>
             <li class="new">
-                <a href="https://github.com/chaika/chaika/wiki/%E9%96%8B%E7%99%BA%E6%96%B9%E9%87%9D">chaika の開発方針が明文化されました</a>
-            </li>
-            <li class="changed">
-                chaika の開発目的が 2ch.net 専用ブラウザから汎用掲示板ブラウザへと変更されました
-                (<a href="https://github.com/chaika/chaika/issues/265">#265</a>)
+                <a href="#">WebExtensions API の発表に伴い，chaika の開発は無期限停止となります</a>
             </li>
         </ul>
     </section>
@@ -247,6 +243,9 @@
     <section>
         <h3>掲示板への対応</h3>
         <ul>
+            <li class="new">
+                多くの外部板を板として認識するようになりました
+            </li>
             <li class="fixed">
                 ID のないしたらばの板にて無意味な ID が表示されてしまう問題を修正しました
             </li>
@@ -260,9 +259,6 @@
     <section>
         <h3>スレッドの表示 (ローカルサーバ)</h3>
         <ul>
-            <li class="new">
-                ローカルサーバが httpd.js ベースの新しいものとなり, 処理を非同期に行うようになりました
-            </li>
             <li class="new">
                 使用するポートが使えない場合に自動的に他の空いているポートを探すようになりました
                 (<a href="https://github.com/chaika/chaika/issues/264">#264</a>)
@@ -335,6 +331,67 @@
     </section>
 
     <section>
+        <h3>Electrolysis (e10s)</h3>
+        <ul>
+            <li class="new">
+                <a href="https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox">Electrolysis</a>
+                (e10s, マルチプロセス化 Firefox) が有効な Firefox 上での動作に対応しました．
+                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
+            </li>
+            <li class="changed">
+                e10s の制約から，書き込みウィザードを開く chaika://post/[URL] の挙動が大きく変更になりました
+                <aside class="info">
+                    <p>
+                        スキンの機能により書き込みウィザードを開く場合，
+                        今までは必ずポップアップとして開かれていましたが，
+                        今後は以下のような挙動になります．
+                    </p>
+                    <ul class="list">
+                        <li>
+                            <code>browser.link.open_newwindow.restriction</code>
+                            が 1 に設定されている場合: ロケーションバーやサイドバーなどが
+                            表示された状態の書き込みウィザードが，ウィンドウとして開きます
+                        </li>
+                        <li>
+                            上記以外の場合: 新規タブに書き込みウィザードが開きます
+                        </li>
+                    </ul>
+                    <p>
+                        また，一度書き込みウィザードの URL に遷移してから再びスレッド表示に戻るような挙動になるため，
+                        スキンによってはスクロール位置や既読管理などが影響を受ける可能性があります．
+                    </p>
+                </aside>
+            </li>
+            <li class="changed">
+                e10s の制約から，chaika:// から始まるいくつかの URL が変更されました
+                <aside class="info">
+                    <p>
+                        以前の URL へアクセスすると，自動的に新しい URL へリダイレクトされます．
+                    </p>
+                    <ul class="list">
+                        <li>
+                            板が chaika://board/[URL] から
+                            chrome://chaika/content/board/page.xul?url=[URL] へと変更されました
+                        </li>
+                        <li>
+                            ログマネージャが chaika://log-manager/ から
+                            chrome://chaika/content/board/log-manager.xul へと変更されました
+                        </li>
+                        <li>
+                            トラブルシューティング情報が chaika://support/ から
+                            chrome://chaika/content/support.xhtml へと変更されました
+                        </li>
+                    </ul>
+                </aside>
+            </li>
+            <li class="removed">
+                e10s への対応の難しさから, 複数箇所を選択し, コンテキストメニューからそれぞれ別の条件として NGEx に登録する機能が削除されました
+                (<a href="https://github.com/chaika/chaika/issues/277">#277</a>)
+            </li>
+        </ul>
+    </section>
+
+    <section>
         <h3>その他</h3>
         <ul>
             <li class="new">
@@ -346,11 +403,6 @@
                 <a href="https://people.mozilla.org/~jgruen/chameleon/">Chameleon Style</a>
                 を導入しました
                 (<a href="https://github.com/chaika/chaika/issues/272">#272</a>)
-            </li>
-            <li class="new">
-                <a href="https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox">e10s</a>
-                (electrolysis, マルチプロセス化 Firefox) への対応を進めました
-                (<a href="https://github.com/chaika/chaika/issues/100">#100</a>)
             </li>
             <li class="changed">
                 いくつかのデフォルト設定値が変更されました
@@ -380,10 +432,6 @@
                 minVersion が Firefox 38 に引き上げられました
                 (<a href="https://github.com/chaika/chaika/issues/85">#85</a>,
                  <a href="https://github.com/chaika/chaika/issues/275">#275</a>)
-            </li>
-            <li class="removed">
-                e10s への対応の難しさから, 複数箇所を選択し, コンテキストメニューからそれぞれ別の条件として NGEx に登録する機能が削除されました
-                (<a href="https://github.com/chaika/chaika/issues/277">#277</a>)
             </li>
         </ul>
     </section>
