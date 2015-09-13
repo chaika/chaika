@@ -36,21 +36,16 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
+Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
+Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
+Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
-const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
-
-let { XPCOMUtils } = Cu.import('resource://gre/modules/XPCOMUtils.jsm', {});
-let { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
-let { Logger } = Cu.import('resource://chaika-modules/utils/Logger.js', {});
-let { Browser } = Cu.import('resource://chaika-modules/utils/Browser.js', {});
-let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
-let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
-let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
-let { ChaikaCore } = Cu.import('resource://chaika-modules/ChaikaCore.js', {});
-let { ChaikaBoard } = Cu.import('resource://chaika-modules/ChaikaBoard.js', {});
-let { ChaikaDownloader } = Cu.import('resource://chaika-modules/ChaikaDownloader.js', {});
-let { ChaikaAboneManager } = Cu.import('resource://chaika-modules/ChaikaAboneManager.js', {});
-let { ChaikaContentReplacer } = Cu.import('resource://chaika-modules/ChaikaContentReplacer.js', {});
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
 
 var gBoard;
 var gSubjectDownloader;
@@ -67,8 +62,6 @@ function startup(){
     document.title = location.href;
     document.getElementById("lblTitle").setAttribute("value", location.href);
 
-    Logger.debug(location.href);
-
         // chrome から呼ばれたら止める
     if(location.href.match(/^chrome:/)){
         alert("BAD URL");
@@ -84,7 +77,6 @@ function startup(){
         gBoard = new ChaikaBoard(boardURL);
     }catch(ex){
         // 認識できない URL
-        Logger.error(ex);
         alert("BAD URL");
         return;
     }
@@ -104,7 +96,7 @@ function startup(){
         }
     }
 
-    if(Prefs.get("board.auto_update")){
+    if(ChaikaCore.pref.getBool("board.auto_update")){
         subjectUpdate();
     }else if(!subjectFile.exists() || subjectFile.fileSize==0){
         subjectUpdate();
@@ -179,7 +171,7 @@ function loadPersist(){
             }
         }
     }catch(ex){
-        Logger.error(ex + " : " + content);
+        ChaikaCore.logger.error(ex + " : " + content);
     }
 }
 
@@ -251,12 +243,12 @@ var BoardTree = {
         setPageTitle();
 
         if(this.firstInitBoardTree){
-            // ChaikaCore.history.visitPage(gBoard.url,
-            //         ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
+            ChaikaCore.history.visitPage(gBoard.url,
+                    ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
             this.firstInitBoardTree = false;
         }
 
-        var browserWindow = Browser.getBrowser();
+        var browserWindow = ChaikaCore.browser.getBrowserWindow();
         if(browserWindow && browserWindow.XULBrowserWindow){
             this._XULBrowserWindow = browserWindow.XULBrowserWindow;
         }
@@ -274,7 +266,7 @@ var BoardTree = {
 
 
         //スレッドあぼーん処理 および スレタイ置換
-        var enableHideAbone = Prefs.get('thread_hide_abone');
+        var enableHideAbone = ChaikaCore.pref.getBool('thread_hide_abone');
         var threads = gBoard.itemsDoc.documentElement.getElementsByTagName('boarditem');
 
         for(let i = 0, iz = threads.length; i < iz; i++){
@@ -329,7 +321,7 @@ var BoardTree = {
         this.tree.builder.datasource = gBoard.itemsDoc.documentElement;
         this.tree.builder.rebuild();
 
-        Logger.debug("Tree Build Time: " + (Date.now() - startTime));
+        ChaikaCore.logger.debug("Tree Build Time: " + (Date.now() - startTime));
 
             // 前回のソートを復元
         var colNodes = document.getElementsByClassName("boardTreeCol");
@@ -359,7 +351,7 @@ var BoardTree = {
         this.tree.collapsed = true;
 
         this.tree.className = this.tree.className.replace(/tree-text-\W+/g, '');
-        this.tree.classList.add('tree-text-' + Prefs.get("board.tree_size"));
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
 
         setTimeout(() => this.tree.collapsed = false, 0);
     },
@@ -371,8 +363,8 @@ var BoardTree = {
         if(aEvent.button > 1) return;
 
         var singleClicked = aEvent.type == "click";
-        var openSingleClick = Prefs.get("board.open_single_click");
-        var openNewTab = Prefs.get("board.open_new_tab");
+        var openSingleClick = ChaikaCore.pref.getBool("board.open_single_click");
+        var openNewTab = ChaikaCore.pref.getBool("board.open_new_tab");
 
         if(aEvent.button==1 && singleClicked){
             this.openThread(!openNewTab);
@@ -512,7 +504,7 @@ var BoardTree = {
     openThread: function BoardTree_openThread(aAddTab){
         var index = this.tree.currentIndex;
         if(index == -1) return null;
-        Browser.open(URLUtils.chaikafy(this.getItemURL(index)), aAddTab, true);
+        ChaikaCore.browser.openThread(this.getItemURL(index), aAddTab, true, false, true);
     },
 
         // nsDragAndDrop Observer
@@ -544,7 +536,7 @@ function subjectUpdate(aForceUpdate){
     var settingFile = gBoard.settingFile.clone();
     if(subjectFile.exists() && !aForceUpdate){
         var interval = new Date().getTime() - subjectFile.lastModifiedTime;
-        var updateIntervalLimit =  Prefs.getInt("board.update_interval_limit");
+        var updateIntervalLimit =  ChaikaCore.pref.getInt("board.update_interval_limit");
             // 不正な値や、10 秒以下なら 10 秒にする
         if(isNaN(parseInt(updateIntervalLimit)) || updateIntervalLimit < 10)
             updateIntervalLimit = 10;
@@ -628,20 +620,19 @@ function showBrowser(aTab){
     if(aTab){
         document.getElementById("popTools").hidePopup();
     }
-
-    Browser.open(URLUtils.unchaikafy(gBoard.url), aTab);
+    ChaikaCore.browser.openURL(gBoard.url, aTab);
 }
 
 function openLogsDir(){
-    FileIO.reveal(gBoard.subjectFile.parent);
+    ChaikaCore.io.reveal(gBoard.subjectFile.parent);
 }
 
 function postNewThread(){
-    Browser.openWindow("chrome://chaika/content/post/wizard.xul", null, gBoard.url.spec, true);
+    ChaikaCore.browser.openWindow("chrome://chaika/content/post/wizard.xul", null, gBoard.url.spec, true);
 }
 
 function openSettings(){
-    Browser.openWindow("chrome://chaika/content/settings/settings.xul#paneBoard", "chaika:settings");
+    ChaikaCore.browser.openWindow("chrome://chaika/content/settings/settings.xul#paneBoard", "chaika:settings");
 }
 
 function showBanner(aEvent){

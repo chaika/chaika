@@ -1,15 +1,14 @@
 /* See license.txt for terms of usage */
 
-const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 EXPORTED_SYMBOLS = ["ChaikaBoard"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
-let { Logger } = Cu.import('resource://chaika-modules/utils/Logger.js', {});
-let { OS } = Cu.import("resource://gre/modules/osfile.jsm", {});
-let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
-let { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
+
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
 
 
 /** @ignore */
@@ -861,13 +860,14 @@ ChaikaBoard.getLogFileAtURL = function ChaikaBoard_getLogFileAtURL(aURL){
  * @return {nsIFile}
  */
 ChaikaBoard.getLogFileAtBoardID = function ChaikaBoard_getLogFileAtBoardID(aBoardID){
-    try{
-        let path = OS.Path.join(FileIO.Path.logDir, aBoardID.split('/'));
+    var logFile = ChaikaCore.getLogDir();
 
-        return new FileUtils.File(path);
-    }catch(ex){
-        ChaikaCore.logger.error(ex);
+    var pathArray = aBoardID.split("/");
+    for(var i=0; i<pathArray.length; i++){
+        if(pathArray[i]) logFile.appendRelativePath(pathArray[i]);
     }
+
+    return logFile;
 }
 
 

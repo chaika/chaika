@@ -1,10 +1,5 @@
 /* See license.txt for terms of usage */
 
-/** !!
- * This module is deprecated and will be removed in the future version of chaika.
- * Please do not use anymore.
- * No bugs will be fixed, no refactoring or modification will be made on ChaikaCore.
- */
 
 EXPORTED_SYMBOLS = ["ChaikaCore"];
 
@@ -1323,8 +1318,6 @@ ChaikaHistory.prototype = {
 const loggerLevel = Services.prefs.getIntPref("extensions.chaika.logger.level");
 
 /**
- * @deprecated
- */
 var ChaikaCore = new Proxy(ChaikaCore_, {
 
     get: function(target, name, receiver){
