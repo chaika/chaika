@@ -79,7 +79,7 @@
             var isBoard = (firstItem.itemType == "board");
             var isPage = (firstItem.itemType == "page");
 
-            var osName = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;
+            var osName = Components.classes["@mozilla.org/xre/app-info;1"].getService(Components.interfaces.nsIXULRuntime).OS;
             const NEWLINE = (osName == "Darwin") ? "\n" : "\r\n";
 
             switch(target.getAttribute("anonid")){
@@ -130,8 +130,8 @@
                         return aElement.title;
                     }).join(NEWLINE);
 
-                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-                            .getService(Ci.nsIClipboardHelper);
+                    var clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Components.interfaces.nsIClipboardHelper);
                     clipboardHelper.copyString(titles);
                     break;
 
@@ -140,8 +140,8 @@
                         return aElement.urlSpec;
                     }).join(NEWLINE);
 
-                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-                            .getService(Ci.nsIClipboardHelper);
+                    var clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Components.interfaces.nsIClipboardHelper);
                     clipboardHelper.copyString(urls);
                     break;
 
@@ -150,8 +150,8 @@
                         return aElement.title + NEWLINE + aElement.urlSpec;
                     }).join(NEWLINE);
 
-                    var clipboardHelper = Cc["@mozilla.org/widget/clipboardhelper;1"]
-                            .getService(Ci.nsIClipboardHelper);
+                    var clipboardHelper = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+                            .getService(Components.interfaces.nsIClipboardHelper);
                     clipboardHelper.copyString(urls);
                     break;
 
@@ -164,8 +164,8 @@
                         }
                     }, this);
 
-                    var os = Cc["@mozilla.org/observer-service;1"]
-                                .getService(Ci.nsIObserverService);
+                    var os = Components.classes["@mozilla.org/observer-service;1"]
+                                .getService(Components.interfaces.nsIObserverService);
                     var urls = this.items.map(function(aElement, aIndex, aArray){
                         return aElement.urlSpec;
                     }).join(",");
@@ -174,7 +174,7 @@
             }
 
         ]]></handler>
-    </handlers>    
+    </handlers>
 </binding>
 
 <binding id="historyMenuPopup" extends="chrome://global/content/bindings/popup.xml#popup">

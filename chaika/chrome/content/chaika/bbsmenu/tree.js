@@ -95,6 +95,42 @@
             return URLUtils.isBBS(node.getAttribute('url'));
         },
 
+
+        showContext: function Tree_showContext(event){
+            let row = {};
+            let obj = {};
+
+            this._treeBoxObject.getCellAt(event.clientX, event.clientY, row, {}, obj);
+
+            if(row.value === -1 || obj.value === 'twisty') return false;
+            if(this.isContainer(row.value)) return false;
+
+            let urlItem = this._getURLItem(row.value);
+            let contextMenu = document.getElementById('treeContextMenu');
+
+            contextMenu.items = [urlItem];
+
+            return true;
+        },
+
+
+        _getURLItem: function Tree_getURLItem(aRowIndex){
+            let node = this._visibleNodes[aRowIndex];
+            let title = node.getAttribute("title");
+            let urlSpec = node.getAttribute("url");
+            let itemType;
+
+            if(URLUtils.isBoard(urlSpec)){
+                itemType = 'board';
+            }else if(URLUtils.isThread(urlSpec)){
+                itemType = 'thread';
+            }else{
+                itemType = 'page';
+            }
+
+            return new ChaikaCore.ChaikaURLItem(title, urlSpec, itemType);
+        },
+
         handleClick: function(event){
             if(event.button > 1) return;
 
