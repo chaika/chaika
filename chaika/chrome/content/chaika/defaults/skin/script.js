@@ -1043,7 +1043,7 @@ var ResCommand = {
      * @return {Boolean}
      */
     isAnonymousID (id) {
-        let isEmptyID = !id || Number.parseInt(id.trim(), 10) === 0;
+        let isEmptyID = !id || id.trim().length <= 1;
         let isAnonymousID = id.startsWith('???');
 
         return isEmptyID || isAnonymousID;

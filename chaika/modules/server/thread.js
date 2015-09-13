@@ -383,8 +383,8 @@ Thread2ch.prototype = {
         var resMail = "";
         var resDate = "BROKEN";
         var resID = "";
-        var resBeID = 0;
-        var resBeBaseID = 0;
+        var resBeID = '';
+        var resBeBaseID = '';
         var resBeLink = "";
         var resIP = "";
         var resHost = "";
@@ -466,21 +466,25 @@ Thread2ch.prototype = {
         if(resBeLink){
             // 2ch Be の不具合により BeID が数値でなくなる場合があるので,
             // 正規表現にマッチしない可能性も考慮する必要がある
-            resBeID = resBeLink.match(/^\d+/) ? RegExp.lastMatch - 0 : -1;
+            resBeID = resBeLink.match(/^\d+/) || '';
 
-            //BeIDのリンク処理
-            resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
+            if(resBeID){
+                resBeID = resBeID[0];
 
-            // Be基礎番号を取得
-            // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
-            // let centesimalBeNumber = Math.floor(resBeID / 100);
-            // let deciBeNumber = Math.floor(resBeID / 10);
-            // resBeBaseID = ( centesimalBeNumber + deciBeNumber % 10 - resBeID % 10 - 5 ) /
-            //                                ( (deciBeNumber % 10) * (resBeID % 10) * 3 );
-            //
-            // Be 2.0 では基礎番号は廃止されたので、BeID をそのまま用いることにする
-            // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
-            resBeBaseID = resBeID;
+                //BeIDのリンク処理
+                resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
+
+                // Be基礎番号を取得
+                // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
+                // let centesimalBeNumber = Math.floor(resBeID / 100);
+                // let deciBeNumber = Math.floor(resBeID / 10);
+                // resBeBaseID = ( centesimalBeNumber + deciBeNumber % 10 - resBeID % 10 - 5 ) /
+                //                                ( (deciBeNumber % 10) * (resBeID % 10) * 3 );
+                //
+                // Be 2.0 では基礎番号は廃止されたので、BeID をそのまま用いることにする
+                // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
+                resBeBaseID = resBeID;
+            }
         }
 
 
@@ -749,7 +753,6 @@ Thread2ch.prototype = {
                         '</span></span>';
             }
         });
-
 
         return this.converter.getResponse(aNew, resNumber, resName, resMail, resMailName, resDate,
                                           resID, resIP, resHost, resBeLink, resBeID, resBeBaseID, resMes, isAbone, ngData);
