@@ -11,26 +11,86 @@ let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
-// We are hard-coding these constants for now,
-// just until finishing the implementation of Pluggable Board Definition and Pluggable Dat Fetching;
-// These will and should be removed on released version.
-const BBS_DOMAINS = [
-    '2ch.net',
-    'bbspink.com',
-    'machi.to',
-    'jbbs.livedoor.jp',
-    'jbbs.shitaraba.net'
-];
+let includes = {
+    bbs: [
+        // Here we make sure these rules begin with "/^https?:\/\/"
+        // so that they will keep compatible with TLS-version of these websites.
+        // There is a decent posibility of switching from normal HTTP to SSL/TLS
+        // in the future on any websites because Mozilla and other browser vendors are now
+        // promoting deprecation of Non-Secure HTTP.
+        //  cf.) http://t-webber.hatenablog.com/entry/2015/05/01/231948
+        /^https?:\/\/\w+\.2ch\.net\//,
+        /^https?:\/\/\w+\.bbspink.com\//,
+        /^https?:\/\/\w+\.machi\.to\//,
+        /^https?:\/\/jbbs\.shitaraba\.net\//,
+        /^https?:\/\/\w+\.2ch\.sc\//,
+        /^https?:\/\/blogban\.net\//,
+        /^https?:\/\/\w+\.vip2ch\.com\//,
+        /^https?:\/\/\w+\.open2ch\.net\//,
+        /^https?:\/\/\w+\.jikkyo.org\//,
+        /^https?:\/\/\w+\.next2ch.net\//,
+        /^https?:\/\/\w+\.plusvip\.jp\//,
+        /^https?:\/\/\w+\.blogbbs\.net\//,
+        /^https?:\/\/bbs\.shingetsu\.info\//,
+        /^https?:\/\/\w+\.m-ch\.jp\//,
+        /^https?:\/\/uravip.tonkotsu\.jp\//,
+        /^https?:\/\/7gon\.jp\//,
+        /^https?:\/\/saradabird\.com\//,
+        /^https?:\/\/\w+\.2nn\.jp\//,
+    ],
 
+    thread: [
+        /\/test\/read\.cgi\//,
+        /\/bbs\/read\.cgi\//,
+    ]
+};
 
-const EXCLUDE_DOMAINS = [
-    "find.2ch.net",
-    "info.2ch.net",
-    "epg.2ch.net",
-    "headline.2ch.net",
-    "newsnavi.2ch.net",
-    "headline.bbspink.com"
-];
+let excludes = {
+    bbs: [
+        /* 2ch-compatible */
+        /^https?:\/\/[^\/]+\/$/,            // top page of each BBS.
+        /^https?:\/\/[^\/]+\/\w+\.html?$/,  // anouncement etc.
+        /bbs\.html?/i,                      // BBSMENU of plusvip.jp etc.
+        /bbsmenu\.html?/i,                  // BBSMENU of most 2ch-compatible BBS.
+        /\/cbm\//,                          // CBM Custom BBS Menu provided by jikkyo.org.
+        /\.txt$/,
+        /shingetsu\.info\/gateway\.cgi/,
+
+        /* Shitaraba */
+        /\/subject\.cgi\//,
+        /\/storage\.cgi\//,
+        /\/notice_mail\.cgi\//,
+
+        /* Machi */
+        /^https?:\/\/\w+\.machi\.to\/\w+\/i\//, // Mobile-version
+
+        /* 2ch.net */
+        /find\.2ch\.net/,          // 2ch Search
+        /dig\.2ch\.net/,           // 2ch Thread Search
+        /info\.2ch\.net/,          // 2ch Wiki
+        /wiki\.2ch\.net/,          // 2ch Wiki
+        /developer\.2ch\.net/,     // Notice of new specs for 2ch dedicated browser developers
+        /notice\.2ch\.net/,        // Notice of new features for 2ch users and developers
+        /headline\.2ch\.net/,      // Headline on 2ch.net
+        /newsnavi\.2ch\.net/,      // 2channel News Navigator (2NN)
+        /api\.2ch\.net/,           // 2ch API entry point
+        /be\.2ch\.net/,            // 2ch Be 2.0
+        /stats\.2ch\.net/,         // 2ch Hot Threads
+        /c\.2ch\.net/,             // Mobile-version 2ch.net
+        /p2\.2ch\.net/,            // Ads of Ronin
+        /conbini\.2ch\.net/,       // Ads of Ronin
+        /\/test\/bbs\.cgi/,        // CGI for posting
+
+        /* bbspink.com */
+        /headline\.bbspink\.net/,  // Headline on bbspink.com
+
+        /* obsoleted domains */
+        /epg\.2ch\.net/,           // Japan TV Guide provided by 2ch, vanished on 4/6/2014.
+    ],
+
+    thread: [
+    ]
+}
 
 
 /**
@@ -70,15 +130,12 @@ let URLUtils = {
             return true;
         }
 
-
-        let url = Services.io.newURI(aURL, null, null);
-
-        if(!url.scheme || !url.scheme.startsWith('http')){
+        if(!aURL.startsWith('http')){
             return false;
         }
 
-        return BBS_DOMAINS.some((domain) => url.host.contains(domain)) &&
-               !EXCLUDE_DOMAINS.some((domain) => url.host.contains(domain));
+        return includes.bbs.some((regexp) => regexp.test(aURL)) &&
+               !excludes.bbs.some((regexp) => regexp.test(aURL));
     },
 
 
@@ -99,7 +156,8 @@ let URLUtils = {
      * @return {Bool}
      */
     isThread: function(aURL){
-        return aURL.contains('/read.');
+        return includes.thread.some((regexp) => regexp.test(aURL)) &&
+               !excludes.thread.some((regexp) => regexp.test(aURL));
     },
 
 
