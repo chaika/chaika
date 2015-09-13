@@ -1,5 +1,22 @@
 /* See license.txt for terms of usage */
 
+if(location.protocol === 'chaika:'){
+    console.info('This page is loaded in the content process. Reload!');
+
+    let urlToPost = location.href.replace(/^chaika:\/\/post\//, '');
+
+    window.open(
+        'chrome://chaika/content/post/wizard.xul?url=' + urlToPost,
+        'chrome, toolbar, centerscreen, resizable, minimizable'
+    );
+
+    if(window.history.length === 1){
+        window.close();
+    }else{
+        window.history.back();
+    }
+}
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/FormHistory.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
@@ -10,6 +27,7 @@ Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
+Components.utils.import('resource://chaika-modules/utils/Browser.js');
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -26,17 +44,14 @@ var gWizType = WIZ_TYPE_RES;
 
 
 function startup(){
-
     gWizard = document.documentElement;
     gWizard.canRewind = false;
     gWizard.canAdvance = false;
 
-    if(!("arguments" in window)){
-        Notification.critical("認識できない URL です");
-        return;
-    }
+    let params = new URL(location.href).searchParams;
+    let url = (window.arguments && window.arguments[0]) || params.get('url');
 
-    if(window.arguments[1]){
+    if(window.arguments && window.arguments[1]){
         gWizType = WIZ_TYPE_NEW_THREAD;
     }
 
@@ -45,7 +60,7 @@ function startup(){
     if(gWizType == WIZ_TYPE_RES){
         var threadURL;
         try{
-            threadURL = ioService.newURI(window.arguments[0], null, null)
+            threadURL = ioService.newURI(url, null, null)
                                 .QueryInterface(Components.interfaces.nsIURL);
         }catch(ex){
                 // 認識できない URL
@@ -77,7 +92,7 @@ function startup(){
 
         var boardURL;
         try{
-            boardURL = ioService.newURI(window.arguments[0], null, null)
+            boardURL = ioService.newURI(url, null, null)
                                 .QueryInterface(Components.interfaces.nsIURL);
         }catch(ex){
                 // 認識できない URL
@@ -97,7 +112,7 @@ function startup(){
         }
 
     }else{
-        ChaikaCore.logger.warning("UNKNOWN WIZ TYPE: " + window.arguments[0]);
+        ChaikaCore.logger.warning("UNKNOWN WIZ TYPE: " + url);
         return;
     }
 
@@ -1001,7 +1016,7 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+        Browser.getGlobalMessageManager().broadcastAsyncMessage(
             'chaika-post-finished', {
                 url: gThread.plainURL.spec,
                 host: ChaikaServer.serverURL.hostPort

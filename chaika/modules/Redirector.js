@@ -2,7 +2,7 @@
 
 "use strict";
 
-this.EXPORTED_SYMBOLS = ["ChaikaRedirector"];
+this.EXPORTED_SYMBOLS = ['Redirector'];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
@@ -15,7 +15,7 @@ let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
  * Thread Redirector to redirect from normal-view to chaika-view automatically.
  * This module should be initialized from the content process to handle connections made in the content.
  */
-let ChaikaRedirector = {
+let Redirector = {
 
     classDescription: "chaika thread redirector",
     classID: Components.ID("{a0f48aef-8a53-4bab-acd5-9618cbb67e14}"),
@@ -155,3 +155,6 @@ let ChaikaRedirector = {
         }
     }
 };
+
+
+Redirector.init();

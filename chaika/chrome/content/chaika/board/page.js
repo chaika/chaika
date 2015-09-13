@@ -59,25 +59,39 @@ var gNewURL;
 function startup(){
     PrefObserver.start();
 
-    document.title = location.href;
-    document.getElementById("lblTitle").setAttribute("value", location.href);
+    if(location.protocol === 'chaika:'){
+        console.info('This page is loaded in the content process. Reload!');
 
-        // chrome から呼ばれたら止める
-    if(location.href.match(/^chrome:/)){
-        alert("BAD URL");
+        let boardXUL = 'chrome://chaika/content/board/page.xul';
+        let boardURI = location.pathname.substring(1);
+        let boardQuery = location.search.substring(1);
+        let url = boardXUL + '?url=' + boardURI;
+
+        if(boardQuery){
+            url += '&query=' + boardQuery;
+        }
+
+        location.href = url;
+    }
+
+    let params = new URL(location.href).searchParams;
+    let boardURI = params.get('url');
+
+    if(!boardURI){
+        alert('板 URL が指定されていません．');
         return;
     }
 
-        // 板一覧URLの取得
-    var boardURLSpec = location.pathname.substring(1);
+    document.title = boardURI;
+    document.getElementById("lblTitle").setAttribute("value", boardURI);
 
     try{
         var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var boardURL = ioService.newURI(boardURLSpec, null, null);
+        var boardURL = ioService.newURI(boardURI, null, null);
         gBoard = new ChaikaBoard(boardURL);
     }catch(ex){
         // 認識できない URL
-        alert("BAD URL");
+        alert('サポートされていない種類の板です．');
         return;
     }
 
@@ -112,14 +126,12 @@ function startup(){
 
 
     //Search Queryが指定されていた時は始めから絞り込んでおく
-    if(location.search){
-        var query = location.search.match(/query=([^&]+)/);
+    var query = params.get('query');
 
-        if(query){
-            var searchBox = document.getElementById('searchTextBox');
-            searchBox.value = decodeURIComponent(query[1]);
-            BoardTree.initTree(true);
-        }
+    if(query){
+        var searchBox = document.getElementById('searchTextBox');
+        searchBox.value = decodeURIComponent(query);
+        BoardTree.initTree(true);
     }
 }
 

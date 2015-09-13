@@ -22,12 +22,3 @@ interfaces components/chIChaikaService.xpt
 component {1a48801d-18c1-4d5f-9fed-03b2aeded9f9} components/chChaikaService.js
 contract @chaika.xrea.jp/chaika-service;1 {1a48801d-18c1-4d5f-9fed-03b2aeded9f9}
 category profile-after-change chChaikaService @chaika.xrea.jp/chaika-service;1
-
-component {5b0cd1b2-2f16-4472-bdd2-1416380ab3d4} components/chProtocolHandler.js
-contract @mozilla.org/network/protocol;1?name=chaika {5b0cd1b2-2f16-4472-bdd2-1416380ab3d4}
-
-component {9c30cf1f-eb30-4870-a12a-15c1414bd299} components/chProtocolHandler.js
-contract @mozilla.org/network/protocol;1?name=bbs2ch {9c30cf1f-eb30-4870-a12a-15c1414bd299}
-
-component {ae4c60c5-6db2-4c39-939f-4bea59fa9508} components/chProtocolHandler.js
-contract @mozilla.org/uriloader/content-handler;1?type=application/x-chaika-command {ae4c60c5-6db2-4c39-939f-4bea59fa9508}

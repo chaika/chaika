@@ -66,6 +66,11 @@
 ]]></style>
 
 <script type="application/javascript"><![CDATA[
+    if(location.protocol === 'chaika:'){
+        console.info('This page is loaded in the content process. Reload!');
+        location.href = 'chrome://chaika/content/support.xhtml';
+    }
+
     Components.utils.import("resource://chaika-modules/ChaikaCore.js");
     Components.utils.import("resource://chaika-modules/ChaikaServer.js");
     Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");

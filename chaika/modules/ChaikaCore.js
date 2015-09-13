@@ -680,7 +680,7 @@ ChaikaBrowser.prototype = {
         if(this._globalMM) return this._globalMM;
 
         this._globalMM = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIFrameScriptLoader);
-        this._globalMM.loadFrameScript('chrome://chaika/content/browser/content.js', true);
+        this._globalMM.loadFrameScript('chrome://chaika/content/browser/frame.js', true);
 
         return this._globalMM;
     },

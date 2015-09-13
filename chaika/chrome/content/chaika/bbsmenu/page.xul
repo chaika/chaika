@@ -22,7 +22,7 @@
 
     <menupopup id="treeContextMenu"
                style="-moz-binding:url(chrome://chaika/content/pageUtils.xml#itemContext)"
-               onpopupshowing="return true;" />
+               onpopupshowing="return Page._treeView.showContext(event);" />
 </popupset>
 
 <hbox align="center">

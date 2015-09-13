@@ -49,6 +49,12 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
+        Components.utils.import('resource://chaika-modules/utils/Browser.js');
+
+        let mm = Browser.getGlobalMessageManager();
+        mm.loadFrameScript('chrome://chaika/content/browser/components.js', true);
+        mm.loadFrameScript('chrome://chaika/content/browser/thread-agent.js', true);
+
 
         var scope = {};
         Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);

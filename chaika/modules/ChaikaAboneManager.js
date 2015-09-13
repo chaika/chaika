@@ -5,6 +5,7 @@ EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import('resource://chaika-modules/utils/Browser.js');
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
@@ -150,7 +151,7 @@ AboneData.prototype = {
         this._data.push(aWord);
 
         //通知する
-        ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+        Browser.getGlobalMessageManager().broadcastAsyncMessage(
             'chaika-abone-add', {
                 type: this._ngType,
                 data: aWord
@@ -165,7 +166,7 @@ AboneData.prototype = {
             this._data.splice(index, 1);
 
             //通知する
-            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
                 'chaika-abone-remove', {
                     type: this._ngType,
                     data: aWord
@@ -401,7 +402,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj.push(aNGData);
 
             //通知する
-            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
                 'chaika-abone-add', {
                     type: this._ngType,
                     data: jsonData
@@ -424,7 +425,7 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                 this._dataObj.splice(index, 1);
 
                 //通知する
-                ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+                Browser.getGlobalMessageManager().broadcastAsyncMessage(
                     'chaika-abone-remove', {
                         type: this._ngType,
                         data: aNGData
@@ -463,14 +464,14 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj[index] = newData;
 
 
-            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
                 'chaika-abone-remove', {
                     type: this._ngType,
                     data: oldData
                 }
             );
 
-            ChaikaCore.browser.getGlobalMessageManager().broadcastAsyncMessage(
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
                 'chaika-abone-add', {
                     type: this._ngType,
                     data: jsonNewData

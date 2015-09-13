@@ -1,35 +1,30 @@
 /* See license.txt for terms of usage */
 
+/* global content, addMessageListener, sendAsyncMessage, sendSyncMessage */
+
+'use strict';
+
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-Cu.import("resource://gre/modules/Services.jsm");
-Cu.import('resource://chaika-modules/ChaikaRedirector.js');
-Cu.import('resource://chaika-modules/utils/URLUtils.js');
+let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 
 
 /**
- * Frame Script
+ * A bridge between chrome and content on chaika's thread pages.
  */
-let ChaikaBrowserContent = {
+let ThreadAgent = {
 
     init: function(){
         addMessageListener('chaika-skin-changed', this.handleMessage.bind(this));
         addMessageListener('chaika-post-finished', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-add', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
-
-        // We should initialize ChaikaRedirector in the content process
-        // so that nsISimpleContentPolicy can handle http-requests made in the content.
-        if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.enabled")){
-            ChaikaRedirector.init();
-        }
     },
 
 
     handleMessage: function(message){
         if(!message.name.startsWith('chaika-')) return;
         if(!URLUtils.isChaikafied(content.location.href)) return;
-
 
         switch(message.name){
             case 'chaika-skin-changed':
@@ -90,7 +85,7 @@ let ChaikaBrowserContent = {
         let doc = content.document;
 
         if(!isLegacyEvent){
-            let sourceEvent = doc.createEvent("CustomEvent");
+            let sourceEvent = doc.createEvent('CustomEvent');
             sourceEvent.initCustomEvent(aSubject, false, false, aData);
 
             let event = doc.createEvent('XULCommandEvents');
@@ -113,4 +108,4 @@ let ChaikaBrowserContent = {
 };
 
 
-ChaikaBrowserContent.init();
+ThreadAgent.init();
