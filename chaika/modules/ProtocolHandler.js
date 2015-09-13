@@ -102,10 +102,6 @@ ChaikaProtocolHandler.prototype = Object.create(AbstractProtocolHandler.prototyp
 
             switch(aURI.host){
 
-                case 'bbsmenu':
-                    channel = this._getRedirectChannel('chrome://chaika/content/bbsmenu/page.xul');
-                    break;
-
                 case 'board':
                     channel = this._getRedirectChannel('chrome://chaika/content/board/page.xul');
                     break;
