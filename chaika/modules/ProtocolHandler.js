@@ -9,20 +9,8 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 let { XPCOMUtils } = Cu.import('resource://gre/modules/XPCOMUtils.jsm', {});
 let { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
-let { Browser } = Cu.import('resource://chaika-modules/utils/Browser.js', {});
 let { Logger } = Cu.import('resource://chaika-modules/utils/Logger.js', {});
 let { ChaikaHttpController } = Cu.import('resource://chaika-modules/ChaikaHttpController.js', {});
-
-
-function runAsync(callback, thisObj, ...params){
-    let runnable = {
-        run: function(){
-            callback.apply(thisObj, params);
-        }
-    };
-
-    Services.tm.currentThread.dispatch(runnable, Ci.nsIEventTarget.DISPATCH_NORMAL);
-}
 
 
 function AbstractProtocolHandler(){
@@ -122,15 +110,9 @@ ChaikaProtocolHandler.prototype = Object.create(AbstractProtocolHandler.prototyp
                     channel = this._getRedirectChannel(ChaikaHttpController.ivur.getRedirectURI(aURI));
                     break;
 
-                case 'post': {
-                    let threadURI = aURI.filePath.substring(1);
-
-                    if(URLUtils.isThread(threadURI)){
-                        Browser.openWindow('chrome://chaika/content/post/wizard.xul', null, threadURI);
-                    }
-
-                    return Cr.NS_ERROR_NO_CONTENT;
-                }
+                case 'post':
+                    channel = this._getRedirectChannel('chrome://chaika/content/post/wizard.xul');
+                    break;
 
                 default:
                     return Cr.NS_ERROR_NO_CONTENT;
@@ -217,7 +199,13 @@ let ProtocolHandlerFrame = {
         ];
 
         handlers.forEach((handler) => {
-            registrar.registerFactory(handler.classID, handler.classDescription, handler.contractID, handler);
+            if(!registrar.isContractIDRegistered(handler.contractID)){
+                registrar.registerFactory(
+                    handler.classID,
+                    handler.classDescription,
+                    handler.contractID,
+                    handler);
+            }
         });
     },
 

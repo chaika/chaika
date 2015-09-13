@@ -16,6 +16,11 @@ const Cr = Components.results;
  * 開始時の処理
  */
 function startup(){
+    if(location.protocol === 'chaika:'){
+        console.info('This page is loaded in the content process. Reload!');
+        location.href = 'chrome://chaika/content/board/log-manager.xul';
+    }
+
     ThreadUpdateObserver.startup();
     setTimeout(function(){ delayStartup(); }, 0);
 }

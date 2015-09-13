@@ -23,17 +23,10 @@ let Browser = {
     /**
      * Returns nsIWindow object that has a specified type.
      * @param {String} [type="navigator:browser"] aType  Window type to get.
-     * @return {nsIWindow}
+     * @return {nsIDOMWindow}
      */
     getWindow(aType = 'navigator:browser') {
         return Services.wm.getMostRecentWindow(aType);
-    },
-
-
-    getBrowser() {
-        let win = this.getWindow();
-
-        return win && win.getBrowser && win.getBrowser();
     },
 
 
@@ -46,9 +39,12 @@ let Browser = {
      */
     open(aURI, inNewTab, openAsTreeChild) {
         let url = aURI.spec || aURI;
-        let browser = this.getBrowser();
+        let browser = this.getWindow().getBrowser();
 
-        if(!browser) return;
+        if(!browser){
+            Services.console.logStringMessage('Cannot find a browser window.');
+            return;
+        }
 
         if(!inNewTab){
             browser.loadURI(url);
