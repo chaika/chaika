@@ -54,7 +54,9 @@ let URLUtils = {
      * @return {Bool}
      */
     isChaikafied: function(aURL){
-        return aURL.startsWith('chaika://') || aURL.startsWith(this.serverURL);
+        return aURL.startsWith('chaika://') ||
+               aURL.startsWith('chrome://chaika/') ||
+               aURL.startsWith(this.serverURL);
     },
 
 
@@ -108,7 +110,8 @@ let URLUtils = {
      */
     unchaikafy: function(aURL){
         return aURL.replace(this.serverURL + 'thread/', '')
-                   .replace(/^chaika:\/\/[a-z]*\/?/, '');
+                   .replace(/^chaika:\/\/[a-z]*\/?/, '')
+                   .replace(/^chrome:\/\/chaika\/content\/board\/page\.xul\?url=/, '');
     },
 
 
@@ -118,11 +121,15 @@ let URLUtils = {
      * @return {String}
      */
     chaikafy: function(aURL){
+        let chaikafied;
+
         if(this.isThread(aURL)){
-            return this._chaikafyThread(aURL);
+            chaikafied = this._chaikafyThread(aURL);
         }else{
-            return this._chaikafyBoard(aURL);
+            chaikafied = this._chaikafyBoard(aURL);
         }
+
+        return chaikafied.replace(/[\?&]?chaika_force_browser=1/, '');
     },
 
 
@@ -131,7 +138,7 @@ let URLUtils = {
      * @return {String}
      */
     _chaikafyBoard: function(aURL){
-        return 'chaika://board/' + aURL;
+        return 'chrome://chaika/content/board/page.xul?url=' + aURL;
     },
 
 

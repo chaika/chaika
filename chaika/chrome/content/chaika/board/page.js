@@ -36,16 +36,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+
+let { Browser } = Cu.import('resource://chaika-modules/utils/Browser.js', {});
+let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
-
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
 
 var gBoard;
 var gSubjectDownloader;
@@ -632,7 +633,8 @@ function showBrowser(aTab){
     if(aTab){
         document.getElementById("popTools").hidePopup();
     }
-    ChaikaCore.browser.openURL(gBoard.url, aTab);
+
+    Browser.open(URLUtils.unchaikafy(gBoard.url.spec) + '?chaika_force_browser=1', aTab);
 }
 
 function openLogsDir(){
