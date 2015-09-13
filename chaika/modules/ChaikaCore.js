@@ -3,18 +3,17 @@
 
 EXPORTED_SYMBOLS = ["ChaikaCore"];
 
-const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
+Components.utils.import('resource://gre/modules/Services.jsm');
+Components.utils.import('resource://gre/modules/Deprecated.jsm');
+Components.utils.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
+Components.utils.import("resource://chaika-modules/ChaikaAddonInfo.js");
+Components.utils.import("resource://chaika-modules/utils/URLUtils.js");
 
-Cu.import("resource://gre/modules/XPCOMUtils.jsm");
-Cu.import('resource://gre/modules/Services.jsm');
-Cu.import('resource://gre/modules/Deprecated.jsm');
-Cu.import("resource://gre/modules/PrivateBrowsingUtils.jsm");
-Cu.import("resource://chaika-modules/ChaikaAddonInfo.js");
-Cu.import("resource://chaika-modules/utils/URLUtils.js");
-Cu.import('resource://chaika-modules/utils/Logger.js');
 
-let { FileIO } = Cu.import('resource://chaika-modules/utils/FileIO.js', {});
-let { FileUtils } = Cu.import('resource://gre/modules/FileUtils.jsm', {});
+const Ci = Components.interfaces;
+const Cc = Components.classes;
+const Cr = Components.results;
 
 
 const DATA_DIR_NAME = "chaika";
@@ -160,55 +159,15 @@ var ChaikaCore_ = {
      * @private
      */
     _startup: function ChaikaCore__startup(){
-        if(this.initialized) return;
+        this.logger = new ChaikaLogger();
+        this.pref = new ChaikaPref("extensions.chaika.");
+        this.browser = new ChaikaBrowser();
+        this.io = new ChaikaIO();
+        this.history = new ChaikaHistory();
 
-        try{
-            this.logger = new ChaikaLogger();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.pref = new ChaikaPref("extensions.chaika.");
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.browser = new ChaikaBrowser();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.io = new ChaikaIO();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.history = new ChaikaHistory();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.logger._startup();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.storage = this._openStorage();
-        }catch(ex){
-            Logger.error(ex);
-        }
-
-        try{
-            this.history._startup();
-        }catch(ex){
-            Logger.error(ex);
-        }
+        this.logger._startup();
+        this.storage = this._openStorage();
+        this.history._startup();
 
         this.initialized = true;
     },
@@ -315,8 +274,27 @@ var ChaikaCore_ = {
      * @return {nsIFile}
      */
     getDataDir: function ChaikaCore_getDataDir(){
-        let dataDir = new FileUtils.File(FileIO.Path.dataDir);
+        if(!this._dataDir){
+            if(this.pref.getBool("appoint_data_dir")){
+                try{
+                    this._dataDir = this.pref.getFile("data_dir");
+                    if(this._dataDir.leafName != DATA_DIR_NAME){
+                        this._dataDir.appendRelativePath(DATA_DIR_NAME);
+                    }
+                }catch(ex){
+                    this.logger.error(ex);
+                    this._dataDir = null;
+                }
+            }
+            if(!this._dataDir){
+                var dirService = Cc["@mozilla.org/file/directory_service;1"]
+                        .getService(Ci.nsIProperties);
+                this._dataDir = dirService.get("ProfD", Ci.nsIFile);
+                this._dataDir.appendRelativePath(DATA_DIR_NAME);
+            }
+        }
 
+        var dataDir = this._dataDir.clone();
         if(!dataDir.exists()){
             dataDir.create(Ci.nsIFile.DIRECTORY_TYPE, PR_PERMS_DIR);
         }
@@ -696,6 +674,16 @@ function ChaikaBrowser(){
 }
 
 ChaikaBrowser.prototype = {
+
+
+    getGlobalMessageManager: function(){
+        if(this._globalMM) return this._globalMM;
+
+        this._globalMM = Cc["@mozilla.org/globalmessagemanager;1"].getService(Ci.nsIFrameScriptLoader);
+        this._globalMM.loadFrameScript('chrome://chaika/content/browser/frame.js', true);
+
+        return this._globalMM;
+    },
 
 
     /**
@@ -1317,7 +1305,6 @@ ChaikaHistory.prototype = {
 
 const loggerLevel = Services.prefs.getIntPref("extensions.chaika.logger.level");
 
-/**
 var ChaikaCore = new Proxy(ChaikaCore_, {
 
     get: function(target, name, receiver){
