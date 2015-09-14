@@ -17,7 +17,7 @@
     <implementation>
         <constructor><![CDATA[
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
-            Components.utils.import('resource://chaika-modules/Browser.js', this);
+            Components.utils.import('resource://chaika-modules/utils/Browser.js', this);
 
             //読み込み時にメニューを構築しておかないと、
             //設定画面のmenulistが初期状態で空になってしまう
@@ -68,7 +68,7 @@
                 skinDir.appendRelativePath("skin");
 
                 if(!skinDir.exists()){
-                    skinDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+                    skinDir.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
                 }
 
                 let entries = skinDir.directoryEntries.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
