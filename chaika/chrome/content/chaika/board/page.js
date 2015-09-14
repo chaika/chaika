@@ -58,8 +58,6 @@ var gNewURL;
  * 開始時の処理
  */
 function startup(){
-    PrefObserver.start();
-
     if(location.protocol === 'chaika:'){
         console.info('This page is loaded in the content process. Reload!');
 
@@ -73,7 +71,10 @@ function startup(){
         }
 
         location.href = url;
+        return;
     }
+
+    PrefObserver.start();
 
     let params = new URL(location.href).searchParams;
     let boardURI = params.get('url');
