@@ -19,6 +19,7 @@ function startup(){
     if(location.protocol === 'chaika:'){
         console.info('This page is loaded in the content process. Reload!');
         location.href = 'chrome://chaika/content/board/log-manager.xul';
+        return;
     }
 
     ThreadUpdateObserver.startup();
