@@ -2,8 +2,6 @@
 
 "use strict";
 
-this.EXPORTED_SYMBOLS = ['ProtocolHandlerFrame'];
-
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { XPCOMUtils } = Cu.import('resource://gre/modules/XPCOMUtils.jsm', {});
@@ -110,9 +108,17 @@ ChaikaProtocolHandler.prototype = Object.create(AbstractProtocolHandler.prototyp
                     channel = this._getRedirectChannel(ChaikaHttpController.ivur.getRedirectURI(aURI));
                     break;
 
-                case 'post':
-                    channel = this._getRedirectChannel('chrome://chaika/content/post/wizard.xul');
-                    break;
+                case 'post': {
+                    let threadURL = aURI.spec.replace(/^chaika:\/\/post\//, '')
+                                             .replace(/^bbs2ch:post:/, '');
+
+                    sendAsyncMessage('chaika-open-chrome-window', {
+                        'url': 'chrome://chaika/content/post/wizard.xul',
+                        'args': [threadURL]
+                    });
+
+                    return Cr.NS_ERROR_NO_CONTENT;
+                }
 
                 default:
                     return Cr.NS_ERROR_NO_CONTENT;

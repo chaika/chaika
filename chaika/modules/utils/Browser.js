@@ -11,12 +11,25 @@ let { Services } = Cu.import('resource://gre/modules/Services.jsm', {});
 
 let Browser = {
 
+    init() {
+        let ppmm = Cc["@mozilla.org/parentprocessmessagemanager;1"]
+                    .getService(Ci.nsIProcessScriptLoader);
+        ppmm.addMessageListener('chaika-open-chrome-window', this._openWindowFromContent);
+    },
+
+
+    uninit() {
+        let ppmm = Cc["@mozilla.org/parentprocessmessagemanager;1"]
+                    .getService(Ci.nsIProcessScriptLoader);
+        ppmm.removeMessageListener('chaika-open-chrome-window', this._openWindowFromContent);
+    },
+
+
     getGlobalMessageManager() {
         if(this._mm) return this._mm;
 
-        this._mm = Cc['@mozilla.org/globalmessagemanager;1'].getService(Ci.nsIFrameScriptLoader);
-
-        return this._mm;
+        return this._mm = Cc['@mozilla.org/globalmessagemanager;1']
+                            .getService(Ci.nsIFrameScriptLoader);
     },
 
 
@@ -82,4 +95,12 @@ let Browser = {
         }
     },
 
+
+    _openWindowFromContent(message) {
+        return Browser.openWindow(message.data.url, null, ...message.data.args);
+    }
+
 };
+
+
+Browser.init();

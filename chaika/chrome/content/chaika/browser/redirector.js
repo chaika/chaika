@@ -2,8 +2,6 @@
 
 "use strict";
 
-this.EXPORTED_SYMBOLS = ['Redirector'];
-
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 let { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
@@ -39,38 +37,25 @@ let Redirector = {
     },
 
 
-    _runAsync: function(callback, thisObj, ...params){
-        let runnable = {
-            run: function(){
-                callback.apply(thisObj, params);
-            }
-        };
-
-        Services.tm.currentThread.dispatch(runnable, Ci.nsIEventTarget.DISPATCH_NORMAL);
-    },
-
-
     init: function(){
         let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
         let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
 
-        try{
-            registrar.registerFactory(this.classID, this.classDescription, this.contractID, this);
-        }catch(e if e.result == Cr.NS_ERROR_FACTORY_EXISTS){
-            // This workaround causes freezing during shutdown. Disabled for now.
-            // Workaround Bug 924340: rerun this method asynchronously.
-            //this._runAsync(this.init.bind(this));
-            return;
+        if(!registrar.isContractIDRegistered(this.contractID)){
+            registrar.registerFactory(
+                this.classID,
+                this.classDescription,
+                this.contractID,
+                this
+            );
+
+            this.xpcom_categories.forEach((category) => {
+                cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
+            });
+
+            Services.obs.addObserver(this, "xpcom-category-entry-removed", true);
+            Services.obs.addObserver(this, "xpcom-category-cleared", true);
         }
-
-
-        this.xpcom_categories.forEach((category) => {
-            cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
-        });
-
-
-        Services.obs.addObserver(this, "xpcom-category-entry-removed", true);
-        Services.obs.addObserver(this, "xpcom-category-cleared", true);
     },
 
 
