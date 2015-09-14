@@ -80,9 +80,27 @@ var gBbsmenuPane = {
     },
 
     addFavoriteBoard: function(){
-        let favBoardsFile = ChaikaCore.getDataDir();
-        favBoardsFile.appendRelativePath('favorite_boards.xml');
-        ChaikaCore.io.reveal(favBoardsFile);
+        let favBoardFile = ChaikaCore.getDataDir();
+        favBoardFile.appendRelativePath('favorite_boards.xml');
+
+        if(ChaikaCore.pref.getBool('bbsmenu.open_favs_in_scratchpad')){
+            let { ScratchpadManager } =
+                Components.utils.import('resource:///modules/devtools/scratchpad-manager.jsm', {});
+            let win = ScratchpadManager.openScratchpad();
+
+            win.addEventListener('load', () => {
+                win.Scratchpad.addObserver({
+                    onReady: () => {
+                        win.Scratchpad.removeObserver(this);
+                        win.Scratchpad.importFromFile(favBoardFile, false, () => {
+                            win.Scratchpad.editor.setMode({ name: 'xml' });
+                        });
+                    }
+                });
+            });
+        }else{
+            this._openFile(favBoardFile);
+        }
     }
 
 };
