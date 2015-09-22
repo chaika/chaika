@@ -111,7 +111,7 @@ let Redirector = {
             return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is forced to load as normal web-view.
-        if(aLocation.spec.contains('?chaika_force_browser=1'))
+        if(aLocation.spec.contains('chaika_force_browser=1'))
             return Ci.nsISimpleContentPolicy.ACCEPT;
 
 

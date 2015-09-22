@@ -626,7 +626,11 @@
                 var boardURL = this._getCurrentBoardURL();
                 if(!boardURL) return;
 
-                var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(aTerm), null, null);
+                var params = new URL(boardURL.spec).searchParams;
+
+                params.set('query', aTerm);
+
+                var searchURL = Services.io.newURI(boardURL.spec + '?' + params, null, null);
 
                 this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
             ]]></body>
@@ -861,7 +865,11 @@
 
                 //検索文字列を設定して板を開く
                 let boardURL = this._getCurrentBoardURL();
-                let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
+                let params = new URL(boardURL.spec).searchParams;
+
+                params.set('query', query);
+
+                let searchURL = Services.io.newURI(boardURL.spec + '?' + params, null, null);
 
                 this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
             ]]></body>

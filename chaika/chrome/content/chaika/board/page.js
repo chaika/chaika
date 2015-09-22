@@ -63,14 +63,11 @@ function startup(){
 
         let boardXUL = 'chrome://chaika/content/board/page.xul';
         let boardURI = location.pathname.substring(1);
-        let boardQuery = location.search.substring(1);
-        let url = boardXUL + '?url=' + boardURI;
+        let params = new URL(location.href).searchParams;
 
-        if(boardQuery){
-            url += '&query=' + boardQuery;
-        }
+        params.set('url', boardURI);
 
-        location.href = url;
+        location.href = boardXUL + '?' + params;
         return;
     }
 
@@ -635,7 +632,12 @@ function showBrowser(aTab){
         document.getElementById("popTools").hidePopup();
     }
 
-    Browser.open(URLUtils.unchaikafy(gBoard.url.spec) + '?chaika_force_browser=1', aTab);
+    let url = URLUtils.unchaikafy(gBoard.url.spec);
+    let params = new URL(url).searchParams;
+
+    params.set('chaika_force_browser', 1);
+
+    Browser.open(url + '?' + params, aTab);
 }
 
 function openLogsDir(){
