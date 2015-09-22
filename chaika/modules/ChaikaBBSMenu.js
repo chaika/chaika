@@ -102,20 +102,23 @@ let ChaikaBBSMenu = {
     update: function(){
         let primaryURL = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_url");
         let primaryCharset = ChaikaCore.pref.getChar("bbsmenu.bbsmenu_html_charset");
+        let addChaikaBoards = ChaikaCore.pref.getBool('bbsmenu.add_chaika_boards');
 
-        let root = '' +
-            '<bbsmenu>' +
-                '<bbsmenu src="%%DATA_DIR%%/favorite_boards.xml" charset="utf-8" />' +
-                '<separator />' +
+        let root = `
+        <bbsmenu>
+            <bbsmenu src="%%DATA_DIR%%/favorite_boards.xml" charset="utf-8" />
+            ${
+                addChaikaBoards ?
                 '<bbsmenu src="%%DEFAULTS_DIR%%/chaika_boards.xml" charset="utf-8" />' +
-                '<separator />' +
-                '<bbsmenu src="' + primaryURL + '" charset="' + primaryCharset + '" />' +
-            '</bbsmenu>';
+                '<separator />' :
+                ''
+            }
+            <bbsmenu src="${primaryURL}" charset="${primaryCharset}" />
+        </bbsmenu>`;
 
-        return this._parseXML(root)
-                   .then((doc) => {
-                       return this._xml = doc;
-                   });
+        return this._parseXML(root).then((doc) => {
+            return this._xml = doc;
+        });
     },
 
 
