@@ -7,6 +7,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 let { XPCOMUtils } = Cu.import("resource://gre/modules/XPCOMUtils.jsm", {});
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
+let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 
 
 /**
@@ -38,10 +39,29 @@ let Redirector = {
 
 
     init: function(){
+        if(Prefs.get('browser.redirector.enabled')){
+            this.register();
+        }
+
+        Prefs.branch.addObserver('browser.redirector.enabled', this, true);
+        Services.obs.addObserver(this, "xpcom-category-entry-removed", true);
+        Services.obs.addObserver(this, "xpcom-category-cleared", true);
+    },
+
+
+    uninit: function(){
+        this.unregister();
+        Prefs.branch.removeObserver('browser.redirector.enabled', this);
+        Services.obs.removeObserver(this, "xpcom-category-entry-removed");
+        Services.obs.removeObserver(this, "xpcom-category-cleared");
+    },
+
+
+    register() {
         let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
         let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
 
-        if(!registrar.isContractIDRegistered(this.contractID)){
+        if(!registrar.isCIDRegistered(this.classID)){
             registrar.registerFactory(
                 this.classID,
                 this.classDescription,
@@ -52,19 +72,13 @@ let Redirector = {
             this.xpcom_categories.forEach((category) => {
                 cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
             });
-
-            Services.obs.addObserver(this, "xpcom-category-entry-removed", true);
-            Services.obs.addObserver(this, "xpcom-category-cleared", true);
         }
     },
 
 
-    uninit: function(){
+    unregister() {
         let registrar = Components.manager.QueryInterface(Ci.nsIComponentRegistrar);
         let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
-
-        Services.obs.removeObserver(this, "xpcom-category-entry-removed");
-        Services.obs.removeObserver(this, "xpcom-category-cleared");
 
         this.xpcom_categories.forEach((category) => {
             cm.deleteCategoryEntry(category, this.contractID, false);
@@ -76,32 +90,37 @@ let Redirector = {
 
     shouldLoad: function(aContentType, aLocation, aRequestOrigin){
         // Don't redirect if the page is not HTTP document.
-        if(aContentType !== Ci.nsISimpleContentPolicy.TYPE_DOCUMENT) return Ci.nsISimpleContentPolicy.ACCEPT;
-        if(!aLocation.scheme.startsWith('http')) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(aContentType !== Ci.nsISimpleContentPolicy.TYPE_DOCUMENT)
+            return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(!aLocation.scheme.startsWith('http'))
+            return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is loaded from localhost or chrome.
-        if(Services.prefs.getBoolPref("extensions.chaika.browser.redirector.throw_bookmarks") && aRequestOrigin){
+        if(Prefs.get("browser.redirector.throw_bookmarks") && aRequestOrigin){
             if(aRequestOrigin.host === "127.0.0.1" || aRequestOrigin.scheme === "chrome"){
                 return Ci.nsISimpleContentPolicy.ACCEPT;
             }
         }
 
         // Don't redirect if the page is chaika-view.
-        if(URLUtils.isChaikafied(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(URLUtils.isChaikafied(aLocation.spec))
+            return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is not BBS.
-        if(!URLUtils.isBBS(aLocation.spec)) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(!URLUtils.isBBS(aLocation.spec))
+            return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is forced to load as normal web-view.
-        if(aLocation.spec.contains('?chaika_force_browser=1')) return Ci.nsISimpleContentPolicy.ACCEPT;
+        if(aLocation.spec.contains('?chaika_force_browser=1'))
+            return Ci.nsISimpleContentPolicy.ACCEPT;
 
 
         // Redirect to chaika-view page!
         let redirectTo = URLUtils.chaikafy(aLocation.spec);
 
         // Replace view limit
-        let replaceViewLimit = Services.prefs.getBoolPref("extensions.chaika.browser.redirector.replace_view_limit");
-        let viewLimit = Services.prefs.getIntPref("extensions.chaika.board.thread_view_limit");
+        let replaceViewLimit = Prefs.get("browser.redirector.replace_view_limit");
+        let viewLimit = Prefs.get("board.thread_view_limit");
 
         if(replaceViewLimit){
             redirectTo = redirectTo.replace(/[^\/]+$/, viewLimit ? 'l' + viewLimit : '');
@@ -135,8 +154,19 @@ let Redirector = {
                 // Our category entry was removed, make sure to add it back
                 let cm = Cc["@mozilla.org/categorymanager;1"].getService(Ci.nsICategoryManager);
                 cm.addCategoryEntry(category, this.contractID, this.contractID, false, true);
-                break;
             }
+            break;
+
+            case 'nsPref:changed': {
+                if(data === 'browser.redirector.enabled'){
+                    if(Prefs.get('browser.redirector.enabled')){
+                        this.register();
+                    }else{
+                        this.unregister();
+                    }
+                }
+            }
+            break;
         }
     }
 };
