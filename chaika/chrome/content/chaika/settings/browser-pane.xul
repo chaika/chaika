@@ -75,7 +75,7 @@
     <groupbox>
         <caption class="setting-description" label="スレッドリダイレクタ" />
         <vbox>
-            <checkbox label="2ch スレッド URL を自動的に chaika で開く *"
+            <checkbox label="2ch スレッド URL を自動的に chaika で開く"
                     preference="extensions.chaika.browser.redirector.enabled"/>
             <vbox id="redirectorSubBox" class="indent">
                 <checkbox label="URL の表示制限を書き換えて開く"
