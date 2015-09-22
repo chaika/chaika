@@ -727,7 +727,7 @@ Thread2ch.prototype = {
                     const url = 'http' + (aSecure || '') + ':' + aSpec;
                     const image_url = ChaikaHttpController.ivur.replaceURL(url);
 
-                    return '<a href="' + image_url + '" class="outLink">' + url + '</a>';
+                    return '<a href="' + image_url + '" class="outLink">' + aStr + '</a>';
                 });
             }else{
                 resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
