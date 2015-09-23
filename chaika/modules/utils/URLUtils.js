@@ -25,7 +25,7 @@ let includes = {
         /^https?:\/\/jbbs\.shitaraba\.net\//,
         /^https?:\/\/\w+\.2ch\.sc\//,
         /^https?:\/\/blogban\.net\//,
-        /^https?:\/\/\w+\.vip2ch\.com\//,
+        /^https?:\/\/ex14\.vip2ch\.com\//,
         /^https?:\/\/\w+\.open2ch\.net\//,
         /^https?:\/\/\w+\.jikkyo.org\//,
         /^https?:\/\/\w+\.next2ch.net\//,
