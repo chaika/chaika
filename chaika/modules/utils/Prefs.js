@@ -9,7 +9,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 
 
-let Prefs = {
+this.Prefs = {
 
 
     get branch(){

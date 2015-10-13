@@ -12,7 +12,7 @@ let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 let { Logger } = Cu.import("resource://chaika-modules/utils/Logger.js", {});
 
 
-let FileIO = {
+this.FileIO = {
 
     Path: {
         get dataDir() {

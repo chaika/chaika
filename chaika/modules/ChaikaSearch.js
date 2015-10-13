@@ -13,7 +13,7 @@ let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
 /**
  * chaika のスレッド検索を行うクラス
  */
-var ChaikaSearch = {
+this.ChaikaSearch = {
 
     /**
      * 検索プラグインオブジェクトが入る配列

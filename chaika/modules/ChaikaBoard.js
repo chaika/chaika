@@ -1,7 +1,7 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaBoard"];
+this.EXPORTED_SYMBOLS = ["ChaikaBoard"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 

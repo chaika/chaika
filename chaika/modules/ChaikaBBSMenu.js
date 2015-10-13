@@ -4,10 +4,10 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 Cu.import("resource://chaika-modules/ChaikaCore.js");
 
-EXPORTED_SYMBOLS = ["ChaikaBBSMenu"];
+this.EXPORTED_SYMBOLS = ["ChaikaBBSMenu"];
 
 
-let ChaikaBBSMenu = {
+this.ChaikaBBSMenu = {
 
     /**
      * @type {Document}

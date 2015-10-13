@@ -2,7 +2,7 @@
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-EXPORTED_SYMBOLS = ["ChaikaRoninLogin", "ChaikaBeLogin", "ChaikaP2Login"];
+this.EXPORTED_SYMBOLS = ["ChaikaRoninLogin", "ChaikaBeLogin", "ChaikaP2Login"];
 
 Cu.import("resource://chaika-modules/ChaikaCore.js");
 
@@ -106,7 +106,7 @@ var ChaikaLogin = {
  * 浪人アカウント
  * @extends ChaikaLogin
  */
-var ChaikaRoninLogin = {
+this.ChaikaRoninLogin = {
 
     /**
      * Ronin経由で書き込むかどうか
@@ -366,7 +366,7 @@ var ChaikaRoninLogin = {
  * Be@2ch ログインオブジェクト
  * @extends ChaikaLogin
  */
-var ChaikaBeLogin = {
+this.ChaikaBeLogin = {
 
     _loggedIn: false,
 
@@ -572,7 +572,7 @@ var ChaikaBeLogin = {
  * p2/rep2 ログインオブジェクト
  * @extends ChaikaLogin
  */
-var ChaikaP2Login = {
+this.ChaikaP2Login = {
 
     /**
      * p2にログインしているかどうか

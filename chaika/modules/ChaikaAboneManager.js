@@ -1,7 +1,7 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
+this.EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
@@ -10,7 +10,7 @@ Components.utils.import('resource://chaika-modules/utils/Browser.js');
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 
-var ChaikaAboneManager = {
+this.ChaikaAboneManager = {
 
     /** あぼーんの種類を表す定数 */
 
