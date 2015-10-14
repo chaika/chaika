@@ -1,6 +1,6 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaHttpController"];
+this.EXPORTED_SYMBOLS = ["ChaikaHttpController"];
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
@@ -13,7 +13,7 @@ Cu.import("resource://chaika-modules/ChaikaServer.js");
  * chaika のスレッド表示における HTTP 通信を制御するクラス
  * @class
  */
-var ChaikaHttpController = {
+this.ChaikaHttpController = {
 
     /** @private */
     _startup: function(){

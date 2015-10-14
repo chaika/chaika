@@ -1,6 +1,6 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaContentReplacer"];
+this.EXPORTED_SYMBOLS = ["ChaikaContentReplacer"];
 
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
@@ -12,7 +12,7 @@ const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 /**
  * ユーザーによるスレタイ・レスなどの置換を扱う
  */
-var ChaikaContentReplacer = {
+this.ChaikaContentReplacer = {
 
     /**
      * 置換ルール

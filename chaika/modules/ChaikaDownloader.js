@@ -1,7 +1,7 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaDownloader", "ChaikaSimpleDownloader"];
+this.EXPORTED_SYMBOLS = ["ChaikaDownloader", "ChaikaSimpleDownloader"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 

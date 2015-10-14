@@ -7,7 +7,7 @@ Cu.import("resource://gre/modules/Services.jsm");
 Cu.import("resource://chaika-modules/utils/Logger.js");
 
 
-const EXPORTED_SYMBOLS = ["ChaikaServer"];
+this.EXPORTED_SYMBOLS = ["ChaikaServer"];
 
 
 var gServerScriptList = [];

@@ -10,7 +10,7 @@ let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
 let { Log } = Cu.import("resource://gre/modules/Log.jsm", {});
 
 
-let Logger = {
+this.Logger = {
 
     init: function(){
         if(this._initialized){

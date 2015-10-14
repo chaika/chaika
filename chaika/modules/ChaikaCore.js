@@ -1,7 +1,7 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaCore"];
+this.EXPORTED_SYMBOLS = ["ChaikaCore"];
 
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
@@ -1305,7 +1305,7 @@ ChaikaHistory.prototype = {
 
 const loggerLevel = Services.prefs.getIntPref("extensions.chaika.logger.level");
 
-var ChaikaCore = new Proxy(ChaikaCore_, {
+this.ChaikaCore = new Proxy(ChaikaCore_, {
 
     get: function(target, name, receiver){
         const caller = Components.stack.caller;

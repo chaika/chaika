@@ -1,6 +1,6 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["SkinServerScript"];
+this.EXPORTED_SYMBOLS = ["SkinServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 
 
