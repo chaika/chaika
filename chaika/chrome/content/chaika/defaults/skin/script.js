@@ -742,7 +742,11 @@ var ThreadCommand = {
      * スレッドに書き込む
      */
     write: function(){
-        location.href = 'chaika://post/' + EXACT_URL;
+        try{
+            location.href = 'chaika://post/' + EXACT_URL;
+        }catch(ex){
+            console.warn(ex.name + ' occurred, but it has been ignored.');
+        }
     },
 
 
