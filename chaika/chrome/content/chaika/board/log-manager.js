@@ -11,16 +11,19 @@ const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
 
+var gLogManagerReloaded = false;
 
 /**
  * 開始時の処理
  */
 function startup(){
+    gLogManagerReloaded = false;
     if(location.protocol === 'chaika:'){
         console.info('This page is loaded in the content process. Reload!');
         location.href = 'chrome://chaika/content/board/log-manager.xul';
         return;
     }
+    gLogManagerReloaded = true;
 
     ThreadUpdateObserver.startup();
     setTimeout(function(){ delayStartup(); }, 0);
@@ -35,6 +38,7 @@ function delayStartup(){
  * 終了時の処理
  */
 function shutdown(){
+    if(!gLogManagerReloaded) return;
     ThreadUpdateObserver.shutdown();
 }
 

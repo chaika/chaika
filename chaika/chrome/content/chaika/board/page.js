@@ -53,11 +53,13 @@ var gSubjectDownloader;
 var gSettingDownloader;
 var gBoardMoveChecker;
 var gNewURL;
+var gPageReloaded = false;
 
 /**
  * 開始時の処理
  */
 function startup(){
+    gPageReloaded = false;
     if(location.protocol === 'chaika:'){
         console.info('This page is loaded in the content process. Reload!');
 
@@ -70,6 +72,7 @@ function startup(){
         location.href = boardXUL + '?' + params;
         return;
     }
+    gPageReloaded = true;
 
     PrefObserver.start();
 
@@ -138,6 +141,8 @@ function startup(){
  * 終了時の処理
  */
 function shutdown(){
+    if(!gPageReloaded) return;
+
     PrefObserver.stop();
 
     if(!BoardTree.firstInitBoardTree){
