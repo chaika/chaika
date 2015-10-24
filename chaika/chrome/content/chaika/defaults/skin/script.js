@@ -895,7 +895,11 @@ var ResCommand = {
      * @param {Number} resNumber 返信元のレス番号
      */
     replyTo: function(resNumber){
-        location.href = 'chaika://post/' + EXACT_URL + resNumber;
+        try{
+            location.href = 'chaika://post/' + EXACT_URL + resNumber;
+        }catch(ex){
+            console.warn(ex.name + ' occurred, but it has been ignored.');
+        }
     },
 
 
