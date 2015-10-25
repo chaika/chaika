@@ -223,7 +223,9 @@
             <parameter name="aEvent" />
             <body><![CDATA[
                 //表示・非表示を制御するためのステータスを設定する
-                this._setStatus();
+                if(!this._setStatus()){
+                    return;
+                }
 
                 //選択文字列の保存
                 this._selectedText = gContextMenu.textSelected;
@@ -265,6 +267,12 @@
         </method>
 
 
+        <!--
+        /**
+         * 現在タブのchaikａステータスをclassにセットする
+         * @return {boolean} isContextMenu の値を返す
+         */
+        -->
         <method name="_setStatus">
             <body><![CDATA[
                 const url = gBrowser.currentURI.spec;
@@ -293,6 +301,7 @@
                                  root.classList.remove('chaika-status-text-selected');
                 isOnBBSLink ? root.classList.add('chaika-status-on-bbs-link') :
                               root.classList.remove('chaika-status-on-bbs-link');
+                return isContextMenu;
             ]]></body>
         </method>
 
