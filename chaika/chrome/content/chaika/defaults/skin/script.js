@@ -1285,7 +1285,7 @@ var Popup = {
 
 
     mouseover: function(aEvent){
-        var target = aEvent.originalTarget;
+        var target = aEvent.target;
         if(!(target instanceof HTMLElement)) return;
 
         //Beリンク
@@ -1327,7 +1327,7 @@ var Popup = {
 
 
     mouseout: function(aEvent){
-        var target = aEvent.originalTarget;
+        var target = aEvent.target;
 
         if(!(target instanceof HTMLElement)) return;
         if(target.className === "") return;
@@ -1463,7 +1463,7 @@ var Popup = {
         }
 
         //消そうとしているポップアップ要素
-        let targetPopup = aEvent.originalTarget;
+        let targetPopup = aEvent.target;
 
         //ポップアップ元要素からポップアップを得る
         if(!targetPopup.classList.contains('popup')){
