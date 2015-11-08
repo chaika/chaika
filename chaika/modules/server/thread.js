@@ -17,6 +17,16 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
 function ThreadServerScript(){
 }
 
@@ -37,7 +47,7 @@ ThreadServerScript.prototype  = {
 
         // 板のタイプが、BOARD_TYPE_PAGE でも、
         // URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
-        if(type === ChaikaBoard.BOARD_TYPE_PAGE && threadURL.spec.contains("/test/read.cgi/")){
+        if(type === ChaikaBoard.BOARD_TYPE_PAGE && threadURL.spec.includes("/test/read.cgi/")){
             type = ChaikaBoard.BOARD_TYPE_2CH;
         }
 
@@ -141,7 +151,7 @@ Thread2ch.prototype = {
         return (this.thread.url.fileName.match(/\-(\d+)/)) ? parseInt(RegExp.$1) : null;
     },
     get optionsNoFirst(){
-        return this.thread.url.fileName.contains("n");
+        return this.thread.url.fileName.includes("n");
     },
 
     init: function(aHandler, aThreadURL, aBoardURL, aType){
@@ -153,7 +163,7 @@ Thread2ch.prototype = {
         this._chainAboneNumbers = [];
         this._chainHideAboneNumbers = [];
 
-        this._disableAbone = aThreadURL.query.contains('chaika_disable_abone=1');
+        this._disableAbone = aThreadURL.query.includes('chaika_disable_abone=1');
         this._enableChainAbone = !this._disableAbone && ChaikaCore.pref.getBool("thread_chain_abone");
         this._enableHideAbone = !this._disableAbone && ChaikaCore.pref.getBool('thread_hide_abone');
         this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
@@ -421,7 +431,7 @@ Thread2ch.prototype = {
                             .replace(/<b>/g, "</span>");
 
         //日付中のHTMLを除去
-        if(resDate.contains("<")){
+        if(resDate.includes("<")){
             resDate = this.htmlToText(resDate);
         }
 
@@ -434,27 +444,27 @@ Thread2ch.prototype = {
 
 
         // resDate を DATE と BeID に分割
-        if(resDate.contains('BE:') && resDate.match(/(.+)BE:([^ ]+)/)){
+        if(resDate.includes('BE:') && resDate.match(/(.+)BE:([^ ]+)/)){
             resDate = RegExp.$1;
             resBeLink = RegExp.$2;
         }
 
         // resDate を DATE と 発信元 に分割
         // \x94\xad \x90\x4d \x8c\xb3 = 発信元
-        if(resDate.contains('\x94\xad\x90\x4d\x8c\xb3:') &&
+        if(resDate.includes('\x94\xad\x90\x4d\x8c\xb3:') &&
            resDate.match(/(.+)\x94\xad\x90\x4d\x8c\xb3:([\d\.]+)/)){
             resDate = RegExp.$1;
             resIP = RegExp.$2;
         }
 
         // resDate を DATE と HOST に分割
-        if(resDate.contains('HOST:') && resDate.match(/(.+)HOST:([^ ]+)/)){
+        if(resDate.includes('HOST:') && resDate.match(/(.+)HOST:([^ ]+)/)){
             resDate = RegExp.$1;
             resHost = RegExp.$2;
         }
 
         // resDate を DATE と ID に分割
-        if(resDate.contains('ID:') && resDate.match(/(.+)ID:([^ ]+)/)){
+        if(resDate.includes('ID:') && resDate.match(/(.+)ID:([^ ]+)/)){
             resDate = RegExp.$1;
             resID = RegExp.$2;
         }
@@ -681,7 +691,7 @@ Thread2ch.prototype = {
             if(!fixInvalidAnchor){
                 // > 一つなど不正なアンカの場合, 2ch 側ではリンクが貼られていないので
                 // 末尾に </a> を補って通常アンカの場合と同じ状態にする
-                if(!ancBody.contains('</a>')){
+                if(!ancBody.includes('</a>')){
                     ancBody += '</a>';
                 }
 
@@ -719,7 +729,7 @@ Thread2ch.prototype = {
 
 
         // 通常リンク処理
-        if(resMes.contains("ttp")){
+        if(resMes.includes("ttp")){
             var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#\|]+)/g;
 
             if(ChaikaHttpController.ivur.enabled){
@@ -1461,7 +1471,7 @@ ThreadConverter.prototype = {
         }
 
         // 旧仕様の互換性確保
-        if(!this._tmpFooter.contains('<STATUS/>')){
+        if(!this._tmpFooter.includes('<STATUS/>')){
             this._tmpFooter = '<p class="info"><STATUS/></p>\n' + this._tmpFooter;
         }
     },
@@ -1593,19 +1603,19 @@ ThreadConverter.prototype = {
 
         var template = aNew ? this._tmpNewRes : this._tmpRes;
 
-        if(aIP && !template.contains('<IP/>')){
+        if(aIP && !template.includes('<IP/>')){
             aDate = aDate + " \x94\xad\x90\x4d\x8c\xb3:" + aIP;
         }
 
-        if(aHost && !template.contains('<HOST/>')){
+        if(aHost && !template.includes('<HOST/>')){
             aDate = aDate + " HOST:" + aHost;
         }
 
-        if(aID && !template.contains('<ID/>')){
+        if(aID && !template.includes('<ID/>')){
             aDate = aDate + " ID:" + aID;
         }
 
-        if(aBeLink && !template.contains('<BEID/>')){
+        if(aBeLink && !template.includes('<BEID/>')){
             aDate = aDate + " Be:" + aBeLink;
         }
 
@@ -1625,10 +1635,10 @@ ThreadConverter.prototype = {
             aID = aBeID = aIP = aHost = "";
         }
 
-        var resIDColor = template.contains('<IDCOLOR/>') ?
+        var resIDColor = template.includes('<IDCOLOR/>') ?
                             this._id2Color.getColor(aID, false) : "inherit";
 
-        var resIDBgColor = template.contains('<IDBACKGROUNDCOLOR/>') ?
+        var resIDBgColor = template.includes('<IDBACKGROUNDCOLOR/>') ?
                                 this._id2Color.getColor(aID, true) : "inherit";
 
         //AAレス

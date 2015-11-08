@@ -11,6 +11,16 @@ let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
 let includes = {
     bbs: [
         // Here we make sure these rules begin with "/^https?:\/\/"
@@ -244,7 +254,7 @@ ThreadFilter.prototype = {
     // 5,10- -> 5,10-
 
     parse(str, upos) {
-        if(str.contains(',') || str.contains('+')){
+        if(str.includes(',') || str.includes('+')){
             return str.split(/,\+/).map((range) => this._parseRange(range, upos));
         }else{
             // A blank filter means a request for all posts from the first.
@@ -262,7 +272,7 @@ ThreadFilter.prototype = {
                 return [Number.parseInt(str, 10)];
             }
 
-            if(str.contains('n')){
+            if(str.includes('n')){
                 return [this._parseRange(str.replace(/n/g, ''))];
             }else{
                 let _range = this._parseRange(str, upos);

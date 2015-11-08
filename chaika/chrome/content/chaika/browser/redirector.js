@@ -11,6 +11,16 @@ let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 
 
 /**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
+/**
  * Thread Redirector to redirect from normal-view to chaika-view automatically.
  * This module should be initialized from the content process to handle connections made in the content.
  */
@@ -111,7 +121,7 @@ let Redirector = {
             return Ci.nsISimpleContentPolicy.ACCEPT;
 
         // Don't redirect if the page is forced to load as normal web-view.
-        if(aLocation.spec.contains('chaika_force_browser=1'))
+        if(aLocation.spec.includes('chaika_force_browser=1'))
             return Ci.nsISimpleContentPolicy.ACCEPT;
 
 
