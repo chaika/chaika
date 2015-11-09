@@ -1314,6 +1314,7 @@ ChaikaHistory.prototype = {
 
 
 const loggerLevel = Services.prefs.getIntPref("extensions.chaika.logger.level");
+const enableWarning = Services.prefs.getBoolPref("extensions.chaika.deprecation-warning.enabled");
 
 this.ChaikaCore = new Proxy(ChaikaCore_, {
 
@@ -1327,7 +1328,7 @@ this.ChaikaCore = new Proxy(ChaikaCore_, {
             // because ChaikaCore is still widely used in the chaika codebase.
             if(loggerLevel > 40 && /:\/\/chaika|chaika@chaika\.xrea\.jp/.test(caller.filename)){
                 // Do not warn
-            }else{
+            }else if(enableWarning){
                 Deprecated.warning('ChaikaCore is deprecated. It will be removed from chaika in the future.',
                                    'https://github.com/chaika/chaika/issues/234');
             }

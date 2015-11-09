@@ -1,4 +1,5 @@
 pref("extensions.chaika.logger.level", 2);
+pref("extensions.chaika.deprecation-warning.enabled", false);
 pref('extensions.chaika.releasenotes_showed', '1.5.7');
 
 // general
