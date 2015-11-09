@@ -2,3 +2,4 @@
 # Ú×‚Èİ’è•û–@‚Í
 #    https://github.com/chaika/chaika/wiki/defaultname.txt-%26-defaultmail.txt
 # ‚ğQÆ‚µ‚Ä‰º‚³‚¢.
+	sage
