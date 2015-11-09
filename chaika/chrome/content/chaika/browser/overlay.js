@@ -178,9 +178,7 @@
             }
 
             // Forward the method call to browserMenu.xml
-            return () => {
-                let args = Array.from(arguments);
-
+            return (...args) => {
                 return target._root[name](...args);
             };
         }
