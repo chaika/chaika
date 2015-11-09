@@ -111,7 +111,7 @@
 
                 case "openBrowser":
                     if(isBoard || isPage){
-                        this.ChaikaCore.browser.openURL(firstItem.getURL(), false);
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), false, false, true);
                     }else{
                         this.ChaikaCore.browser.openThread(firstItem.getURL(), false, true, true);
                     }
@@ -119,7 +119,7 @@
 
                 case "openBrowserTab":
                     if(isBoard || isPage){
-                        this.ChaikaCore.browser.openURL(firstItem.getURL(), true);
+                        this.ChaikaCore.browser.openThread(firstItem.getURL(), true, false, true);
                     }else{
                         this.ChaikaCore.browser.openThread(firstItem.getURL(), true, true, true);
                     }
