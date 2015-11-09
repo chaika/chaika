@@ -649,7 +649,7 @@
 
                     if(sidebarBox.hidden || sidebar.getAttribute('src') !== SIDEBAR_URL){
                         sidebar.addEventListener("DOMContentLoaded", _doSearch, false);
-                        toggleSidebar("viewChaikaSidebar", true);
+                        SidebarUI.show("viewChaikaSidebar");
                     }else{
                         _doSearch();
                     }
