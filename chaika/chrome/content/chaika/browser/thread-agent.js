@@ -24,11 +24,19 @@ if(!String.prototype.includes){
  */
 let ThreadAgent = {
 
+    logmsg: function(msg){
+        var consoleService = Components.classes["@mozilla.org/consoleservice;1"]
+                                .getService(Components.interfaces.nsIConsoleService);
+        consoleService.logStringMessage(msg);
+    },
+
+
     init: function(){
         addMessageListener('chaika-skin-changed', this.handleMessage.bind(this));
         addMessageListener('chaika-post-finished', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-add', this.handleMessage.bind(this));
         addMessageListener('chaika-abone-remove', this.handleMessage.bind(this));
+        addMessageListener('chaika-get-selected-text', this.handleMessage.bind(this));
     },
 
 
@@ -65,7 +73,19 @@ let ThreadAgent = {
                 this.emitEvent(message.name, message.data.type, message.data.data);
                 sendAsyncMessage(message.name, message.data);
                 break;
-
+            case 'chaika-get-selected-text':
+                try{
+                    let sel = content.getSelection();
+                    if(!sel.isCollapsed){
+                        sendAsyncMessage(message.name, {isSelected: true, text: sel.toString()});
+                    }else{
+                        sendAsyncMessage(message.name, {isSelected: false, text: ''});
+                    }
+                }catch(ex){
+                    this.logmsg(ex);
+                    sendAsyncMessage(message.name, {isSelected: false, text: ''});
+                }
+                break;
         }
     },
 
