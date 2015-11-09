@@ -43,6 +43,16 @@ var gPost   = null;
 var gWizType = WIZ_TYPE_RES;
 
 
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
 function startup(){
     gWizard = document.documentElement;
     gWizard.canRewind = false;
@@ -607,7 +617,7 @@ var FormPage = {
         //チェックボックスをそれに合わせて defaultmail.txt ではない時の値を覚えておく
         if(init && this._getDefaultData('defaultmail.txt') !== null){
             this._sageCheck.setAttribute('originalSageChecked', this._sageCheck.checked.toString());
-            this._sageCheck.checked = this._mailForm.value.contains('sage');
+            this._sageCheck.checked = this._mailForm.value.includes('sage');
         }
 
         //emptyTextの設定
@@ -682,7 +692,7 @@ var FormPage = {
                 template += '【関連アドオン】(なし)\n';
             }
 
-            if(userAgent.contains('pre')){
+            if(userAgent.includes('pre')){
                 template += '【コミットハッシュ】※ コミットハッシュは git rev-parse HEAD にて取得できます\n\n';
             }
 
@@ -803,7 +813,7 @@ var FormPage = {
 
         for(let i=0; i<lines.length; i++){
             // タブがない行は単なる空行
-            if(!lines[i].contains('\t')) continue;
+            if(!lines[i].includes('\t')) continue;
 
             // コメント行
             if(/^\s*(?:;|'|#|\/\/)/.test(lines[i])) continue;
@@ -816,7 +826,7 @@ var FormPage = {
                 continue;
             }
 
-            if(boardURL.contains(boardID)){
+            if(boardURL.includes(boardID)){
                 return defaultData;
             }
         }

@@ -9,8 +9,17 @@
 <link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
 <title>リリースノート [chaika]</title>
 <script>
+    /**
+     * Polyfill for Firefox 39-
+     */
+    if(!String.prototype.includes){
+        String.prototype.includes = function(){'use strict';
+            return String.prototype.indexOf.apply(this, arguments) !== -1;
+        };
+    }
+
     window.addEventListener('DOMContentLoaded', function(){
-        if(location.search.contains('updated=1')){
+        if(location.search.includes('updated=1')){
             document.body.classList.add('updated');
         }
 

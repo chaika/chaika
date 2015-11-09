@@ -192,7 +192,7 @@
                 let linkURL = gContextMenu.linkURL;
 
                 // Google リダイレクタ対策
-                if(linkURL.contains('google') && linkURL.contains('/url?')){
+                if(linkURL.includes('google') && linkURL.includes('/url?')){
                     linkURL = decodeURIComponent(linkURL.match(/url=([^&]*)/i)[1]);
                 }
 

@@ -2,6 +2,16 @@
 
 'use strict';
 
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
 /* *** Utils *** */
 var $ = {
 
@@ -1233,7 +1243,7 @@ var AboneHandler = {
         let targets = $.klass(className);
 
         targets.forEach((target) => {
-            if(!target.textContent.contains(ngWord)) return;
+            if(!target.textContent.includes(ngWord)) return;
 
             let res = target.closest('.resContainer');
             let header = $.klass('resHeader', res);
@@ -1289,7 +1299,7 @@ var Popup = {
         if(!(target instanceof HTMLElement)) return;
 
         //Beリンク
-        if(target.href && target.href.contains('be.2ch')){
+        if(target.href && target.href.includes('be.2ch')){
             target = target.parentNode;
         }
 

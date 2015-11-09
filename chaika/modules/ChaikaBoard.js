@@ -11,6 +11,16 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
 /** @ignore */
 function makeException(aResult){
     var stack = Components.stack.caller.caller;
@@ -890,7 +900,7 @@ ChaikaBoard.getBoardType = function ChaikaBoard_getBoardType(aURL){
     if(EX_HOSTS.indexOf(aURL.host) != -1) return ChaikaBoard.BOARD_TYPE_PAGE;
 
         // Be Profile Page
-    if(aURL.spec.contains('http://be.2ch.net/test/p.php')) return ChaikaBoard.BOARD_TYPE_PAGE;
+    if(aURL.spec.includes('http://be.2ch.net/test/p.php')) return ChaikaBoard.BOARD_TYPE_PAGE;
         // Be@2ch.net
     if(aURL.host == "be.2ch.net") return ChaikaBoard.BOARD_TYPE_BE2CH;
         // 2ch.net
