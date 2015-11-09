@@ -59,6 +59,10 @@
 
     <!-- Browser Context Menu -->
     <popup id="contentAreaContextMenu">
+        <vbox id="context-chaika-flattened"
+              insertbefore="context-navigation"
+              style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+
         <menu id="context-chaika"
               label="chaika"
               class="menu-iconic"
