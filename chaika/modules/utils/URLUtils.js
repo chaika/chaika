@@ -89,7 +89,8 @@ let excludes = {
         /c\.2ch\.net/,             // Mobile-version 2ch.net
         /p2\.2ch\.net/,            // Ads of Ronin
         /conbini\.2ch\.net/,       // Ads of Ronin
-        /\.cgi/,                   // CGI
+        /\/test\/bbs\.cgi/,        // CGI for posting
+        /\.cgi[^\/]*$/,            // Other CGI (example: madakana.cgi)
 
         /* bbspink.com */
         /headline\.bbspink\.net/,  // Headline on bbspink.com
