@@ -1018,6 +1018,7 @@ var ResCommand = {
 
         let numberLimit = Prefs.get('pref-limit-number-of-anchors') - 0;
         let rangeLimit = Prefs.get('pref-limit-range-of-anchor') - 0;
+        let allres = $.tag('footer')[0].dataset.allres - 0;
 
         // Exceeded the limit of # anchors in a post.
         if(!ignoreLimits && numberLimit && anchors.length >= numberLimit){
@@ -1025,26 +1026,28 @@ var ResCommand = {
         }
 
         anchors = anchors.reduce((ary, node) => {
-            return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/g));
+            return ary.concat(node.textContent.match(/(?:\d{1,4}-\d{1,4}|\d{1,4}(?!-))/));
         }, []).map((anc) => {
             let [start, end = 0] = anc.split('-');
 
             start = start - 0;
             end = end - 0;
 
-            if(!start || start <= 0){
+            if(!start){
                 return null;
             }
 
             if(!end){
-                return { start, end: start };
-            }
-
-            if(end < start){
+                [start, end] = [start, start];
+            }else if(end < start){
                 [start, end] = [end, start];
             }
 
-            if(!ignoreLimits && rangeLimit && (end - start + 1) >= rangeLimit){
+            if(allres < end){
+                end = allres;
+            }
+
+            if(allres < start || (!ignoreLimits && rangeLimit && (end - start + 1) >= rangeLimit)){
                 return null;
             }
 
