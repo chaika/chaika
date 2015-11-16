@@ -1174,7 +1174,7 @@ ChaikaIO.prototype = {
                    .replace(/&quot;/g, '"')
                    .replace(/&#039;/g, "'")
                    .replace(/&amp;/g, '&')
-                   .replace(/&copy;/g, this.fromUTF8Octets('©'));
+                   .replace(/&copy;|&#169;/g, this.fromUTF8Octets('©'));
     },
 
 
