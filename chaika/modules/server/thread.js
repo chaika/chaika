@@ -1643,7 +1643,7 @@ ThreadConverter.prototype = {
 
         //AAレス
         if(this.isAA(aMessage)){
-            aMessage = '<span class="aaRes">' + aMessage + '</span>';
+            aMessage = '<span class="aaRes" style="display:inline-block">' + aMessage + '</span>';
         }
 
 
