@@ -96,19 +96,20 @@ var gAboneManager = {
 
 
     handleEvent: function(aEvent){
-        let panel = document.getElementById('aboneManagerTabBox').selectedPanel;
-        let type = panel.getAttribute('id').replace('abone-', '');
-        let target = aEvent.originalTarget;
+        const panel = document.getElementById('aboneManagerTabBox').selectedPanel;
+        const type = panel.getAttribute('id').replace('abone-', '');
+        const view = this[type];
+        const target = aEvent.target;
 
         switch(aEvent.type){
             case 'select':
-                if(target.nodeName === 'listbox'){
-                    this[type].populateData(this[type]._listbox.selectedItem.value, true);
+                if(target.nodeName === 'listbox' && !!view._listbox.selectedItem){
+                    view.populateData(view._listbox.selectedItem.value, true);
                 }
                 break;
 
             case 'command':
-                this[type].doCommand(target.className);
+                view.doCommand(target.className);
                 break;
         }
     }
@@ -213,19 +214,25 @@ AboneManagerView.prototype = {
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
+        const items = this._listbox.selectedItems;
         let rv = true;
 
         if(ChaikaCore.pref.getBool('abone.warn_when_delete')){
-            if(this._listbox.selectedItems.length > 1){
-                rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+            if(items.length > 1){
+                rv = window.confirm(items.length + ' 件のデータを削除してもよろしいですか？');
             }else{
                 rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
             }
         }
 
         if(rv){
-            this._listbox.selectedItems.map((node) => node.value)
-                                       .forEach((item) => ChaikaAboneManager[this._type].remove(item));
+            if(items instanceof Array){
+                items.map((node) => node.value)
+                    .forEach((item) => ChaikaAboneManager[this._type].remove(item));
+            }else{
+                Array.from(items).map((node) => node.value)
+                    .forEach((item) => ChaikaAboneManager[this._type].remove(item));
+            }
         }
     }
 
