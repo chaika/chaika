@@ -58,13 +58,16 @@ let includes = {
 
 let excludes = {
     bbs: [
+        /* extentions possibly unrelated to bbs pages */
+        /\.(?:txt|gif|jpe?g|png|svg|bmp|tiff?|json|js|css|md|csv|pdf|xml|mp3|ogg|wmv|mpe?g|mp4|zip|rar)[\?#\s]?[^\/\?]*$/,
+
         /* 2ch-compatible */
-        /^https?:\/\/[^\/]+\/$/,            // top page of each BBS.
-        /^https?:\/\/[^\/]+\/\w+\.html?$/,  // anouncement etc.
-        /bbs\.html?/i,                      // BBSMENU of plusvip.jp etc.
-        /bbsmenu\.html?/i,                  // BBSMENU of most 2ch-compatible BBS.
-        /\/cbm\//,                          // CBM Custom BBS Menu provided by jikkyo.org.
-        /\.txt$/,
+        /^https?:\/\/[^\/]+\/$/,                            // top page of each BBS.
+        /^https?:\/\/[^\/]+\/\w+\.html?[\?#\s]?[^\/\?]*$/,  // anouncement etc.
+        /bbs\.html?/i,                                      // BBSMENU of plusvip.jp etc.
+        /bbsmenu\.html?/i,                                  // BBSMENU of most 2ch-compatible BBS.
+        /bbstable\.html?/i,                                 // Yet another BBSMENU
+        /\/cbm\//,                                          // CBM Custom BBS Menu provided by jikkyo.org.
 
         /* Shitaraba */
         /\/subject\.cgi\//,
@@ -77,6 +80,7 @@ let excludes = {
         /* 2ch.net */
         /find\.2ch\.net/,          // 2ch Search
         /dig\.2ch\.net/,           // 2ch Thread Search
+        /search\.2ch\.net/,        // 2ch Search
         /info\.2ch\.net/,          // 2ch Wiki
         /wiki\.2ch\.net/,          // 2ch Wiki
         /developer\.2ch\.net/,     // Notice of new specs for 2ch dedicated browser developers
@@ -87,16 +91,27 @@ let excludes = {
         /be\.2ch\.net/,            // 2ch Be 2.0
         /stats\.2ch\.net/,         // 2ch Hot Threads
         /c\.2ch\.net/,             // Mobile-version 2ch.net
+        /itest\.2ch\.net/,         // Smartphone-version 2ch.net
+        /i\.2ch\.net/,             // Smartphone-version 2ch.net
+        /menu\.2ch\.net/,          // BBSMENU
         /p2\.2ch\.net/,            // Ads of Ronin
         /conbini\.2ch\.net/,       // Ads of Ronin
+        /premium\.2ch\.net/,       // Ads of Ronin
+        /irc\.2ch\.net/,           // IRC
         /\/test\/bbs\.cgi/,        // CGI for posting
-        /\.cgi[^\/]*$/,            // Other CGI (example: madakana.cgi)
+        /^https?:\/\/\w+\.2ch\.net\/.*\.cgi[\?#\s]?[^\/\?]*$/, // Other CGI in 2ch (e.g. madakana.cgi)
+        /^https?:\/\/\w+\.2ch\.net\/.*\/kako\//, // Thread archives
+
+        /* 2ch.sc */
+        /find\.2ch\.sc/,          // 2ch Search
+        /info\.2ch\.sc/,          // 2ch Wiki
+        /be\.2ch\.sc/,            // 2ch Be 2.0
+        /c\.2ch\.sc/,             // Mobile-version 2ch.net
+        /p2\.2ch\.sc/,            // Ads of Ronin
+        /^https?:\/\/\w+\.2ch\.sc\/.*\.cgi[\?#\s]?[^\/\?]*$/, // Other CGI in 2ch (e.g. madakana.cgi)
 
         /* bbspink.com */
         /headline\.bbspink\.net/,  // Headline on bbspink.com
-
-        /* obsoleted domains */
-        /epg\.2ch\.net/,           // Japan TV Guide provided by 2ch, vanished on 4/6/2014.
     ],
 
     thread: [
