@@ -150,6 +150,7 @@ var gReplacementManager = {
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
+        const items = this._listbox.selectedItems;
         let rv = true;
 
         if(ChaikaCore.pref.getBool('replace.warn_when_delete')){
@@ -161,13 +162,9 @@ var gReplacementManager = {
         }
 
         if(rv){
-            if(items instanceof Array){
-                items.map((node) => JSON.parse(node.value))
-                    .forEach((item) => ChaikaContentReplacer.remove(item));
-            }else{
-                Array.from(items).map((node) => JSON.parse(node.value))
-                    .forEach((item) => ChaikaContentReplacer.remove(item));
-            }
+            Array.from(items)
+                 .map((node) => JSON.parse(node.value))
+                 .forEach((item) => ChaikaContentReplacer.remove(item));
         }
     },
 
