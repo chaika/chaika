@@ -4,7 +4,7 @@
 
     <Description about="urn:mozilla:install-manifest"
                  em:name="chaika"
-                 em:version="1.8.0pre"
+                 em:version="1.8.0"
                  em:description="Textboard reader to enhance your BBS browsing experience, especially for 2ch-like services"
                  em:id="chaika@chaika.xrea.jp"
                  em:type="2"
@@ -18,7 +18,7 @@
             <!-- Firefox -->
             <Description em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                          em:minVersion="38.0"
-                         em:maxVersion="38.*"/>
+                         em:maxVersion="42.*"/>
         </em:targetApplication>
     </Description>
 </RDF>
