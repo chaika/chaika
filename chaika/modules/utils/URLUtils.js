@@ -195,7 +195,7 @@ this.URLUtils = {
     unchaikafy: function(aURL){
         return aURL.replace(this.serverURL + 'thread/', '')
                    .replace(/^chaika:\/\/[a-z]*\/?/, '')
-                   .replace(/^chrome:\/\/chaika\/content\/board\/page\.xul\?url=/, '');
+                   .replace(/^chrome:\/\/chaika\/content\/board\/page\.xul\?(?:.*&)?url=([^&#]*).*$/, '$1');
     },
 
 
@@ -222,7 +222,7 @@ this.URLUtils = {
      * @return {String}
      */
     _chaikafyBoard: function(aURL){
-        return 'chrome://chaika/content/board/page.xul?url=' + aURL;
+        return 'chrome://chaika/content/board/page.xul?url=' + aURL.replace('?', '&');
     },
 
 
