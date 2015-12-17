@@ -69,7 +69,11 @@ function startup(){
 
         params.set('url', boardURI);
 
-        location.href = boardXUL + '?' + params;
+        // 上の params.set にて url=http%3A%2F%2Fhanabi.2ch.net%2Fqa%2F というように
+        // 暗黙でURLエンコードされるが、元々 / と : はクエリパートにそのまま使える文字なので、
+        // この２文字に関してはエンコードされていない形式に統一する
+        location.href = boardXUL + '?' + params.toString()
+                        .replace(/%(2F|3A)/ig, (match, p1) => String.fromCharCode('0x' + p1));
         return;
     }
     gPageReloaded = true;
