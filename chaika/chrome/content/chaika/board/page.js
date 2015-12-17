@@ -223,7 +223,7 @@ function savePersist(){
 function setPageTitle(){
     var boardTitle = gBoard.getTitle();
     document.title = boardTitle + " [chaika]";
-    document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/[@＠].+$/, ""));
+    document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/^実況せんかいｺﾞﾙｧ！＠|[@＠].+$/, ""));
 }
 
 var PrefObserver = {
