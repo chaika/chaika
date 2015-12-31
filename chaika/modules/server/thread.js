@@ -70,7 +70,7 @@ ThreadServerScript.prototype  = {
         if(this.thread){
             this.thread.init(aServerHandler, threadURL, boardURL, type);
         }else{
-            aServerHandler.write("No Supported Boad");
+            aServerHandler.response.write("No Supported Boad");
             aServerHandler.close();
         }
     },
