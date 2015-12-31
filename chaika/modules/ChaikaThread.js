@@ -371,7 +371,7 @@ ChaikaThread.getBoardURL = function ChaikaThread_getBoardURL(aThreadURL){
 
 
     var type = ChaikaBoard.getBoardType(aThreadURL);
-    var boardURLSpec = aThreadURL.resolve("../");
+    var boardURLSpec = aThreadURL.resolve(/^\d{9,10}$/.test(aThreadURL.fileName) ? "./" : "../");
 
     switch(type){
         case ChaikaBoard.BOARD_TYPE_2CH:
