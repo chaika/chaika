@@ -85,10 +85,12 @@ var gBbsmenuPane = {
 
         if(ChaikaCore.pref.getBool('bbsmenu.open_favs_in_scratchpad')){
             try{
-                var { ScratchpadManager } = Cu.import('resource:///modules/devtools/scratchpad-manager.jsm', {});
+                var { ScratchpadManager } =
+                    Components.utils.import('resource:///modules/devtools/scratchpad-manager.jsm', {});
             }catch(ex){
                 // Firefox 44+ (See https://bugzilla.mozilla.org/show_bug.cgi?id=912121)
-                var { ScratchpadManager } = Cu.import('resource://devtools/client/scratchpad/scratchpad-manager.jsm', {});
+                var { ScratchpadManager } =
+                    Components.utils.import('resource://devtools/client/scratchpad/scratchpad-manager.jsm', {});
             }
             let win = ScratchpadManager.openScratchpad();
 
