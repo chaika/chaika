@@ -192,8 +192,11 @@ this.URLUtils = {
             return false;
         }
 
-        return includes.board.some((regexp) => regexp.test(aURL)) &&
-               !excludes.board.some((regexp) => regexp.test(aURL));
+        let url = aURL.replace(/[\?#].*$/, '')
+                      .replace(/\/(?:test|bbs)\/read\.cgi\/(.+?)\/\d{9,}.*$/, '/$1/');
+
+        return includes.board.some((regexp) => regexp.test(url)) &&
+               !excludes.board.some((regexp) => regexp.test(url));
     },
 
 
