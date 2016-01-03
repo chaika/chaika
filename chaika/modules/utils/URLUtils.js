@@ -30,24 +30,39 @@ let includes = {
         // promoting deprecation of Non-Secure HTTP.
         //  cf.) http://t-webber.hatenablog.com/entry/2015/05/01/231948
         /^https?:\/\/\w+\.2ch\.net\/\w+\/$/,
-        /^https?:\/\/\w+\.bbspink.com\/\w+\/$/,
+        /^https?:\/\/\w+\.bbspink\.com\/\w+\/$/,
         /^https?:\/\/\w+\.machi\.to\/\w+\/$/,
         /^https?:\/\/jbbs\.shitaraba\.net\/\w+\/\d+\/$/,
-        /^https?:\/\/jbbs\.livedoor\.net\/\w+\/\d+\/$/,
+        /^https?:\/\/jbbs\.livedoor\.jp\/\w+\/\d+\/$/,
         /^https?:\/\/\w+\.2ch\.sc\/\w+\/$/,
+        /^https?:\/\/xpic\.sc\/\w+\/$/,                     // part of 2ch.sc bbs
         /^https?:\/\/blogban\.net\/\w+\/$/,
         /^https?:\/\/ex14\.vip2ch\.com\/\w+\/$/,
         /^https?:\/\/\w+\.open2ch\.net\/\w+\/$/,
         /^https?:\/\/\w+\.jikkyo\.org\/\w+\/$/,
+        /^https?:\/\/rikach\.usamimi\.info\/cgi-bin\/lnanusmm\/$/,  // part of jikkyo.org bbs
+        /^https?:\/\/livech\.sakura\.ne\.jp\/livesalon\/$/,         // part of jikkyo.org bbs
+        /^https?:\/\/super2ch\.net\/\w+\/$/,
         /^https?:\/\/next2ch\.net\/\w+\/$/,
-        /^https?:\/\/bbs\.nicovideo\.jp\/\w+\/$/,
+        /^https?:\/\/bbs\.nicovideo\.jp\/(?:delete\/)?\w+\/$/,
+        /^https?:\/\/nicodic\.razil\.jp\/\w+\/$/,
         /^https?:\/\/\w+\.plusvip\.jp\/\w+\/$/,
-        /^https?:\/\/\w+\.blogbbs\.net\/\w+\/$/,
         /^https?:\/\/\w+\.m-ch\.jp\/\w+\/$/,
-        /^https?:\/\/uravip.tonkotsu\.jp\/\w+\/$/,
-        /^https?:\/\/7gon\.jp\/\w+\/$/,
+        /^https?:\/\/mch\.qp\.land\.to\/2ch\/$/,            // part of m-ch.jp bbs
+        /^https?:\/\/uravip\.tonkotsu\.jp\/\w+\/$/,         // alias of 7gon.net
+        /^https?:\/\/7gon\.net\/\w+\/$/,
+        /^https?:\/\/septagon\.s602\.xrea\.com\/\w+\/$/,    // part of 7gon.net bbs
         /^https?:\/\/saradabird\.com\/\w+\/$/,
-        /^https?:\/\/\w+\.2nn\.jp\/\w+\/$/,
+        /^https?:\/\/\w+\.mmobbs\.com\/\w+\/$/,
+        /^https?:\/\/free2\.ch\/(?:original\/)?\w+\/$/,
+        /^https?:\/\/ha10\.net\/\w+\/$/,
+        /^https?:\/\/www\.bbs2ch\.net\/\w+\/$/,
+        /^https?:\/\/friend\.ship\.jp\/\w+\/$/,             // alias of www.bbs2ch.net
+        /^https?:\/\/refugee-chan\.mobi\/\w+\/$/,
+        /^https?:\/\/rankstker\.net\/urisure\/$/,           // part of refugee-chan.mobi bbs
+        /^https?:\/\/bbs\.unionbbs\.org\/\w+\/$/,
+        /^https?:\/\/www\.2nn\.jp\/(?:refuge|temp)\/$/,
+        /^https?:\/\/azlucky\.s28\.xrea\.com\/\w+\/$/,
     ],
 
     thread: [
@@ -59,6 +74,7 @@ let includes = {
 let excludes = {
     board: [
         /* 2ch.net */
+        /^https?:\/\/www\.2ch\.net\//,          // Top Page
         /^https?:\/\/find\.2ch\.net\//,         // 2ch Search
         /^https?:\/\/dig\.2ch\.net\//,          // 2ch Thread Search
         /^https?:\/\/search\.2ch\.net\//,       // 2ch Search
@@ -79,19 +95,55 @@ let excludes = {
         /^https?:\/\/conbini\.2ch\.net\//,      // Ads of Ronin
         /^https?:\/\/premium\.2ch\.net\//,      // Ads of Ronin
         /^https?:\/\/irc\.2ch\.net\//,          // IRC
+        /^https?:\/\/ken\.2ch\.net\//,          // Prefecture Name Server
+        /^https?:\/\/\w+\.2ch\.net\/_403\//,    // BBON House
+        /^https?:\/\/\w+\.2ch\.net\/_service\//, // Server Log
 
         /* 2ch.sc */
         /^https?:\/\/find\.2ch\.sc\//,          // 2ch Search
         /^https?:\/\/info\.2ch\.sc\//,          // 2ch Wiki
-        /^https?:\/\/be\.2ch\.sc\//,            // 2ch Be 2.0
-        /^https?:\/\/c\.2ch\.sc\//,             // Mobile-version 2ch.net
-        /^https?:\/\/p2\.2ch\.sc\//,            // Ads of Ronin
+        /^https?:\/\/be\.2ch\.sc\//,            // 2ch Be
+        /^https?:\/\/c\.2ch\.sc\//,             // Mobile-version 2ch.sc
+        /^https?:\/\/sp\.2ch\.sc\//,            // Smartphone-version 2ch.sc
+        /^https?:\/\/p2\.2ch\.sc\//,            // p2 on 2ch.sc
+
+        /* open2ch */
+        /^https?:\/\/find\.open2ch\.net\//,     // open2ch Search
+        /^https?:\/\/wiki\.open2ch\.net\//,     // open2ch Wiki
+        /^https?:\/\/p2\.open2ch\.net\//,       // open p2
+        /^https?:\/\/\w+\.open2ch\.net\/menu\//, // Top Menu
 
         /* bbspink.com */
-        /^https?:\/\/headline\.bbspink\.net\//, // Headline on bbspink.com
+        /^https?:\/\/www\.bbspink\.com\//,      // Top Page
+        /^https?:\/\/headline\.bbspink\.com\//, // Headline on bbspink.com
+        /^https?:\/\/update\.bbspink\.com\//,   // PINKheadline
+        /^https?:\/\/ronin\.bbspink\.com\//,    // RONIN on bbspink.com
+        /^https?:\/\/nyan\.bbspink\.com\//,     // nyan nyan
+        /^https?:\/\/\w+\.bbspink\.com\/_service\//,    // Server Log
 
         /* jikkyo.org */
         /^https?:\/\/kita\.jikkyo\.org\/cbm\//,         // CBM Custom BBS Menu
+        /^https?:\/\/free\.jikkyo\.org\/menu2ch\//,     // jikkyo board data
+        /^https?:\/\/free\.jikkyo\.org\/i\//,           // Mobile-version Top Page
+        /^https?:\/\/captain\.jikkyo\.org\/wiki\//,     // jikkyo.org wiki
+        /^https?:\/\/captain\.jikkyo\.org\/posts\//,    // jikkyo.org statistics
+        /^https?:\/\/captain\.jikkyo\.org\/cat\//,      // JLAB uploader
+
+        /* vip2ch.com */
+        /^https?:\/\/ex14\.vip2ch\.com\/(?:m|monazilla)\//,
+        /* plusvip.jp */
+        /^https?:\/\/docs\.plusvip\.jp\//,
+        /* m-ch.jp */
+        /^https?:\/\/www\.m-ch\.jp\/mail\//,
+        /* 7gon.net */
+        /^https?:\/\/7gon\.net\/PONNAProject\//,
+        /^https?:\/\/uravip\.tonkotsu\.jp\/PONNAProject\//,
+        /* saradabird.com */
+        /^https?:\/\/saradabird\.com\/(?:blog|TC)\//,
+        /* mmobbs.com */
+        /^https?:\/\/www\.mmobbs\.com\//,
+        /* ha10.net */
+        /^https?:\/\/ha10\.net\/(?:m|map|bbs|js|up|test|wiki)\//,
     ],
 
     thread: [
