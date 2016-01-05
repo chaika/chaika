@@ -310,6 +310,10 @@ nav > ul:hover > li > ul{
     color: var(--in-content-text-color);
 }
 
+.aaRes{
+    display: inline-block !important;
+}
+
 
 /* ***** ***** あぼーん レス ***** ***** */
 
@@ -430,7 +434,6 @@ nav > ul:hover > li > ul{
 }
 
 .popupInner > .aaRes{
-    display: inline-block !important;
     white-space: pre !important;
 }
 
