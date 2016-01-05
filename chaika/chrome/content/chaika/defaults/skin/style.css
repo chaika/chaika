@@ -411,8 +411,8 @@ nav > ul:hover > li > ul{
 .popupInner {
     min-width: 18em;
     min-height: 3em;
-    max-height: 25em;
-    max-width: 55em;
+    max-height: 30em;
+    max-width: 60em;
     overflow: auto;
 }
 
