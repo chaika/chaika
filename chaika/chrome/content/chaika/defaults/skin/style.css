@@ -426,7 +426,7 @@ nav > ul:hover > li > ul{
 
 .popupInner > .resContainer {
     padding-left: 2.5em;
-    padding-right: 1em;
+    padding-right: 18px;
 }
 
 .popupInner .resBody{
