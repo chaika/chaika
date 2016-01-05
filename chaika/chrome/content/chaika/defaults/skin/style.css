@@ -312,6 +312,7 @@ nav > ul:hover > li > ul{
 
 .aaRes{
     display: inline-block !important;
+    white-space: nowrap !important;
 }
 
 
