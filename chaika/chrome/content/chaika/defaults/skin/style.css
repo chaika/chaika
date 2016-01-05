@@ -433,7 +433,7 @@ nav > ul:hover > li > ul{
     padding-bottom: 5px;
 }
 
-.popupInner > .aaRes{
+.popupInner .aaRes{
     white-space: pre !important;
 }
 
