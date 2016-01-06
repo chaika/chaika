@@ -1365,10 +1365,21 @@ var Popup = {
         let baseRect = $.rect(baseNode);
         let popupRect = $.rect(popupNode);
 
+        // スクロールバーの有無によって clientWidth/Height の値は異なる。
+        // ポップアップの表示位置がスクロールバーの表示状態に影響するし、
+        // 計算前と移動後でスクロールバーの表示状態が異なってもいけないので、
+        // 対象のポップアップを左上に移動させてから位置計算する。
+
         let scrollX = window.scrollX;
         let scrollY = window.scrollY;
-        let innerWidth = window.innerWidth;
-        let innerHeight = window.innerHeight;
+
+        $.css(popupNode, {
+            left: scrollX + 'px',
+            top: scrollY + 'px'
+        });
+
+        let innerWidth = document.documentElement.clientWidth;
+        let innerHeight = document.documentElement.clientHeight;
 
         let top = scrollY + baseRect.bottom - 2;
         let bottom = innerHeight - scrollY - baseRect.top - 2;
