@@ -1376,12 +1376,14 @@ var Popup = {
 
         //右端
         if(left + popupRect.width > scrollX + innerWidth){
-            left = scrollX + innerWidth - popupRect.width;
+            // ポップアップが表示領域よりも大きいときは左端を優先して揃える
+            left = scrollX + Math.max(0, innerWidth - popupRect.width);
         }
 
         //下端
         if(top + popupRect.height > scrollY + innerHeight){
-            top = scrollY + innerHeight - popupRect.height;
+            // ポップアップが表示領域よりも大きいときは上端を優先して揃える
+            top = scrollY + Math.max(0, innerHeight - popupRect.height);
         }
 
         //上端
