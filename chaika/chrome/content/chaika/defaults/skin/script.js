@@ -1837,10 +1837,8 @@ Popup.Image = {
         }, false);
 
         image.addEventListener('load', function(){
-            if(Prefs.get('pref-invert-image-popup-dir')){
-                let popupNode = this.closest('.popup');
-                Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted);
-            }
+            let popupNode = this.closest('.popup');
+            Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted === 'true');
         }, false);
 
         var popupContent = $.node({ 'div': { children: image }});
