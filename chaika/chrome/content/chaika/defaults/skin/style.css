@@ -444,8 +444,8 @@ nav > ul:hover > li > ul{
     max-width: none;
 }
 
-.small {
-    width: 200px;
+.ImagePopup img{
+    vertical-align: bottom;
 }
 
 .error > img {

@@ -383,6 +383,9 @@ var Prefs = {
         'pref-disable-single-id-popup': false,
         'pref-delay-popup': false,
         'pref-enable-non-strict-image-detection': false,
+        'pref-image-popup-fit-to-window': true,
+        'pref-image-popup-width': 200,
+        'pref-image-popup-height': 0,
         'pref-invert-res-popup-dir': false,
         'pref-invert-image-popup-dir': false,
         'pref-invert-id-popup-dir': false,
@@ -1798,12 +1801,39 @@ Popup.Image = {
 
         var image = $.node({ img: { 'class': 'small', 'src': linkURL }});
 
+        var popupWidth = Prefs.get('pref-image-popup-width');
+        var popupHeight = Prefs.get('pref-image-popup-height');
+        var fitToWindow = Prefs.get('pref-image-popup-fit-to-window');
+
+        $.css(image, {
+            maxWidth: popupWidth > 0 ? popupWidth + 'px' : 'none',
+            maxHeight: popupHeight > 0 ? popupHeight + 'px' : 'none'
+        });
+
         image.addEventListener('error', function(){
             this.parentNode.classList.add('error');
         }, false);
 
         image.addEventListener('click', function(){
-            this.classList.toggle('small');
+            let popupNode = this.closest('.popup');
+            if(this.classList.toggle('small')){
+                $.css(this, {
+                    maxWidth: popupWidth > 0 ? popupWidth + 'px' : 'none',
+                    maxHeight: popupHeight > 0 ? popupHeight + 'px' : 'none'
+                });
+            }else if(fitToWindow){
+                let popupRect = $.rect(popupNode);
+                let imageRect = $.rect(this);
+                $.css(this, {
+                    maxWidth: (document.documentElement.clientWidth
+                               - popupRect.width + imageRect.width) + 'px',
+                    maxHeight: (document.documentElement.clientHeight
+                                - popupRect.height + imageRect.height) + 'px'
+                });
+            }else{
+                $.css(this, { maxWidth: 'none', maxHeight: 'none' });
+            }
+            Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted === 'true');
         }, false);
 
         image.addEventListener('load', function(){

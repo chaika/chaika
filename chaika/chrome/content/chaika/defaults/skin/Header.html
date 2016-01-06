@@ -82,6 +82,13 @@
             <label title="リンク末尾だけでなく, リンク中に画像拡張子のような文字列がある場合も画像と判定するようになります.">
                 <input type="checkbox" id="pref-enable-non-strict-image-detection"> 画像リンクの判定を緩くする
             </label>
+            <label><input type="checkbox" id="pref-image-popup-fit-to-window" /> 画像拡大時にウィンドウサイズを超えないようにする</label>
+            <fieldset class="inline-form">
+                <legend>縮小画像サイズ (上限):</legend>
+                <label>横 <input type="number" min="0" id="pref-image-popup-width" /></label> ×
+                <label>縦 <input type="number" min="0" id="pref-image-popup-height" /></label> (0で無制限)
+                </label>
+            </fieldset>
 
             <fieldset class="inline-form">
                 <legend>次の種類のポップアップを上方向に表示する:</legend>
