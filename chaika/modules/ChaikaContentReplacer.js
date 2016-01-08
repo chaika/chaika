@@ -18,7 +18,7 @@ this.ChaikaContentReplacer = {
      * 置換ルール
      * @type {Array.<ReplaceData>}
      */
-    _rule: [],
+    _rules: [],
 
 
     /**
