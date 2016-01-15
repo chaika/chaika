@@ -125,6 +125,8 @@ let excludes = {
         /^https?:\/\/kita\.jikkyo\.org\/cbm\//,         // CBM Custom BBS Menu
         /^https?:\/\/free\.jikkyo\.org\/menu2ch\//,     // jikkyo board data
         /^https?:\/\/free\.jikkyo\.org\/i\//,           // Mobile-version Top Page
+        /^https?:\/\/free\.jikkyo\.org\/j\//,           // jikkyo.org jump service
+        /^https?:\/\/captain\.jikkyo\.org\/j\//,        // jikkyo.org jump service
         /^https?:\/\/captain\.jikkyo\.org\/wiki\//,     // jikkyo.org wiki
         /^https?:\/\/captain\.jikkyo\.org\/posts\//,    // jikkyo.org statistics
         /^https?:\/\/captain\.jikkyo\.org\/cat\//,      // JLAB uploader
