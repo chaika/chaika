@@ -405,20 +405,20 @@ ChaikaServerRequest.prototype = {
 
             // リクエストヘッダの解析
         var headerReg = /([^: ]+)[: ]+(.+)/;
-        for each (var line in lines){
-            if(line == "") break;
+        lines.every((line) => {
             if(headerReg.test(line)){
                 this.headers[RegExp.$1] = RegExp.$2;
             }
-        }
+            return line != "";
+        });
 
 
             // リクエスト URL クエリの解析
         var queries = this.url.query.split("&");
-        for each (var item in queries){
+        queries.forEach((item) => {
             var query = item.split("=");
             this.queries[query[0]] = query[1];
-        }
+        });
     },
 
 
