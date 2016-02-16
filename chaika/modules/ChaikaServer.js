@@ -204,8 +204,8 @@ ChaikaServerHandler.prototype = {
     _init: function ChaikaServerHandler__init(aTransport){
         this.isAlive = false;
 
-        aTransport.setTimeout(Ci.nsITransport.TIMEOUT_CONNECT, 30);
-        aTransport.setTimeout(Ci.nsITransport.TIMEOUT_READ_WRITE, 30);
+        aTransport.setTimeout(Ci.nsISocketTransport.TIMEOUT_CONNECT, 30);
+        aTransport.setTimeout(Ci.nsISocketTransport.TIMEOUT_READ_WRITE, 30);
 
         this._transport = aTransport;
 
