@@ -186,10 +186,9 @@ Post.prototype = {
     writeKakikomi: function Post_writeKakikomi(aNewThread){
         var url = aNewThread ? this._board.url.spec :
                                this._thread.plainURL.spec;
-        var nowDate = new Date();
-        var week = "日月火水木金土";
-        var date = nowDate.toLocaleFormat("%Y/%m/%d($WEEK$) %H:%M:%S")
-                .replace("$WEEK$", week[nowDate.getDay()]);
+        var options = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        var date = new Date().toLocaleString('ja-JP', options);
 
         var kakikomi = [];
         kakikomi.push("--------------------------------------------");
