@@ -383,6 +383,9 @@ var Prefs = {
         'pref-disable-single-id-popup': false,
         'pref-delay-popup': false,
         'pref-enable-non-strict-image-detection': false,
+        'pref-image-popup-fit-to-window': true,
+        'pref-image-popup-width': 200,
+        'pref-image-popup-height': 0,
         'pref-invert-res-popup-dir': false,
         'pref-invert-image-popup-dir': false,
         'pref-invert-id-popup-dir': false,
@@ -1362,10 +1365,21 @@ var Popup = {
         let baseRect = $.rect(baseNode);
         let popupRect = $.rect(popupNode);
 
+        // スクロールバーの有無によって clientWidth/Height の値は異なる。
+        // ポップアップの表示位置がスクロールバーの表示状態に影響するし、
+        // 計算前と移動後でスクロールバーの表示状態が異なってもいけないので、
+        // 対象のポップアップを左上に移動させてから位置計算する。
+
         let scrollX = window.scrollX;
         let scrollY = window.scrollY;
-        let innerWidth = window.innerWidth;
-        let innerHeight = window.innerHeight;
+
+        $.css(popupNode, {
+            left: scrollX + 'px',
+            top: scrollY + 'px'
+        });
+
+        let innerWidth = document.documentElement.clientWidth;
+        let innerHeight = document.documentElement.clientHeight;
 
         let top = scrollY + baseRect.bottom - 2;
         let bottom = innerHeight - scrollY - baseRect.top - 2;
@@ -1373,12 +1387,14 @@ var Popup = {
 
         //右端
         if(left + popupRect.width > scrollX + innerWidth){
-            left = scrollX + innerWidth - popupRect.width;
+            // ポップアップが表示領域よりも大きいときは左端を優先して揃える
+            left = scrollX + Math.max(0, innerWidth - popupRect.width);
         }
 
         //下端
         if(top + popupRect.height > scrollY + innerHeight){
-            top = scrollY + innerHeight - popupRect.height;
+            // ポップアップが表示領域よりも大きいときは上端を優先して揃える
+            top = scrollY + Math.max(0, innerHeight - popupRect.height);
         }
 
         //上端
@@ -1798,19 +1814,44 @@ Popup.Image = {
 
         var image = $.node({ img: { 'class': 'small', 'src': linkURL }});
 
+        var popupWidth = Prefs.get('pref-image-popup-width');
+        var popupHeight = Prefs.get('pref-image-popup-height');
+        var fitToWindow = Prefs.get('pref-image-popup-fit-to-window');
+
+        $.css(image, {
+            maxWidth: popupWidth > 0 ? popupWidth + 'px' : 'none',
+            maxHeight: popupHeight > 0 ? popupHeight + 'px' : 'none'
+        });
+
         image.addEventListener('error', function(){
             this.parentNode.classList.add('error');
         }, false);
 
         image.addEventListener('click', function(){
-            this.classList.toggle('small');
+            let popupNode = this.closest('.popup');
+            if(this.classList.toggle('small')){
+                $.css(this, {
+                    maxWidth: popupWidth > 0 ? popupWidth + 'px' : 'none',
+                    maxHeight: popupHeight > 0 ? popupHeight + 'px' : 'none'
+                });
+            }else if(fitToWindow){
+                let popupRect = $.rect(popupNode);
+                let imageRect = $.rect(this);
+                $.css(this, {
+                    maxWidth: (document.documentElement.clientWidth
+                               - popupRect.width + imageRect.width) + 'px',
+                    maxHeight: (document.documentElement.clientHeight
+                                - popupRect.height + imageRect.height) + 'px'
+                });
+            }else{
+                $.css(this, { maxWidth: 'none', maxHeight: 'none' });
+            }
+            Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted === 'true');
         }, false);
 
         image.addEventListener('load', function(){
-            if(Prefs.get('pref-invert-image-popup-dir')){
-                let popupNode = this.closest('.popup');
-                Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted);
-            }
+            let popupNode = this.closest('.popup');
+            Popup._adjustPopupPosition(link, popupNode, popupNode.dataset.inverted === 'true');
         }, false);
 
         var popupContent = $.node({ 'div': { children: image }});
