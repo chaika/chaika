@@ -69,7 +69,11 @@ function startup(){
 
         params.set('url', boardURI);
 
-        location.href = boardXUL + '?' + params;
+        // 上の params.set にて url=http%3A%2F%2Fhanabi.2ch.net%2Fqa%2F というように
+        // 暗黙でURLエンコードされるが、元々 / と : はクエリパートにそのまま使える文字なので、
+        // この２文字に関してはエンコードされていない形式に統一する
+        location.href = boardXUL + '?' + params.toString()
+                        .replace(/%(2F|3A)/ig, (match, p1) => String.fromCharCode('0x' + p1));
         return;
     }
     gPageReloaded = true;
@@ -219,7 +223,7 @@ function savePersist(){
 function setPageTitle(){
     var boardTitle = gBoard.getTitle();
     document.title = boardTitle + " [chaika]";
-    document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/[@＠].+$/, ""));
+    document.getElementById("lblTitle").setAttribute("value", boardTitle.replace(/^実況せんかいｺﾞﾙｧ！＠|[@＠].+$/, ""));
 }
 
 var PrefObserver = {
@@ -255,7 +259,7 @@ var BoardTree = {
     initTree: function BoardTree_initTree(aNoFocus){
         this.tree = document.getElementById("boardTree");
 
-        this.changeTreeSize();
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
         setPageTitle();
 
         if(this.firstInitBoardTree){
@@ -366,7 +370,7 @@ var BoardTree = {
     changeTreeSize: function BoardTree_changeTreeSize(){
         this.tree.collapsed = true;
 
-        this.tree.className = this.tree.className.replace(/tree-text-\W+/g, '');
+        this.tree.className = this.tree.className.replace(/tree-text-\w+/g, '');
         this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
 
         setTimeout(() => this.tree.collapsed = false, 0);

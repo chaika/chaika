@@ -606,7 +606,7 @@ ChaikaNGFiles.prototype = {
                     return ("0" + charCode.toString(16)).slice(-2);
                 };
 
-                return [toHexString(hash.charCodeAt(i)) for (i in hash)].join("");
+                return Array.from(hash, (c) => toHexString(c.charCodeAt(0))).join("");
             }
         }catch(ex){
             ChaikaCore.logger.error(ex);

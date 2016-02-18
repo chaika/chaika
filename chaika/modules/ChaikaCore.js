@@ -789,7 +789,7 @@ ChaikaBrowser.prototype = {
         }
 
         var boardURI = Cc["@mozilla.org/network/simple-uri;1"].createInstance(Ci.nsIURI);
-        boardURI.spec = "chaika://board/" + aBoardURL.spec;
+        boardURI.spec = URLUtils.chaikafy(aBoardURL.spec);
         return boardURI;
     },
 

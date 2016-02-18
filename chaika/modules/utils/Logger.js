@@ -87,6 +87,7 @@ this.Logger = {
 
 
 function Formatter(){
+    Log.BasicFormatter.apply(this);
 }
 
 Formatter.prototype = Object.create(Log.BasicFormatter.prototype, {
