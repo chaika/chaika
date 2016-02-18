@@ -1,10 +1,10 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaAddonInfo"];
+this.EXPORTED_SYMBOLS = ["ChaikaAddonInfo"];
 
 
-var ChaikaAddonInfo = {
+this.ChaikaAddonInfo = {
 
     name: "chaika",
     version: "1",

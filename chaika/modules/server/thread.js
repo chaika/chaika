@@ -2,12 +2,14 @@
 
 EXPORTED_SYMBOLS = ["ThreadServerScript"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 Components.utils.import("resource://chaika-modules/ChaikaHttpController.js");
+Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 
 
 const Ci = Components.interfaces;
@@ -15,38 +17,14 @@ const Cc = Components.classes;
 const Cr = Components.results;
 
 
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
 }
-
 
 
 function ThreadServerScript(){
@@ -69,7 +47,7 @@ ThreadServerScript.prototype  = {
 
         // 板のタイプが、BOARD_TYPE_PAGE でも、
         // URL に /test/read.cgi/ を含んでいたら 2ch互換とみなす
-        if(type === ChaikaBoard.BOARD_TYPE_PAGE && threadURL.spec.contains("/test/read.cgi/")){
+        if(type === ChaikaBoard.BOARD_TYPE_PAGE && threadURL.spec.includes("/test/read.cgi/")){
             type = ChaikaBoard.BOARD_TYPE_2CH;
         }
 
@@ -173,7 +151,7 @@ Thread2ch.prototype = {
         return (this.thread.url.fileName.match(/\-(\d+)/)) ? parseInt(RegExp.$1) : null;
     },
     get optionsNoFirst(){
-        return this.thread.url.fileName.contains("n");
+        return this.thread.url.fileName.includes("n");
     },
 
     init: function(aHandler, aThreadURL, aBoardURL, aType){
@@ -185,7 +163,7 @@ Thread2ch.prototype = {
         this._chainAboneNumbers = [];
         this._chainHideAboneNumbers = [];
 
-        this._disableAbone = aThreadURL.query.contains('chaika_disable_abone=1');
+        this._disableAbone = aThreadURL.query.includes('chaika_disable_abone=1');
         this._enableChainAbone = !this._disableAbone && ChaikaCore.pref.getBool("thread_chain_abone");
         this._enableHideAbone = !this._disableAbone && ChaikaCore.pref.getBool('thread_hide_abone');
         this._showBeIcon = ChaikaCore.pref.getBool("thread_show_be_icon");
@@ -384,7 +362,7 @@ Thread2ch.prototype = {
      */
     sanitizeHTML: function(aStr){
         //実体参照を保護する
-        aStr = aStr.replace("&#", "_&#_", "g")  // &#169; など
+        aStr = aStr.replace(/&#/g, "_&#_")  // &#169; など
                    .replace(/&([a-zA-Z0-9]+?);/g, '_&_$1;');  // &copy; など
 
         //sanitize
@@ -393,14 +371,14 @@ Thread2ch.prototype = {
         var sanitizedStr = this._serializer.serializeToString(fragment);
 
         //serializeで余計に挿入されるxmlns属性を削除
-        sanitizedStr = sanitizedStr.replace(' xmlns="http://www.w3.org/1999/xhtml"', '', 'g');
+        sanitizedStr = sanitizedStr.replace(/ xmlns="http:\/\/www\.w3\.org\/1999\/xhtml"/g, '');
 
         //実体参照を元に戻す
-        sanitizedStr = sanitizedStr.replace("_&amp;#_", "&#", "g")
+        sanitizedStr = sanitizedStr.replace(/_&amp;#_/g, "&#")
                                    .replace(/_&amp;_([a-zA-Z0-9]+?);/g, '&$1;');
 
         // <br /> をもとに戻す
-        sanitizedStr = sanitizedStr.replace('<br />', '<br>', 'g');
+        sanitizedStr = sanitizedStr.replace(/<br \/>/g, '<br>');
 
         return sanitizedStr;
     },
@@ -415,8 +393,8 @@ Thread2ch.prototype = {
         var resMail = "";
         var resDate = "BROKEN";
         var resID = "";
-        var resBeID = 0;
-        var resBeBaseID = 0;
+        var resBeID = '';
+        var resBeBaseID = '';
         var resBeLink = "";
         var resIP = "";
         var resHost = "";
@@ -449,11 +427,11 @@ Thread2ch.prototype = {
 
 
         //特殊な名前欄の置換
-        resName = resName.replace("</b>", '<span class="resSystem">', "g")
-                            .replace("<b>", "</span>", "g");
+        resName = resName.replace(/<\/b>/g, '<span class="resSystem">')
+                            .replace(/<b>/g, "</span>");
 
         //日付中のHTMLを除去
-        if(resDate.contains("<")){
+        if(resDate.includes("<")){
             resDate = this.htmlToText(resDate);
         }
 
@@ -466,27 +444,27 @@ Thread2ch.prototype = {
 
 
         // resDate を DATE と BeID に分割
-        if(resDate.contains('BE:') && resDate.match(/(.+)BE:([^ ]+)/)){
+        if(resDate.includes('BE:') && resDate.match(/(.+)BE:([^ ]+)/)){
             resDate = RegExp.$1;
             resBeLink = RegExp.$2;
         }
 
         // resDate を DATE と 発信元 に分割
         // \x94\xad \x90\x4d \x8c\xb3 = 発信元
-        if(resDate.contains('\x94\xad\x90\x4d\x8c\xb3:') &&
+        if(resDate.includes('\x94\xad\x90\x4d\x8c\xb3:') &&
            resDate.match(/(.+)\x94\xad\x90\x4d\x8c\xb3:([\d\.]+)/)){
             resDate = RegExp.$1;
             resIP = RegExp.$2;
         }
 
         // resDate を DATE と HOST に分割
-        if(resDate.contains('HOST:') && resDate.match(/(.+)HOST:([^ ]+)/)){
+        if(resDate.includes('HOST:') && resDate.match(/(.+)HOST:([^ ]+)/)){
             resDate = RegExp.$1;
             resHost = RegExp.$2;
         }
 
         // resDate を DATE と ID に分割
-        if(resDate.contains('ID:') && resDate.match(/(.+)ID:([^ ]+)/)){
+        if(resDate.includes('ID:') && resDate.match(/(.+)ID:([^ ]+)/)){
             resDate = RegExp.$1;
             resID = RegExp.$2;
         }
@@ -498,21 +476,25 @@ Thread2ch.prototype = {
         if(resBeLink){
             // 2ch Be の不具合により BeID が数値でなくなる場合があるので,
             // 正規表現にマッチしない可能性も考慮する必要がある
-            resBeID = resBeLink.match(/^\d+/) ? RegExp.lastMatch - 0 : -1;
+            resBeID = resBeLink.match(/^\d+/) || '';
 
-            //BeIDのリンク処理
-            resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
+            if(resBeID){
+                resBeID = resBeID[0];
 
-            // Be基礎番号を取得
-            // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
-            // let centesimalBeNumber = Math.floor(resBeID / 100);
-            // let deciBeNumber = Math.floor(resBeID / 10);
-            // resBeBaseID = ( centesimalBeNumber + deciBeNumber % 10 - resBeID % 10 - 5 ) /
-            //                                ( (deciBeNumber % 10) * (resBeID % 10) * 3 );
-            //
-            // Be 2.0 では基礎番号は廃止されたので、BeID をそのまま用いることにする
-            // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
-            resBeBaseID = resBeID;
+                //BeIDのリンク処理
+                resBeLink = "<a href='http://be.2ch.net/test/p.php?i=" + resBeID + "'>" + resBeLink + '</a>';
+
+                // Be基礎番号を取得
+                // refs http://qb5.2ch.net/test/read.cgi/operate/1296265910/569
+                // let centesimalBeNumber = Math.floor(resBeID / 100);
+                // let deciBeNumber = Math.floor(resBeID / 10);
+                // resBeBaseID = ( centesimalBeNumber + deciBeNumber % 10 - resBeID % 10 - 5 ) /
+                //                                ( (deciBeNumber % 10) * (resBeID % 10) * 3 );
+                //
+                // Be 2.0 では基礎番号は廃止されたので、BeID をそのまま用いることにする
+                // http://qb5.2ch.net/test/read.cgi/operate/1396689383/50
+                resBeBaseID = resBeID;
+            }
         }
 
 
@@ -709,7 +691,7 @@ Thread2ch.prototype = {
             if(!fixInvalidAnchor){
                 // > 一つなど不正なアンカの場合, 2ch 側ではリンクが貼られていないので
                 // 末尾に </a> を補って通常アンカの場合と同じ状態にする
-                if(!ancBody.contains('</a>')){
+                if(!ancBody.includes('</a>')){
                     ancBody += '</a>';
                 }
 
@@ -747,7 +729,7 @@ Thread2ch.prototype = {
 
 
         // 通常リンク処理
-        if(resMes.contains("ttp")){
+        if(resMes.includes("ttp")){
             var regUrlLink = /(h?ttp)(s)?\:([\-_\.\!\~\*\'\(\)a-zA-Z0-9\;\/\?\:\@\&\=\+\$\,\%\#\|]+)/g;
 
             if(ChaikaHttpController.ivur.enabled){
@@ -755,7 +737,7 @@ Thread2ch.prototype = {
                     const url = 'http' + (aSecure || '') + ':' + aSpec;
                     const image_url = ChaikaHttpController.ivur.replaceURL(url);
 
-                    return '<a href="' + image_url + '" class="outLink">' + url + '</a>';
+                    return '<a href="' + image_url + '" class="outLink">' + aStr + '</a>';
                 });
             }else{
                 resMes = resMes.replace(regUrlLink, '<a href="http$2:$3" class="outLink">$1$2:$3</a>');
@@ -782,13 +764,12 @@ Thread2ch.prototype = {
             }
         });
 
-
         return this.converter.getResponse(aNew, resNumber, resName, resMail, resMailName, resDate,
                                           resID, resIP, resHost, resBeLink, resBeID, resBeBaseID, resMes, isAbone, ngData);
     },
 
 
-    datDownload: function(aKako){
+    datDownload: function(aKako, aDisableRange){
         this._maruMode = false;
         this._mimizunMode = false;
 
@@ -840,15 +821,21 @@ Thread2ch.prototype = {
         this._aboneChecked = true;
         this._threadAbone = false;
 
-        // 差分GET
-        if(this.thread.datFile.exists() && this.thread.lastModified){
-            let lastModified = this.thread.lastModified;
-            let range = this.thread.datFile.fileSize - 1;  //あぼーんされたか調べるために1byte余計に取得する
+        // Set If-Modified-Since
+        if(this.thread.lastModified){
+            this.httpChannel.setRequestHeader("If-Modified-Since", this.thread.lastModified, false);
+        }
+
+        if(!aDisableRange && this.thread.datFile.exists()){
+            // 差分 GET
+            // あぼーんされたか調べるために1byte余計に取得する
+            let begin = this.thread.datFile.fileSize - 1;
+
             this.httpChannel.setRequestHeader("Accept-Encoding", "", false);
-            this.httpChannel.setRequestHeader("If-Modified-Since", lastModified, false);
-            this.httpChannel.setRequestHeader("Range", "bytes=" + range + "-", false);
+            this.httpChannel.setRequestHeader("Range", "bytes=" + begin + "-", false);
             this._aboneChecked = false;
         }else{
+            // 全取得
             this.httpChannel.setRequestHeader("Accept-Encoding", "gzip", false);
         }
 
@@ -989,8 +976,7 @@ Thread2ch.prototype = {
                 this.close();
                 return;
             case 416: //あぼーん
-                this.write(this.converter.getFooter("abone"));
-                this.close();
+                this._onThreadCollapsed();
                 return;
             default: // HTTP エラー
                 this.write(this.converter.getFooter(httpStatus));
@@ -998,9 +984,9 @@ Thread2ch.prototype = {
                 return;
         }
 
-        if(this._threadAbone){ //あぼーん
-            this.write(this.converter.getFooter("abone"));
-            this.close();
+        //あぼーん発生時
+        if(this._threadAbone){
+            this._onThreadCollapsed();
             return;
         }
 
@@ -1020,6 +1006,32 @@ Thread2ch.prototype = {
         this.close();
         this._data = null;
     },
+
+
+    /**
+     * あぼーんが発生して dat が正常に差分取得できなくなったときに呼ばれる
+     */
+    _onThreadCollapsed: function(){
+        if(ChaikaCore.pref.getBool('dat.self-repair.enabled')){
+            // dat の自動修復
+            ChaikaCore.logger.warning('The dat file of this thread seems to be collapsed. ' +
+                                      'Recapture the whole dat to repair.');
+
+            this.thread.lineCount = this._logLineCount;
+            this._readLogCount = this._logLineCount;
+            this.datDownload(false, true);
+
+            // dat が壊れる (あぼーんされた部分が残っている dat になってしまうので, 次回の range がおかしくなる)
+            // ため, うらで dat を取得しなおして置き換える
+            //    (dat の取得処理とブラウザへの出力処理が分離されていないので応急処置)
+            let downloader = new ChaikaDownloader(this.thread.datURL, this.thread.datFile);
+            downloader.download();
+        }else{
+            this.write(this.converter.getFooter("abone"));
+            this.close();
+        }
+    },
+
 
     datSave: function(aDatContent){
                 // 書き込みのバッティングを避ける
@@ -1133,7 +1145,7 @@ ThreadJbbs.prototype = Object.create(Thread2ch.prototype, {
             line = [
                 resName,
                 resMail,
-                resDate + ' ID:' + resID,
+                resDate + (resID ? ' ID:' + resID : ''),
                 resMes,
                 threadTitle
             ].join('<>');
@@ -1459,7 +1471,7 @@ ThreadConverter.prototype = {
         }
 
         // 旧仕様の互換性確保
-        if(!this._tmpFooter.contains('<STATUS/>')){
+        if(!this._tmpFooter.includes('<STATUS/>')){
             this._tmpFooter = '<p class="info"><STATUS/></p>\n' + this._tmpFooter;
         }
     },
@@ -1485,8 +1497,8 @@ ThreadConverter.prototype = {
      * @param aString string 置換される文字列
      */
     _replaceBaseTag: function(aString){
-        var skinURISpec = ChaikaCore.getServerURL().resolve("./skin/");
-        var serverURLSpec = ChaikaCore.getServerURL().resolve("./thread/");
+        var skinURISpec = ChaikaServer.serverURL.resolve("./skin/");
+        var serverURLSpec = ChaikaServer.serverURL.resolve("./thread/");
         var fontName = ChaikaCore.pref.getUniChar("thread_font_name");
         var fontSize = ChaikaCore.pref.getInt("thread_font_size");
         var aaFontName = ChaikaCore.pref.getUniChar("thread_aa_font_name");
@@ -1559,7 +1571,7 @@ ThreadConverter.prototype = {
             //置換文字列で特殊な意味を持つ$をエスケープする
             for(let i=0, l=arguments.length; i<l; i++){
                 if(typeof arguments[i] === 'string'){
-                    arguments[i] = arguments[i].replace('$', '&#36;', 'g');
+                    arguments[i] = arguments[i].replace(/\$/g, '&#36;');
                 }
             }
 
@@ -1591,19 +1603,19 @@ ThreadConverter.prototype = {
 
         var template = aNew ? this._tmpNewRes : this._tmpRes;
 
-        if(aIP && !template.contains('<IP/>')){
+        if(aIP && !template.includes('<IP/>')){
             aDate = aDate + " \x94\xad\x90\x4d\x8c\xb3:" + aIP;
         }
 
-        if(aHost && !template.contains('<HOST/>')){
+        if(aHost && !template.includes('<HOST/>')){
             aDate = aDate + " HOST:" + aHost;
         }
 
-        if(aID && !template.contains('<ID/>')){
+        if(aID && !template.includes('<ID/>')){
             aDate = aDate + " ID:" + aID;
         }
 
-        if(aBeLink && !template.contains('<BEID/>')){
+        if(aBeLink && !template.includes('<BEID/>')){
             aDate = aDate + " Be:" + aBeLink;
         }
 
@@ -1623,10 +1635,10 @@ ThreadConverter.prototype = {
             aID = aBeID = aIP = aHost = "";
         }
 
-        var resIDColor = template.contains('<IDCOLOR/>') ?
+        var resIDColor = template.includes('<IDCOLOR/>') ?
                             this._id2Color.getColor(aID, false) : "inherit";
 
-        var resIDBgColor = template.contains('<IDBACKGROUNDCOLOR/>') ?
+        var resIDBgColor = template.includes('<IDBACKGROUNDCOLOR/>') ?
                                 this._id2Color.getColor(aID, true) : "inherit";
 
         //AAレス
@@ -1659,7 +1671,7 @@ ThreadConverter.prototype = {
         var lineCount = aMessage.match(/<br>/g);
 
         if(lineCount && lineCount.length >= 3){
-            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ￣
+            // \x81\x40 = 全角空白, \x81F = ：, \x81b = ｜, \x84\xab = ┃, \x81P = ‾
             // \x81\x5e = ／, \x81_ = ＼, \x84\xaa = ━, \x81i = （, \x81j = ）
             // 半角空白は、英文中に多く含まれるためカウントから外す
             let aaSymbols = /(?:\x81\x40|\x81F|\x81b|\x84\xab|\x81P|\x81\x5e|\x81_|\x84\xaa|\x81i|\x81j|[^\x81-\xfc][_:;\|\/\\\(\)])/g;

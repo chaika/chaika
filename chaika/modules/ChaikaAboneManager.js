@@ -1,15 +1,26 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
+this.EXPORTED_SYMBOLS = ["ChaikaAboneManager"];
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import('resource://chaika-modules/utils/Browser.js');
 
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 
-var ChaikaAboneManager = {
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
+
+
+this.ChaikaAboneManager = {
 
     /** あぼーんの種類を表す定数 */
 
@@ -132,7 +143,7 @@ AboneData.prototype = {
      * @see ChaikaAboneManager.shouldAbone
      */
     shouldAbone: function(aResData){
-        return aResData && this._data.find((ngData) => aResData.contains(ngData));
+        return aResData && this._data.find((ngData) => aResData.includes(ngData));
     },
 
 
@@ -150,10 +161,12 @@ AboneData.prototype = {
         this._data.push(aWord);
 
         //通知する
-        let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-        type.data = this._ngType;
-
-        Services.obs.notifyObservers(type, "chaika-abone-data-add", aWord);
+        Browser.getGlobalMessageManager().broadcastAsyncMessage(
+            'chaika-abone-add', {
+                type: this._ngType,
+                data: aWord
+            }
+        );
     },
 
     remove: function(aWord){
@@ -163,10 +176,12 @@ AboneData.prototype = {
             this._data.splice(index, 1);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-remove", aWord);
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-remove', {
+                    type: this._ngType,
+                    data: aWord
+                }
+            );
         }
     },
 
@@ -348,10 +363,10 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
 
                 switch(aRule.condition){
                     case 'contains':
-                        return target.contains(aRule.query);
+                        return target.includes(aRule.query);
 
                     case 'notContain':
-                        return !target.contains(aRule.query);
+                        return !target.includes(aRule.query);
 
                     case 'equals':
                         return target === aRule.query;
@@ -397,10 +412,12 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj.push(aNGData);
 
             //通知する
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonData);
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-add', {
+                    type: this._ngType,
+                    data: jsonData
+                }
+            );
         }
     },
 
@@ -418,10 +435,12 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
                 this._dataObj.splice(index, 1);
 
                 //通知する
-                let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-                type.data = this._ngType;
-
-                Services.obs.notifyObservers(type, "chaika-abone-data-remove", aNGData);
+                Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                    'chaika-abone-remove', {
+                        type: this._ngType,
+                        data: aNGData
+                    }
+                );
             }
         }
     },
@@ -455,48 +474,22 @@ NGExAboneData.prototype = Object.create(AboneData.prototype, {
             this._dataObj[index] = newData;
 
 
-            let type = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
-            type.data = this._ngType;
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-remove', {
+                    type: this._ngType,
+                    data: oldData
+                }
+            );
 
-
-            Services.obs.notifyObservers(type, "chaika-abone-data-remove", oldData);
-            Services.obs.notifyObservers(type, "chaika-abone-data-add", jsonNewData);
+            Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                'chaika-abone-add', {
+                    type: this._ngType,
+                    data: jsonNewData
+                }
+            );
         }
     },
 
 });
 
 NGExAboneData.constructor = NGExAboneData;
-
-
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
-}

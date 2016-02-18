@@ -48,7 +48,7 @@ var Trip = {
         cryptoHash.init(Ci.nsICryptoHash.SHA1);
         cryptoHash.update(data, data.length);
 
-        return cryptoHash.finish(true).substring(0,12).replace("+", ".", "g");
+        return cryptoHash.finish(true).substring(0,12).replace(/\+/g, ".");
     },
 
 

@@ -1,16 +1,19 @@
 /* See license.txt for terms of usage */
 
-EXPORTED_SYMBOLS = ["ChaikaSearch"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://gre/modules/Services.jsm");
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+'use strict';
+
+this.EXPORTED_SYMBOLS = ["ChaikaSearch"];
 
 const { classes: Cc, interfaces: Ci, utils: Cu, results: Cr } = Components;
+
+let { Services } = Cu.import("resource://gre/modules/Services.jsm", {});
+let { ChaikaCore } = Cu.import("resource://chaika-modules/ChaikaCore.js", {});
+
 
 /**
  * chaika のスレッド検索を行うクラス
  */
-var ChaikaSearch = {
+this.ChaikaSearch = {
 
     /**
      * 検索プラグインオブジェクトが入る配列
@@ -26,71 +29,19 @@ var ChaikaSearch = {
 
     /** @private **/
     _startup: function(){
-        this._loadPlugins();
-        this._updatePlugins();
-    },
-
-
-    /**
-     * プラグインのアップデート処理を行う
-     */
-    _updatePlugins: function(){
-        let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
-        let pluginFolder = this._getPluginFolder();
-        let hasUpdate = false;
-
-        this.plugins.forEach(plugin => {
-            if(!plugin.version || !plugin.updateURL) return;
-
-            let updateURL = plugin.updateURL;
-
-            if(updateURL.contains('%%ChaikaDefaultsDir%%')){
-                let defaultsDir = ChaikaCore.getDefaultsDir();
-                let defaultsDirSpec = fph.getURLSpecFromActualFile(defaultsDir);
-
-                updateURL = updateURL.replace('%%ChaikaDefaultsDir%%', defaultsDirSpec);
-            }
-
-            let remotePlugin = this._loadPluginFromURL(updateURL);
-
-            if(Services.vc.compare(plugin.version, remotePlugin.version) < 0){
-                ChaikaCore.logger.debug(plugin.name, 'needs to be updated.',
-                                        'old:', plugin.version, 'new:', remotePlugin.version);
-
-                //いまのところ file:// スキーム以外は未対応
-                if(!updateURL.startsWith('file://')) return;
-
-                let fileName = updateURL.match(/[^\/]+$/)[0];
-                let oldFile = pluginFolder.clone();
-                let newFile = fph.getFileFromURLSpec(updateURL);
-
-                oldFile.appendRelativePath(fileName);
-                oldFile.remove(false);
-                newFile.copyTo(oldFile.parent, null);
-
-                ChaikaCore.logger.debug('Successfully updated.');
-                hasUpdate = true;
-            }
-        });
-
-        if(hasUpdate){
-            ChaikaCore.logger.debug('All search plugins are now up-to-date. Reload the plugins...');
-            this._loadPlugins();
-        }
+        // Load the third-party plugins first so that they can override the default plugins.
+        this._loadPlugins(this._getUserPluginsFolder());
+        this._loadPlugins(this._getDefaultPluginsFolder());
     },
 
 
     /**
      * 検索プラグインを読み込む
      */
-    _loadPlugins: function(){
+    _loadPlugins: function(pluginFolder){
         const pluginExtReg = /\.search\.js$/;
         let fph = Cc["@mozilla.org/network/protocol;1?name=file"].createInstance(Ci.nsIFileProtocolHandler);
-
-        let pluginFolder = this._getPluginFolder();
         let files = pluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
-
-        this.plugins.length = 0;
 
         while(true){
             let file = files.nextFile;
@@ -100,7 +51,14 @@ var ChaikaSearch = {
                 let url = fph.getURLSpecFromActualFile(file);
                 let plugin = this._loadPluginFromURL(url);
 
-                if(plugin){
+                // Migration: remove the old files.
+                if(plugin && plugin.updateURL && plugin.updateURL.contains('%%ChaikaDefaultsDir%%')){
+                    file.remove(false);
+                    continue;
+                }
+
+                // Don't load the plugin whose id is already existed.
+                if(plugin && !this.getPlugin(plugin.id)){
                     this.plugins.push(plugin);
                 }
             }
@@ -138,44 +96,31 @@ var ChaikaSearch = {
 
 
     /**
-     * 検索プラグインフォルダを返す
+     * 組み込みの検索プラグインフォルダを返す
+     * @return {nsFile}
+     */
+    _getDefaultPluginsFolder: function(){
+        let folder = ChaikaCore.getDefaultsDir();
+        folder.appendRelativePath('search');
+
+        return folder;
+    },
+
+
+    /**
+     * サードパーティ検索プラグインフォルダを返す
      * なければ作成する
      * @return {nsFile}
      */
-    _getPluginFolder: function(){
-        let pluginFolder = ChaikaCore.getDataDir();
-        pluginFolder.appendRelativePath('search');
+    _getUserPluginsFolder: function(){
+        let folder = ChaikaCore.getDataDir();
+        folder.appendRelativePath('search');
 
-        let origPluginFolder = ChaikaCore.getDefaultsDir();
-        origPluginFolder.appendRelativePath('search');
-
-
-        if(!pluginFolder.exists()){
-            //フォルダがまだ存在しない場合には、
-            //defaults フォルダからコピーしてくる
-            origPluginFolder.copyTo(ChaikaCore.getDataDir(), null);
-        }else{
-            //新規に追加されたデフォルトプラグインをコピーする
-
-            let entries = origPluginFolder.directoryEntries.QueryInterface(Ci.nsIDirectoryEnumerator);
-
-            while(true){
-                let origPlugin = entries.nextFile;
-                if(!origPlugin) break;
-
-                let plugin = pluginFolder.clone();
-                plugin.appendRelativePath(origPlugin.leafName);
-
-                if(!plugin.exists()){
-                    origPlugin.copyTo(pluginFolder, null);
-                }
-            }
-
-            entries.close();
+        if(!folder.exists()){
+            folder.create(Ci.nsIFile.DIRECTORY_TYPE, Number.parseInt('0755', 8));
         }
 
-
-        return pluginFolder;
+        return folder;
     },
 
 
@@ -244,7 +189,7 @@ var ChaikaSearchPlugin = {
      *
      * 検索結果を取得する用途がない場合、null を指定する
      *
-     * @param {String} term 検索文字列 (URIEncode はされていないが, '<' などは ChaikaIO#escapeHTML により実体参照化されている)
+     * @param {String} query 検索文字列 (URIEncode はされていないが, '<' などは ChaikaIO#escapeHTML により実体参照化されている)
      * @return {Promise} - 成功時: 以下のようなオブジェクトの配列を返す必要がある
      *     [
      *         {
@@ -260,39 +205,6 @@ var ChaikaSearchPlugin = {
      *     ]
      *                    - 失敗時: エラーオブジェクトを返す必要がある
      */
-    search: function(term){},
+    search: function(query){},
 
 };
-
-
-//Polyfill for Firefox 24
-//Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find
-if (!Array.prototype.find) {
-    Object.defineProperty(Array.prototype, 'find', {
-        enumerable: false,
-        configurable: true,
-        writable: true,
-        value: function(predicate) {
-            if (this == null) {
-                throw new TypeError('Array.prototype.find called on null or undefined');
-            }
-            if (typeof predicate !== 'function') {
-                throw new TypeError('predicate must be a function');
-            }
-            var list = Object(this);
-            var length = list.length >>> 0;
-            var thisArg = arguments[1];
-            var value;
-
-            for (var i = 0; i < length; i++) {
-                if (i in list) {
-                    value = list[i];
-                    if (predicate.call(thisArg, value, i, list)) {
-                        return value;
-                    }
-                }
-            }
-            return undefined;
-        }
-    });
-}

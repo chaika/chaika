@@ -1,7 +1,7 @@
 /* See license.txt for terms of usage */
 
 
-EXPORTED_SYMBOLS = ["ChaikaBoard"];
+this.EXPORTED_SYMBOLS = ["ChaikaBoard"];
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
@@ -9,6 +9,16 @@ Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 const Ci = Components.interfaces;
 const Cc = Components.classes;
 const Cr = Components.results;
+
+
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
 
 
 /** @ignore */
@@ -889,6 +899,8 @@ ChaikaBoard.getBoardType = function ChaikaBoard_getBoardType(aURL){
 
     if(EX_HOSTS.indexOf(aURL.host) != -1) return ChaikaBoard.BOARD_TYPE_PAGE;
 
+        // Be Profile Page
+    if(aURL.spec.includes('http://be.2ch.net/test/p.php')) return ChaikaBoard.BOARD_TYPE_PAGE;
         // Be@2ch.net
     if(aURL.host == "be.2ch.net") return ChaikaBoard.BOARD_TYPE_BE2CH;
         // 2ch.net

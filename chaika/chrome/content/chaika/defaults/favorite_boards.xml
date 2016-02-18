@@ -8,9 +8,13 @@
 
 <bbsmenu>
 <!--
-	<category title="パート速報">
-	    <board title="パート速報VIP" url="http://ex14.vip2ch.com/part4vip/" type="0" />
-        <board title="SS速報VIP" url="http://ex14.vip2ch.com/news4ssnip/" type="0" />
-	</category>
+    # 他掲示板の BBSMENU をインポートする場合
+    <bbsmenu src="http://open2ch.net" charset="utf-8" />
+
+    # フォルダをつくり、板を個別に追加する場合
+    <category title="パート速報">
+        <board title="パート速報VIP" url="http://ex14.vip2ch.com/part4vip/" />
+        <board title="SS速報VIP" url="http://ex14.vip2ch.com/news4ssnip/" />
+    </category>
 -->
 </bbsmenu>

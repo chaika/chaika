@@ -17,6 +17,7 @@
     <implementation>
         <constructor><![CDATA[
             Components.utils.import("resource://chaika-modules/ChaikaCore.js", this);
+            Components.utils.import('resource://chaika-modules/utils/Browser.js', this);
 
             //読み込み時にメニューを構築しておかないと、
             //設定画面のmenulistが初期状態で空になってしまう
@@ -67,7 +68,7 @@
                 skinDir.appendRelativePath("skin");
 
                 if(!skinDir.exists()){
-                    skinDir.create(Ci.nsIFile.DIRECTORY_TYPE, 0755);
+                    skinDir.create(Components.interfaces.nsIFile.DIRECTORY_TYPE, 0755);
                 }
 
                 let entries = skinDir.directoryEntries.QueryInterface(Components.interfaces.nsIDirectoryEnumerator);
@@ -129,10 +130,11 @@
             <body><![CDATA[
                 this.ChaikaCore.pref.setUniChar('thread_skin', aSkinName);
 
-                let os = Components.classes["@mozilla.org/observer-service;1"]
-                                    .getService(Components.interfaces.nsIObserverService);
-
-                os.notifyObservers(null, "chaika-skin-changed", aSkinName);
+                if(this.ChaikaCore.pref.getBool('browser.browsermenu.reload_when_skin_changed')){
+                    this.Browser.getGlobalMessageManager().broadcastAsyncMessage(
+                        'chaika-skin-changed', { name: aSkinName }
+                    );
+                }
             ]]></body>
         </method>
 

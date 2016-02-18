@@ -50,12 +50,14 @@ var gBbsmenuPane = {
         let menupopup = document.createElement('menupopup');
 
         ChaikaSearch.plugins.forEach(plugin => {
-            if(!plugin.search) return;
-
             let menuitem = document.createElement('menuitem');
 
             menuitem.setAttribute('label', plugin.name);
             menuitem.setAttribute('value', plugin.id);
+
+            if(!plugin.search){
+                menuitem.setAttribute('disabled', 'true');
+            }
 
             menupopup.appendChild(menuitem);
         });
@@ -72,9 +74,37 @@ var gBbsmenuPane = {
         ChaikaCore.io.reveal(pluginDir);
     },
 
-    resetBbsmenuURL: function(){
+    resetBBSMenuURL: function(){
         var pref = document.getElementById("extensions.chaika.bbsmenu.bbsmenu_html_url");
         pref.value = pref.defaultValue;
+    },
+
+    addFavoriteBoard: function(){
+        let favBoardFile = ChaikaCore.getDataDir();
+        favBoardFile.appendRelativePath('favorite_boards.xml');
+
+        if(ChaikaCore.pref.getBool('bbsmenu.open_favs_in_scratchpad')){
+            try{
+                var { ScratchpadManager } = Cu.import('resource:///modules/devtools/scratchpad-manager.jsm', {});
+            }catch(ex){
+                // Firefox 44+ (See https://bugzilla.mozilla.org/show_bug.cgi?id=912121)
+                var { ScratchpadManager } = Cu.import('resource://devtools/client/scratchpad/scratchpad-manager.jsm', {});
+            }
+            let win = ScratchpadManager.openScratchpad();
+
+            win.addEventListener('load', () => {
+                win.Scratchpad.addObserver({
+                    onReady: () => {
+                        win.Scratchpad.removeObserver(this);
+                        win.Scratchpad.importFromFile(favBoardFile, false, () => {
+                            win.Scratchpad.editor.setMode({ name: 'xml' });
+                        });
+                    }
+                });
+            });
+        }else{
+            this._openFile(favBoardFile);
+        }
     }
 
 };

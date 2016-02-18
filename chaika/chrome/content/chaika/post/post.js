@@ -91,7 +91,7 @@ Post.prototype = {
         if(ChaikaCore.pref.getBool('post.warn_fusianasan')){
             var name = this.name || this._board.getSetting("BBS_NONAME_NAME") || "";
             if(name){
-                name = name.replace("&r", "", "g");
+                name = name.replace(/&r/g, "");
                 if(name.indexOf("fusianasan") != -1){
                     result.push("fusianasan トラップ (リモートホストが表示されます)");
                 }
@@ -138,20 +138,15 @@ Post.prototype = {
         var preview = {};
 
         var board = this._board;
+
         function getSetting(aSettingName){
             return board.getSetting(aSettingName);
         }
 
-        function convertEntity(aStr){
-            return aStr.replace("&", "&amp;", "g")
-                        .replace("<", "&lt;", "g")
-                        .replace(">", "&gt;", "g");
-        }
+        preview["title"]   = ChaikaCore.io.escapeHTML(this.getThreadTitle());
 
-        preview["title"]   = convertEntity(this.getThreadTitle());
-
-        preview["mail"]    = convertEntity(this.mail);
-        preview["message"] = convertEntity(this.message).replace("\n", "<br>", "g");
+        preview["mail"]    = ChaikaCore.io.escapeHTML(this.mail);
+        preview["message"] = ChaikaCore.io.escapeHTML(this.message).replace(/\n/g, "<br>");
 
         preview["bgColor"]   = getSetting("BBS_THREAD_COLOR") || "#EFEFEF";
         preview["color"]     = getSetting("BBS_TEXT_COLOR") || "#000000";
@@ -162,8 +157,8 @@ Post.prototype = {
         preview["vlinkColor"] = getSetting("BBS_VLINK_COLOR");
 
 
-        var name = convertEntity(this.name || getSetting("BBS_NONAME_NAME") || "");
-        name = name.replace("◆", "◇", "g");
+        var name = ChaikaCore.io.escapeHTML(this.name || getSetting("BBS_NONAME_NAME") || "");
+        name = name.replace(/◆/g, "◇");
 
 
         // トリップ変換
@@ -528,8 +523,8 @@ PostP2.prototype = Object.create(Post.prototype, {
 
             var bbs, host;
 
-            if(this._board.url.host.contains('jbbs.livedoor.jp') ||
-               this._board.url.host.contains('jbbs.shitaraba.net')){
+            if(this._board.url.host.includes('jbbs.livedoor.jp') ||
+               this._board.url.host.includes('jbbs.shitaraba.net')){
                 bbs = this._board.url.directory.match(/\/([^\/]+)\/?$/)[1];
                 host = this._board.url.host + '%2F' + this._board.url.directory.match(/\/([^\/]+)\/?/)[1];
             }else{

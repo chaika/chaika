@@ -36,6 +36,11 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
+
+let { Browser } = Cu.import('resource://chaika-modules/utils/Browser.js', {});
+let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
@@ -43,41 +48,52 @@ Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js");
 Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
-
 var gBoard;
 var gSubjectDownloader;
 var gSettingDownloader;
 var gBoardMoveChecker;
 var gNewURL;
+var gPageReloaded = false;
 
 /**
  * 開始時の処理
  */
 function startup(){
+    gPageReloaded = false;
+    if(location.protocol === 'chaika:'){
+        console.info('This page is loaded in the content process. Reload!');
+
+        let boardXUL = 'chrome://chaika/content/board/page.xul';
+        let boardURI = location.pathname.substring(1);
+        let params = new URL(location.href).searchParams;
+
+        params.set('url', boardURI);
+
+        location.href = boardXUL + '?' + params;
+        return;
+    }
+    gPageReloaded = true;
+
     PrefObserver.start();
 
-    document.title = location.href;
-    document.getElementById("lblTitle").setAttribute("value", location.href);
+    let params = new URL(location.href).searchParams;
+    let boardURI = params.get('url');
 
-        // chrome から呼ばれたら止める
-    if(location.href.match(/^chrome:/)){
-        alert("BAD URL");
+    if(!boardURI){
+        alert('板 URL が指定されていません．');
         return;
     }
 
-        // 板一覧URLの取得
-    var boardURLSpec = location.pathname.substring(1);
+    document.title = boardURI;
+    document.getElementById("lblTitle").setAttribute("value", boardURI);
 
     try{
         var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-        var boardURL = ioService.newURI(boardURLSpec, null, null);
+        var boardURL = ioService.newURI(boardURI, null, null);
         gBoard = new ChaikaBoard(boardURL);
     }catch(ex){
         // 認識できない URL
-        alert("BAD URL");
+        alert('サポートされていない種類の板です．');
         return;
     }
 
@@ -112,14 +128,12 @@ function startup(){
 
 
     //Search Queryが指定されていた時は始めから絞り込んでおく
-    if(location.search){
-        var query = location.search.match(/query=([^&]+)/);
+    var query = params.get('query');
 
-        if(query){
-            var searchBox = document.getElementById('searchTextBox');
-            searchBox.value = decodeURIComponent(query[1]);
-            BoardTree.initTree(true);
-        }
+    if(query){
+        var searchBox = document.getElementById('searchTextBox');
+        searchBox.value = decodeURIComponent(query);
+        BoardTree.initTree(true);
     }
 }
 
@@ -127,6 +141,8 @@ function startup(){
  * 終了時の処理
  */
 function shutdown(){
+    if(!gPageReloaded) return;
+
     PrefObserver.stop();
 
     if(!BoardTree.firstInitBoardTree){
@@ -238,9 +254,10 @@ var BoardTree = {
 
     initTree: function BoardTree_initTree(aNoFocus){
         this.tree = document.getElementById("boardTree");
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
 
+        this.changeTreeSize();
         setPageTitle();
+
         if(this.firstInitBoardTree){
             ChaikaCore.history.visitPage(gBoard.url,
                     ChaikaBoard.getBoardID(gBoard.url), gBoard.getTitle(), 0);
@@ -259,7 +276,7 @@ var BoardTree = {
             searchStr = "%" + searchStr + "%";
             gBoard.refresh(gBoard.FILTER_LIMIT_SEARCH, searchStr);
         }else{
-            var filterLimit = Number(document.getElementById("filterGroup").getAttribute("value"));
+            var filterLimit = Number(document.getElementById("filterGroup").value);
             gBoard.refresh(filterLimit);
         }
 
@@ -348,8 +365,11 @@ var BoardTree = {
 
     changeTreeSize: function BoardTree_changeTreeSize(){
         this.tree.collapsed = true;
-        this.tree.setAttribute("treesize", ChaikaCore.pref.getChar("board.tree_size"));
-        setTimeout(function(){ BoardTree.tree.collapsed = false }, 0);
+
+        this.tree.className = this.tree.className.replace(/tree-text-\W+/g, '');
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
+
+        setTimeout(() => this.tree.collapsed = false, 0);
     },
 
     click: function BoardTree_click(aEvent){
@@ -377,7 +397,6 @@ var BoardTree = {
                 this.openThread(aEvent.ctrlKey || aEvent.altKey);
                 break;
 
-            case 'Spacebar':  // For Firefox 28-
             case ' ':
                 if(aEvent.shiftKey){
                     this.tree._moveByPage(-1, 0, aEvent);
@@ -521,7 +540,6 @@ var BoardTree = {
 };
 
 function setStatus(aString){
-    document.getElementById("statusDeck").selectedIndex = (aString) ? 1 : 0;
     document.getElementById("lblStatus").value = aString;
 }
 
@@ -618,7 +636,13 @@ function showBrowser(aTab){
     if(aTab){
         document.getElementById("popTools").hidePopup();
     }
-    ChaikaCore.browser.openURL(gBoard.url, aTab);
+
+    let url = URLUtils.unchaikafy(gBoard.url.spec);
+    let params = new URL(url).searchParams;
+
+    params.set('chaika_force_browser', 1);
+
+    Browser.open(url + '?' + params, aTab);
 }
 
 function openLogsDir(){

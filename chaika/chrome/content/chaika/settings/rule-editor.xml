@@ -110,48 +110,6 @@
                   onget="return document.getAnonymousElementByAttribute(this, 'anonid', 'root')" />
 
 
-        <!--
-        /**
-         * 直下の要素のみに対して querySelectorAll を実行する
-         * Firefox 31- では querySelector における :scope が実装されていないため
-         * その shim として使用する
-         *
-         * @param query {String} セレクタ文字列
-         * @param parent {Element} 親要素
-         * @return <Array.Element>
-         */
-        -->
-        <method name="_querySelectorAllForChildren">
-            <parameter name="query" />
-            <parameter name="parent" />
-            <body><![CDATA[
-                try{
-                    // For Firefox 32+
-                    return parent.querySelectorAll(query);
-                }catch(ex){
-                    // For Firefox 31- (much slower)
-                    function _query(query, parent){
-                        let queries = query.replace(':scope >', '', 'g').split('>');
-                        let children = Array.slice(parent.querySelectorAll(queries.shift()));
-
-                        children = children.filter((node) => node.parentNode === parent);
-
-                        if(!queries.length){
-                            return children;
-                        }else{
-                            return children.reduce((elems, elem) =>
-                                elems.concat(_query(queries.join('>'), elem))
-                            , []);
-                        }
-                    }
-
-                    return _query(query, parent);
-                }
-            ]]></body>
-        </method>
-
-
-
         <method name="handleEvent">
             <parameter name="aEvent"/>
             <body><![CDATA[
@@ -232,7 +190,7 @@
         <method name="removeItem">
             <parameter name="item"/>
             <body><![CDATA[
-                if(this._querySelectorAllForChildren(':scope > .rule, :scope > .group', item.parentNode).length !== 1){
+                if(item.parentNode.querySelectorAll(':scope > .rule, :scope > .group').length !== 1){
                     item.parentNode.removeChild(item);
                 }
             ]]></body>
@@ -253,9 +211,9 @@
                 var getGroupLabel = function(groupNode){
                     let groupLabel = '';
                     let match = groupNode.querySelector('caption > .match').selectedItem.label;
-                    let rules = this._querySelectorAllForChildren(':scope > .rules > :-moz-any(.rule, .group)', groupNode);
+                    let rules = groupNode.querySelectorAll(':scope > .rules > :-moz-any(.rule, .group)');
 
-                    groupLabel = Array.slice(rules).map((node) => {
+                    groupLabel = Array.from(rules).map((node) => {
                         if(node.classList.contains('rule')){
                             let target = node.querySelector('.rule-target').selectedItem.label;
                             let query = node.querySelector('.rule-query').value;
@@ -294,9 +252,9 @@
 
                     groupData.match = groupNode.querySelector('caption > .match').value;
 
-                    let rules = this._querySelectorAllForChildren(':scope > .rules > :-moz-any(.rule, .group)', groupNode);
+                    let rules = groupNode.querySelectorAll(':scope > .rules > :-moz-any(.rule, .group)');
 
-                    groupData.rules = Array.slice(rules).map((node) => {
+                    groupData.rules = Array.from(rules).map((node) => {
                         if(node.classList.contains('rule')){
                             return {
                                 target: node.querySelector('.rule-target').value,

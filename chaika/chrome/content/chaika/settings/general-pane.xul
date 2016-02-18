@@ -9,6 +9,19 @@
 <prefpane id="paneGeneral" onpaneload="gGeneralPane.startup()">
 
     <preferences>
+        <preference id="extensions.chaika.server.port"
+                    name="extensions.chaika.server.port"
+                    type="int" />
+        <preference id="extensions.chaika.server.port.retry"
+                    name="extensions.chaika.server.port.retry"
+                    type="bool" />
+        <preference id="extensions.chaika.server.port.randomization"
+                    name="extensions.chaika.server.port.randomization"
+                    type="bool" />
+        <preference id="extensions.chaika.http_proxy_mode"
+                    name="extensions.chaika.http_proxy_mode"
+                    type="int"
+                    onchange="setContainerDisabled(this.name, 'txtProxyValue', 2)"/>
         <preference id="extensions.chaika.warn_when_delete_log"
                     name="extensions.chaika.warn_when_delete_log"
                     type="bool"/>
@@ -25,10 +38,6 @@
         <preference id="extensions.chaika.historymenu.thread_max"
                     name="extensions.chaika.historymenu.thread_max"
                     type="int"/>
-        <preference id="extensions.chaika.http_proxy_mode"
-                    name="extensions.chaika.http_proxy_mode"
-                    type="int"
-                    onchange="setContainerDisabled(this.name, 'txtProxyValue', 2)"/>
         <preference id="extensions.chaika.http_proxy_value"
                     name="extensions.chaika.http_proxy_value"
                     type="unichar"/>
@@ -41,42 +50,27 @@
             src="chrome://chaika/content/settings/general-pane.js"/>
 
     <groupbox>
-        <caption class="setting-description" label="ログ" />
-        <vbox>
-            <checkbox label="ログを削除するときに警告する"
-                      preference="extensions.chaika.warn_when_delete_log" />
-            <checkbox label="ログファイルの位置を指定する *"
-                      preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
-            <hbox id="boxDataDir" class="indent" flex="1" align="start">
-                <textbox id="txtDataDir" flex="8"
-                         preference="extensions.chaika.data_dir"
-                         onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
-                <button id="btnDataDirSelect" label="参照..."
-                        oncommand="gGeneralPane.selectDataDir()"/>
-                <spacer flex="1"/>
-            </hbox>
-        </vbox>
-    </groupbox>
+        <caption class="setting-description" label="ローカルサーバ" />
 
-    <groupbox>
-        <caption class="setting-description" label="履歴" />
-        <vbox align="left">
-            <hbox align="center">
-                <label value="記憶する板の数:"/>
-                <textbox type="number" min="0" max="20" size="1"
-                         preference="extensions.chaika.historymenu.board_max"/>
-            </hbox>
-            <hbox align="center">
-                <label value="記憶するスレの数:"/>
-                <textbox type="number" min="0" max="20" size="1"
-                         preference="extensions.chaika.historymenu.thread_max"/>
-            </hbox>
-        </vbox>
+        <hbox align="center">
+            <label value="使用するポート *:" />
+            <textbox type="number" min="1" max="65535" size="3"
+                     preference="extensions.chaika.server.port" />
+        </hbox>
+
+        <checkbox label="サーバの立ち上げに失敗したときに自動的に代替ポートを探す *"
+                  preference="extensions.chaika.server.port.retry"
+                  tooltiptext="指定したポートが開いていなかった場合に, 空きポートを自動的に探します. ブックマークや開いていたスレッドが一時的に使用できなくなることがあります." />
+
+        <checkbox label="使用するポートを毎回ランダムに選択する *"
+                  preference="extensions.chaika.server.port.randomization"
+                  tooltiptext="外部からの意図しないスレッド読み込みを防ぎ, セキュリティ・プライバシーが向上しますが, ブックマークや開いていたスレッドは再起動のたびに無効になります." />
     </groupbox>
 
     <groupbox>
         <caption class="setting-description" label="プロキシ" />
-        <hbox align="start">
+
+        <hbox align="center">
             <menulist preference="extensions.chaika.http_proxy_mode">
                 <menupopup>
                     <menuitem value="0" label="ブラウザの設定に従う"/>
@@ -89,10 +83,51 @@
     </groupbox>
 
     <groupbox>
+        <caption class="setting-description" label="ログ" />
+
+        <vbox>
+            <checkbox label="ログを削除するときに警告する"
+                      preference="extensions.chaika.warn_when_delete_log" />
+
+            <checkbox label="ログファイルの位置を指定する *"
+                      preference="extensions.chaika.appoint_data_dir" control="txtDataDir"/>
+
+            <hbox id="boxDataDir" class="indent" flex="1" align="center">
+                <textbox id="txtDataDir" flex="8"
+                         preference="extensions.chaika.data_dir"
+                         onsyncfrompreference="return gGeneralPane.readDataDirPref()"/>
+                <button id="btnDataDirSelect" label="参照..."
+                        oncommand="gGeneralPane.selectDataDir()"/>
+                <spacer flex="1"/>
+            </hbox>
+        </vbox>
+    </groupbox>
+
+    <groupbox>
+        <caption class="setting-description" label="履歴" />
+
+        <vbox align="left">
+            <hbox align="center">
+                <label value="記憶する板の数:"/>
+                <textbox type="number" min="0" max="20" size="1"
+                         preference="extensions.chaika.historymenu.board_max"/>
+            </hbox>
+
+            <hbox align="center">
+                <label value="記憶するスレの数:"/>
+                <textbox type="number" min="0" max="20" size="1"
+                         preference="extensions.chaika.historymenu.thread_max"/>
+            </hbox>
+        </vbox>
+    </groupbox>
+
+    <groupbox>
         <caption class="setting-description" label="置換" />
-        <vbox align="start">
+
+        <vbox align="left">
             <button label="置換マネージャ..."
                     oncommand="gGeneralPane.openReplacementManager()" />
+
             <checkbox label="項目を削除するときに警告する"
                       preference="extensions.chaika.replace.warn_when_delete" />
         </vbox>

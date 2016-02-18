@@ -1,14 +1,13 @@
 /* See license.txt for terms of usage */
 
+const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
-EXPORTED_SYMBOLS = ["ChaikaServer"];
-Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
-Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Cu.import("resource://gre/modules/XPCOMUtils.jsm");
+Cu.import("resource://gre/modules/Services.jsm");
+Cu.import("resource://chaika-modules/utils/Logger.js");
 
 
-const Ci = Components.interfaces;
-const Cc = Components.classes;
-const Cr = Components.results;
+this.EXPORTED_SYMBOLS = ["ChaikaServer"];
 
 
 var gServerScriptList = [];
@@ -28,7 +27,7 @@ function sleep(aWait) {
             this.timeup = true;
         },
         timeup: false
-    }
+    };
 
     var timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
     timer.initWithCallback(timerCallback, aWait, Ci.nsITimer.TYPE_ONE_SHOT);
@@ -44,14 +43,14 @@ function sleep(aWait) {
 
 var ChaikaServer = {
 
-    listening: false,
+    _listening: false,
 
 
     /**
      * ブラウザ起動時のプロファイル読み込み後に一度だけ実行され、初期化処理を行う。
      * @private
      */
-    _startup: function ChaikaServer__startup(){
+    _startup: function(){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.addObserver(this, "network:offline-status-changed", false);
 
@@ -61,10 +60,10 @@ var ChaikaServer = {
             gServerScriptList["skin"]   = SkinServerScript;
             gServerScriptList["thread"] = ThreadServerScript;
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            Logger.error(ex);
         }
 
-        this.startServer();
+        this._start();
     },
 
 
@@ -72,66 +71,116 @@ var ChaikaServer = {
      * ブラウザ終了時に一度だけ実行され、終了処理を行う。
      * @private
      */
-    _quit: function ChaikaServer__quit(){
+    _quit: function(){
         var os = Cc["@mozilla.org/observer-service;1"].getService(Ci.nsIObserverService);
         os.removeObserver(this, "network:offline-status-changed");
 
-        this.stopServer();
+        this._stop();
+
+        // Restore the original port number.
+        if(this._origPort){
+            Services.prefs.setIntPref('extensions.chaika.server.port', this._origPort);
+        }
     },
 
 
-    startServer: function ChaikaServer_startServer(){
-        if(this.listening){
-            ChaikaCore.logger.warning("Is listening");
+    get serverURL(){
+        if(!this._serverURL){
+            let port = Services.prefs.getIntPref('extensions.chaika.server.port');
+
+            this._serverURL = Services.io.newURI('http://127.0.0.1:' + port, null, null);
+        }
+
+        return this._serverURL.clone().QueryInterface(Ci.nsIURL);
+    },
+
+
+    _invalidateServerURL: function(){
+        this._stop();
+        this._serverURL = null;
+    },
+
+
+    _start: function(){
+        if(this._listening){
+            Logger.warn("chaika is already listening port " + this.serverURL.port);
             return;
         }
 
-        var port = ChaikaCore.getServerURL().port;
-        this._serverSocket = Cc["@mozilla.org/network/server-socket;1"]
-                .createInstance(Ci.nsIServerSocket);
-        this._serverSocket.init(port, true, 10);
-        this._serverSocket.asyncListen(this);
-
-        this.listening = true;
-        ChaikaCore.logger.info("Start Listening Port " + port);
-    },
-
-
-    stopServer: function ChaikaServer_stopServer(){
-        if(this.listening && this._serverSocket){
-            this._serverSocket.close();
-            this._serverSocket = null;
-            this.listening = false;
+        // port randomization
+        if(Services.prefs.getBoolPref('extensions.chaika.server.port.randomization')){
+            // Use one of the private ports
+            Services.prefs.setIntPref('extensions.chaika.server.port', 49513 + Math.floor(16000 * Math.random()));
         }
-    },
 
+        try{
+            // Listen the port to establish the local server
+            let url = this.serverURL;
 
-      // ********** ********* implements nsIServerSocketListener ********** **********
+            this._socket = Cc["@mozilla.org/network/server-socket;1"].createInstance(Ci.nsIServerSocket);
+            this._socket.init(url.port, true, 10);
+            this._socket.asyncListen(this);
 
-    onSocketAccepted: function ChaikaServer_onSocketAccepted(aServerSocket, aTransport){
-        (new ChaikaServerHandler(aTransport));
-    },
+            this._listening = true;
+            Logger.info("Start listening port " + url.port);
+        }catch(ex){
+            // Reject listening the port.
+            if(Services.prefs.getBoolPref('extensions.chaika.server.port.retry')){
+                let port = this.serverURL.port;
 
+                // Save the original port number to restore it during shutting down.
+                if(!this._origPort){
+                    this._origPort = port;
+                }
 
-    onStopListening: function ChaikaServer_onStopListening(aServerSocket, aStatus){
-        ChaikaCore.logger.info("Stop Listening");
-    },
+                Logger.info('Fail to listen port ' + port + '. Try another one.');
 
+                // Find another port.
+                Services.prefs.setIntPref('extensions.chaika.server.port', port + 1);
 
-    // ********** ********* implements nsIObserver ********** **********
-
-    observe: function ChaikaServer_observe(aSubject, aTopic, aData){
-        if(aTopic == "network:offline-status-changed"){
-            if(aData == "online"){
-                this.startServer();
+                // Retry.
+                this._invalidateServerURL();
+                this._start();
             }else{
-                this.stopServer();
+                Logger.fatal('Cannot establish the local server bacause port ' + this.serverURL.port +
+                             ' is not available!');
+                this._stop();
             }
         }
     },
 
 
-    // ********** ********* implements nsISupports ********** **********
+    _stop: function(){
+        if(this._listening && this._socket){
+            this._socket.close();
+            this._socket = null;
+            this._listening = false;
+        }
+    },
+
+
+    observe: function(aSubject, aTopic, aData){
+        if(aTopic == "network:offline-status-changed"){
+            if(aData == "online"){
+                this._start();
+            }else{
+                this._stop();
+            }
+        }
+    },
+
+
+    // ********** ********* implements nsIServerSocketListener ********** **********
+
+    onSocketAccepted: function(aServerSocket, aTransport){
+        (new ChaikaServerHandler(aTransport));
+    },
+
+
+    onStopListening: function(aServerSocket, aStatus){
+        Logger.info("Stop Listening");
+    },
+
 
     QueryInterface: XPCOMUtils.generateQI([
         Ci.nsIServerSocketListener,
@@ -182,7 +231,7 @@ ChaikaServerHandler.prototype = {
         try{
             this.request = new ChaikaServerRequest(aInputStream);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            Logger.error(ex);
 
             aInputStream.close();
             this.sendErrorPage(400, "Invalid Request");
@@ -220,7 +269,7 @@ ChaikaServerHandler.prototype = {
             this._script = new gServerScriptList[mode]();
             this._script.start(this);
         }catch(ex){
-            ChaikaCore.logger.error(ex);
+            Logger.error(ex);
             var message = (typeof(ex) == "string") ? ex :
                     (ex.message + "\n" + ex.fileName +" : "+ ex.lineNumber);
             this.sendErrorPage(500, message);
@@ -247,7 +296,7 @@ ChaikaServerHandler.prototype = {
 
     onCancelled: function ChaikaServerHandler_onCancelled(){
         if(this._script){
-            ChaikaCore.logger.warning("Cancelled");
+            Logger.warn("Cancelled");
             this._script.cancel();
             this._script = null;
         }
@@ -264,7 +313,7 @@ ChaikaServerHandler.prototype = {
 
         var status = StatusCode.getStatusCode(aStatusCode);
 
-        var html = 
+        var html =
             "<html>" +
             "<head><title>" + status + "[ChaikaServer]</title></head>" +
             "<body><h1>" + status + "</h1><pre>" + message + "</pre></body>" +
@@ -347,7 +396,7 @@ ChaikaServerRequest.prototype = {
 
         try{
             var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-            var baseURI = ChaikaCore.getServerURL();
+            var baseURI = ChaikaServer.serverURL;
             this.url = ioService.newURI(urlSpec, null, baseURI).QueryInterface(Ci.nsIURL);
         }catch(ex){
             throw makeException(Cr.NS_ERROR_INVALID_ARG, "Invalid Request");
@@ -427,7 +476,7 @@ ChaikaServerResponse.prototype = {
         if(this.stream){
             this.stream.write(aString, aString.length);
         }else{
-            ChaikaCore.logger.warning("Stream Closed");
+            Logger.warn("Stream Closed");
         }
     },
 
@@ -438,7 +487,7 @@ ChaikaServerResponse.prototype = {
         if(this.stream){
             this.stream.flush();
         }else{
-            ChaikaCore.logger.warning("Stream Closed");
+            Logger.warn("Stream Closed");
         }
     },
 

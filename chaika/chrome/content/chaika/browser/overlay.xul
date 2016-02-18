@@ -41,7 +41,7 @@
                      group="sidebar"
                      sidebarurl="chrome://chaika/content/bbsmenu/page.xul"
                      sidebartitle="chaika"
-                     oncommand="toggleSidebar('viewChaikaSidebar');"/>
+                     oncommand="SidebarUI.toggle('viewChaikaSidebar');"/>
     </broadcasterset>
 
     <!-- Toolbar Button -->
@@ -52,13 +52,17 @@
                        tooltiptext="chaika"
                        type="menu-button"
                        contextmenu="chaika-browsermenu-popup"
-                       oncommand="toggleSidebar('viewChaikaSidebar');">
+                       oncommand="SidebarUI.toggle('viewChaikaSidebar');">
             <menupopup style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
         </toolbarbutton>
     </toolbarpalette>
 
     <!-- Browser Context Menu -->
     <popup id="contentAreaContextMenu">
+        <vbox id="context-chaika-flattened"
+              insertbefore="context-navigation"
+              style="-moz-binding:url(chrome://chaika/content/browser/browserMenu.xml#browserMenu)" />
+
         <menu id="context-chaika"
               label="chaika"
               class="menu-iconic"

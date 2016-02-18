@@ -75,7 +75,9 @@ var gReplacementManager = {
     handleEvent: function(aEvent){
         switch(aEvent.type){
             case 'select':
-                this.populateData(JSON.parse(this._listbox.selectedItem.value), true);
+                if(!!this._listbox.selectedItem){
+                    this.populateData(JSON.parse(this._listbox.selectedItem.value), true);
+                }
                 break;
 
             case 'command':
@@ -148,19 +150,21 @@ var gReplacementManager = {
     remove: function(){
         if(this._listbox.selectedIndex === -1) return;
 
+        const items = this._listbox.selectedItems;
         let rv = true;
 
         if(ChaikaCore.pref.getBool('replace.warn_when_delete')){
-            if(this._listbox.selectedItems.length > 1){
-                rv = window.confirm(this._listbox.selectedItems.length + ' 件のデータを削除してもよろしいですか？');
+            if(items.length > 1){
+                rv = window.confirm(items.length + ' 件のデータを削除してもよろしいですか？');
             }else{
                 rv = window.confirm(this._listbox.selectedItem.label + ' を削除してもよろしいですか？');
             }
         }
 
         if(rv){
-            this._listbox.selectedItems.map((node) => JSON.parse(node.value))
-                                       .forEach((item) => ChaikaContentReplacer.remove(item));
+            Array.from(items)
+                 .map((node) => JSON.parse(node.value))
+                 .forEach((item) => ChaikaContentReplacer.remove(item));
         }
     },
 

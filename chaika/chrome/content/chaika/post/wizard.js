@@ -1,14 +1,33 @@
 /* See license.txt for terms of usage */
 
+if(location.protocol === 'chaika:'){
+    console.info('This page is loaded in the content process. Reload!');
+
+    let urlToPost = location.href.replace(/^chaika:\/\/post\//, '');
+
+    window.open(
+        'chrome://chaika/content/post/wizard.xul?url=' + urlToPost,
+        'chrome, toolbar, centerscreen, resizable, minimizable'
+    );
+
+    if(window.history.length === 1){
+        window.close();
+    }else{
+        window.history.back();
+    }
+}
+
 Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 Components.utils.import("resource://gre/modules/FormHistory.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
+Components.utils.import("resource://chaika-modules/ChaikaServer.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaDownloader.js");
 Components.utils.import("resource://chaika-modules/ChaikaLogin.js");
+Components.utils.import('resource://chaika-modules/utils/Browser.js');
 
 const Ci = Components.interfaces;
 const Cc = Components.classes;
@@ -24,18 +43,25 @@ var gPost   = null;
 var gWizType = WIZ_TYPE_RES;
 
 
-function startup(){
+/**
+ * Polyfill for Firefox 39-
+ */
+if(!String.prototype.includes){
+    String.prototype.includes = function(){'use strict';
+        return String.prototype.indexOf.apply(this, arguments) !== -1;
+    };
+}
 
+
+function startup(){
     gWizard = document.documentElement;
     gWizard.canRewind = false;
     gWizard.canAdvance = false;
 
-    if(!("arguments" in window)){
-        Notification.critical("認識できない URL です");
-        return;
-    }
+    let params = new URL(location.href).searchParams;
+    let url = (window.arguments && window.arguments[0]) || params.get('url');
 
-    if(window.arguments[1]){
+    if(window.arguments && window.arguments[1]){
         gWizType = WIZ_TYPE_NEW_THREAD;
     }
 
@@ -44,7 +70,7 @@ function startup(){
     if(gWizType == WIZ_TYPE_RES){
         var threadURL;
         try{
-            threadURL = ioService.newURI(window.arguments[0], null, null)
+            threadURL = ioService.newURI(url, null, null)
                                 .QueryInterface(Components.interfaces.nsIURL);
         }catch(ex){
                 // 認識できない URL
@@ -76,7 +102,7 @@ function startup(){
 
         var boardURL;
         try{
-            boardURL = ioService.newURI(window.arguments[0], null, null)
+            boardURL = ioService.newURI(url, null, null)
                                 .QueryInterface(Components.interfaces.nsIURL);
         }catch(ex){
                 // 認識できない URL
@@ -96,7 +122,7 @@ function startup(){
         }
 
     }else{
-        ChaikaCore.logger.warning("UNKNOWN WIZ TYPE: " + window.arguments[0]);
+        ChaikaCore.logger.warning("UNKNOWN WIZ TYPE: " + url);
         return;
     }
 
@@ -322,7 +348,7 @@ var FormPage = {
 
         //このレスにレス
         if(gWizType == WIZ_TYPE_RES && gThread.url.fileName){
-            var res = ">>" + gThread.url.fileName.replace(",", "\n>>", "g") +"\n";
+            var res = ">>" + gThread.url.fileName.replace(/,/g, "\n>>") + "\n";
             this._messeageForm.value = res;
         }
 
@@ -591,7 +617,7 @@ var FormPage = {
         //チェックボックスをそれに合わせて defaultmail.txt ではない時の値を覚えておく
         if(init && this._getDefaultData('defaultmail.txt') !== null){
             this._sageCheck.setAttribute('originalSageChecked', this._sageCheck.checked.toString());
-            this._sageCheck.checked = this._mailForm.value.contains('sage');
+            this._sageCheck.checked = this._mailForm.value.includes('sage');
         }
 
         //emptyTextの設定
@@ -659,15 +685,26 @@ var FormPage = {
         relatedAddons.then((addonList) => {
             template += "【ユーザーエージェント】" + userAgent + '\n';
             template += "【使用スキン】" + skinName + '\n';
-            template += "【関連アドオン】\n" + (addonList.join('\n') || '(なし)');
-            template += '\n\n';
+
+            if(addonList.length > 0){
+                template += "【関連アドオン】\n" + addonList.join('\n') + '\n\n';
+            }else{
+                template += '【関連アドオン】(なし)\n';
+            }
+
+            if(userAgent.includes('pre')){
+                template += '【コミットハッシュ】※ コミットハッシュは git rev-parse HEAD にて取得できます\n\n';
+            }
 
             if(detailed){
                 let changedPrefs = this._getChangedPrefList();
                 template += '【変更した設定値】\n' + changedPrefs.join('\n') + '\n\n';
             }
 
-            template += '【不具合の内容・再現手順】\n';
+            template += '【不具合の再現手順】\n' +
+                        '1. \n\n' +
+                        '【期待される現象・結果】\n\n' +
+                        '【実際に起こる現象・結果】\n';
 
             this._messeageForm.value += template;
         });
@@ -776,7 +813,7 @@ var FormPage = {
 
         for(let i=0; i<lines.length; i++){
             // タブがない行は単なる空行
-            if(!lines[i].contains('\t')) continue;
+            if(!lines[i].includes('\t')) continue;
 
             // コメント行
             if(/^\s*(?:;|'|#|\/\/)/.test(lines[i])) continue;
@@ -789,7 +826,7 @@ var FormPage = {
                 continue;
             }
 
-            if(boardURL.contains(boardID)){
+            if(boardURL.includes(boardID)){
                 return defaultData;
             }
         }
@@ -989,28 +1026,11 @@ var SubmitPage = {
     reloadThreadPage: function SubmitPage_reloadThreadPage(){
         if(!this.succeeded) return;
 
-        var serverURL = ChaikaCore.getServerURL();
-
-        var browserWindows = Cc["@mozilla.org/appshell/window-mediator;1"]
-                .getService(Ci.nsIWindowMediator).getEnumerator("navigator:browser");
-        while(browserWindows.hasMoreElements()){
-            var browserWindow = browserWindows.getNext();
-            if(!browserWindow.getBrowser) continue;
-
-            var browsers = browserWindow.getBrowser().browsers;
-            for(var i = 0; i < browsers.length; i++){
-                var currentURI = browsers[i].currentURI;
-                if(!(currentURI instanceof Ci.nsIURL)) continue;
-                try{
-                    if(serverURL.hostPort != currentURI.hostPort) continue;
-                    if(currentURI.filePath.indexOf(gThread.plainURL.spec) != -1){
-                        browsers[i].reload();
-                    }
-                }catch(ex){
-                    ChaikaCore.logger.error(ex);
-                }
-            }
-        }
+        Browser.getGlobalMessageManager().broadcastAsyncMessage(
+            'chaika-post-finished', {
+                url: gThread.plainURL.spec,
+                host: ChaikaServer.serverURL.hostPort
+        });
     }
 
 };

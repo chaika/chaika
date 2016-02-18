@@ -3,9 +3,9 @@
 <!-- See license.txt for terms of usage -->
 
 <bindings id="chaikaBrowserMenuBindings"
-        xmlns="http://www.mozilla.org/xbl"
-        xmlns:xbl="http://www.mozilla.org/xbl"
-        xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+          xmlns="http://www.mozilla.org/xbl"
+          xmlns:xbl="http://www.mozilla.org/xbl"
+          xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
 
 <binding id="browserMenu" extends="chrome://global/content/bindings/popup.xml#popup">
@@ -13,12 +13,17 @@
         <xul:arrowscrollbox orient="vertical" flex="1" anonid="root" class="chaika-browser-menu-root">
             <xul:menu label="あぼーん" anonid="abone">
                 <xul:menupopup>
-                    <xul:menuitem label="名前" anonid="abone-name" />
-                    <xul:menuitem label="メール" anonid="abone-mail" />
-                    <xul:menuitem label="ID" anonid="abone-id" />
-                    <xul:menuitem label="本文" anonid="abone-word" />
-                    <xul:menuitem label="NGEx" anonid="abone-ex" />
-                    <xul:menuseparator />
+                    <xul:menuitem title="%SELECTION% を名前あぼーん" anonid="abone-name"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% をメールあぼーん" anonid="abone-mail"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を ID あぼーん" anonid="abone-id"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を本文あぼーん" anonid="abone-word"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuitem title="%SELECTION% を NGEx あぼーん" anonid="abone-ex"
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
+                    <xul:menuseparator class="chaika-shown-when-text-selected" />
                     <xul:menuitem label="あぼーんマネージャ..." anonid="open-abone-manager" />
                 </xul:menupopup>
             </xul:menu>
@@ -28,18 +33,19 @@
                     <xul:menuitem label="タイトル" anonid="copy-title" />
                     <xul:menuitem label="URL" anonid="copy-url" />
                     <xul:menuitem label="タイトルと URL" anonid="copy-title-url" />
-                    <xul:menuitem label="タイトルと URL と選択部分"
+                    <xul:menuitem title="タイトルと URL と %SELECTION%"
                                   anonid="copy-title-url-selection"
-                                  class="chaika-shown-when-text-selected" />
+                                  class="chaika-shown-when-text-selected chaika-need-populate" />
                 </xul:menupopup>
             </xul:menu>
 
-            <xul:menu label="検索" anonid="search" class="chaika-shown-when-text-selected chaika-shown-on-thread">
+            <xul:menu title="%SELECTION% を検索" anonid="search"
+                      class="chaika-shown-when-text-selected chaika-shown-on-thread chaika-need-populate">
                 <xul:menupopup>
                     <xul:vbox anonid="search-thread" />
                     <xul:menuseparator anonid="search-thread-sep" />
-                    <xul:menuitem label="板で検索" anonid="search-in-board" />
-                    <xul:menuitem label="スレッド内を検索" anonid="search-in-thread" />
+                    <xul:menuitem label="この板内を検索" anonid="search-in-board" />
+                    <xul:menuitem label="このスレッド内を検索" anonid="search-in-thread" />
                 </xul:menupopup>
             </xul:menu>
 
@@ -75,9 +81,9 @@
 
             <xul:menuseparator anonid="thread-utils-sep" class="chaika-shown-on-thread" />
 
-            <xul:menuitem label="選択部分を AA として登録する"
+            <xul:menuitem title="%SELECTION% を AA として登録する"
                           anonid="register-selection-as-aa"
-                          class="chaika-shown-when-text-selected" />
+                          class="chaika-shown-when-text-selected chaika-need-populate" />
 
             <xul:menuitem label="置換マネージャ..." anonid="open-replacement-manager" />
 
@@ -117,6 +123,7 @@
             Components.utils.import("resource://chaika-modules/ChaikaBoard.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaThread.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaSearch.js", this);
+            Components.utils.import("resource://chaika-modules/utils/URLUtils.js", this);
             Components.utils.import("resource://chaika-modules/ChaikaAboneManager.js", this);
 
             this.classList.add('chaika-browser-menu');
@@ -136,16 +143,13 @@
         -->
         <method name="_getCurrentThreadURL">
             <body><![CDATA[
-                var currentURI = null;
-                try{
-                    currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
-                }catch(ex){
+                let url = gBrowser.currentURI.spec;
+
+                if(!this.URLUtils.isThread(url)){
                     return null;
+                }else{
+                    return Services.io.newURI(this.URLUtils.unchaikafy(url), null, null);
                 }
-
-                if(!this._isThread(currentURI)) return null;
-
-                return this._getPlainURL(currentURI);
             ]]></body>
         </method>
 
@@ -158,20 +162,14 @@
         -->
         <method name="_getCurrentBoardURL">
             <body><![CDATA[
-                let currentURI = null;
+                let url = gBrowser.currentURI.spec;
 
-                try{
-                    currentURI = getBrowser().currentURI.QueryInterface(Ci.nsIURL);
-                }catch(ex){
-                    return null;
+                if(this.URLUtils.isThread(url)){
+                    return this.ChaikaThread.getBoardURL(this._getCurrentThreadURL());
                 }
 
-                let threadURI = this._getCurrentThreadURL();
-
-                if(threadURI){
-                    return this.ChaikaThread.getBoardURL(threadURI);
-                }else if(this._isBoard(currentURI)){
-                    return this._getPlainURL(currentURI);
+                if(this.URLUtils.isBoard(url)){
+                    return Services.io.newURI(this.URLUtils.unchaikafy(url), null, null);
                 }
 
                 return null;
@@ -181,112 +179,24 @@
 
         <!--
         /**
-         * chaika 形式の URL を標準の形式に変換する
-         * @param {nsIURI|String} aURI 変換するURL
-         * @return {nsIURI} 変換後の URL 変換できなかった場合はnullが返る
+         * Get the URL of the link under the cursor without Google redirection
+         * @return {nsIURI}
          */
         -->
-        <method name="_getPlainURL">
-            <parameter name="aURI"/>
+        <method name="_getLinkURL">
             <body><![CDATA[
-                if(!aURI) return;
+                if(!gContextMenu || !gContextMenu.onLink){
+                    return null;
+                }
 
-                let spec = aURI instanceof Components.interfaces.nsIURI ? aURI.spec : aURI;
+                let linkURL = gContextMenu.linkURL;
 
                 // Google リダイレクタ対策
-                if(spec.contains('google') && spec.contains('/url?')){
-                    spec = decodeURIComponent(spec.match(/url=([^&]*)/i)[1]);
+                if(linkURL.includes('google') && linkURL.includes('/url?')){
+                    linkURL = decodeURIComponent(linkURL.match(/url=([^&]*)/i)[1]);
                 }
 
-                let uri = Services.io.newURI(spec, null, null).QueryInterface(Ci.nsIURI);
-
-                if(!this._isChaika(uri)){
-                    return uri;
-                }else{
-                    let plainURL = uri.path.substring(1)
-                                           .replace(/^thread\//, "")
-                                           .replace("/test/read.html/", "/test/read.cgi/")
-                                           .replace("/test/mread.cgi/", "/test/read.cgi/");
-
-                    try{
-                        return Services.io.newURI(plainURL, null, null);
-                    }catch(ex){
-                        return null;
-                    }
-                }
-            ]]></body>
-        </method>
-
-
-        <!--
-        /**
-         * chaika 形式の URL であるかどうかを返す
-         * @param {nsIURI|String} aURI 調べる URL
-         * @return {Boolean}
-         */
-        -->
-        <method name="_isChaika">
-            <parameter name="aURI"/>
-            <body><![CDATA[
-                try{
-                    if(!(aURI instanceof Components.interfaces.nsIURI)){
-                        aURI = Services.io.newURI(aURI, null, null).QueryInterface(Ci.nsIURI);
-                    }
-
-                    var isThread = (aURI.host === "localhost" || aURI.host === "127.0.0.1") &&
-                                    aURI.path.substring(0, 8) === "/thread/";
-                    var isBoard = aURI.spec.lastIndexOf("chaika://board/", 0) !== -1;
-
-                    return isThread || isBoard;
-                }catch(ex){
-                    return false;
-                }
-            ]]></body>
-        </method>
-
-
-        <!--
-        /**
-         * 掲示板の URL であるかどうかを返す
-         * @param {nsIURI|String} aURI 調べる URL
-         * @return {Boolean}
-         */
-        -->
-        <method name="_isBBS">
-            <parameter name="aURI"/>
-            <body><![CDATA[
-                var plainURL = this._getPlainURL(aURI);
-                return this.ChaikaBoard.getBoardType(plainURL) !== this.ChaikaBoard.BOARD_TYPE_PAGE;
-            ]]></body>
-        </method>
-
-
-        <!--
-        /**
-         * スレッドの URL であるかどうかを返す
-         * @param {nsIURI|String} aURI 調べる URL
-         * @return {Boolean}
-         */
-        -->
-        <method name="_isThread">
-            <parameter name="aURI"/>
-            <body><![CDATA[
-                return this._isBBS(aURI) && /\/(?:test|bbs)\/m?read\.(?:cgi|html)\//.test(aURI.spec || aURI);
-            ]]></body>
-        </method>
-
-
-        <!--
-        /**
-         * 板の URL であるかどうかを返す
-         * @param {nsIURI|String} aURI 調べる URL
-         * @return {Boolean}
-         */
-        -->
-        <method name="_isBoard">
-            <parameter name="aURI"/>
-            <body><![CDATA[
-                return this._isBBS(aURI) && !this._isThread(aURI);
+                return Services.io.newURI(linkURL, null, null);
             ]]></body>
         </method>
 
@@ -310,13 +220,70 @@
 
 
         <method name="_onPopupshowing">
+            <parameter name="aEvent" />
             <body><![CDATA[
-                //表示・非表示を制御するためのステータスを設定する
-                this._setStatus();
+                let mm = gBrowser.selectedBrowser.messageManager;
 
                 // フラット時の gContextMenu 初期化バグ (_onPopuphiding のコメント参照)
                 // への対処のため、gContextMenu をストアしておく
                 this._gContextMenu = gContextMenu;
+
+                // 表示・非表示を制御するためのステータスを設定する
+                if(!this._setStatus()){
+                    this.classList.remove('chaika-status-text-selected');
+                    return;
+                }
+
+                let getSelectedtext = () => {
+                    return new Promise((resolve, reject) => {
+                        // 応答タイムアウト設定
+                        let timeoutID = setTimeout(() => {
+                            clearTimeout(timeoutID);
+                            reject(new Error('chaika-get-selected-text is timeout.'));
+                        }, 1000);
+                        
+                        // frameスクリプトからの応答メッセージのlistener
+                        mm.addMessageListener('chaika-get-selected-text', message => {
+                            clearTimeout(timeoutID);
+                            resolve(message.data);
+                        });
+                        
+                        // frameスクリプトへ要求メッセージ送信
+                        mm.sendAsyncMessage('chaika-get-selected-text');
+                    });
+                };
+
+                getSelectedtext()
+                .then(data => {
+                    // 選択文字列を取得して保存
+                    if(!data.isSelected){
+                        this._selectedText = null;
+                        this.classList.remove('chaika-status-text-selected');
+                        return;
+                    }
+
+                    this._selectedText = data.text;
+                    this.classList.add('chaika-status-text-selected');
+
+                    // 選択文字列を表示する項目へテキストを設定する
+                    let root = document.getAnonymousElementByAttribute(this, "anonid", "root");
+                    let itemsToPopulate = root.querySelectorAll('.chaika-need-populate');
+                    let selectedText = this._selectedText;
+
+                    if(selectedText.length > 12){
+                        selectedText = selectedText.slice(0, 12) + '…';
+                    }
+
+                    Array.from(itemsToPopulate).forEach((item) => {
+                        let label = item.getAttribute('title').replace(/%SELECTION%/g, '"' + selectedText + '"');
+
+                        item.setAttribute('label', label);
+                    })
+                }).catch(ex => {
+                    this.ChaikaCore.logger.warning(ex);
+                    this._selectedText = null;
+                    this.classList.remove('chaika-status-text-selected');
+                });
             ]]></body>
         </method>
 
@@ -327,7 +294,7 @@
                 // コンテキストメニューをフラットにしている場合,
                 // browserMenu.xml 内のサブメニュー (menu) を閉じた際に
                 // #contentAreaContextMenu の onpopuphiding が動作してしまい,
-                // gContextMenu = null となってしまう
+                // gContextMenu === null となってしまう
                 // これを回避するため, サブメニューを閉じた時に gContextMenu を復元する
                 if(aEvent.originalTarget.nodeName === 'xul:menupopup'){
                     gContextMenu = this._gContextMenu;
@@ -336,18 +303,26 @@
         </method>
 
 
+        <!--
+        /**
+         * 現在タブの内容でメニューの表示・非表示を制御するスタータスをセットし、chaikaスレッド表示かどうかを返す。
+         * @return {boolean} isOnThread の判定結果。
+         */
+        -->
         <method name="_setStatus">
             <body><![CDATA[
-                const currentURI = getBrowser().currentURI;
+                // 選択文字列の状態についてはここでは行わない。
+                // この関数が false を返した場合、呼び元の _onPopupshowing() は選択文字列の取得を行わない。
+                const url = gBrowser.currentURI.spec;
 
-                const isOnBBS = this._isBBS(currentURI);
-                const isOnChaika = this._isChaika(currentURI);
-                const isOnThread = this._isThread(currentURI);
-                const isOnBoard = this._isBoard(currentURI);
+                const isOnBBS = this.URLUtils.isBBS(url);
+                const isOnChaika = this.URLUtils.isChaikafied(url);
+                const isOnThread = this.URLUtils.isThread(url);
+                const isOnBoard = this.URLUtils.isBoard(url);
 
                 const isContextMenu = !!gContextMenu;
-                const isTextSelected = isContextMenu && gContextMenu.isTextSelected;
-                const isOnBBSLink = isContextMenu && gContextMenu.onLink && this._isBBS(gContextMenu.linkURL);
+                const isOnBBSLink = isContextMenu && gContextMenu.onLink &&
+                                    this.URLUtils.isBBS(this._getLinkURL().spec);
 
                 let root = this;
 
@@ -359,10 +334,10 @@
                              root.classList.remove('chaika-status-on-thread');
                 isOnBoard ? root.classList.add('chaika-status-on-board') :
                             root.classList.remove('chaika-status-on-board');
-                isTextSelected ? root.classList.add('chaika-status-text-selected') :
-                                 root.classList.remove('chaika-status-text-selected');
                 isOnBBSLink ? root.classList.add('chaika-status-on-bbs-link') :
                               root.classList.remove('chaika-status-on-bbs-link');
+
+                return isOnThread;
             ]]></body>
         </method>
 
@@ -382,8 +357,8 @@
                 let anonymousID = targetElement.getAttribute("anonid");
                 let addTab = this.ChaikaCore.pref.getBool("browser.browsermenu.open_in_new_tab");
                 let disregardLimit = this.ChaikaCore.pref.getBool("browser.browsermenu.disregard_url_limit");
-                let selection = content.getSelection();
-                let selectedText = selection.toString();
+                let selectedText = this._selectedText;
+                let singleLineText = /^[^\r\n]*/.exec(selectedText)[0];
 
 
                 if(aMiddleClicked || aEvent.ctrlKey || aEvent.metaKey){
@@ -393,23 +368,23 @@
 
                 switch(anonymousID){
                     case 'abone-name':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_NAME, singleLineText);
                         break;
 
                     case 'abone-mail':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_MAIL, singleLineText);
                         break;
 
                     case 'abone-id':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_ID, singleLineText);
                         break;
 
                     case 'abone-word':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_WORD, singleLineText);
                         break;
 
                     case 'abone-ex':
-                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, selection);
+                        this.addAbone(this.ChaikaAboneManager.ABONE_TYPE_EX, singleLineText);
                         break;
 
                     case "open-abone-manager":
@@ -433,11 +408,11 @@
                         break;
 
                     case 'search-in-board':
-                        this.searchInBoard(selectedText, addTab);
+                        this.searchInBoard(singleLineText, addTab);
                         break;
 
                     case 'search-in-thread':
-                        this.searchInThread(selectedText);
+                        this.searchInThread(singleLineText);
                         break;
 
                     case "write":
@@ -457,11 +432,11 @@
                         break;
 
                     case 'open-link-in-chaika':
-                        this.viewInChaika(gContextMenu.linkURL, addTab, disregardLimit);
+                        this.viewInChaika(this._getLinkURL(), addTab, disregardLimit);
                         break;
 
                     case 'open-link-in-browser':
-                        this.viewInBrowser(gContextMenu.linkURL, addTab, disregardLimit);
+                        this.viewInBrowser(this._getLinkURL(), addTab, disregardLimit);
                         break;
 
                     case "change-limit-all":
@@ -495,7 +470,7 @@
                     default:
                         //検索メニューかも
                         if(targetElement.parentNode.getAttribute('anonid') === 'search-thread'){
-                            this.searchThread(anonymousID, selectedText, addTab);
+                            this.searchThread(anonymousID, singleLineText, addTab);
                         }
                 }
 
@@ -526,8 +501,8 @@
         <!--
         /**
          * 指定された文字列をNGワードに追加する
-         * @param {Number} ngType NGワードの種類
-         * @param {Selection} ngWord 追加するNGワード
+         * @param {String} ngType NGワードの種類 ChaikaAboneManager.ABONE_TYPE_***
+         * @param {String} ngWord 追加するNGワード
          * @see ChaikaAboneManager
          */
         -->
@@ -535,7 +510,7 @@
             <parameter name="ngType" />
             <parameter name="ngWord" />
             <body><![CDATA[
-                var shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
+                let shouldConfirm = this.ChaikaCore.pref.getBool('browser.browsermenu.confirm_add_abone');
 
                 if(ngType !== this.ChaikaAboneManager.ABONE_TYPE_EX){
                     if(shouldConfirm){
@@ -544,23 +519,15 @@
                         this.ChaikaAboneManager[ngType].add(ngWord.toString());
                     }
                 }else{
-                    let ngData = {
+                    this.openAboneManager(ngType, {
                         target: 'post',
                         match: 'all',
-                        rules: [],
-                    };
-
-                    for(let i = 0, iz = ngWord.rangeCount; i < iz; i++){
-                        let range = ngWord.getRangeAt(i);
-
-                        ngData.rules.push({
+                        rules: [{
                             target: 'msg',
-                            query: range.toString(),
+                            query: ngWord,
                             condition: 'contains'
-                        });
-                    }
-
-                    this.openAboneManager(ngType, ngData);
+                        }]
+                    });
                 }
             ]]></body>
         </method>
@@ -613,7 +580,7 @@
                     try{
                         title = (new this.ChaikaBoard(uri)).getTitle();
                     }catch(ex2){
-                        title = content.document.title;
+                        title = getBrowser().contentTitle;
                     }
                 }
 
@@ -621,10 +588,10 @@
                     uri = Services.io.newURI("./", null, uri);
                 }
 
-                var text = template.replace("%TITLE%", title, "g")
-                                   .replace("%URL%", uri.spec, "g")
-                                   .replace("%SEL%", content.getSelection().toString(), "g")
-                                   .replace("%NEWLINE%", NEWLINE, "g");
+                var text = template.replace(/%TITLE%/g, title)
+                                   .replace(/%URL%/g, uri.spec)
+                                   .replace(/%SEL%/g, this._selectedText)
+                                   .replace(/%NEWLINE%/g, NEWLINE);
 
                 var clipboard = Cc["@mozilla.org/widget/clipboardhelper;1"].getService(Ci.nsIClipboardHelper);
 
@@ -673,8 +640,8 @@
 
                             searchBox.focus();
                             searchBox.value = aTerm;
-                            sideWin.SearchBox.setSearchMode(aID);
-                            sideWin.SearchBox.search(aTerm);
+
+                            sideWin.Page.search(aTerm, aID);
 
                             sidebar.removeEventListener('DOMContentLoaded', _doSearch, false);
                         }, 0);
@@ -682,7 +649,7 @@
 
                     if(sidebarBox.hidden || sidebar.getAttribute('src') !== SIDEBAR_URL){
                         sidebar.addEventListener("DOMContentLoaded", _doSearch, false);
-                        toggleSidebar("viewChaikaSidebar", true);
+                        SidebarUI.show("viewChaikaSidebar");
                     }else{
                         _doSearch();
                     }
@@ -705,7 +672,11 @@
                 var boardURL = this._getCurrentBoardURL();
                 if(!boardURL) return;
 
-                var searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(aTerm), null, null);
+                var params = new URL(boardURL.spec).searchParams;
+
+                params.set('query', aTerm);
+
+                var searchURL = Services.io.newURI(boardURL.spec + '?' + params, null, null);
 
                 this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
             ]]></body>
@@ -779,7 +750,7 @@
         <!--
         /**
          * chaika で開く
-         * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+         * @param {nsIURI} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
          * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
          * @param {Boolean} [disregardLimit=false] 表示制限を置き換えるかどうか
          */
@@ -789,14 +760,14 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit"/>
             <body><![CDATA[
-                var url = this._getPlainURL(aURI) ||
+                var url = aURI ||
                           this._getCurrentThreadURL() ||
                           this._getCurrentBoardURL();
 
                 if(!url) return;
 
                 try{
-                    if(this._isBoard(url)){
+                    if(this.URLUtils.isBoard(url.spec)){
                         this.ChaikaCore.browser.openBoard(url, aAddTab);
                     }else{
                         this.ChaikaCore.browser.openThread(url, aAddTab, disregardLimit, false);
@@ -812,7 +783,7 @@
         <!--
         /**
          * ブラウザで開く
-         * @param {nsIURI|String} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
+         * @param {nsIURI} [aURI] 開くURL 省略時は現在開いているスレッドまたは板になる
          * @param {Boolean} [aAddTab=false] 新規タブで開くかどうか
          * @param {Boolean} [disregardLimit] 表示制限を書き換えて開くかどうか
          */
@@ -822,7 +793,7 @@
             <parameter name="aAddTab"/>
             <parameter name="disregardLimit" />
             <body><![CDATA[
-                var url = this._getPlainURL(aURI) ||
+                var url = aURI ||
                           this._getCurrentThreadURL() ||
                           this._getCurrentBoardURL();
 
@@ -844,15 +815,18 @@
             <parameter name="aOption"/>
             <parameter name="aAddTab"/>
             <body><![CDATA[
-                var threadURL = this._getCurrentThreadURL();
+                let threadURL = this._getCurrentThreadURL();
+
                 if(!threadURL) return;
 
-                var currentURL = getBrowser().currentURI;
+                let currentURL = gBrowser.currentURI;
 
                 try{
-                    var threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+                    let threadPlainURL = (new this.ChaikaThread(threadURL)).plainURL;
+
                     threadURL = Services.io.newURI('./' + aOption, null, threadPlainURL);
-                    this.ChaikaCore.browser.openThread(threadURL, aAddTab, false, !this._isChaika(currentURL));
+                    this.ChaikaCore.browser.openThread(threadURL, aAddTab, false,
+                                                       !this.URLUtils.isChaikafied(currentURL.spec));
                 }catch(ex){
                     this.ChaikaCore.logger.error(ex);
                 }
@@ -869,11 +843,12 @@
         <method name="goToBoard">
             <parameter name="aAddTab"/>
             <body><![CDATA[
-                var boardURL = this._getCurrentBoardURL();
-                if(boardURL){
-                    var currentURI = getBrowser().currentURI;
+                let boardURL = this._getCurrentBoardURL();
 
-                    if(this._isChaika(currentURI)){
+                if(boardURL){
+                    let currentURI = gBrowser.currentURI;
+
+                    if(this.URLUtils.isChaikafied(currentURI.spec)){
                         this.ChaikaCore.browser.openBoard(boardURL, aAddTab);
                     }else{
                         this.ChaikaCore.browser.openURL(boardURL, aAddTab);
@@ -936,7 +911,11 @@
 
                 //検索文字列を設定して板を開く
                 let boardURL = this._getCurrentBoardURL();
-                let searchURL = Services.io.newURI(boardURL.spec + '?query=' + encodeURIComponent(query), null, null);
+                let params = new URL(boardURL.spec).searchParams;
+
+                params.set('query', query);
+
+                let searchURL = Services.io.newURI(boardURL.spec + '?' + params, null, null);
 
                 this.ChaikaCore.browser.openBoard(searchURL, aAddTab);
             ]]></body>

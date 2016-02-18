@@ -17,6 +17,8 @@ function ChaikaService(){
 ChaikaService.prototype = {
 
     _startup: function ChaikaService__startup(){
+        Components.utils.import("resource://chaika-modules/utils/Logger.js");
+
         Components.utils.import("resource://chaika-modules/ChaikaCore.js");
         ChaikaCore._startup();
 
@@ -41,9 +43,20 @@ ChaikaService.prototype = {
         Components.utils.import("resource://chaika-modules/ChaikaContentReplacer.js");
         ChaikaContentReplacer._startup();
 
+        Components.utils.import('resource://chaika-modules/ChaikaBBSMenu.js');
+        ChaikaBBSMenu._startup();
+
         Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
         Components.utils.import("resource://chaika-modules/ChaikaThread.js");
 
+        let mm = Cc['@mozilla.org/globalmessagemanager;1']
+                    .getService(Ci.nsIFrameScriptLoader);
+        let ppmm = Cc["@mozilla.org/parentprocessmessagemanager;1"]
+                    .getService(Ci.nsIProcessScriptLoader);
+
+        ppmm.loadProcessScript('chrome://chaika/content/browser/redirector.js', true);
+        ppmm.loadProcessScript('chrome://chaika/content/browser/protocol-handler.js', true);
+        mm.loadFrameScript('chrome://chaika/content/browser/thread-agent.js', true);
 
         var scope = {};
         Components.utils.import("resource://gre/modules/AddonManager.jsm", scope);
@@ -61,7 +74,9 @@ ChaikaService.prototype = {
         ChaikaAboneManager._quit();
         ChaikaHttpController._quit();
         ChaikaServer._quit();
+        ChaikaBBSMenu._quit();
         ChaikaCore._quit();
+        Logger.uninit();
     },
 
 
