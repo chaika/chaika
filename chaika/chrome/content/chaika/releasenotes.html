@@ -168,6 +168,85 @@
 </section>
 
 <section>
+  <h2>1.8.1 - 2016/2/18</h2>
+
+  <ul>
+    <li class="new">
+      デフォルトスキンにおいてポップアップの表示を改善しました
+      (<a href="https://github.com/chaika/chaika/commit/a522d03634fa9d1ac15229489921077dd83d291b">a522d03</a>,
+      <a href="https://github.com/chaika/chaika/commit/483ef2fcb8bdcb916e258d20db3f891616fd212e">483ef2f</a>,
+      <a href="https://github.com/chaika/chaika/commit/b7a09d0ba538e7cae46620f7677f06b4f23850d2">b7a09d0</a>,
+      <a href="https://github.com/chaika/chaika/commit/c2d16a6dec53bb6a9348454781a185a54b696f58">c2d16a6</a>,
+      <a href="https://github.com/chaika/chaika/commit/c418057994f356f3fb5fde0ef9485703a501b076">c418057</a>,
+      <a href="https://github.com/chaika/chaika/commit/55748ee3d6a7957fddfb98ec974479a61d4ea98a">55748ee</a>,
+      <a href="https://github.com/chaika/chaika/commit/d7c8f4bc6e91e6d339418f6d5757857791d77df4">d7c8f4b</a>)
+      <aside class="info">
+        <p>
+          画像ポップアップの大きさを設定から変更できるようになりました．
+        </p>
+      </aside>
+    </li>
+    <li class="new">
+      デフォルトスキンにおいて AA の表示を改善しました
+      (<a href="https://github.com/chaika/chaika/commit/1644080c0d09531cf8dce64ea6c0c36fbd19161e">1644080</a>,
+      <a href="https://github.com/chaika/chaika/commit/4af6f175a1015a2f35f2ee46ac22c104e26b4b19">4af6f17</a>)
+    </li>
+    <li class="fixed">
+      ログマネージャのカラム幅が記憶されなくなっていた問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/bc60a3ca24cdb72c9c80e734e214f5764e8218bb">bc60a3c</a>)
+    </li>
+    <li class="fixed">
+      ログマネージャで正しい板名が表示されないことがある問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/fabe4b8bbf803f62e333caa65505e8abf9ea7188">fabe4b8</a>)
+    </li>
+    <li class="fixed">
+      スレッドリダイレクタが誤爆することがある問題を修正しました
+        (<a href="https://github.com/chaika/chaika/commit/1070c60d32197550e38cc9aeccbec8cba6f713c5">1070c60</a>,
+        <a href="https://github.com/chaika/chaika/commit/acfca486b7cf7fab26840347f63599255c054ea5">acfca48</a>,
+        <a href="https://github.com/chaika/chaika/commit/4788b2cd916a243169f3d5b06557e96ce821f07d">4788b2c</a>)
+    </li>
+    <li class="fixed">
+      スレッド URL がスレッド ID で終わっている場合に「スレッド一覧を開く」が動作しない問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/50fa074501cc97597c85c3a5cdb20f730a4133c5">50fa074</a>)
+    </li>
+    <li class="fixed">
+      設定の「外部板・BBSMENU取得元を追加する」が動作しない問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/f2530dfc75426270ca7aa8ee04d642a6394df67b">f2530df</a>)
+    </li>
+    <li class="fixed">
+      スレ一覧上部の板名表示が一部の2ch実況板では「実況せんかいｺﾞﾙｧ！」となる問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/8de86e317599c52f74bee6c707c9d6f29a1203a7">8de86e3</a>)
+    </li>
+    <li class="fixed">
+      ブラウザ表示からchaika表示へ切り替えたとき chaika_force_browser=1 が残る場合がある問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/186d6acf93d663db48165675c36647008fd35a3f">186d6ac</a>)
+    </li>
+    <li class="fixed">
+      書き込みプレビューにおいてトリップキーが正しく表示されないことがある問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/d03b04e9d16d37f5992a6a231160fbb88b176b56">d03b04e</a>)
+    </li>
+    <li class="fixed">
+      板・スレ一覧のフォントサイズを変更したとき即座に反映されない場合がある問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/40aad8e6d21abde2cca8f0ca32c35ad28f69586a">40aad8e</a>)
+    </li>
+    <li class="fixed">
+      スレ一覧を開いたときにリスト部分にフォーカスが当たらなくなっていた問題を修正しました
+      (<a href="https://github.com/chaika/chaika/commit/3da49d6c332697ff71f771b95b9e89a8e5c628e6">3da49d6</a>)
+    </li>
+    <li class="fixed">
+      非標準コードの削除を進めました
+        (<a href="https://github.com/chaika/chaika/commit/c7bc8c70859b5331cee057e5fec115151614ff26">c7bc87c</a>,
+        <a href="https://github.com/chaika/chaika/commit/483bcb09e35798731e4cd5f0d366c251ffff2379">483bcb0</a>,
+        <a href="https://github.com/chaika/chaika/commit/a4590709fc982e5a216256a49eedb5f204b50519">a459070</a>,
+        <a href="https://github.com/chaika/chaika/commit/8e928ddaf3b6a328c0efc87e6a9a9e3add8f492b">8e928dd</a>,
+        <a href="https://github.com/chaika/chaika/commit/254eb21bab96d37881fb442c72dd444df1f5c19d">254eb21</a>,
+        <a href="https://github.com/chaika/chaika/commit/6717f097f4d2b9826241bb04f5887056efafacba">6717f09</a>)
+    </li>
+  </ul>
+
+</section>
+
+<section>
     <h2>1.8.0 - 2015/11/22</h2>
 
     <section>
