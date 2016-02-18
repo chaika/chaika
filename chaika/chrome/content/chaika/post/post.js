@@ -325,12 +325,12 @@ Post.prototype = {
                 var additionalData = [];
                 var ignoreInputs = ["submit", "subject", "bbs", "key", "time", "MESSAGE", "FROM", "mail"];
 
-                for(let [i, input] in Iterator(inputNodes)){
-                    if(input.type != "hidden") continue;
-                    if(ignoreInputs.indexOf(input.name) != -1) continue;
+                Array.from(inputNodes).forEach((input) => {
+                  if (input.type !== 'hidden') return;
+                  if (ignoreInputs.indexOf(input.name) !== -1) return;
 
-                    additionalData.push(input.name + "=" + input.value);
-                }
+                  additionalData.push(`${input.name}=${input.value}`);
+                });
 
                 this._listener.onCookieCheck(this, responseData, postStatus);
                 this.submit(this._listener, additionalData);
