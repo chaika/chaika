@@ -259,7 +259,7 @@ var BoardTree = {
     initTree: function BoardTree_initTree(aNoFocus){
         this.tree = document.getElementById("boardTree");
 
-        this.changeTreeSize();
+        this.tree.classList.add('tree-text-' + ChaikaCore.pref.getChar("board.tree_size"));
         setPageTitle();
 
         if(this.firstInitBoardTree){
