@@ -39,7 +39,7 @@ var Trip = {
 
     getSHA1Trip: function Trip_getSHA1Trip(aTripKey){
         var tripKey = aTripKey.substring(1);
-        var data = Array.map(tripKey, function(aElement, aIndex, aArray){
+        var data = Array.from(tripKey, function(aElement, aIndex, aArray){
             return aElement.charCodeAt(0);
         });
 
@@ -71,7 +71,7 @@ var Trip = {
 
         var tripKey = aTripKey.substring(1);
         var salt = (tripKey + "H.").substring(1,3).replace(/[^\.-z]/g, ".");
-        salt = Array.map(salt, function(aElement, aIndex, aArray){
+        salt = Array.from(salt, function(aElement, aIndex, aArray){
             var i = REPLACE_CHAR_LIST.indexOf(aElement);
             if(i != -1) return REPLACE_CHAR_RESULT_LIST[i];
             return aElement;

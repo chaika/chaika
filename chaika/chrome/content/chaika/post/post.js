@@ -157,19 +157,18 @@ Post.prototype = {
         preview["vlinkColor"] = getSetting("BBS_VLINK_COLOR");
 
 
-        var name = ChaikaCore.io.escapeHTML(this.name || getSetting("BBS_NONAME_NAME") || "");
-        name = name.replace(/◆/g, "◇");
-
+        var name = this.name || getSetting("BBS_NONAME_NAME") || "";
 
         // トリップ変換
-        var tripPos = name.indexOf("#");
+        var nameKey = name.match(/^(.*?)(#.*)?$/);
+        var tripKey = nameKey[2];
+        name = ChaikaCore.io.escapeHTML(nameKey[1]).replace(/◆/g, "◇");
 
-        if(tripPos !== -1){
-            let tripKey = name.substring(tripPos);
+        if(tripKey){
             let trip = Trip.getTrip(tripKey);
 
             name = [
-                name.substring(0, tripPos),
+                name,
                 " <span class='resSystem'>",
                 "◆",
                 trip,
@@ -187,10 +186,9 @@ Post.prototype = {
     writeKakikomi: function Post_writeKakikomi(aNewThread){
         var url = aNewThread ? this._board.url.spec :
                                this._thread.plainURL.spec;
-        var nowDate = new Date();
-        var week = "日月火水木金土";
-        var date = nowDate.toLocaleFormat("%Y/%m/%d($WEEK$) %H:%M:%S")
-                .replace("$WEEK$", week[nowDate.getDay()]);
+        var options = { year: 'numeric', month: '2-digit', day: '2-digit', weekday: 'short',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        var date = new Date().toLocaleString('ja-JP', options);
 
         var kakikomi = [];
         kakikomi.push("--------------------------------------------");
@@ -327,12 +325,12 @@ Post.prototype = {
                 var additionalData = [];
                 var ignoreInputs = ["submit", "subject", "bbs", "key", "time", "MESSAGE", "FROM", "mail"];
 
-                for(let [i, input] in Iterator(inputNodes)){
-                    if(input.type != "hidden") continue;
-                    if(ignoreInputs.indexOf(input.name) != -1) continue;
+                Array.from(inputNodes).forEach((input) => {
+                  if (input.type !== 'hidden') return;
+                  if (ignoreInputs.indexOf(input.name) !== -1) return;
 
-                    additionalData.push(input.name + "=" + input.value);
-                }
+                  additionalData.push(`${input.name}=${input.value}`);
+                });
 
                 this._listener.onCookieCheck(this, responseData, postStatus);
                 this.submit(this._listener, additionalData);
@@ -367,7 +365,7 @@ Post.prototype = {
 
         unicodeConverter.charset = aCharset;
 
-        var result = Array.map(aStr, function(aElement, aIndex, aArray){
+        var result = Array.from(aStr, function(aElement, aIndex, aArray){
             var convertCharsetChar = unicodeConverter.ConvertFromUnicode(aElement);
             var redecodeCharsetChar = unicodeConverter.ConvertToUnicode(convertCharsetChar);
 

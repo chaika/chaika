@@ -310,6 +310,11 @@ nav > ul:hover > li > ul{
     color: var(--in-content-text-color);
 }
 
+.aaRes{
+    display: inline-block !important;
+    white-space: nowrap !important;
+}
+
 
 /* ***** ***** あぼーん レス ***** ***** */
 
@@ -406,8 +411,8 @@ nav > ul:hover > li > ul{
 .popupInner {
     min-width: 18em;
     min-height: 3em;
-    max-height: 25em;
-    max-width: 55em;
+    max-height: 30em;
+    max-width: 60em;
     overflow: auto;
 }
 
@@ -422,15 +427,14 @@ nav > ul:hover > li > ul{
 
 .popupInner > .resContainer {
     padding-left: 2.5em;
-    padding-right: 1em;
+    padding-right: 18px;
 }
 
 .popupInner .resBody{
     padding-bottom: 5px;
 }
 
-.popupInner > .aaRes{
-    display: inline-block !important;
+.popupInner .aaRes{
     white-space: pre !important;
 }
 
@@ -444,8 +448,8 @@ nav > ul:hover > li > ul{
     max-width: none;
 }
 
-.small {
-    width: 200px;
+.ImagePopup img{
+    vertical-align: bottom;
 }
 
 .error > img {

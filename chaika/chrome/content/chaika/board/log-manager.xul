@@ -70,13 +70,13 @@
         <treecols>
             <treecol id="threadTree-title" sort="?title" label="スレッドタイトル" flex="1" ignoreincolumnpicker="true" />
             <splitter class="tree-splitter"/>
-            <treecol id="threadTree-read" sort="?readSort" label="既読" />
+            <treecol id="threadTree-read" sort="?readSort" label="既読" style="width:4.5em;" />
             <splitter class="tree-splitter"/>
-            <treecol id="threadTree-force" sort="?forceSort" label="勢い" hidden="true" />
+            <treecol id="threadTree-force" sort="?forceSort" label="勢い" style="width:4.5em;" hidden="true" />
             <splitter class="tree-splitter"/>
-            <treecol id="threadTree-created" sort="?datID" label="作成日" hidden="true" />
+            <treecol id="threadTree-created" sort="?datID" label="作成日" style="width:9em;" hidden="true" />
             <splitter class="tree-splitter"/>
-            <treecol id="threadTree-board" sort="?boardTitle" label="板" />
+            <treecol id="threadTree-board" sort="?boardTitle" label="板" style="width:8em;" />
         </treecols>
 
         <template>

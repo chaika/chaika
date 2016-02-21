@@ -5,6 +5,8 @@ Components.utils.import('resource://gre/modules/Services.jsm');
 Components.utils.import("resource://chaika-modules/ChaikaCore.js");
 Components.utils.import("resource://chaika-modules/ChaikaBoard.js");
 Components.utils.import("resource://chaika-modules/ChaikaThread.js");
+Components.utils.import("resource://chaika-modules/ChaikaBBSMenu.js");
+Components.utils.import("resource://chaika-modules/utils/URLUtils.js");
 
 
 const Ci = Components.interfaces;
@@ -26,11 +28,11 @@ function startup(){
     gLogManagerReloaded = true;
 
     ThreadUpdateObserver.startup();
-    setTimeout(function(){ delayStartup(); }, 0);
-}
 
-function delayStartup(){
-    BoardTree.initTree();
+    ChaikaBBSMenu.getXML()
+        .then((xml) => BBSData.init(xml))
+        .catch((ex) => ChaikaCore.logger.error(ex))
+        .then(() => BoardTree.initTree());
 }
 
 
@@ -89,6 +91,30 @@ function delayVacuum(){
 
 
 
+var BBSData = {
+
+    _bbsData: {},
+
+    init: function BBSData_init(aXml){
+        Array.from(aXml.getElementsByTagName("board")).forEach((node) => {
+            let title = node.getAttribute("title");
+            let url = node.getAttribute("url");
+            if(URLUtils.isBBS(url)){
+                let id = ChaikaBoard.getBoardID(Services.io.newURI(url, null, null));
+                this._bbsData[id] = { title: title, url: url };
+            }
+        });
+    },
+
+    lookup: function BBSData_lookup(aBoardID){
+        return this._bbsData[aBoardID] || { title: aBoardID, url: "" };
+    }
+
+};
+
+
+
+
 var BoardTree = {
 
     initTree: function BoardTree_initTree(){
@@ -106,13 +132,9 @@ var BoardTree = {
 
         var sql = [
             "SELECT",
-            "    IFNULL(bm.title, td.board_id) AS board_title,",
             "    td.board_id AS board_id,",
-            "    IFNULL(bm.url, '') AS board_url,",
-            "    IFNULL(bm.board_type, 0) AS board_type,",
             "    td.url AS threas_url",
-            "FROM thread_data AS td LEFT OUTER JOIN bbsmenu AS bm",
-            "ON td.board_id=bm.board_id",
+            "FROM thread_data AS td",
             "GROUP BY td.board_id;"
         ].join("\n");
 
@@ -124,12 +146,13 @@ var BoardTree = {
         try{
             while(statement.executeStep()){
                 var boardItem = itemsDoc.createElement("boardItem");
-                boardItem.setAttribute("title", statement.getString(0));
-                boardItem.setAttribute("id",    statement.getString(1));
-                boardItem.setAttribute("url",   statement.getString(2));
-                boardItem.setAttribute("type",  statement.getInt32(3));
+                var board = BBSData.lookup(statement.getString(0));
+                boardItem.setAttribute("title", board.title);
+                boardItem.setAttribute("id",    statement.getString(0));
+                boardItem.setAttribute("url",   board.url);
+                boardItem.setAttribute("type",  "0");
                 if(!boardItem.getAttribute("url")){
-                    var threadURL = ioService.newURI(statement.getString(4), null, null);
+                    var threadURL = ioService.newURI(statement.getString(1), null, null);
                     var boardURL =  ChaikaThread.getBoardURL(threadURL);
                     boardItem.setAttribute("url", boardURL.spec);
                 }
@@ -232,13 +255,10 @@ var ThreadTree = {
                 "    td.line_count AS read,",
                 "    CAST(td.dat_id AS TEXT) AS dat_id,",
                 "    td.board_id AS board_id,",
-                "    IFNULL(bm.board_type, 0) AS board_type,",
-                "    IFNULL(bm.title, td.board_id) AS board_title,",
                 "    td.url,",
                 "    STRFTIME('%Y/%m/%d %H:%M', td.dat_id, 'unixepoch', 'localtime') AS created,",
                 "    td.line_count * 86400 / (strftime('%s','now') - td.dat_id) AS force",
-                "FROM thread_data AS td LEFT OUTER JOIN bbsmenu AS bm",
-                "ON td.board_id=bm.board_id"
+                "FROM thread_data AS td"
             ].join("\n");
         }else{
             sql = [
@@ -247,13 +267,10 @@ var ThreadTree = {
                 "    td.line_count AS read,",
                 "    CAST(td.dat_id AS TEXT) AS dat_id,",
                 "    td.board_id AS board_id,",
-                "    IFNULL(bm.board_type, 0) AS board_type,",
-                "    IFNULL(bm.title, td.board_id) AS board_title,",
                 "    td.url,",
                 "    STRFTIME('%Y/%m/%d %H:%M', td.dat_id, 'unixepoch', 'localtime') AS created,",
                 "    td.line_count * 86400 / (strftime('%s','now') - td.dat_id) AS force",
-                "FROM thread_data AS td LEFT OUTER JOIN bbsmenu AS bm",
-                "ON td.board_id=bm.board_id",
+                "FROM thread_data AS td",
                 "WHERE td.board_id='" + aBoardID + "';"
             ].join("\n");
         }
@@ -265,17 +282,18 @@ var ThreadTree = {
         try{
             while(statement.executeStep()){
                 var threadItem = itemsDoc.createElement("threadItem");
+                var board = BBSData.lookup(statement.getString(3));
                 threadItem.setAttribute("title",      ChaikaCore.io.unescapeHTML(statement.getString(0)));
                 threadItem.setAttribute("read",       statement.getInt32(1));
                 threadItem.setAttribute("readSort",   statement.getInt32(1) + 10000);
                 threadItem.setAttribute("datID",      statement.getString(2));
                 threadItem.setAttribute("boardID",    statement.getString(3));
-                threadItem.setAttribute("type",       statement.getInt32(4));
-                threadItem.setAttribute("boardTitle", statement.getString(5));
-                threadItem.setAttribute("url",        statement.getString(6));
-                threadItem.setAttribute("created",    statement.getString(7));
-                threadItem.setAttribute("force",      statement.getInt32(8));
-                threadItem.setAttribute("forceSort",  statement.getInt32(8) + 10000);
+                threadItem.setAttribute("type",       "0");
+                threadItem.setAttribute("boardTitle", board.title);
+                threadItem.setAttribute("url",        statement.getString(4));
+                threadItem.setAttribute("created",    statement.getString(5));
+                threadItem.setAttribute("force",      statement.getInt32(6));
+                threadItem.setAttribute("forceSort",  statement.getInt32(6) + 10000);
                 itemsDoc.documentElement.appendChild(threadItem);
             }
         }catch(ex){

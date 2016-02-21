@@ -70,7 +70,7 @@ ThreadServerScript.prototype  = {
         if(this.thread){
             this.thread.init(aServerHandler, threadURL, boardURL, type);
         }else{
-            aServerHandler.write("No Supported Boad");
+            aServerHandler.response.write("No Supported Boad");
             aServerHandler.close();
         }
     },
@@ -1390,11 +1390,8 @@ Id2Color.prototype = {
         var cache = (aIsBackground) ? this._bgcache : this._cache;
 
         if(!(aID in cache)){
-            var newint = 0;
-            for each(var s in aID){
-                newint <<= 3;
-                newint |= this._char64To8[s];
-            }
+            var newint = Array.from(aID).reduce((p, c) => (p << 3) | this._char64To8[c], 0);
+
             // hsl(0-360,0-100%,0-100%);
             var h = newint%360;
             newint = Math.floor(newint/360);
