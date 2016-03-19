@@ -142,9 +142,11 @@
          * @param {String} aID 検索エンジンのID
          */
         setSearchEngine: function(aID){
-            this._engine = aID;
-
             let engineNode = this._engineMenu.querySelector('menuitem[value="' + aID + '"]');
+
+            if(!engineNode) return;
+
+            this._engine = aID;
 
             engineNode.setAttribute('checked', 'true');
             this._engineMenu.selectedItem = engineNode;
