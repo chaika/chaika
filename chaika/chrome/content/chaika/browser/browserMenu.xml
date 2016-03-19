@@ -238,16 +238,19 @@
                     return new Promise((resolve, reject) => {
                         // 応答タイムアウト設定
                         let timeoutID = setTimeout(() => {
+                            mm.removeMessageListener('chaika-get-selected-text', listener);
                             clearTimeout(timeoutID);
                             reject(new Error('chaika-get-selected-text is timeout.'));
                         }, 1000);
-                        
+
                         // frameスクリプトからの応答メッセージのlistener
-                        mm.addMessageListener('chaika-get-selected-text', message => {
+                        let listener = message => {
+                            mm.removeMessageListener('chaika-get-selected-text', listener);
                             clearTimeout(timeoutID);
                             resolve(message.data);
-                        });
-                        
+                        };
+                        mm.addMessageListener('chaika-get-selected-text', listener);
+
                         // frameスクリプトへ要求メッセージ送信
                         mm.sendAsyncMessage('chaika-get-selected-text');
                     });
