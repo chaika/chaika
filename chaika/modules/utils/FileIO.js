@@ -71,7 +71,7 @@ this.FileIO = {
                .then((text) => {
                    // If the text contains U+FFFD (REPLACEMENT CHARACTER),
                    // that means the specified encoding was wrong.
-                   if(text.contains('\uFFFD')){
+                   if(text.includes('\uFFFD')){
                        throw new Error('Wrong Encoding');
                    }
 

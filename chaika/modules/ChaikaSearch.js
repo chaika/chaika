@@ -52,7 +52,7 @@ this.ChaikaSearch = {
                 let plugin = this._loadPluginFromURL(url);
 
                 // Migration: remove the old files.
-                if(plugin && plugin.updateURL && plugin.updateURL.contains('%%ChaikaDefaultsDir%%')){
+                if(plugin && plugin.updateURL && plugin.updateURL.includes('%%ChaikaDefaultsDir%%')){
                     file.remove(false);
                     continue;
                 }
