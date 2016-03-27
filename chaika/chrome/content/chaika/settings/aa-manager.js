@@ -342,7 +342,7 @@ AATreeView.prototype = {
     },
 
     canDrop: function(targetIndex, orientation, dataTransfer){
-        if(!dataTransfer.types.contains('text/x-moz-tree-index')) return false;
+        if(!dataTransfer.types.includes('text/x-moz-tree-index')) return false;
 
         let sourceIndex = this.selectedIndex;
 
