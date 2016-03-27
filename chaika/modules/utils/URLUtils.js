@@ -87,6 +87,7 @@ let excludes = {
         /^https?:\/\/api\.2ch\.net\//,          // 2ch API entry point
         /^https?:\/\/be\.2ch\.net\//,           // 2ch Be 2.0
         /^https?:\/\/stats\.2ch\.net\//,        // 2ch Hot Threads
+        /^https?:\/\/stat\.2ch\.net\//,         // 2ch Hot Threads
         /^https?:\/\/c\.2ch\.net\//,            // Mobile-version 2ch.net
         /^https?:\/\/itest\.2ch\.net\//,        // Smartphone-version 2ch.net
         /^https?:\/\/i\.2ch\.net\//,            // Smartphone-version 2ch.net
