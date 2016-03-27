@@ -1,17 +1,17 @@
 # chaika
 
-## :warning: 重要なお知らせ
-chaika は e10s には対応しますが， WebExtensions に対応する予定はありません．
-詳しくは，以下の記事をお読みください．
+2ちゃんねるなどの掲示板閲覧をより快適にするアドオンです。
+他の専用ブラウザに引けを取らないだけでなく、Firefox と連携した多様な機能を提供します。
 
-- [bbs2chreader/chaika 避難所 ★3 (レス432番)](http://jbbs.shitaraba.net/bbs/read.cgi/computer/44179/1435322223/432)
-- [chaikaの開発を無期限停止します - 徒然技術日記](http://nodaguti.hatenablog.com/entry/2015/09/13/222613)
-- [bbs2chreader/chaika Part49 (レス568番)](http://potato.2ch.net/test/read.cgi/software/1434991857/568)
 
 ----
 
-2ちゃんねるなどの掲示板閲覧をより快適にするアドオンです。
-他の専用ブラウザに引けを取らないだけでなく、Firefox と連携した多様な機能を提供します。
+### :warning: :warning: :warning:
+chaika は e10s には対応しますが， WebExtensions に対応する予定はありません．
+
+詳しくは，[重要なお知らせ](./NOTICE.md) をご覧ください．
+
+----
 
 ## Install
 
