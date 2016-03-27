@@ -10,16 +10,6 @@ Components.utils.import('resource://chaika-modules/utils/Browser.js');
 const { interfaces: Ci, classes: Cc, results: Cr, utils: Cu } = Components;
 
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 this.ChaikaAboneManager = {
 
     /** あぼーんの種類を表す定数 */

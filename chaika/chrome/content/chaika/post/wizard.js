@@ -43,16 +43,6 @@ var gPost   = null;
 var gWizType = WIZ_TYPE_RES;
 
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 function startup(){
     gWizard = document.documentElement;
     gWizard.canRewind = false;

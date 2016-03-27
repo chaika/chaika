@@ -95,16 +95,6 @@ const SQL_BOARD_DATA = [
     ].join("\n");
 
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 /** @ignore */
 function makeException(aResult){
     var stack = Components.stack.caller.caller;

@@ -10,16 +10,6 @@ let { URLUtils } = Cu.import('resource://chaika-modules/utils/URLUtils.js', {});
 
 
 /**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
-/**
  * A bridge between chrome and content on chaika's thread pages.
  */
 let ThreadAgent = {

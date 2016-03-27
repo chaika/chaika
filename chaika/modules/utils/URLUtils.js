@@ -11,16 +11,6 @@ let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 let includes = {
     board: [
         // Here we make sure these rules begin with "/^https?:\/\/"

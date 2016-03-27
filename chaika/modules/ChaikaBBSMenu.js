@@ -6,17 +6,6 @@ Cu.import("resource://chaika-modules/ChaikaCore.js");
 
 this.EXPORTED_SYMBOLS = ["ChaikaBBSMenu"];
 
-
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 this.ChaikaBBSMenu = {
 
     /**
