@@ -9,15 +9,6 @@
 <link rel="stylesheet" href="chrome://global/skin/in-content/common.css" />
 <title>リリースノート [chaika]</title>
 <script>
-    /**
-     * Polyfill for Firefox 39-
-     */
-    if(!String.prototype.includes){
-        String.prototype.includes = function(){'use strict';
-            return String.prototype.indexOf.apply(this, arguments) !== -1;
-        };
-    }
-
     window.addEventListener('DOMContentLoaded', function(){
         if(location.search.includes('updated=1')){
             document.body.classList.add('updated');
@@ -165,6 +156,49 @@
         ご利用ありがとうございます。<br />
         公式サイト等へのリンクはページ下部をご覧ください。
     </p>
+</section>
+
+<section>
+  <h2>1.9.0 - 2016/3/28</h2>
+  <section>
+    <h3>NEWS</h3>
+    <ul>
+      <li class="new">
+        <a href="https://github.com/chaika/chaika/blob/develop/NOTICE.md">改めて今後の方針について解説したページを作成しました</a>ので，ご一読いただければ幸いです．
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>変更</h3>
+    <ul>
+      <li class="changed">
+        Firefox 45 ESR のリリースに伴い，インストールに必要な最低のバージョンが Firefox 45 へ引き上げられました
+        (<a href="https://github.com/chaika/chaika/issues/357">#357</a>,
+        <a href="https://github.com/chaika/chaika/commit/31722c7e2d7abc451548c21b895eb2ace059f0b0">31722c7</a>,
+        <a href="https://github.com/chaika/chaika/commit/2f9f56cc1c67a415e3d266e040fc1c87334f1932">2f9f56c</a>,
+        <a href="https://github.com/chaika/chaika/commit/7beae4cdd734f7dfe4d849778c231cfc665d48a8">7beae4c</a>)
+      </li>
+    </ul>
+  </section>
+  <section>
+    <h3>修正</h3>
+    <ul>
+      <li class="fixed">
+        存在しない検索エンジンがデフォルトとして設定されている場合にサイドバーが利用できなくなる問題を修正しました
+        (<a href="https://github.com/chaika/chaika/commit/abc81ff5270c20dcf550bbb9635c141e229f2669">abc81ff</a>)
+      </li>
+      <li class="fixed">
+        <a href="http://stat.2ch.net/SPARROW">stat.2ch.net/SPARROW/</a> が板と誤認識されていた問題を修正しました
+        (<a href="https://github.com/chaika/chaika/commit/545ca074b5ab918877367317b25bd893f5e16165">545ca07</a>)
+      </li>
+      <li class="fixed">
+        その他，軽微な修正を行いました
+        (<a href="https://github.com/chaika/chaika/commit/dbe2927e9d448b355f4d4b28dd7fc0a76ad1db65">dbe2927</a>,
+        <a href="https://github.com/chaika/chaika/commit/32e5a1f6f7b1c1d1f8159e73450dc4341f30cf20">32e5a1f</a>,
+        <a href="https://github.com/chaika/chaika/commit/e355c0daf7351f5789143bf60e510976204abd74">e355c0d</a>)
+      </li>
+    </ul>
+  </section>
 </section>
 
 <section>

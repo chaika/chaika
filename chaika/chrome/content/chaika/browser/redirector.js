@@ -11,16 +11,6 @@ let { Prefs } = Cu.import('resource://chaika-modules/utils/Prefs.js', {});
 
 
 /**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
-/**
  * Thread Redirector to redirect from normal-view to chaika-view automatically.
  * This module should be initialized from the content process to handle connections made in the content.
  */

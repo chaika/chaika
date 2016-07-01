@@ -11,16 +11,6 @@ let { Range } = Cu.import("resource://chaika-modules/utils/Range.js", {});
 let { ChaikaServer } = Cu.import("resource://chaika-modules/ChaikaServer.js", {});
 
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
-
 let includes = {
     board: [
         // Here we make sure these rules begin with "/^https?:\/\/"
@@ -87,6 +77,7 @@ let excludes = {
         /^https?:\/\/api\.2ch\.net\//,          // 2ch API entry point
         /^https?:\/\/be\.2ch\.net\//,           // 2ch Be 2.0
         /^https?:\/\/stats\.2ch\.net\//,        // 2ch Hot Threads
+        /^https?:\/\/stat\.2ch\.net\//,         // 2ch Hot Threads
         /^https?:\/\/c\.2ch\.net\//,            // Mobile-version 2ch.net
         /^https?:\/\/itest\.2ch\.net\//,        // Smartphone-version 2ch.net
         /^https?:\/\/i\.2ch\.net\//,            // Smartphone-version 2ch.net

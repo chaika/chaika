@@ -2,15 +2,6 @@
 
 'use strict';
 
-/**
- * Polyfill for Firefox 39-
- */
-if(!String.prototype.includes){
-    String.prototype.includes = function(){'use strict';
-        return String.prototype.indexOf.apply(this, arguments) !== -1;
-    };
-}
-
 
 /* *** Utils *** */
 var $ = {
