@@ -1164,7 +1164,9 @@ ChaikaIO.prototype = {
                    .replace(/&quot;/g, '"')
                    .replace(/&#039;/g, "'")
                    .replace(/&amp;/g, '&')
-                   .replace(/&copy;|&#169;/g, this.fromUTF8Octets('©'));
+                   .replace(/&copy;/g, this.fromUTF8Octets('©'))
+                   .replace(/&#(x([0-9a-f]{1,6})|\d{1,7});/ig,
+                        (m, d, x) => String.fromCodePoint(!x ? parseInt(d, 10) : parseInt(x, 16)));
     },
 
 
